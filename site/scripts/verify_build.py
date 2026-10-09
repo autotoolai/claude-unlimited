@@ -114,7 +114,7 @@ def main():
         check(f'{u:16} {st}', st == 200 and is_real, '' if is_real else f'实际标题 {titles[:1]}')
 
     print('\nOG 图（社交分享卡片）')
-    for slug in ['home', 'pricing', 'unlimited', 'faq']:  # 教程页暂不出 OG 图，沿用 home
+    for slug in ['home', 'pricing', 'unlimited', 'faq', 'guide', 'guide_clients', 'guide_models', 'guide_ccswitch']:  # 每页一张
         try:
             st, raw = get(base, f'/og/{slug}.png')
             ok = st == 200 and raw.startswith(b'\x89PNG')
@@ -137,6 +137,9 @@ def main():
     check('CTA 按钮均 target=_blank + rel=noopener sponsored nofollow', all('target="_blank"' in b and 'rel="noopener sponsored nofollow"' in b for b in buttons))
     ctas = [re.findall(r'data-cta="([^"]*)"', b) for b in buttons]
     check('CTA 按钮均带非空 data-cta', all(len(c) == 1 and c[0] for c in ctas), str(ctas))
+    # 导航条右侧 CTA 走 ExternalCta（带 data-cta），页头不再有第二个购买按钮
+    check('导航条购买 CTA 走 ExternalCta', 'data-cta="nav"' in h, '')
+    check('页头不再有第二个购买按钮', 'cu-navcta' not in h, '')
     text_links = re.findall(r'<a(?! class=)[^>]*href="' + re.escape(SHOP_URL) + r'"[^>]*>', h)
     check('正文下单链接同样带 rel', all('rel="noopener sponsored nofollow"' in a for a in text_links), f'{len(text_links)} 处')
 
@@ -183,8 +186,10 @@ def main():
     )
     faq = pages['/faq'].decode('utf-8')
     check(
-        'FAQ 页：33 条 + 7 个分类锚点',
-        len(re.findall('cu-faq__item', faq)) == 33 and len(set(re.findall(r'id="cat-([a-z]+)"', faq))) == 7,
+        'FAQ 页：33 条 + 8 个分类锚点（buying + 7 类）+ summary role=button',
+        len(re.findall('cu-faq__item', faq)) == 33
+        and len(set(re.findall(r'id="(cat-[a-z]+)"', faq))) == 8
+        and faq.count('<summary role="button"') == 33,
         f'faq={len(re.findall("cu-faq__item", faq))} anchors={len(set(re.findall(r"id=.cat-([a-z]+)", faq)))}',
     )
     check('FAQ 页：答案里没有残留 Markdown 语法', not re.search(r'class="cu-faq__para">\s*[-*#`|]', faq))

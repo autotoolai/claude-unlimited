@@ -66,24 +66,13 @@
   letter-spacing: 0.02em;
 }
 
-.cu-navcta {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 0.5rem 1.1rem;
-  border-radius: 999px;
-  background: var(--cu-accent);
-  color: #fff6ec !important;
-  font-weight: 700;
-  font-size: 0.92rem;
-  text-decoration: none;
+.cu-brandbar__note {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--cu-muted);
+  text-align: right;
+  line-height: 1.6;
   white-space: nowrap;
-  transition: background 0.18s ease, transform 0.18s ease;
-}
-
-.cu-navcta:hover {
-  background: var(--cu-accent-deep);
-  transform: translateY(-1px);
 }
 
 /* —— 主导航条 —— */
@@ -118,6 +107,8 @@
   align-items: center;
   flex: 0 0 auto;
   min-height: 44px;
+  /* 扩大点击区到 44px 高（窄屏下同行还有购买 CTA，44px 高会让导航条撑到 88px） */
+  padding-block: 0.5rem;
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--cu-muted);
@@ -141,6 +132,13 @@
   flex: 0 0 auto;
   white-space: nowrap;
   margin-left: auto;
+  min-height: 40px;
+  padding: 0.35rem 1rem;
+  font-size: 0.88rem;
+}
+
+.cu-tabs__cta .cu-btn__price {
+  padding-left: 0.45rem;
 }
 
 /* —— 主体两列 —— */
@@ -218,14 +216,14 @@
   font-size: 1rem;
   line-height: 1.85;
   color: var(--cu-ink-2);
-  max-width: 46rem;
+  max-width: var(--cu-content-w);
 }
 
 .cu-page ul,
 .cu-page ol {
   margin: 0.9rem 0;
   padding-left: 1.25rem;
-  max-width: 46rem;
+  max-width: var(--cu-content-w);
   color: var(--cu-ink-2);
   line-height: 1.85;
 }
@@ -308,6 +306,25 @@
   font-weight: 700;
 }
 
+@media (max-width: 900px) {
+  /* 品牌页头在窄屏只留 logo + 站名，右侧声明让位给 CTA */
+  .cu-brandbar__text small {
+    display: none;
+  }
+  .cu-brandbar__note {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 620px) {
+  .cu-brandbar__note {
+    display: none;
+  }
+  .cu-tabs__link {
+    font-size: 0.9rem;
+  }
+}
+
 @media (max-width: 1100px) {
   .cu-shell__body {
     grid-template-columns: minmax(0, 1fr);
@@ -343,6 +360,14 @@
   }
   .cu-page {
     padding-top: 2rem;
+  }
+}
+
+@media (max-width: 620px) {
+  .cu-brandbar__inner,
+  .cu-tabs__inner,
+  .cu-page {
+    width: min(1160px, 100% - 1.75rem);
   }
 }
 

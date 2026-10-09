@@ -63,15 +63,28 @@ const cards = count(index, /class="cu-card"/g)
 ok(cards >= 6, `/ : 首页卖点卡数 ${cards}，应 >= 6（卖点 6 + 合作平台 3 + 教程 4）`)
 ok(index.includes('partner_'), '/ : 首页缺少合作平台卡片（data-cta=partner_*）')
 ok(count(index, /cu-card--link/g) === 4, `/ : 首页教程卡片应为 4，实际 ${count(index, /cu-card--link/g)}`)
+ok(index.includes('id="get-started"') && index.includes('id="workflow"'), '/ : 首页缺少「开始之前 / 从买到用起来」小节')
+ok(index.includes('cu-brandbar__note'), '/ : 首页页头缺少关联声明（cu-brandbar__note）')
+
+// 导航条右侧 CTA 走 ExternalCta（带 data-cta），页头不再有第二个购买按钮
+for (const [route, file] of Object.entries(PAGES)) {
+  const html = fs.readFileSync(path.join(DIST, `${file}.html`), 'utf8')
+  const nav = html.match(/<nav class="cu-tabs"[\s\S]*?<\/nav>/) || ['']
+  ok(/data-cta="nav"/.test(nav[0]), `${route}: 导航条缺少购买 CTA（ExternalCta data-cta=nav）`)
+  ok(!/cu-navcta/.test(html), `${route}: 页头仍有旧的 cu-navcta 购买按钮（应换成 cu-brandbar__note 声明）`)
+}
 const guideSteps = count(fs.readFileSync(path.join(DIST, 'guide/index.html'), 'utf8'), /cu-step-block__no/g)
 ok(guideSteps === 5, `/guide: 五步总览步骤数 ${guideSteps}，应为 5`)
 
 const faq = fs.readFileSync(path.join(DIST, 'faq.html'), 'utf8')
 const FAQ_COUNT = Number(process.env.CU_FAQ_COUNT || 33)
-const FAQ_CATS = Number(process.env.CU_FAQ_CATS || 7) // cat-* 分类锚点数（页尾「还没解决？」用 id=more，不计入）
+// /faq 顶部「买之前」常开 5 条 + 其余按分类列出：详情条仍是全部 FAQ，分类锚点比分类数多 1（buying）
+const FAQ_CATS = Number(process.env.CU_FAQ_CATS || 8) // cat-* 分类锚点数（buying + 7 个分类；页尾「还没解决？」用 id=more，不计入）
 ok(count(faq, /cu-faq__item/g) === FAQ_COUNT, `/faq: FAQ 条数 ${count(faq, /cu-faq__item/g)}，应为 ${FAQ_COUNT}（config/faq.ts 条数，改 FAQ 后同步这里的默认值）`)
-ok(new Set([...faq.matchAll(/id="cat-([a-z]+)"/g)].map((m) => m[1])).size === FAQ_CATS, `/faq: 分类锚点不是 ${FAQ_CATS} 个`)
+ok(new Set([...faq.matchAll(/id="(cat-[a-z]+)"/g)].map((m) => m[1])).size === FAQ_CATS, `/faq: 分类锚点不是 ${FAQ_CATS} 个`)
 ok(count(faq, /class="cu-faq__item"/g) === FAQ_COUNT, `/faq: 渲染出的 details 条数 ${count(faq, /class="cu-faq__item"/g)}，应为 ${FAQ_COUNT}`)
+ok(count(faq, /<summary role="button"/g) === FAQ_COUNT, `/faq: summary 缺 role=button（屏幕阅读器读不出展开状态），实际 ${count(faq, /<summary role="button"/g)}`)
+ok(count(faq, /aria-expanded="true"/g) >= 5, `/faq: 顶部「买之前」应至少常开 5 条，实际 ${count(faq, /aria-expanded="true"/g)}`)
 
 if (fails.length) {
   console.error('\n[x] 构建产物结构检查未通过:')

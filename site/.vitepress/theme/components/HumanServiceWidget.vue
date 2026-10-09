@@ -1,28 +1,44 @@
 <script setup lang="ts">
 /**
- * 人工客服浮标 + 二维码面板。
+ * 人工客服浮标 + 联系方式面板。
  *
  * 数据全部来自 config/site.ts 的 contact（微信号 / 二维码 / QQ / QQ 群 / 邮箱）与 partners
- * （兑换页地址）。二维码路径留空时面板显示占位，并只保留「复制号码」按钮——晚点补图即可，无需改代码。
- * 组件不硬编码任何联系方式或平台地址。
+ * （兑换页地址）。二维码路径留空时不渲染占位框，改成「先复制微信号」的引导——空占位框会让
+ * 用户以为客服还没准备好。组件不硬编码任何联系方式或平台地址。
  */
 import { computed, ref } from 'vue'
-import { siteConfig, partnerUrl } from '../../../config/site'
+import { siteConfig, partnerUrl, activationReady } from '../../../config/site'
 
 const c = computed(() => siteConfig.contact)
 const open = ref(false)
 const copied = ref('')
 const activation = computed(() => partnerUrl('activation'))
-
 const hasQr = computed(() => !!c.value.wechatQr)
 const hasWechat = computed(() => !!c.value.wechatId)
 const hasQq = computed(() => !!c.value.qq)
-const anyContact = computed(() => hasWechat.value || hasQq.value || !!c.value.qqGroup)
+const hasGroup = computed(() => !!c.value.qqGroup)
+const hasEmail = computed(() => !!c.value.email)
+const anyContact = computed(() => hasWechat.value || hasQq.value || hasGroup.value || hasEmail.value)
 
-function copy(text: string, label: string) {
+/**
+ * 复制：优先用异步剪贴板 API（需要安全上下文 / 权限），失败时退回 execCommand('copy')，
+ * 再失败就选中文本并提示手动复制——不能因为浏览器拒绝剪贴板就把按钮做成死的。
+ */
+async function copy(text: string, label: string) {
   if (!text) return
-  navigator.clipboard?.writeText(text)
-  copied.value = label
+  try {
+    await navigator.clipboard?.writeText(text)
+    copied.value = label
+  } catch {
+    const ta = document.createElement('textarea')
+    ta.value = text
+    ta.style.cssText = 'position:fixed;opacity:0'
+    document.body.appendChild(ta)
+    ta.select()
+    const ok = document.execCommand?.('copy')
+    ta.remove()
+    copied.value = ok ? label : '复制失败，请手动选中'
+  }
   setTimeout(() => (copied.value = ''), 2000)
 }
 </script>
@@ -38,31 +54,31 @@ function copy(text: string, label: string) {
         <button class="cu-human__close" type="button" aria-label="关闭" @click="open = false">×</button>
       </header>
       <div class="cu-human__body">
-        <img v-if="hasQr" class="cu-human__qr" :src="c.wechatQr" alt="客服微信二维码" />
-        <div v-else class="cu-human__qr cu-human__qr--empty">客服微信二维码&#10;（待放置）</div>
+        <p class="cu-human__hint">在线助手答不上来时，直接复制微信号或 QQ 联系我们；报故障请附上账号标识与报错截图。</p>
 
-        <p class="cu-human__name">
-          微信 <span v-if="hasWechat">{{ c.wechatId }}</span>
-          <button v-if="hasWechat" type="button" class="cu-human__copy" @click="copy(c.wechatId, '微信号')">
-            {{ copied === '微信号' ? '已复制' : '复制' }}
+        <img v-if="hasQr" class="cu-human__qr" :src="c.wechatQr" alt="客服微信二维码" />
+
+        <p v-if="hasWechat" class="cu-human__name">
+          微信 <span>{{ c.wechatId }}</span>
+          <button type="button" class="cu-human__copy" @click="copy(c.wechatId, '微信号')">
+            {{ copied === '微信号' ? '已复制' : '复制微信号' }}
           </button>
         </p>
-        <p class="cu-human__hint">扫码添加，或复制微信号搜索添加。报故障时请附上截图与账号标识。</p>
 
         <div class="cu-human__acts">
-          <button v-if="c.qq" type="button" class="cu-btn cu-btn--ghost cu-btn--sm" @click="copy(c.qq, 'QQ')">
-            QQ {{ c.qq }} 复制
+          <button v-if="hasQq" type="button" class="cu-btn cu-btn--ghost cu-btn--sm" @click="copy(c.qq, 'QQ')">
+            {{ copied === 'QQ' ? '已复制' : '复制' }} QQ {{ c.qq }}
           </button>
-          <button v-if="c.qqGroup" type="button" class="cu-btn cu-btn--ghost cu-btn--sm" @click="copy(c.qqGroup, 'QQ 群')">
-            QQ 群 {{ c.qqGroup }}
+          <button v-if="hasGroup" type="button" class="cu-btn cu-btn--ghost cu-btn--sm" @click="copy(c.qqGroup, 'QQ 群')">
+            复制 QQ 群 {{ c.qqGroup }}
           </button>
-          <button v-if="c.email" type="button" class="cu-btn cu-btn--ghost cu-btn--sm" @click="copy(c.email, '邮箱')">
-            邮箱
+          <button v-if="hasEmail" type="button" class="cu-btn cu-btn--ghost cu-btn--sm" @click="copy(c.email, '邮箱')">
+            {{ copied === '邮箱' ? '已复制' : '复制' }}邮箱
           </button>
         </div>
 
         <p v-if="!anyContact" class="cu-human__hint">联系方式配置中。</p>
-        <p v-if="activation" class="cu-human__hint">
+        <p v-if="activationReady() && activation" class="cu-human__hint">
           <a class="cu-human__link" :href="activation" target="_blank" rel="noopener sponsored nofollow">卡密还没兑换？去兑换页 →</a>
         </p>
       </div>

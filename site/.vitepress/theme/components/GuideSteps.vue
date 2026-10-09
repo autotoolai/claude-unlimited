@@ -17,7 +17,7 @@ defineProps<{ steps: GuideStep[]; /** 序号起始（默认 1） */ start?: numb
       <div class="cu-step-block__body">
         <h3>{{ s.title }}</h3>
         <p v-for="(p, j) in s.body" :key="j">{{ p }}</p>
-        <p v-if="s.do" class="cu-step-block__do">{{ s.do }}</p>
+        <p v-if="s.do" class="cu-step-block__do"><span class="cu-step-block__do-label">要做的事</span>{{ s.do }}</p>
         <ul v-if="s.tips?.length" class="cu-step-block__tips">
           <li v-for="(t, j) in s.tips" :key="j">{{ t }}</li>
         </ul>

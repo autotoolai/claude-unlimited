@@ -26,6 +26,11 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
+.cu-faq__q {
+  flex: 1;
+  min-width: 0;
+}
+
 .cu-faq__item > summary::-webkit-details-marker {
   display: none;
 }
@@ -69,6 +74,34 @@
   font-size: 0.94rem;
   color: var(--cu-ink-2);
   line-height: 1.85;
+  max-width: var(--cu-content-w, 44rem);
+}
+
+/* 「展开全部 / 收起全部」：由 FaqList 的 ref 控制显隐（不用 :has()，浏览器支持不齐） */
+.cu-faq__more {
+  margin: 0.5rem 0 0;
+  text-align: center;
+}
+.cu-faq__more button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0.4rem 1.1rem;
+  border: 1px solid var(--cu-line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--cu-ink-2);
+  font-family: var(--cu-sans);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.cu-faq__more button:hover {
+  border-color: var(--cu-accent);
+  color: var(--cu-accent-deep);
+  background: var(--cu-accent-soft);
 }
 
 .cu-faq__para {
@@ -107,11 +140,23 @@
   margin: 0 0 2.5rem;
 }
 
-.cu-faq-cat-block > h2 {
+.cu-faq-cat-block__head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
   margin-top: 2.5rem;
   padding-top: 1rem;
   border-top: 1px solid var(--cu-line);
   scroll-margin-top: calc(var(--cu-nav-h) + 16px);
+}
+
+.cu-faq-cat-block__head > span {
+  font-family: var(--cu-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--cu-muted);
 }
 
 .cu-anchor-nav {
@@ -119,6 +164,12 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin: 0 0 1rem;
+}
+
+/* FAQ 页「买之前」引导语 */
+.cu-more {
+  font-size: 0.92rem;
+  color: var(--cu-muted);
 }
 
 .cu-anchor-nav a {

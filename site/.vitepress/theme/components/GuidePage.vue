@@ -13,23 +13,25 @@ import CompareTable from './CompareTable.vue'
 import CtaBand from './CtaBand.vue'
 import { guidePage, guidePages } from '../../../config/guide'
 import { siteConfig } from '../../../config/site'
-import { jsonLdGuide, modelIdRows } from '../pages/data'
+import { guideNavItems, jsonLdGuide, modelIdRows } from '../pages/data'
 
 const props = defineProps<{ slug: string }>()
 
 /** 目录 slug：/guide/clients → guide_clients，与 SECTION_NAV 的键一一对应 */
 const navKey = computed(() => props.slug.replace(/\//g, '_'))
 const page = computed(() => guidePage(props.slug))
-const others = computed(() => guidePages.filter((p) => p.slug !== props.slug))
+/** 顶部互链与页尾「接着看」共用 guideNavItems（已按 order 升序），保证各页顺序一致 */
+const others = computed(() => guideNavItems.filter((g) => g.url !== props.slug))
+const next = computed(() => page.value.next.map((n) => ({ ...n, desc: others.value.find((g) => g.url === n.url)?.desc ?? '' })))
 const guideJsonLd = computed(() => jsonLdGuide(page.value))
 </script>
 
 <template>
   <JsonLd id="cu-jsonld-guide" :json="guideJsonLd" />
 
-  <PageShell :slug="navKey" :title="page.title" :lead="page.lead">
+  <PageShell :slug="navKey" :title="page.title" :lead="page.lead" :eyebrow="page.eyebrow">
     <nav class="cu-anchor-nav" aria-label="教程目录">
-      <a v-for="p in others" :key="p.slug" :href="p.slug">{{ p.nav }}</a>
+      <a v-for="p in others" :key="p.url" :href="p.url">{{ p.nav }}</a>
     </nav>
 
     <template v-for="b in page.blocks" :key="b.id">
@@ -60,11 +62,11 @@ const guideJsonLd = computed(() => jsonLdGuide(page.value))
       </ul>
     </template>
 
-
     <nav class="cu-next" aria-label="接着看">
-      <a v-for="n in page.next" :key="n.url" :href="n.url">
+      <a v-for="n in next" :key="n.url" :href="n.url">
         <small>接着看</small>
         <strong>{{ n.text }}</strong>
+        <span>{{ n.desc }}</span>
       </a>
     </nav>
 

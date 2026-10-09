@@ -4,14 +4,17 @@
  * 约定：
  * - 所有平台地址（购买、兑换、CC Switch 下载）只在 partners 里出现，组件内禁止硬编码。
  * - 商品购买按钮的 URL 从 products[].shopUrl 取（= partners.purchase.url）。
- * - 客服浮标二维码、微信号、QQ、QQ 群从 contact 取；字段留空时组件自动降级为「复制号码」。
- * - 改价格 / 名称 / 周期只改本文件一处。
+ * - 客服浮标二维码、微信号、QQ、QQ 群从 contact 取；二维码留空时组件自动降级为「复制微信号」。
+ * - 改价格 / 名称 / 周期只改本文件一处；周期天数 days 与首屏承诺 promise 也在这里，页面不另写。
  *
  * TODO（上线前必须替换，见 README「上线前必须确认」）：
  * - R1 正式主域名 url
  * - R2 商品名称 / 价格 / 周期的最终文案
  * - R3 客服微信号 / 微信二维码 / QQ / QQ 群 / 邮箱
  * - R4 运营主体与 ICP 备案号
+ *
+ * 文案约定：页面上任何「N 天」「分钟级」表述都从 products[].days / products[].promise 派生，
+ * 不在组件或 config/faq.ts 里再写一遍；改价格或周期只改本文件。
  */
 
 export interface Partner {
@@ -28,8 +31,14 @@ export interface Partner {
 export interface Product {
   id: string
   name: string
+  /** 展示价，带 ¥ 前缀（JSON-LD 的 price 由它去掉非数字字符得到） */
   price: string
+  /** 展示周期，如「30 天」 */
   period: string
+  /** 周期天数：页面上所有「N 天」表述都从这里派生，避免散落各处的硬编码 */
+  days: number
+  /** 首屏承诺语（描述性，不写具体分钟数）；正文、按钮下提示、OG 图统一用它 */
+  promise: string
   /** 购买落地页（第三方发卡站） */
   shopUrl: string
   features: string[]
@@ -69,6 +78,10 @@ export interface SiteConfig {
   legal: { icp?: string; company?: string }
   /** 页脚固定声明 */
   disclaimer: string
+  /** 免责声明的前半句（关联声明），后半句从 disclaimer 里拆不动，保持原样 */
+  shortDisclaimer: string
+  /** 全站提示语（Hero 按钮下方、公告位） */
+  notice: string
 }
 
 export const siteConfig: SiteConfig = {
@@ -89,6 +102,8 @@ export const siteConfig: SiteConfig = {
       id: 'activation',
       name: '卡密兑换与 API Key',
       desc: '输入买到的卡密兑换额度，并在同一页查看网关地址（Base URL）与 API Key；页面里还有「一键导入配置」按钮，能直接导入 CC Switch。',
+      // TODO R5：卡密兑换页地址（Base URL + API Key 获取页）。拿到后填这里，首页卡片、教程第 1/3 步、
+      // 人工客服面板会自动跟随；留空时这三处显示「兑换入口即将开放」，不会出现点不动的按钮。
       url: '',
     },
     {
@@ -109,11 +124,14 @@ export const siteConfig: SiteConfig = {
     { text: '关于我们', link: '/about', enabled: false },
   ],
 
+  /**
+   * 首屏数据条。动态项（从买到接入）由 pages/data.ts 从商品 days / promise 派生，
+   * 这里只放稳定的数字，避免促销语改动时要改两处。
+   */
   stats: [
     { value: '10+', label: '主流客户端开箱即用' },
     { value: '0', label: '按 token 计费' },
     { value: '200k', label: '单次上下文上限' },
-    { value: '5 分钟', label: '从买到接入' },
   ],
 
   products: [
@@ -122,13 +140,15 @@ export const siteConfig: SiteConfig = {
       name: 'Claude 无限卡',
       price: '¥298',
       period: '30 天',
+      days: 30,
+      promise: '买完即用，分钟级跑起第一请求',
       shopUrl: 'https://catfk.com/shop/2Z0CEP7C',
       highlighted: true,
       features: [
         '订阅期内不按 token 计费，Opus / Sonnet / Fable 通用',
         '一个 Key 通吃 Claude Code、Cursor、Cline、Aider 等主流工具',
         '支持流式输出、工具调用、扩展思考、视觉输入、长上下文',
-        '买完即用，不排队、不审核，5 分钟内跑起第一请求',
+        '买完即用，不排队、不审核，分钟级拿到卡密并激活',
       ],
     },
   ],
@@ -151,6 +171,8 @@ export const siteConfig: SiteConfig = {
 
   disclaimer:
     '本站为第三方 API 网关服务，与 Anthropic 无隶属关系、未获其背书。Claude 与 Anthropic 为 Anthropic, Inc. 的商标。本站不处理支付与账号，商品信息与最终价格以下单页为准。',
+  shortDisclaimer: '第三方 API 网关 · 与 Anthropic 无隶属关系',
+  notice: '支付后分钟级自动发货卡密，不排队、不人工审核。最终价格与库存以下单页为准。',
 }
 
 /** 取当前主推商品；组件用它渲染购买按钮 */
@@ -172,6 +194,14 @@ export function partnerUrl(id: Partner['id']): string {
 
 export function partner(id: Partner['id']): Partner {
   return siteConfig.partners.find((p) => p.id === id) ?? { id, name: '', desc: '', url: '' }
+}
+
+/**
+ * 兑换页（id='activation'）是否已就绪。首页合作平台卡、教程第 1/3 步、人工客服面板都用它：
+ * 地址为空时显示「兑换入口即将开放」而不是一个点不动的按钮。
+ */
+export function activationReady(): boolean {
+  return !!partnerUrl('activation')
 }
 
 /** 已启用的导航项；TabBar 在此基础上补一个「首页」 */

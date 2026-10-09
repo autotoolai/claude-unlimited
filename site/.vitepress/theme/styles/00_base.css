@@ -35,7 +35,12 @@
   --cu-mono: ui-monospace, 'Cascadia Code', Consolas, 'SF Mono', Menlo, monospace;
 }
 
-.dark {
+/*
+ * 深色色板。html.dark 由 Layout.vue 依据 VitePress 的 isDark 写入（跟随系统偏好），
+ * prefers-color-scheme 那条让「系统为深色但还没挂载 JS」的 SSR 首帧也是深色，避免白闪。
+ */
+.dark,
+html:not(.light):has(.dark) {
   --cu-accent: #e08a5f;
   --cu-accent-deep: #f0a97f;
   --cu-ink: #ede6d6;
@@ -52,6 +57,32 @@
   --cu-shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.35);
   --cu-brandbar-bg: color-mix(in srgb, var(--cu-card) 82%, transparent);
   --cu-figure-frame: rgba(237, 230, 214, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not(.light) {
+    --cu-accent: #e08a5f;
+    --cu-accent-deep: #f0a97f;
+    --cu-ink: #ede6d6;
+    --cu-ink-2: #c9c1b1;
+    --cu-muted: #a49a89;
+    --cu-bg: #17150f;
+    --cu-card: #211e16;
+    --cu-line: rgba(237, 230, 214, 0.12);
+    --cu-line-strong: rgba(237, 230, 214, 0.28);
+    --cu-accent-soft: rgba(224, 138, 95, 0.12);
+    --cu-code-bg: #262219;
+    --cu-hero-line: rgba(237, 230, 214, 0.08);
+    --cu-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+    --cu-shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.35);
+    --cu-brandbar-bg: color-mix(in srgb, var(--cu-card) 82%, transparent);
+    --cu-figure-frame: rgba(237, 230, 214, 0.2);
+  }
+}
+
+/* 正文可读宽度：约 70 个中文字符。卡片、表格、图示用满栏，只有段落与列表限宽。 */
+.cu-page {
+  --cu-content-w: 44rem;
 }
 
 /* 小节标题前的上款短线：替代巨大字号差做层级 */

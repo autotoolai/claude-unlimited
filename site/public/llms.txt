@@ -20,10 +20,12 @@
 - 支持工具：Claude Code、Cursor、Cline、Roo Code、Aider、Continue、Zed、JetBrains、VS Code 官方插件、官方 SDK
 - 接口：Anthropic 兼容端点 + OpenAI 兼容端点（/v1/chat/completions）
 - 上下文：标准 200k token
+- 退款：购买后 7 个自然日内，仅限卡密未激活、兑换后连续不可用超 24 小时、实际能力与描述明显不符三种情形
 - 公平使用：单 Key 并发默认 20、请求速率默认 60 次/分钟、Token 吞吐默认 300k token/分钟
 - 购买：第三方发卡站 catfk.com，本站不处理支付
 - 配置工具：CC Switch（ccswitch.io），支持一键导入与链路检测
-- 人工客服：微信 bn23923 / QQ 1351315（见站点右下角「人工客服」入口）
+- 人工客服：微信 bn23923 / QQ 1351315（见站点右下角「人工客服」入口，可一键复制）
+- 接入与购买流程：首页「从买到用起来」四步；教程「五步总览」含兑换卡密、安装 CC Switch、一键导入、获取模型列表、启用与检测链路
 
 ## 声明
 

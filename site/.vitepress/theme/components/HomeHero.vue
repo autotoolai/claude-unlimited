@@ -18,7 +18,7 @@ import { siteConfig } from '../../../config/site'
           <ExternalCta label="立即购买" variant="primary" size="lg" cta="hero_primary" />
           <a class="cu-btn cu-btn--ghost cu-btn--md" href="/unlimited">了解无限额度</a>
         </div>
-        <p class="cu-hint">买完即用，不排队不审核，5 分钟内跑起第一请求。最终价格以下单页为准。</p>
+        <p class="cu-hint">{{ siteConfig.notice }}</p>
       </div>
       <div class="cu-hero__art">
         <svg viewBox="0 0 440 330" role="img" aria-label="一个 Key 通吃多个客户端的示意图">

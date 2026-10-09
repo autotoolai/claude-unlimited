@@ -13,10 +13,31 @@ Claude 无限卡的展示型官网：介绍商品与接入方式，把购买导�
 | 部署 | Cloudflare Pages **直接上传模式**（本机构建后 `wrangler pages deploy` 推 dist，不绑 Git；托管方式抽象在 `scripts/deploy_claude_unlimited_site.ps1`，可切 Workers Static Assets） |
 | 图床 | 二期接 Cloudflare R2；`imgCdn` 留空时回落打包资源 |
 
+## 用户体验改动记录（2026-10-09 第二轮）
+
+面向真实用户视角（桌面 1440 / 平板 768 / 手机 390 三档视口走查）做的结构性调整：
+
+- **购买入口收敛**：页头原来的第二个「立即购买」删掉，导航条右侧改用 `ExternalCta`（带价格、`data-cta="nav"`）；
+  首页按钮换文案（「看套餐 ¥298」→「立即购买」）避免同页两个同义按钮。购买 URL 仍是 `products[].shopUrl` 一个来源，
+  FAQ 里的下单链接改成 `partnerUrl('purchase')`。
+- **FAQ 分层**：`FaqList` 新增 `defaultOpen`（默认 0，收起）与「展开全部 / 收起全部」按钮（ref 控制，不用 `:has()`）；
+  `/faq` 顶部新增「买之前，先看这五个问题」常开区块，其余按分类折叠；分类顺序改为购买 → 商品 → 限速 → 配置 → 接入 → 安全 → 我们
+  （`pages/data.ts` 的 `faqGroupOrder`）。`summary` 加 `role="button"` + `aria-expanded`。
+- **首页重排**：小节改为 为什么 → 开始之前 → 从买到用起来（四步）→ 套餐 → 对比 → 平台 → 教程 → FAQ，
+  与 `components/sections.ts` 的 `SECTION_NAV.index` 一一对应（`check_dist.mjs` 逐页断言）。
+- **信任与文案**：页头加「第三方 API 网关 · 与 Anthropic 无隶属关系」；工程口吻（「在 config/site.ts 里改」）从正文移除；
+  「5 分钟内跑起」等承诺改为「分钟级」，周期天数 `days` / 承诺 `promise` 统一从 `products[]` 派生。
+- **可读性**：正文限宽 44rem；900px 以下卖点卡两列；620px 以下品牌页头只留 logo；
+- **深色模式**：CSS 加 `@media (prefers-color-scheme: dark)`，跟随系统（此前只在 JS 挂载后生效）。
+- **分享卡片**：教程四页各出一张 OG 图（`scripts/gen_og.py` 补 4 页），FAQ 页角标改成 33 条。
+- **客服**：二维码为空时不再渲染占位框，改成「复制微信号」为主；复制按钮加了 `execCommand` 兜底。
+
+未决：`config/site.ts` 里 `partners.activation.url`（卡密兑换页）仍为空，三处显示「兑换入口即将开放」。
+
 ## 目录
 
 ```
-config/site.ts     站点元信息 + 商品 + 合作平台地址（purchase / activation / ccswitch）+ 客服联系方式（全站唯一数据源）
+config/site.ts     站点元信息 + 商品（价格 / 周期天数 days / 承诺 promise）+ 合作平台地址（purchase / activation / ccswitch）+ 客服联系方式（全站唯一数据源）
 config/faq.ts      FAQ 唯一数据源（页面 + 助手 + JSON-LD 共用；7 个分类，使用与配置分类来自卖家教程站）
 config/models.ts   模型层级与 model ID 表（/unlimited、/guide/models、FAQ 共用）
 config/guide.ts    使用教程四页的内容数据（唯一编辑入口；改教程只改这里）

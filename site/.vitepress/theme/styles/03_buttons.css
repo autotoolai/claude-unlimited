@@ -91,7 +91,8 @@
 }
 
 @media (max-width: 560px) {
-  .cu-cta-row .cu-btn {
+  /* 居中排列的 CTA 行（底部横条）按钮保持自身宽度并排，全宽会显得松散 */
+  .cu-cta-row:not(.cu-cta-row--center) .cu-btn {
     width: 100%;
   }
 }

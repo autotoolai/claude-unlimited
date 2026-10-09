@@ -76,12 +76,12 @@ const limitsFaq = faqByCategory('limits')
     <ul>
       <li>本站不处理支付，下单在第三方发卡站完成，<strong>最终价格与库存以下单页为准</strong>；</li>
       <li>支付成功后分钟级自动发货卡密，不排队、不人工审核；</li>
-      <li>有效期从支付成功起算 30 天，到期后访问权限结束，<strong>不自动续费</strong>；</li>
+      <li>有效期从支付成功起算 {{ product.days }} 天，到期后访问权限结束，<strong>不自动续费</strong>；</li>
       <li>企业用户需要发票或签合同，请在购买前联系客服确认后再下单。</li>
     </ul>
 
     <h2 id="faq">购买与限速相关常见问题</h2>
-    <FaqList :items="purchaseFaq" :open-first="true" />
+    <FaqList :items="purchaseFaq" :default-open="2" />
     <FaqList :items="limitsFaq" />
 
     <CtaBand title="看价格不如先看懂无限额度怎么算" />

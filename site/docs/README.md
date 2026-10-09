@@ -20,6 +20,13 @@
 `<guide_index></guide_index>`），而且会被 `check_dist.mjs` 的「外壳内 H1 数量」断言拦下。
 页面组件里的文件名、slug 的对应关系：`docs/guide/clients.md` → `layout: guide_clients` → `theme/guide_clients.vue` → `slug: '/guide/clients'`。
 
+## FAQ 怎么写
+
+全部问答在 `config/faq.ts`，页面顺序由 `.vitepress/theme/pages/data.ts` 的 `faqGroupOrder`
+（购买 → 商品 → 限速 → 配置 → 接入 → 安全 → 我们）决定，`components/sections.ts` 的 `SECTION_NAV.faq` 要与之一致
+（`check_dist.mjs` 会逐页断言）。`/faq` 顶部「买之前」区块取 `buyingQuestions` 里列出的条目 id，
+这些条目不会再在下面的分类里重复出现。改 FAQ 条数要同步 `check_dist.mjs` 的 `CU_FAQ_COUNT`（默认 33）。
+
 ## 教程页怎么写
 
 教程正文**不在 md 里，也不在页面组件里**，而在 `config/guide.ts`：四个 `GuidePage` 数据对象（总览 / 接入与模型 / 模型与切换 / CC Switch 详解）。

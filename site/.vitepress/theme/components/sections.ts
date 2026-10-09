@@ -7,12 +7,14 @@ export interface SectionLink {
 }
 
 export const SECTION_NAV: Record<string, { id: string; label: string }[]> = {
+  // 顺序与 index.vue 正文一致：首屏 → 为什么 → 开始之前 → 四步 → 套餐 → 对比 → 平台 → 教程 → FAQ
   index: [
     { id: 'why-unlimited', label: '为什么选无限额度' },
-    { id: 'get-started', label: '从买到用起来' },
+    { id: 'get-started', label: '开始之前' },
+    { id: 'workflow', label: '从买到用起来' },
     { id: 'pricing', label: '套餐' },
     { id: 'compare', label: '和按量计费的区别' },
-    { id: 'partners', label: '合作与兑换' },
+    { id: 'partners', label: '买、换、配在哪一步' },
     { id: 'guide', label: '使用教程' },
     { id: 'faq', label: '常见问题' },
   ],
@@ -32,12 +34,14 @@ export const SECTION_NAV: Record<string, { id: string; label: string }[]> = {
     { id: 'setup', label: '怎么开始配置' },
     { id: 'faq', label: '常见问题' },
   ],
+  // 与 pages/data.ts 的 faqGroupOrder 一致：购买 → 商品 → 限速 → 配置 → 接入 → 安全 → 我们
   faq: [
-    { id: 'cat-product', label: '关于商品' },
+    { id: 'cat-buying', label: '买之前' },
     { id: 'cat-purchase', label: '购买与支付' },
+    { id: 'cat-product', label: '关于商品' },
+    { id: 'cat-limits', label: '限速与封号' },
     { id: 'cat-setup', label: '使用与配置' },
     { id: 'cat-usage', label: '接入与使用' },
-    { id: 'cat-limits', label: '限速与封号' },
     { id: 'cat-security', label: '数据与安全' },
     { id: 'cat-about', label: '关于我们' },
     { id: 'more', label: '还没解决？' },

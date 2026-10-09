@@ -73,7 +73,7 @@ const usageFaq = faqByCategory('usage')
     <p>大多数接入失败都是 Base URL 填错，尤其是 /v1 后缀漏填或多填。</p>
 
     <h2 id="faq">商品与接入相关常见问题</h2>
-    <FaqList :items="productFaq" />
+    <FaqList :items="productFaq" :default-open="2" />
     <FaqList :items="setupFaq" />
     <FaqList :items="usageFaq" />
 

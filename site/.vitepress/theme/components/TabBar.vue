@@ -1,8 +1,11 @@
 <script setup lang="ts">
-/** 主导航条：首页 + 已启用的导航项 + 「立即购买」CTA。数据来自 config/site.ts 的 nav 与 products。 */
+/**
+ * 主导航条：首页 + 已启用的导航项 + 右侧「立即购买」CTA。
+ * CTA 走 ExternalCta（全站购买链接的唯一出口），size="sm" 保持与导航同高。
+ */
 import { computed } from 'vue'
 import { useRoute } from 'vitepress'
-import { siteConfig, navItems, featuredProduct } from '../../../config/site'
+import { navItems, featuredProduct } from '../../../config/site'
 
 const route = useRoute()
 const links = computed(() => [{ text: '首页', link: '/' }, ...navItems])
@@ -22,15 +25,7 @@ const isActive = (link: string) => (link === '/' ? route.path === '/' : route.pa
         :aria-current="isActive(n.link) ? 'page' : undefined"
         >{{ n.text }}</a
       >
-      <a
-        v-if="shopUrl"
-        class="cu-btn cu-btn--primary cu-btn--sm cu-tabs__cta"
-        :href="shopUrl"
-        target="_blank"
-        rel="noopener sponsored nofollow"
-        data-cta="nav"
-        >立即购买</a
-      >
+      <ExternalCta v-if="shopUrl" class="cu-tabs__cta" size="sm" cta="nav" />
     </div>
   </nav>
 </template>

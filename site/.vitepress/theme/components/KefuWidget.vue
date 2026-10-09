@@ -90,9 +90,13 @@ function onDocClick(e: MouseEvent) {
   if (!t.closest('.cu-kefu')) open.value = false
 }
 
-function copy(text: string) {
-  navigator.clipboard?.writeText(text)
-  push('bot', `已复制：${text}`)
+async function copy(text: string) {
+  try {
+    await navigator.clipboard?.writeText(text)
+    push('bot', `已复制：${text}`)
+  } catch {
+    push('bot', '复制失败，请手动选中复制。')
+  }
 }
 
 function reset() {
@@ -164,6 +168,8 @@ onUnmounted(() => document.removeEventListener('click', onDocClick))
       </div>
 
       <footer class="cu-kefu__foot">
+        <!-- 展开/收起后按钮仍可达 -->
+
         <div class="cu-kefu__input">
           <input
             ref="inputEl"
@@ -175,8 +181,8 @@ onUnmounted(() => document.removeEventListener('click', onDocClick))
           <button type="button" @click="input.trim() && (ask(input.trim()), (input = ''))">发送</button>
         </div>
         <div class="cu-kefu__contact">
-          <span>人工：</span>
-          <span v-if="contact.wechatId" class="cu-kefu__muted">点右下角「人工客服」加微信 {{ contact.wechatId }}</span>
+          <span>答不上来：</span>
+          <span v-if="contact.wechatId" class="cu-kefu__muted">点右下角「人工客服」复制微信号 {{ contact.wechatId }}</span>
         </div>
       </footer>
     </aside>

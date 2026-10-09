@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /** 页脚：品牌行 + 两列导航 + 底部声明 / ICP / 主体。数据来自 config/site.ts 与 navItems。 */
 import { siteConfig, navItems } from '../../../config/site'
+import { guideNavItems } from '../pages/data'
 
 const year = new Date().getFullYear()
 </script>
@@ -25,10 +26,7 @@ const year = new Date().getFullYear()
       <nav aria-label="教程目录">
         <h4>教程</h4>
         <ul>
-          <li><a href="/guide">使用教程</a></li>
-          <li><a href="/guide/clients">接入与模型</a></li>
-          <li><a href="/guide/models">模型与切换</a></li>
-          <li><a href="/guide/ccswitch">CC Switch 详解</a></li>
+          <li v-for="g in guideNavItems" :key="g.url"><a :href="g.url">{{ g.nav }}</a></li>
         </ul>
       </nav>
     </div>
@@ -36,7 +34,8 @@ const year = new Date().getFullYear()
       <div>
         <span>© {{ year }} {{ siteConfig.legal.company || siteConfig.name }}</span>
         <span v-if="siteConfig.legal.icp">{{ siteConfig.legal.icp }}</span>
-        <span>{{ siteConfig.disclaimer }}</span>
+        <span>{{ siteConfig.shortDisclaimer }}。Claude 与 Anthropic 为 Anthropic, Inc. 的商标。</span>
+        <span>本站不处理支付与账号，商品信息与最终价格以下单页为准。</span>
       </div>
     </div>
   </footer>

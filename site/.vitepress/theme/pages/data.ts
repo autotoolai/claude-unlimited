@@ -2,11 +2,12 @@
  * 四页共享的静态数据（卖点、步骤、对比表、JSON-LD）。页面组件（index.vue / pricing.vue / unlimited.vue / faq.vue）
  * 从这里取数，config/ 里的站点配置与 FAQ 是唯一真源。
  */
-import { siteConfig, partner } from '../../../config/site'
+import { siteConfig, partner, activationReady } from '../../../config/site'
 import { modelIds, tierRows, recommendedIds, modelCommand, modelSwitchCommand } from '../../../config/models'
 import { guidePages } from '../../../config/guide'
 import type { GuidePage } from '../../../config/guide'
 import { faqByCategory, faqItems, faqCategories, categoryLabels } from '../../../config/faq'
+import type { FaqCategory } from '../../../config/faq'
 import { TOKEN_COST_ART } from '../components/sections'
 
 export { TOKEN_COST_ART }
@@ -33,17 +34,45 @@ export function jsonLdGuide(page: GuidePage) {
   return { '@context': 'https://schema.org', '@graph': graph }
 }
 
-/** 教程导航（总览页内嵌） */
-export const guideNavItems = guidePages.map((g) => ({ title: g.title, nav: g.nav, url: g.slug, desc: g.desc }))
+/** 教程导航（首页卡片、教程页互链）：按 order 升序，保证各页顺序一致 */
+export const guideNavItems = [...guidePages]
+  .sort((a, b) => a.order - b.order)
+  .map((g) => ({ title: g.title, nav: g.nav, url: g.slug, desc: g.desc, eyebrow: g.eyebrow }))
 
-/** 合作平台卡片（首页「合作与兑换」用） */
+/**
+ * 合作平台卡片（首页「买、换、配在哪一步」用）。activation 的地址为空时不渲染按钮，
+ * 改显示 pending 提示（activationReady），避免出现点不动的死链。
+ */
 export const partnerCards = [
-  { ...partner('purchase'), cta: '去购买', kind: 'shop' as const },
-  { ...partner('activation'), cta: '去兑换', kind: 'activation' as const },
-  { ...partner('ccswitch'), cta: '去下载', kind: 'tool' as const },
+  { ...partner('purchase'), cta: '去购买', kind: 'shop' as const, ready: true, pending: '' },
+  {
+    ...partner('activation'),
+    cta: '去兑换',
+    kind: 'activation' as const,
+    ready: activationReady(),
+    pending: '兑换入口即将开放，购买后可先保留卡密',
+  },
+  { ...partner('ccswitch'), cta: '去下载', kind: 'tool' as const, ready: true, pending: '' },
 ]
 
-export { siteConfig, modelIds, tierRows, recommendedIds, modelCommand, modelSwitchCommand }
+/** 四个平台步骤（首页「从买到用起来」用）：买 → 换 → 配 → 用 */
+export const flowSteps = [
+  { title: '下单拿卡密', desc: '在发卡站完成付款，系统自动发货卡密，通常分钟级到账。' },
+  { title: '兑换成额度', desc: '用卡密在你的账号下兑换 API 额度，即刻生效。' },
+  { title: '配置 Base URL 和 Key', desc: '在 Claude Code 或编辑器里填两个环境变量，指向网关地址与你的 Key。' },
+  { title: '正常用', desc: '像用官方 Key 一样调用。后续模型升级只改 model ID，Key 不用换。' },
+]
+
+/** 购买前要问清的五件事（FAQ 页顶部「买之前」区块用），全部对应 config/faq.ts 里的条目 */
+export const buyingQuestions = faqItems.filter((x) => [
+  'cat-purchase-where',
+  'cat-purchase-refund',
+  'cat-limits-speed',
+  'cat-product-period',
+  'cat-purchase-delivery',
+].includes(x.id))
+
+export { siteConfig, modelIds, tierRows, recommendedIds, modelCommand, modelSwitchCommand, faqCategories, categoryLabels, faqItems }
 
 export const featureItems = [
   { title: '不按 token 计费', desc: '订阅期内每次调用都包含在订阅价里，无论消耗 1 千还是 20 万 token。', icon: 'icon-usage' },
@@ -52,13 +81,6 @@ export const featureItems = [
   { title: 'API 能力完整透传', desc: '流式输出、工具调用、扩展思考、视觉输入、200k 长上下文均按 Anthropic API 同样方式提供。', icon: 'icon-usage' },
   { title: '限速宽松并公开数字', desc: '单 Key 默认 20 路并发、60 次/分钟，不会因为用得多被停，只拦滥用。', icon: 'icon-fair' },
   { title: '买完即用无排队', desc: '支付后分钟级拿到卡密并激活，不需要人工审核、等待名单或 usage review。', icon: 'icon-fair' },
-]
-
-export const buySteps = [
-  { title: '下单拿卡密', desc: '在发卡站完成付款，系统自动发货卡密，通常分钟级到账。' },
-  { title: '兑换成额度', desc: '用卡密在你的账号下兑换 API 额度，即刻生效。' },
-  { title: '配置 Base URL 和 Key', desc: '在 Claude Code 或编辑器里填两个环境变量，指向网关地址与你的 Key。' },
-  { title: '正常用', desc: '像用官方 Key 一样调用。后续模型升级只改 model ID，Key 不用换。' },
 ]
 
 export const setupSteps = [
@@ -75,7 +97,14 @@ export const compareRows = [
   { label: '超额后', values: ['触发公平使用限速，不额外扣费', '继续按 token 计费', '等待额度窗口重置'] },
 ]
 
-export const product = siteConfig.products[0]
+export const product = siteConfig.products.find((x) => x.id === siteConfig.featuredProductId) ?? siteConfig.products[0]
+
+/** 首屏数据条：前三条来自 siteConfig.stats，第四条从商品周期与承诺语派生，不另写数字 */
+export const homeStats = [
+  ...siteConfig.stats,
+  { value: `${product.days} 天`, label: `固定订阅 · 选 Opus 不加价` },
+  { value: '分钟级', label: '从买到接入' },
+]
 
 export const homeFaq = [
   ...faqByCategory('product').slice(0, 3),
@@ -83,11 +112,22 @@ export const homeFaq = [
   faqByCategory('limits')[0],
 ]
 
-export const faqGroups = faqCategories.map((cat) => ({
+/**
+ * FAQ 分类顺序按「买之前最关心什么」排：先购买、再商品、限速、配置、接入、安全、我们。
+ * 页面胶囊、侧边目录、页面区块都从这一个数组渲染，顺序天然一致。
+ */
+export const faqGroupOrder: FaqCategory[] = ['purchase', 'product', 'limits', 'setup', 'usage', 'security', 'about']
+
+export const faqGroups = faqGroupOrder.map((cat) => ({
   cat,
   label: categoryLabels[cat],
   items: faqItems.filter((x) => x.cat === cat),
 }))
+
+/** FAQ 条目自身的页内锚点：/faq#cat-setup-import */
+export function faqHash(cat: string, id: string): string {
+  return `${id}-${cat}`
+}
 
 const base = siteConfig.url.replace(/\/+$/, '')
 
