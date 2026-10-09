@@ -26,7 +26,7 @@ const urls = walk(dist)
   .map((f) => {
     // srcDir='docs' 时条目页产物在 dist 根；去掉 .html 得到路由，首页映射为 /
     if (f === 'index.html') return origin + '/'
-    // 目录总览页（guide/index.html）对外是 /guide，不是 /guide/index
+    // 目录总览页（guide/index.html）对外是 /guide，不是 /guide/index；canonical 与导航也都写 /guide（无尾斜杠）
     if (f.endsWith('/index.html')) return origin + '/' + f.replace(/index\.html$/, '')
     return origin + '/' + f.replace(/\.html$/, '')
   })

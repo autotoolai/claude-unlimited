@@ -70,7 +70,7 @@ markdown 编译成 `<template><div>…</div></template>` 并用 inline 渲染模
 | Pages 项目 | `claude-unlimited-site`（直接上传，生产分支 `master`，项目 ID `3b3e80aa-3a64-4d73-bdec-64ce9314ca83`） |
 | 线上地址 | https://claude-unlimited-site.pages.dev |
 | 部署凭据 | 本机环境变量 `CLOUDFLARE_API_TOKEN`（与参考项目 Product 共用同一个 token；不要写进仓库） |
-| 源码备份 | https://github.com/futianren/claude-unlimited-site（公开仓库，`master` 分支；Pages 本身不依赖它，只作备份与协作） |
+| 源码备份 | https://github.com/futianren/claude-unlimited-site（公开仓库，`master` 分支；Pages 本身不依赖它，只作备份与协作）。**首次上线期间 `github.com:443` 从本机间歇性连不上（`api.github.com` 正常），若 `git push` 报连接失败，重试即可，Pages 不受影响** |
 | 部署前门禁 | `npm run build` 内含 `check_dist.mjs`（SSR 结构断言）+ `verify`（60+ 项 SEO / 组件 / 链接验收） |
 | 类型检查 | `npm run typecheck` 会报 24 条 TS7016，**全部来自 `node_modules/vitepress` 内部的 `.vue` 文件**，站点源码 0 条；VitePress 1.6.4 自身不带 `.js` 模块声明，`skipLibCheck` 管不到 `.vue`，所以只能过滤：`grep -v "node_modules/vitepress" temp/typecheck.log` 应为空 |
 
@@ -108,6 +108,7 @@ pwsh -File scripts/deploy_claude_unlimited_site.ps1 -Branch preview -SkipNotify
 ## 已知问题
 
 - 兑换页地址为空（见上面第 1 条），这是当前唯一影响用户走通流程的缺口。
+- 404 页（`docs/404.md`）：VitePress 1.6 不对它跑 `transformHead`，SEO 标签用 frontmatter `head`（`<title>` / `robots noindex`）加正文裸 `<link rel="canonical">` 补齐；`NotFoundPage` 组件在客户端挂载，SSR HTML 里没有「返回首页」链接（普通浏览器无影响，纯 HTML 抓取器看不到）。
 - `.wrangler/` 是 wrangler 在**仓库根**写的本地缓存（只存 account_id），已加进根 `.gitignore`；参考项目 Product 里也有同名目录并同样忽略。
 - 生产构建的 dist 每页仍有一条 `Hydration completed but contains mismatches` 控制台警告（dev 下没有），原因与现状见 `temp/hydration_mismatch.md`，不影响功能。
 
