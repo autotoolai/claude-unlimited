@@ -83,7 +83,7 @@ export const siteConfig: SiteConfig = {
       id: 'purchase',
       name: '购买与发卡',
       desc: '选规格 → 付款 → 自动发货卡密。本站不处理支付，下单与支付都在这里完成。',
-      url: 'https://catfk.com/shop/VDR8ZBW9',
+      url: 'https://catfk.com/shop/2Z0CEP7C',
     },
     {
       id: 'activation',
@@ -122,7 +122,7 @@ export const siteConfig: SiteConfig = {
       name: 'Claude 无限卡',
       price: '¥298',
       period: '30 天',
-      shopUrl: 'https://catfk.com/shop/VDR8ZBW9',
+      shopUrl: 'https://catfk.com/shop/2Z0CEP7C',
       highlighted: true,
       features: [
         '订阅期内不按 token 计费，Opus / Sonnet / Fable 通用',

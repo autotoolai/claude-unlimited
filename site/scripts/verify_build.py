@@ -19,7 +19,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 SITE = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # 不受运行时 chdir 影响
 DIST = os.path.join(SITE, '.vitepress', 'dist')
 PAGES = ['/', '/pricing', '/unlimited', '/faq', '/guide', '/guide/clients', '/guide/models', '/guide/ccswitch']  # cleanUrls=false 时条目页是 /guide/clients.html、总览是 /guide.html，Handler 两种路径都接受
-SHOP_URL = 'https://catfk.com/shop/VDR8ZBW9'
+SHOP_URL = 'https://catfk.com/shop/2Z0CEP7C'
 H1_RE = re.compile(r'<' + 'h1')
 
 

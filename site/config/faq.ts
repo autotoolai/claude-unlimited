@@ -114,7 +114,7 @@ Anthropic 发布新版本后，网关会以新的 model identifier 提供访问�
     a: `本站只做介绍与答疑，不处理支付。下单在官方发卡站完成：商品页选规格 → 付款 → 自动获取卡密。
 
 点任意「立即购买」按钮会直接跳转到发卡站。`,
-    links: [{ text: '前往下单页', url: 'https://catfk.com/shop/VDR8ZBW9', external: true }],
+    links: [{ text: '前往下单页', url: 'https://catfk.com/shop/2Z0CEP7C', external: true }],
   },
   {
     cat: 'purchase',
