@@ -105,6 +105,14 @@ pwsh -File scripts/deploy_claude_unlimited_site.ps1 -Branch preview -SkipNotify
 - `config.mts` 里没有 Analytics 埋点占位，`REPLACE_WITH_CF_ANALYTICS_TOKEN` 那条已过期。
 - 域名：`config/site.ts` 的 `url` 现为 `https://claude-unlimited-site.pages.dev`，canonical / sitemap / robots / OG 全部跟随。**换自定义域时只改这一处**，然后重新部署；Pages 侧绑自定义域参考项目是给 Pages 加 domain（DNS 自动出 CNAME，再把同一 host 的 CNAME 指向 `<project>.pages.dev`）。
 
+## 本地 → 上线流程（改内容后照做）
+
+1. 改 `site/config/*.ts`（商品、联系方式、合作平台地址、FAQ、教程）或 `site/.vitepress/theme/*.vue`（版式）。
+2. `cd site && npm run build`：`check_dist.mjs` 结构门禁不过就不要继续；再 `npm run verify` 跑 60+ 项 SEO / 组件 / 链接验收。
+3. `pwsh -File scripts/deploy_claude_unlimited_site.ps1 -SkipNotify`（需要 `CLOUDFLARE_API_TOKEN`）。
+4. 线上核对：`curl -sI https://claude-unlimited-site.pages.dev/guide | grep -i location` 看是否 308 到无后缀；首页看 `grep -o 'data-cta="[a-z_]*"'`；404 看 title / robots noindex。
+5. 提交并推送备份仓库（`git push`；本机到 `github.com:443` 曾出现间歇性连不上，失败时重试或改用 SSH 传输，`gh api repos/futianren/claude-unlimited-site/commits/master` 可查远端状态）。
+
 ## 已知问题
 
 - 兑换页地址为空（见上面第 1 条），这是当前唯一影响用户走通流程的缺口。
