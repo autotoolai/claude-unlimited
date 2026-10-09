@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "cross-env VITEPRESS_DEV=1 node scripts/copy_public.mjs --watch",
     "dev:site": "vitepress dev --host 0.0.0.0 --port 5199 --strictPort",
-    "build": "vitepress build && npm run gen:sitemap && node scripts/copy_public.mjs && node scripts/check_dist.mjs",
+    "build": "vitepress build && npm run gen:sitemap && node scripts/copy_guide_overview.mjs && node scripts/copy_public.mjs && node scripts/check_dist.mjs",
     "preview": "vitepress preview",
     "gen:sitemap": "tsx scripts/gen_sitemap.ts",
     "check:links": "tsx scripts/check_links.ts",

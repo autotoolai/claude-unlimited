@@ -1,11 +1,11 @@
-# 兼容带尾斜杠的链接（cleanUrls=false，产物是 .html；总览页是 /guide/index.html -> /guide.html）
-/pricing/ /pricing.html 301
-/unlimited/ /unlimited.html 301
-/faq/ /faq.html 301
-/guide/ /guide.html 301
-/guide/clients/ /guide/clients.html 301
-/guide/models/ /guide/models.html 301
-/guide/ccswitch/ /guide/ccswitch.html 301
+# 带尾斜杠 -> 无尾斜杠（Pages 自己会把 .html 308 到无后缀，这里直接 301 少一跳）
+/pricing/ /pricing 301
+/unlimited/ /unlimited 301
+/faq/ /faq 301
+/guide/ /guide 301
+/guide/clients/ /guide/clients 301
+/guide/models/ /guide/models 301
+/guide/ccswitch/ /guide/ccswitch 301
 
 # 旧域名（正式域确认后启用）
 # /old-path /new-path 301
