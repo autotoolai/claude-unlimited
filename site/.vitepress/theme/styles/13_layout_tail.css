@@ -1,0 +1,14 @@
+/* 收尾：Layout.vue 已不用默认外壳的 Layout（VPApp/VPContent/VPNav/VPLocalNav…），（从 custom.css 拆出，改这个文件而不是 custom.css） */
+/* 深色模式兜底：默认主题靠 html.dark 上的 --vp-c-* 变量着色，本站的表单控件、滚动条仍引用它们，
+   这里映射到自己的色板，避免漏进来的元素（输入框、边框）在深色下变成近黑。 */
+html.dark {
+  --vp-c-text-1: var(--cu-ink);
+  --vp-c-text-2: var(--cu-ink-2);
+  --vp-c-text-3: var(--cu-muted);
+  --vp-c-bg: var(--cu-bg);
+  --vp-c-bg-soft: var(--cu-card);
+  --vp-c-bg-alt: var(--cu-code-bg);
+  --vp-c-divider: var(--cu-line);
+  --vp-c-border: var(--cu-line-strong);
+  --vp-c-gutter: var(--cu-bg);
+}

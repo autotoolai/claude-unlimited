@@ -1,0 +1,101 @@
+/* Claude 无限卡官网 · 设计 token + 全站样式
+   风格：暖纸底 + 墨黑正文 + 品牌橙点缀；衬线做标题/数字，无衬线做正文，代码用等宽。
+   布局：自定义 PageShell（品牌页头 68px + 导航条 64px + 正文列 + 右侧页内目录），VitePress 默认
+   导航栏、页脚、aside 全部关闭（见 config.mts 的 themeConfig）。
+   断点：1100px 隐藏右侧目录；900px Hero/卡片塌一列；720px 步骤竖排；560px 按钮全宽。
+*/
+
+:root {
+  --vp-c-brand-1: #c85a1e;
+  --vp-c-brand-2: #a8480f;
+  --vp-c-brand-3: #8f3c12;
+  --vp-c-brand-soft: rgba(200, 90, 30, 0.12);
+
+  --cu-accent: #c85a1e;
+  --cu-accent-deep: #a8480f;
+  --cu-ink: #16130f;
+  --cu-ink-2: #403a33;
+  --cu-muted: #6c6459;
+  --cu-bg: #f5f1e8;
+  --cu-card: #fffdf8;
+  --cu-line: rgba(22, 19, 15, 0.09);
+  --cu-line-strong: rgba(22, 19, 15, 0.22);
+  --cu-accent-soft: rgba(200, 90, 30, 0.09);
+  --cu-code-bg: #f0ead9;
+  --cu-hero-line: rgba(22, 19, 15, 0.07);
+  --cu-brandbar-bg: color-mix(in srgb, var(--cu-card) 88%, transparent);
+  --cu-figure-frame: rgba(22, 19, 15, 0.18);
+  --cu-shadow: 0 18px 40px rgba(22, 19, 15, 0.1);
+  --cu-shadow-soft: 0 8px 24px rgba(22, 19, 15, 0.07);
+  --cu-brandbar-h: 64px;
+  --cu-tabs-h: 62px;
+  --cu-nav-h: 126px; /* 品牌页头 + 导航条，供标题锚点定位 */
+  --cu-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', Georgia, 'Times New Roman', serif;
+  --cu-sans: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
+  --cu-mono: ui-monospace, 'Cascadia Code', Consolas, 'SF Mono', Menlo, monospace;
+}
+
+.dark {
+  --cu-accent: #e08a5f;
+  --cu-accent-deep: #f0a97f;
+  --cu-ink: #ede6d6;
+  --cu-ink-2: #c9c1b1;
+  --cu-muted: #a49a89;
+  --cu-bg: #17150f;
+  --cu-card: #211e16;
+  --cu-line: rgba(237, 230, 214, 0.12);
+  --cu-line-strong: rgba(237, 230, 214, 0.28);
+  --cu-accent-soft: rgba(224, 138, 95, 0.12);
+  --cu-code-bg: #262219;
+  --cu-hero-line: rgba(237, 230, 214, 0.08);
+  --cu-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  --cu-shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --cu-brandbar-bg: color-mix(in srgb, var(--cu-card) 82%, transparent);
+  --cu-figure-frame: rgba(237, 230, 214, 0.2);
+}
+
+/* 小节标题前的上款短线：替代巨大字号差做层级 */
+.cu-page h2 {
+  scroll-margin-top: calc(var(--cu-nav-h) + 20px);
+}
+
+.cu-page h2::before {
+  content: '';
+  display: block;
+  width: 2.25rem;
+  height: 3px;
+  margin-bottom: 0.75rem;
+  background: var(--cu-accent);
+}
+
+html {
+  scroll-behavior: smooth;
+  /* 页内锚点跳转时给吸顶的品牌页头+导航条让位 */
+  scroll-padding-top: calc(var(--cu-nav-h) + 16px);
+}
+
+body {
+  font-family: var(--cu-sans);
+  background: var(--cu-bg);
+  color: var(--cu-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: var(--cu-mono);
+}
+
+::selection {
+  background: var(--vp-c-brand-soft);
+}
+
+:focus-visible {
+  outline: 2px solid var(--cu-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+

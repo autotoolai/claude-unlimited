@@ -1,0 +1,72 @@
+/* 套餐卡（从 custom.css 拆出，改这个文件而不是 custom.css） */
+.cu-price-card {
+  display: flex;
+  flex-direction: column;
+  margin: 1.5rem 0;
+  padding: 1.75rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 6px;
+  background: var(--cu-card);
+  max-width: 480px;
+}
+
+.cu-price-card--featured {
+  border-color: var(--cu-accent);
+  box-shadow: 0 12px 28px rgba(200, 90, 30, 0.1);
+}
+
+.cu-price-card__name {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--cu-ink);
+}
+
+.cu-price-card__head h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--cu-ink);
+}
+
+.cu-price-card__price {
+  margin: 0.7rem 0 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.cu-price-card__price strong {
+  font-family: var(--cu-serif);
+  font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--cu-ink);
+  line-height: 1;
+}
+
+.cu-price-card__price span {
+  color: var(--cu-muted);
+  font-size: 0.95rem;
+}
+
+.cu-price-card__features {
+  margin: 1.25rem 0 1.5rem;
+  padding-left: 1.1rem;
+  color: var(--cu-ink-2);
+  font-size: 0.95rem;
+  line-height: 1.8;
+  flex: 1;
+}
+
+.cu-price-card .cu-btn {
+  width: 100%;
+}
+
+.cu-price-card__note {
+  margin: 0.75rem 0 0;
+  font-size: 0.8rem;
+  color: var(--cu-muted);
+  text-align: center;
+}
+

@@ -1,0 +1,1642 @@
+/* Claude 无限卡官网 · 设计 token + 全站样式
+   风格：暖纸底 + 墨黑正文 + 品牌橙点缀；衬线做标题/数字，无衬线做正文，代码用等宽。
+   布局：自定义 PageShell（品牌页头 68px + 导航条 64px + 正文列 + 右侧页内目录），VitePress 默认
+   导航栏、页脚、aside 全部关闭（见 config.mts 的 themeConfig）。
+   断点：1100px 隐藏右侧目录；900px Hero/卡片塌一列；720px 步骤竖排；560px 按钮全宽。
+*/
+
+:root {
+  --vp-c-brand-1: #c85a1e;
+  --vp-c-brand-2: #a8480f;
+  --vp-c-brand-3: #8f3c12;
+  --vp-c-brand-soft: rgba(200, 90, 30, 0.12);
+
+  --cu-accent: #c85a1e;
+  --cu-accent-deep: #a8480f;
+  --cu-ink: #16130f;
+  --cu-ink-2: #403a33;
+  --cu-muted: #6c6459;
+  --cu-bg: #f5f1e8;
+  --cu-card: #fffdf8;
+  --cu-line: rgba(22, 19, 15, 0.09);
+  --cu-line-strong: rgba(22, 19, 15, 0.22);
+  --cu-accent-soft: rgba(200, 90, 30, 0.09);
+  --cu-code-bg: #f0ead9;
+  --cu-hero-line: rgba(22, 19, 15, 0.07);
+  --cu-brandbar-bg: color-mix(in srgb, var(--cu-card) 88%, transparent);
+  --cu-figure-frame: rgba(22, 19, 15, 0.18);
+  --cu-shadow: 0 18px 40px rgba(22, 19, 15, 0.1);
+  --cu-shadow-soft: 0 8px 24px rgba(22, 19, 15, 0.07);
+  --cu-brandbar-h: 64px;
+  --cu-tabs-h: 62px;
+  --cu-nav-h: 126px; /* 品牌页头 + 导航条，供标题锚点定位 */
+  --cu-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', Georgia, 'Times New Roman', serif;
+  --cu-sans: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
+  --cu-mono: ui-monospace, 'Cascadia Code', Consolas, 'SF Mono', Menlo, monospace;
+}
+
+.dark {
+  --cu-accent: #e08a5f;
+  --cu-accent-deep: #f0a97f;
+  --cu-ink: #ede6d6;
+  --cu-ink-2: #c9c1b1;
+  --cu-muted: #a49a89;
+  --cu-bg: #17150f;
+  --cu-card: #211e16;
+  --cu-line: rgba(237, 230, 214, 0.12);
+  --cu-line-strong: rgba(237, 230, 214, 0.28);
+  --cu-accent-soft: rgba(224, 138, 95, 0.12);
+  --cu-code-bg: #262219;
+  --cu-hero-line: rgba(237, 230, 214, 0.08);
+  --cu-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  --cu-shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --cu-brandbar-bg: color-mix(in srgb, var(--cu-card) 82%, transparent);
+  --cu-figure-frame: rgba(237, 230, 214, 0.2);
+}
+
+/* 小节标题前的上款短线：替代巨大字号差做层级 */
+.cu-page h2 {
+  scroll-margin-top: calc(var(--cu-nav-h) + 20px);
+}
+
+.cu-page h2::before {
+  content: '';
+  display: block;
+  width: 2.25rem;
+  height: 3px;
+  margin-bottom: 0.75rem;
+  background: var(--cu-accent);
+}
+
+html {
+  scroll-behavior: smooth;
+  /* 页内锚点跳转时给吸顶的品牌页头+导航条让位 */
+  scroll-padding-top: calc(var(--cu-nav-h) + 16px);
+}
+
+body {
+  font-family: var(--cu-sans);
+  background: var(--cu-bg);
+  color: var(--cu-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: var(--cu-mono);
+}
+
+::selection {
+  background: var(--vp-c-brand-soft);
+}
+
+:focus-visible {
+  outline: 2px solid var(--cu-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* =========================================================
+   外壳：品牌页头 / 导航条 / 正文列 / 右侧目录
+   ========================================================= */
+
+.cu-shell {
+  /* 100dvh 而非 100vh：手机浏览器地址栏收起/展开时 100vh 会超出可视区，
+     底部 CTA / 助手面板的 min(…, 100vh - …) 随之抖动 */
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.cu-shell__body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* —— 品牌页头 —— */
+.cu-brandbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  height: var(--cu-brandbar-h);
+  background: var(--cu-brandbar-bg);
+  backdrop-filter: saturate(140%) blur(8px);
+  border-bottom: 1px solid var(--cu-line);
+}
+
+.cu-brandbar__inner,
+.cu-tabs__inner,
+.cu-page {
+  width: min(1160px, 100% - 2.5rem);
+  margin-inline: auto;
+}
+
+.cu-brandbar__inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cu-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-decoration: none;
+  color: var(--cu-accent);
+}
+
+.cu-brand:hover {
+  text-decoration: none;
+}
+
+.cu-brand__text strong {
+  display: block;
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--cu-ink);
+  line-height: 1.2;
+}
+
+.cu-brand__text small {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--cu-muted);
+  letter-spacing: 0.02em;
+}
+
+.cu-navcta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  background: var(--cu-accent);
+  color: #fff6ec !important;
+  font-weight: 700;
+  font-size: 0.92rem;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.cu-navcta:hover {
+  background: var(--cu-accent-deep);
+  transform: translateY(-1px);
+}
+
+/* —— 主导航条 —— */
+.cu-tabs {
+  position: sticky;
+  top: var(--cu-brandbar-h);
+  z-index: 39;
+  background: color-mix(in srgb, var(--cu-bg) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--cu-line);
+}
+
+.cu-tabs__inner {
+  height: var(--cu-tabs-h);
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  /* 390px 下「三个导航 + 立即购买」自然宽度超过容器，flex 项默认不收缩又把文字压成两行，
+     整页因此多出 22px 横向滚动；这里固定为单行并把溢出收进导航条内部 */
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cu-tabs__inner::-webkit-scrollbar {
+  display: none;
+}
+
+.cu-tabs__link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  min-height: 44px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--cu-muted);
+  text-decoration: none;
+  padding: 0 0.2rem;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.cu-tabs__link:hover {
+  color: var(--cu-ink);
+}
+
+.cu-tabs__link.is-active {
+  color: var(--cu-ink);
+  border-bottom-color: var(--cu-accent);
+}
+
+.cu-tabs__cta {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+/* —— 主体两列 —— */
+.cu-shell__body {
+  flex: 1;
+  width: min(1160px, 100% - 2.5rem);
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 208px;
+  gap: 3.5rem;
+  align-items: start;
+}
+
+.cu-page {
+  width: 100%;
+  padding: 3.5rem 0 5rem;
+}
+
+.cu-page__head {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--cu-line);
+}
+
+.cu-eyebrow {
+  margin: 0 0 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cu-accent);
+}
+
+.cu-page h1 {
+  margin: 0;
+  font-family: var(--cu-serif);
+  font-size: clamp(2.1rem, 4.5vw, 3.1rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.18;
+  color: var(--cu-ink);
+}
+
+.cu-page__lead {
+  margin: 1rem 0 0;
+  max-width: 46rem;
+  font-size: 1.12rem;
+  line-height: 1.8;
+  color: var(--cu-ink-2);
+}
+
+.cu-page h2 {
+  margin: 4rem 0 1rem;
+  font-family: var(--cu-serif);
+  font-size: clamp(1.4rem, 2.6vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  color: var(--cu-ink);
+  scroll-margin-top: calc(var(--cu-nav-h) + 20px);
+}
+
+.cu-page h2 .header-anchor {
+  color: var(--cu-accent);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.cu-page h2:hover .header-anchor {
+  opacity: 1;
+}
+
+.cu-page p {
+  margin: 0.9rem 0;
+  font-size: 1rem;
+  line-height: 1.85;
+  color: var(--cu-ink-2);
+  max-width: 46rem;
+}
+
+.cu-page ul,
+.cu-page ol {
+  margin: 0.9rem 0;
+  padding-left: 1.25rem;
+  max-width: 46rem;
+  color: var(--cu-ink-2);
+  line-height: 1.85;
+}
+
+.cu-page li {
+  margin: 0.3rem 0;
+}
+
+.cu-page li::marker {
+  color: var(--cu-accent);
+}
+
+.cu-page a {
+  color: var(--cu-accent-deep);
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+
+.cu-page code {
+  font-size: 0.88em;
+  padding: 0.1em 0.35em;
+  border-radius: 5px;
+  background: var(--cu-code-bg);
+}
+
+.cu-page strong {
+  font-weight: 700;
+  color: var(--cu-ink);
+}
+
+.cu-page .cu-notice a,
+.cu-page .cu-notice li a {
+  color: inherit;
+}
+
+/* —— 右侧页内目录 —— */
+.cu-sidenav {
+  position: sticky;
+  top: calc(var(--cu-nav-h) + 1.5rem);
+  padding: 3.9rem 0 1rem;
+  font-size: 0.88rem;
+  max-height: calc(100vh - var(--cu-nav-h) - 2rem);
+  overflow-y: auto;
+}
+
+.cu-sidenav__title {
+  margin: 0 0 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cu-muted);
+}
+
+.cu-sidenav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 1px solid var(--cu-line);
+}
+
+.cu-sidenav a {
+  display: block;
+  padding: 0.32rem 0.85rem;
+  margin-left: -1px;
+  border-left: 2px solid transparent;
+  color: var(--cu-muted) !important;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.cu-sidenav a:hover {
+  color: var(--cu-ink) !important;
+}
+
+.cu-sidenav a.is-active {
+  color: var(--cu-accent-deep) !important;
+  border-left-color: var(--cu-accent);
+  font-weight: 700;
+}
+
+@media (max-width: 1100px) {
+  .cu-shell__body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .cu-sidenav {
+    position: static;
+    max-height: none;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--cu-line);
+    order: -1;
+  }
+  .cu-sidenav__title {
+    display: none;
+  }
+  .cu-sidenav ul {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    border-left: none;
+    padding-bottom: 0.25rem;
+  }
+  .cu-sidenav a {
+    white-space: nowrap;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--cu-line);
+    border-radius: 999px;
+    margin-left: 0;
+  }
+  .cu-sidenav a.is-active {
+    border-color: var(--cu-accent);
+    background: var(--cu-accent-soft);
+  }
+  .cu-page {
+    padding-top: 2rem;
+  }
+}
+
+/* =========================================================
+   Hero
+   ========================================================= */
+
+.cu-hero {
+  position: relative;
+  margin: 0 0 2rem;
+  padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 3vw, 2.5rem);
+  border-radius: 4px;
+  border: 1px solid var(--cu-line);
+  background:
+    radial-gradient(ellipse 60% 70% at 100% 0%, var(--cu-accent-soft), transparent 60%),
+    var(--cu-card);
+  overflow: hidden;
+}
+
+/* Hero 顶部「上款线」：像手册扉页顶部的双细线 */
+.cu-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0.65rem 0.65rem auto;
+  height: 3px;
+  border-top: 1px solid var(--cu-line-strong);
+  border-bottom: 1px solid var(--cu-line-strong);
+  pointer-events: none;
+}
+
+.cu-hero__inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.cu-hero h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  line-height: 1.15;
+  color: var(--cu-ink);
+}
+
+.cu-lead {
+  margin: 1.1rem 0 0;
+  font-size: 1.02rem;
+  line-height: 1.85;
+  color: var(--cu-ink-2);
+}
+
+.cu-cta-row {
+  margin-top: 1.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.cu-cta-row--center {
+  justify-content: center;
+}
+
+.cu-hint {
+  margin: 0.8rem 0 0;
+  font-size: 0.84rem;
+  color: var(--cu-muted);
+}
+
+.cu-hint--center {
+  text-align: center;
+}
+
+.cu-hero__art svg {
+  width: 100%;
+  height: auto;
+}
+
+.cu-art-node rect {
+  transition: transform 0.2s ease;
+}
+
+.cu-hero__art:hover .cu-art-node rect {
+  transform: translateY(-2px);
+}
+
+.cu-art-link {
+  animation: cu-dash 24s linear infinite;
+}
+
+@keyframes cu-dash {
+  to {
+    stroke-dashoffset: -160;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .cu-art-link {
+    animation: none;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 900px) {
+  /* Hero 顶部「上款线」：像手册扉页顶部的双细线 */
+.cu-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0.65rem 0.65rem auto;
+  height: 3px;
+  border-top: 1px solid var(--cu-line-strong);
+  border-bottom: 1px solid var(--cu-line-strong);
+  pointer-events: none;
+}
+
+.cu-hero__inner {
+    grid-template-columns: 1fr;
+  }
+  .cu-hero__art {
+    max-width: 480px;
+  }
+}
+
+/* =========================================================
+   按钮
+   ========================================================= */
+
+.cu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding: 0.8rem 1.4rem;
+  border-radius: 999px;
+  font-family: var(--cu-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+.cu-btn:hover {
+  transform: translateY(-1px);
+}
+
+.cu-btn--sm {
+  min-height: 44px;
+  padding: 0.45rem 1.1rem;
+  font-size: 0.9rem;
+}
+
+.cu-btn--md {
+  min-height: 48px;
+}
+
+.cu-btn--lg {
+  min-height: 56px;
+  padding: 0.95rem 1.8rem;
+  font-size: 1.08rem;
+}
+
+/* 「和按量计费的差别」三条：左橙线引用块，与信任背书区分 */
+.cu-compare {
+  margin: 1.25rem 0;
+  padding: 0.1rem 1.25rem;
+  border-left: 3px solid var(--cu-accent);
+}
+
+.cu-compare p {
+  margin: 0.9rem 0;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--cu-muted);
+}
+
+.cu-compare p:first-child {
+  margin-top: 0.85rem;
+  font-size: 1.02rem;
+  color: var(--cu-ink);
+}
+
+.cu-compare p:last-child {
+  margin-bottom: 0.85rem;
+}
+
+.cu-btn--primary {
+  background: var(--cu-accent);
+  color: #fff6ec !important;
+  box-shadow: 0 10px 24px rgba(200, 90, 30, 0.28);
+}
+
+.cu-btn--primary:hover {
+  background: var(--cu-accent-deep);
+}
+
+.cu-btn--ghost {
+  background: transparent;
+  color: var(--cu-ink) !important;
+  border-color: var(--cu-line-strong);
+}
+
+.cu-btn--ghost:hover {
+  border-color: var(--cu-accent);
+  color: var(--cu-accent-deep) !important;
+  background: var(--cu-accent-soft);
+}
+
+.cu-btn__price {
+  font-size: 0.8em;
+  font-weight: 600;
+  opacity: 0.9;
+  padding-left: 0.55rem;
+  border-left: 1px solid rgba(255, 246, 236, 0.4);
+}
+
+@media (max-width: 560px) {
+  .cu-cta-row .cu-btn {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   数据条
+   ========================================================= */
+
+.cu-stats {
+  margin: 0 0 1rem;
+  padding: 1.5rem 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  border-top: 1px solid var(--cu-line);
+  border-bottom: 1px solid var(--cu-line);
+}
+
+.cu-stat {
+  padding-left: 1rem;
+  border-left: 2px solid var(--cu-accent-soft);
+}
+
+.cu-stat dd {
+  margin: 0;
+  font-family: var(--cu-serif);
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--cu-accent);
+  line-height: 1.1;
+}
+
+.cu-stat dt {
+  margin: 0.25rem 0 0;
+  font-size: 0.86rem;
+  color: var(--cu-muted);
+}
+
+@media (max-width: 720px) {
+  .cu-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem 0.5rem;
+  }
+}
+
+/* =========================================================
+   卖点卡片
+   ========================================================= */
+
+.cu-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.cu-card {
+  padding: 1.3rem 1.35rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 6px;
+  background: var(--cu-card);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.cu-card:hover {
+  border-color: var(--cu-accent-soft);
+  transform: translateY(-2px);
+}
+
+.cu-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.9rem 0 0.4rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--cu-ink);
+}
+
+.cu-card__no {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 6px;
+  background: var(--cu-accent-soft);
+  color: var(--cu-accent-deep);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.cu-card p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: var(--cu-muted);
+}
+
+/* 三列 / 两列卡片变体（首页合作平台与教程入口） */
+.cu-cards--three {
+  grid-template-columns: repeat(3, 1fr);
+}
+.cu-cards--two {
+  grid-template-columns: repeat(2, 1fr);
+}
+@media (max-width: 900px) {
+  .cu-cards--three,
+  .cu-cards--two {
+    grid-template-columns: 1fr;
+  }
+}
+.cu-card--link {
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.cu-card--link:hover {
+  border-color: var(--cu-accent);
+  background: var(--cu-accent-soft);
+}
+.cu-card .cu-btn {
+  margin-top: 0.9rem;
+}
+.cu-card__no {
+  display: block;
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cu-accent-deep);
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.cu-card__icon {
+  width: 40px;
+  height: 40px;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .cu-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   步骤条
+   ========================================================= */
+
+.cu-steps {
+  list-style: none;
+  margin: 1.5rem 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.cu-step {
+  position: relative;
+  display: flex;
+  gap: 0.85rem;
+  padding: 1.25rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 6px;
+  background: var(--cu-card);
+}
+
+.cu-step__no {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cu-accent);
+  color: #fff6ec;
+  font-family: var(--cu-serif);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.cu-step__body h3 {
+  margin: 0.35rem 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cu-ink);
+}
+
+.cu-step__body p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: var(--cu-muted);
+}
+
+.cu-step__code {
+  margin: 0.75rem 0 0;
+  padding: 0.7rem 0.8rem;
+  border-radius: 4px;
+  background: var(--cu-code-bg);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+.cu-step__code code {
+  background: transparent;
+  padding: 0;
+}
+
+@media (max-width: 1100px) {
+  .cu-steps--horizontal {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .cu-steps--horizontal,
+  .cu-steps--vertical {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   套餐卡
+   ========================================================= */
+
+.cu-price-card {
+  display: flex;
+  flex-direction: column;
+  margin: 1.5rem 0;
+  padding: 1.75rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 6px;
+  background: var(--cu-card);
+  max-width: 480px;
+}
+
+.cu-price-card--featured {
+  border-color: var(--cu-accent);
+  box-shadow: 0 12px 28px rgba(200, 90, 30, 0.1);
+}
+
+.cu-price-card__name {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--cu-ink);
+}
+
+.cu-price-card__head h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--cu-ink);
+}
+
+.cu-price-card__price {
+  margin: 0.7rem 0 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.cu-price-card__price strong {
+  font-family: var(--cu-serif);
+  font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--cu-ink);
+  line-height: 1;
+}
+
+.cu-price-card__price span {
+  color: var(--cu-muted);
+  font-size: 0.95rem;
+}
+
+.cu-price-card__features {
+  margin: 1.25rem 0 1.5rem;
+  padding-left: 1.1rem;
+  color: var(--cu-ink-2);
+  font-size: 0.95rem;
+  line-height: 1.8;
+  flex: 1;
+}
+
+.cu-price-card .cu-btn {
+  width: 100%;
+}
+
+.cu-price-card__note {
+  margin: 0.75rem 0 0;
+  font-size: 0.8rem;
+  color: var(--cu-muted);
+  text-align: center;
+}
+
+/* =========================================================
+   表格
+   ========================================================= */
+
+.cu-table-wrap {
+  overflow-x: auto;
+  margin: 1.25rem 0;
+  border: 1px solid var(--cu-line-strong);
+  border-radius: 6px;
+  background: var(--cu-card);
+}
+
+.cu-table {
+  width: 100%;
+  min-width: 540px;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.cu-table__caption {
+  caption-side: bottom;
+  text-align: left;
+  padding: 0.75rem 1.1rem;
+  font-size: 0.85rem;
+  color: var(--cu-muted);
+  border-top: 1px solid var(--cu-line);
+}
+
+.cu-table th,
+.cu-table td {
+  padding: 0.8rem 1.1rem;
+  text-align: left;
+  border-top: 1px solid var(--cu-line);
+  vertical-align: top;
+  line-height: 1.7;
+  color: var(--cu-ink-2);
+}
+
+.cu-table thead th {
+  border-top: none;
+  background: var(--cu-accent-soft);
+  font-weight: 700;
+  color: var(--cu-ink);
+  font-size: 0.9rem;
+}
+
+.cu-table__label {
+  width: 24%;
+  color: var(--cu-ink);
+  font-weight: 600;
+}
+
+.cu-table .is-highlight {
+  background: var(--cu-accent-soft);
+  font-weight: 600;
+  color: var(--cu-ink);
+}
+
+.cu-table--plain th,
+.cu-table--plain td {
+  min-width: 0;
+}
+
+.cu-table--plain tbody th {
+  width: 22%;
+}
+
+/* =========================================================
+   示意图 / 配图
+   ========================================================= */
+
+.cu-figure {
+  margin: 1.75rem 0;
+}
+
+.cu-figure--wide {
+  padding: 1.5rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 6px;
+  background: var(--cu-card);
+}
+
+.cu-figs svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.cu-figs--inline {
+  max-width: 560px;
+  margin-inline: auto;
+}
+
+.cu-figure img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  display: block;
+  border: 1px solid var(--cu-line);
+}
+
+.cu-figure figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--cu-muted);
+  text-align: center;
+}
+
+.cu-figure--wide figcaption {
+  text-align: left;
+}
+
+/* =========================================================
+   FAQ
+   ========================================================= */
+
+.cu-faq {
+  margin: 1.25rem 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.cu-faq__item {
+  border: 1px solid var(--cu-line);
+  border-radius: 6px;
+  background: var(--cu-card);
+  overflow: hidden;
+  scroll-margin-top: calc(var(--cu-nav-h) + 16px);
+}
+
+.cu-faq__item > summary {
+  cursor: pointer;
+  padding: 0.95rem 1.2rem;
+  min-height: 48px;
+  font-weight: 600;
+  color: var(--cu-ink);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.cu-faq__item > summary::-webkit-details-marker {
+  display: none;
+}
+
+.cu-faq__item > summary::before {
+  content: '+';
+  flex: none;
+  width: 1.4em;
+  height: 1.4em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: var(--cu-accent-soft);
+  color: var(--cu-accent-deep);
+  font-weight: 800;
+  transition: transform 0.2s ease;
+}
+
+.cu-faq__item[open] > summary::before {
+  content: '−';
+  transform: rotate(180deg);
+}
+
+.cu-faq__item > summary:hover {
+  color: var(--cu-accent-deep);
+}
+
+.cu-faq__cat {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--cu-accent-soft);
+  color: var(--cu-accent-deep);
+  flex: none;
+}
+
+.cu-faq__body {
+  padding: 0 1.2rem 1.2rem 3rem;
+  font-size: 0.94rem;
+  color: var(--cu-ink-2);
+  line-height: 1.85;
+}
+
+.cu-faq__para {
+  margin: 0 0 0.5rem;
+}
+
+.cu-faq__bullets {
+  margin: 0.2rem 0 0.5rem;
+  padding-left: 1.1rem;
+  color: var(--cu-ink-2);
+}
+
+.cu-faq__links {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.cu-faq__code,
+.cu-kefu__answer pre {
+  margin: 0.75rem 0 0;
+  padding: 0.8rem 0.9rem;
+  border-radius: 4px;
+  background: var(--cu-code-bg);
+  font-size: 0.82rem;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+
+.cu-faq__code code,
+.cu-kefu__answer pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.cu-faq-cat-block {
+  margin: 0 0 2.5rem;
+}
+
+.cu-faq-cat-block > h2 {
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--cu-line);
+  scroll-margin-top: calc(var(--cu-nav-h) + 16px);
+}
+
+.cu-anchor-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+.cu-anchor-nav a {
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--cu-line);
+  color: var(--cu-ink-2) !important;
+  text-decoration: none;
+  background: var(--cu-card);
+}
+
+.cu-anchor-nav a:hover {
+  border-color: var(--cu-accent);
+  color: var(--cu-accent-deep) !important;
+}
+
+/* =========================================================
+   信任背书 / 要点框 / CTA 横条 / 声明
+   ========================================================= */
+
+/* 要点框：左侧橙线 + 浅橙底的条目组（教程页 notes、无限额度页信任卡共用同一套 .cu-trust） */
+.cu-notes {
+  margin: 1.25rem 0;
+  border-left: 3px solid var(--cu-accent);
+  background: var(--cu-accent-soft);
+  padding: 0.9rem 1rem;
+}
+.cu-notes p {
+  margin: 0 0 0.5rem;
+  font-size: 0.93rem;
+  line-height: 1.85;
+  color: var(--cu-ink-2);
+}
+.cu-notes p:last-child {
+  margin-bottom: 0;
+}
+
+.cu-trust {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.cu-trust__item {
+  padding: 1.2rem 1.3rem;
+  border-left: 3px solid var(--cu-accent);
+  background: var(--cu-card);
+  border-radius: 0 14px 14px 0;
+}
+
+.cu-trust__item h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cu-ink);
+}
+
+.cu-trust__item p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: var(--cu-muted);
+}
+
+.cu-band {
+  margin: 3.5rem 0 0;
+  padding: 2.75rem 1.75rem;
+  border-radius: 22px;
+  background:
+    radial-gradient(ellipse 70% 90% at 0% 0%, var(--cu-accent-soft), transparent 60%),
+    var(--cu-card);
+  border: 1px solid var(--cu-line);
+  text-align: center;
+}
+
+.cu-band h2 {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.8vw, 1.75rem);
+  border: none;
+  color: var(--cu-ink);
+}
+
+.cu-band p {
+  margin: 0.6rem auto 0;
+  max-width: 36rem;
+  line-height: 1.8;
+  color: var(--cu-ink-2);
+}
+
+.cu-band .cu-cta-row {
+  margin-top: 1.5rem;
+}
+
+.cu-notice {
+  margin: 2.5rem 0 0;
+  padding: 1rem 1.2rem;
+  border: 1px dashed var(--cu-line-strong);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: var(--cu-muted);
+}
+
+.cu-notice p {
+  margin: 0;
+  max-width: none;
+}
+
+@media (max-width: 720px) {
+  .cu-trust {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   在线助手
+   ========================================================= */
+
+.cu-kefu {
+  position: fixed;
+  bottom: 1.25rem;
+  z-index: 40;
+}
+
+.cu-kefu--right {
+  right: 1.25rem;
+}
+
+.cu-kefu--left {
+  left: 1.25rem;
+}
+
+.cu-kefu__fab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 48px;
+  padding: 0.7rem 1.15rem;
+  border: none;
+  border-radius: 3px;
+  background: var(--cu-accent);
+  color: #fff6ec;
+  font-family: var(--cu-sans);
+  font-weight: 700;
+  font-size: 0.92rem;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(200, 90, 30, 0.32);
+  transition: transform 0.16s ease, background 0.16s ease;
+}
+
+.cu-kefu__fab:hover {
+  transform: translateY(-1px);
+  background: var(--cu-accent-deep);
+}
+
+.cu-kefu__panel {
+  position: fixed;
+  right: 1.25rem;
+  bottom: calc(1.25rem + 48px + 0.75rem);
+  width: min(380px, calc(100vw - 2.5rem));
+  height: min(560px, calc(100dvh - 160px));
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--cu-line);
+  border-radius: 6px;
+  background: var(--cu-card);
+  box-shadow: var(--cu-shadow);
+  overflow: hidden;
+  z-index: 41;
+}
+
+.cu-kefu__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.9rem 1rem;
+  background: var(--cu-accent-soft);
+  border-bottom: 1px solid var(--cu-line);
+}
+
+.cu-kefu__head strong {
+  display: block;
+  color: var(--cu-ink);
+}
+
+.cu-kefu__head small {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.78rem;
+  color: var(--cu-muted);
+}
+
+.cu-kefu__close {
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--cu-muted);
+  cursor: pointer;
+  padding: 0 0.4rem;
+  min-width: 32px;
+}
+
+.cu-kefu__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.cu-kefu__intro p,
+.cu-kefu__answer p,
+.cu-kefu__msg {
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--cu-ink-2);
+  margin: 0 0 0.4rem;
+}
+
+.cu-kefu__quick {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.cu-kefu__quick button {
+  width: 100%;
+  text-align: left;
+  min-height: 44px;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--cu-ink);
+  font-family: var(--cu-sans);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.cu-kefu__quick button:hover {
+  border-color: var(--cu-accent);
+  background: var(--cu-accent-soft);
+}
+
+.cu-kefu__answer-cat {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.12rem 0.55rem;
+  border-radius: 3px;
+  background: var(--cu-accent);
+  color: #fff6ec;
+}
+
+.cu-kefu__answer h4 {
+  margin: 0.5rem 0 0.5rem;
+  font-size: 1rem;
+  color: var(--cu-ink);
+  line-height: 1.5;
+}
+
+.cu-kefu__links {
+  margin: 0.6rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.88rem;
+}
+
+.cu-kefu__log .cu-kefu__msg {
+  margin-bottom: 0.4rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: 4px;
+}
+
+.cu-kefu__msg--user {
+  background: var(--cu-accent-soft);
+  color: var(--cu-ink);
+  margin-left: 2.5rem !important;
+}
+
+.cu-kefu__msg--bot {
+  margin-right: 2.5rem !important;
+}
+
+.cu-kefu__fallback {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.cu-kefu__fallback button,
+.cu-kefu__fallback a {
+  min-height: 40px;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--cu-line-strong);
+  border-radius: 8px;
+  background: var(--cu-card);
+  color: var(--cu-ink) !important;
+  font-family: var(--cu-sans);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.cu-kefu__foot {
+  border-top: 1px solid var(--cu-line);
+  padding: 0.75rem;
+}
+
+.cu-kefu__input {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.cu-kefu__input input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--cu-line-strong);
+  border-radius: 4px;
+  background: var(--cu-bg);
+  color: var(--cu-ink);
+  font-size: 0.9rem;
+  font-family: var(--cu-sans);
+}
+
+.cu-kefu__input input:focus {
+  outline: none;
+  border-color: var(--cu-accent);
+  box-shadow: 0 0 0 3px var(--cu-accent-soft);
+}
+
+.cu-kefu__input button {
+  flex: none;
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background: var(--cu-accent);
+  color: #fff6ec;
+  font-family: var(--cu-sans);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cu-kefu__contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+  font-size: 0.78rem;
+  color: var(--cu-muted);
+}
+
+.cu-kefu__copy {
+  border: 1px dashed var(--cu-line-strong);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--cu-muted);
+  font-family: var(--cu-sans);
+  font-size: 0.78rem;
+  padding: 0.25rem 0.5rem;
+  min-height: 30px;
+  cursor: pointer;
+}
+
+.cu-kefu__copy:hover {
+  color: var(--cu-accent-deep);
+  border-color: var(--cu-accent);
+}
+
+.cu-kefu__muted {
+  opacity: 0.6;
+}
+
+@media (max-width: 560px) {
+  .cu-kefu--right,
+  .cu-kefu--left {
+    right: 1rem;
+    left: auto;
+  }
+  .cu-kefu__panel {
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+    bottom: calc(1rem + 48px + 0.75rem);
+    height: min(70dvh, calc(100dvh - 140px));
+  }
+  .cu-kefu__fab-label {
+    display: none;
+  }
+  .cu-kefu__fab {
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+  }
+}
+/* =========================================================
+   收尾：Layout.vue 已不用默认外壳的 Layout（VPApp/VPContent/VPNav/VPLocalNav…），
+   这里对应删掉了原先那批「把默认外壳空节点 visibility: hidden」的补丁（隐藏 display:none 节点会
+   在 hydrate 时多出注释节点、触发 hydration mismatch；退到最薄的一层后问题从根上消失）。
+   深色模式下的 --vp-c-* 兜底变量保留：默认主题 base.css 仍会加载这些变量的默认值。
+   ========================================================= */
+
+/* 深色模式兜底：默认主题靠 html.dark 上的 --vp-c-* 变量着色，本站的表单控件、滚动条仍引用它们，
+   这里映射到自己的色板，避免漏进来的元素（输入框、边框）在深色下变成近黑。 */
+html.dark {
+  --vp-c-text-1: var(--cu-ink);
+  --vp-c-text-2: var(--cu-ink-2);
+  --vp-c-text-3: var(--cu-muted);
+  --vp-c-bg: var(--cu-bg);
+  --vp-c-bg-soft: var(--cu-card);
+  --vp-c-bg-alt: var(--cu-code-bg);
+  --vp-c-divider: var(--cu-line);
+  --vp-c-border: var(--cu-line-strong);
+  --vp-c-gutter: var(--cu-bg);
+}

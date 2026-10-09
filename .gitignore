@@ -1,0 +1,32 @@
+# ===== 敏感配置（含明文密码 / Bearer token / 登录态），禁止提交 =====
+config/agent_session.json
+config/agent_storage_state.json
+config/mcp_playwright_config.json
+config/local/
+config/seo_secrets.env
+.env
+.env.*
+!.env.example
+*.local
+
+# ===== 临时文件与采集产物 =====
+temp/
+.playwright-mcp/
+
+# ===== Python =====
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# ===== 官网构建产物 =====
+site/node_modules/
+site/.vitepress/dist/
+site/.vitepress/cache/
+
+# ===== 通用 =====
+*.log
+.DS_Store
+
+# ===== Cloudflare wrangler 本地状态（pages.json 只存 account_id） =====
+.wrangler/

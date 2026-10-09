@@ -1,0 +1,64 @@
+/* 表格（从 custom.css 拆出，改这个文件而不是 custom.css） */
+.cu-table-wrap {
+  overflow-x: auto;
+  margin: 1.25rem 0;
+  border: 1px solid var(--cu-line-strong);
+  border-radius: 6px;
+  background: var(--cu-card);
+}
+
+.cu-table {
+  width: 100%;
+  min-width: 540px;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.cu-table__caption {
+  caption-side: bottom;
+  text-align: left;
+  padding: 0.75rem 1.1rem;
+  font-size: 0.85rem;
+  color: var(--cu-muted);
+  border-top: 1px solid var(--cu-line);
+}
+
+.cu-table th,
+.cu-table td {
+  padding: 0.8rem 1.1rem;
+  text-align: left;
+  border-top: 1px solid var(--cu-line);
+  vertical-align: top;
+  line-height: 1.7;
+  color: var(--cu-ink-2);
+}
+
+.cu-table thead th {
+  border-top: none;
+  background: var(--cu-accent-soft);
+  font-weight: 700;
+  color: var(--cu-ink);
+  font-size: 0.9rem;
+}
+
+.cu-table__label {
+  width: 24%;
+  color: var(--cu-ink);
+  font-weight: 600;
+}
+
+.cu-table .is-highlight {
+  background: var(--cu-accent-soft);
+  font-weight: 600;
+  color: var(--cu-ink);
+}
+
+.cu-table--plain th,
+.cu-table--plain td {
+  min-width: 0;
+}
+
+.cu-table--plain tbody th {
+  width: 22%;
+}
+

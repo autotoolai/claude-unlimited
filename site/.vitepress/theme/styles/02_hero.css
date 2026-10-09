@@ -1,0 +1,123 @@
+/* Hero（从 custom.css 拆出，改这个文件而不是 custom.css） */
+.cu-hero {
+  position: relative;
+  margin: 0 0 2rem;
+  padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 3vw, 2.5rem);
+  border-radius: 4px;
+  border: 1px solid var(--cu-line);
+  background:
+    radial-gradient(ellipse 60% 70% at 100% 0%, var(--cu-accent-soft), transparent 60%),
+    var(--cu-card);
+  overflow: hidden;
+}
+
+/* Hero 顶部「上款线」：像手册扉页顶部的双细线 */
+.cu-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0.65rem 0.65rem auto;
+  height: 3px;
+  border-top: 1px solid var(--cu-line-strong);
+  border-bottom: 1px solid var(--cu-line-strong);
+  pointer-events: none;
+}
+
+.cu-hero__inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.cu-hero h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  line-height: 1.15;
+  color: var(--cu-ink);
+}
+
+.cu-lead {
+  margin: 1.1rem 0 0;
+  font-size: 1.02rem;
+  line-height: 1.85;
+  color: var(--cu-ink-2);
+}
+
+.cu-cta-row {
+  margin-top: 1.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.cu-cta-row--center {
+  justify-content: center;
+}
+
+.cu-hint {
+  margin: 0.8rem 0 0;
+  font-size: 0.84rem;
+  color: var(--cu-muted);
+}
+
+.cu-hint--center {
+  text-align: center;
+}
+
+.cu-hero__art svg {
+  width: 100%;
+  height: auto;
+}
+
+.cu-art-node rect {
+  transition: transform 0.2s ease;
+}
+
+.cu-hero__art:hover .cu-art-node rect {
+  transform: translateY(-2px);
+}
+
+.cu-art-link {
+  animation: cu-dash 24s linear infinite;
+}
+
+@keyframes cu-dash {
+  to {
+    stroke-dashoffset: -160;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .cu-art-link {
+    animation: none;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 900px) {
+  /* Hero 顶部「上款线」：像手册扉页顶部的双细线 */
+.cu-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0.65rem 0.65rem auto;
+  height: 3px;
+  border-top: 1px solid var(--cu-line-strong);
+  border-bottom: 1px solid var(--cu-line-strong);
+  pointer-events: none;
+}
+
+.cu-hero__inner {
+    grid-template-columns: 1fr;
+  }
+  .cu-hero__art {
+    max-width: 480px;
+  }
+}
+

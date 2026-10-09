@@ -1,0 +1,9 @@
+node_modules/
+.vitepress/dist/
+.vitepress/cache/
+*.log
+temp/
+
+# ===== Playwright MCP 临时产物 =====
+.playwright-mcp/
+home_new_*.png

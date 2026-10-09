@@ -1,0 +1,79 @@
+/* 信任背书 / CTA 横条 / 声明（从 custom.css 拆出，改这个文件而不是 custom.css） */
+.cu-trust {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.cu-trust__item {
+  padding: 1.2rem 1.3rem;
+  border-left: 3px solid var(--cu-accent);
+  background: var(--cu-card);
+  border-radius: 0 14px 14px 0;
+}
+
+.cu-trust__item h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cu-ink);
+}
+
+.cu-trust__item p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: var(--cu-muted);
+}
+
+.cu-band {
+  margin: 3.5rem 0 0;
+  padding: 2.75rem 1.75rem;
+  border-radius: 22px;
+  background:
+    radial-gradient(ellipse 70% 90% at 0% 0%, var(--cu-accent-soft), transparent 60%),
+    var(--cu-card);
+  border: 1px solid var(--cu-line);
+  text-align: center;
+}
+
+.cu-band h2 {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.8vw, 1.75rem);
+  border: none;
+  color: var(--cu-ink);
+}
+
+.cu-band p {
+  margin: 0.6rem auto 0;
+  max-width: 36rem;
+  line-height: 1.8;
+  color: var(--cu-ink-2);
+}
+
+.cu-band .cu-cta-row {
+  margin-top: 1.5rem;
+}
+
+.cu-notice {
+  margin: 2.5rem 0 0;
+  padding: 1rem 1.2rem;
+  border: 1px dashed var(--cu-line-strong);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: var(--cu-muted);
+}
+
+.cu-notice p {
+  margin: 0;
+  max-width: none;
+}
+
+@media (max-width: 720px) {
+  .cu-trust {
+    grid-template-columns: 1fr;
+  }
+}
+

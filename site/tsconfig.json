@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    // vitepress 1.6.4 自身带的 theme-default/*.vue 引用了未声明类型的 .js 模块（TS7016），
+    // 24 条错误全部来自 node_modules/vitepress 内部、站点源码 0 条；skipLibCheck 管不到 .vue，所以过滤掉它们。
+    // 放开后请先确认 grep -v "node_modules/vitepress" temp/typecheck.log 为空。
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client", "node"],
+    "paths": {
+      "*.vue": ["./.vitepress/theme/components/*.vue"]
+    }
+  },
+  "include": ["config/**/*.ts", "scripts/**/*.ts", ".vitepress/**/*.ts", ".vitepress/**/*.vue", "*.mts"],
+  "exclude": ["node_modules", ".vitepress/dist", ".vitepress/cache", "docs"]
+}

@@ -1,0 +1,77 @@
+/* 步骤条（从 custom.css 拆出，改这个文件而不是 custom.css） */
+.cu-steps {
+  list-style: none;
+  margin: 1.5rem 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.cu-step {
+  position: relative;
+  display: flex;
+  gap: 0.85rem;
+  padding: 1.25rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 6px;
+  background: var(--cu-card);
+}
+
+.cu-step__no {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cu-accent);
+  color: #fff6ec;
+  font-family: var(--cu-serif);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.cu-step__body h3 {
+  margin: 0.35rem 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cu-ink);
+}
+
+.cu-step__body p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: var(--cu-muted);
+}
+
+.cu-step__code {
+  margin: 0.75rem 0 0;
+  padding: 0.7rem 0.8rem;
+  border-radius: 4px;
+  background: var(--cu-code-bg);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+.cu-step__code code {
+  background: transparent;
+  padding: 0;
+}
+
+@media (max-width: 1100px) {
+  .cu-steps--horizontal {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .cu-steps--horizontal,
+  .cu-steps--vertical {
+    grid-template-columns: 1fr;
+  }
+}
+

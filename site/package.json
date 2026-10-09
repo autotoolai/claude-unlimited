@@ -1,0 +1,28 @@
+{
+  "name": "claude-unlimited-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "cross-env VITEPRESS_DEV=1 node scripts/copy_public.mjs --watch",
+    "dev:site": "vitepress dev --host 0.0.0.0 --port 5199 --strictPort",
+    "build": "vitepress build && npm run gen:sitemap && node scripts/copy_public.mjs && node scripts/check_dist.mjs",
+    "preview": "vitepress preview",
+    "gen:sitemap": "tsx scripts/gen_sitemap.ts",
+    "check:links": "tsx scripts/check_links.ts",
+    "check:dist": "node scripts/check_dist.mjs",
+    "verify": "python scripts/verify_build.py",
+    "gen:og": "python scripts/gen_og.py",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20 <25"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitepress": "^1.6.4",
+    "vue-tsc": "^2.1.10",
+    "cross-env": "^7.0.3"
+  }
+}

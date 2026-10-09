@@ -1,0 +1,436 @@
+/* 外壳补充样式：主题顶层 import，会被 VitePress 抽成独立 CSS 插进 <head>，不进 JS bundle。
+   内容：外壳底部布局、页脚、教程步骤块 / 截图 / 终端块 / 下一步导航、人工客服浮标与面板。 */
+.cu-shell__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.cu-foot {
+  margin-top: 3rem;
+  border-top: 2px solid var(--cu-ink);
+  background: var(--cu-card);
+}
+.cu-foot__inner {
+  width: min(1160px, 100% - 2.5rem);
+  margin-inline: auto;
+  padding: 2rem 0 2.5rem;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 2rem;
+}
+.cu-foot__brand p {
+  margin: 0.7rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: var(--cu-muted);
+  max-width: 34ch;
+}
+.cu-foot h4 {
+  margin: 0 0 0.6rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cu-muted);
+  font-weight: 700;
+}
+.cu-foot ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cu-foot li {
+  margin: 0.35rem 0;
+}
+.cu-foot a {
+  color: var(--cu-ink-2);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.cu-foot a:hover {
+  color: var(--cu-accent-deep);
+  text-decoration: underline;
+}
+.cu-foot__bottom {
+  border-top: 1px solid var(--cu-line);
+}
+.cu-foot__bottom > div {
+  width: min(1160px, 100% - 2.5rem);
+  margin-inline: auto;
+  padding: 0.9rem 0 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  font-size: 0.78rem;
+  color: var(--cu-muted);
+  line-height: 1.7;
+}
+
+@media (max-width: 720px) {
+  .cu-foot__inner {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.cu-steps-block {
+  margin: 2.5rem 0;
+  border-top: 2px solid var(--cu-ink);
+  border-bottom: 1px solid var(--cu-line);
+}
+
+.cu-step-block {
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr);
+  gap: 0 1.25rem;
+  padding: 1.5rem 0 1.75rem;
+  border-top: 1px solid var(--cu-line);
+  list-style: none;
+  margin: 0;
+}
+.cu-steps-block > .cu-step-block:first-child {
+  border-top: none;
+  padding-top: 1.25rem;
+}
+
+.cu-step-block__no {
+  grid-row: 1 / span 99;
+  font-family: var(--cu-serif);
+  font-size: 2.1rem;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--cu-accent);
+  border-right: 1px solid var(--cu-line-strong);
+  padding-top: 0.1rem;
+}
+
+.cu-step-block__body > h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.18rem;
+  line-height: 1.45;
+  color: var(--cu-ink);
+}
+
+.cu-step-block__body p {
+  margin: 0 0 0.65rem;
+  color: var(--cu-ink-2);
+  line-height: 1.9;
+}
+.cu-step-block__body p:last-child {
+  margin-bottom: 0;
+}
+
+.cu-step-block__do {
+  margin: 0.85rem 0 0;
+  padding: 0.7rem 0.9rem;
+  border-left: 3px solid var(--cu-accent);
+  background: var(--cu-accent-soft);
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--cu-ink-2);
+}
+
+.cu-step-block__tips {
+  margin: 0.9rem 0 0;
+  padding: 0 0 0 1.1rem;
+  font-size: 0.88rem;
+  color: var(--cu-muted);
+}
+.cu-step-block__tips li {
+  margin: 0.25rem 0;
+}
+
+.cu-step-block__shot {
+  margin: 1rem 0 0;
+  max-width: 640px;
+}
+
+.cu-shot {
+  margin: 1.5rem 0;
+}
+.cu-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--cu-figure-frame);
+  border-radius: 2px;
+  background: var(--cu-card);
+}
+.cu-shot figcaption {
+  margin-top: 0.45rem;
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: var(--cu-muted);
+  display: flex;
+  gap: 0.5rem;
+}
+.cu-shot figcaption b {
+  color: var(--cu-accent-deep);
+  font-family: var(--cu-mono);
+  font-weight: 700;
+}
+
+.cu-term {
+  margin: 1rem 0;
+  border: 1px solid var(--cu-line-strong);
+  border-radius: 4px;
+  background: var(--cu-code-bg);
+  overflow: hidden;
+}
+.cu-term__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.7rem;
+  border-bottom: 1px solid var(--cu-line);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cu-muted);
+}
+.cu-term__bar i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--cu-line-strong);
+}
+.cu-term__bar i:first-child {
+  background: var(--cu-accent);
+}
+.cu-term pre {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  overflow-x: auto;
+  font-size: 0.82rem;
+  line-height: 1.75;
+}
+.cu-term code {
+  background: transparent;
+  padding: 0;
+}
+
+.cu-next {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 2.5rem 0 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--cu-line);
+}
+.cu-next a {
+  display: block;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 4px;
+  text-decoration: none;
+  color: var(--cu-ink-2);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.cu-next a:hover {
+  border-color: var(--cu-accent);
+  background: var(--cu-accent-soft);
+}
+.cu-next small {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cu-muted);
+  margin-bottom: 0.25rem;
+}
+.cu-next strong {
+  color: var(--cu-ink);
+  font-size: 1rem;
+}
+
+.cu-human {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 45;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+
+.cu-human__fab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 46px;
+  padding: 0.6rem 1.05rem;
+  border: 1px solid var(--cu-line-strong);
+  border-radius: 3px;
+  background: var(--cu-card);
+  color: var(--cu-ink);
+  font-family: var(--cu-sans);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: var(--cu-shadow-soft);
+  transition: transform 0.16s ease, border-color 0.16s ease;
+}
+.cu-human__fab:hover {
+  transform: translateY(-1px);
+  border-color: var(--cu-accent);
+}
+.cu-human__fab svg {
+  color: #1aad19;
+}
+
+.cu-human__panel {
+  width: 300px;
+  max-width: calc(100vw - 2.5rem);
+  border: 1px solid var(--cu-line-strong);
+  border-radius: 4px;
+  background: var(--cu-card);
+  box-shadow: var(--cu-shadow);
+  overflow: hidden;
+}
+.cu-human__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid var(--cu-line);
+}
+.cu-human__head strong {
+  font-size: 0.95rem;
+  color: var(--cu-ink);
+}
+.cu-human__head small {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--cu-muted);
+}
+.cu-human__close {
+  border: none;
+  background: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--cu-muted);
+  cursor: pointer;
+  padding: 0.2rem 0.35rem;
+}
+.cu-human__close:hover {
+  color: var(--cu-ink);
+}
+
+.cu-human__body {
+  padding: 0.9rem 0.85rem 1rem;
+  text-align: center;
+}
+.cu-human__qr {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 0.7rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 2px;
+  background: #fff;
+  object-fit: contain;
+  padding: 6px;
+}
+.cu-human__qr--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: var(--cu-code-bg);
+  color: var(--cu-muted);
+  font-size: 0.82rem;
+  line-height: 1.7;
+  text-align: center;
+  white-space: pre-line;
+}
+.cu-human__name {
+  margin: 0 0 0.15rem;
+  font-weight: 700;
+  color: var(--cu-ink);
+}
+.cu-human__copy {
+  margin-left: 0.4rem;
+  padding: 0.1rem 0.45rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 3px;
+  background: var(--cu-accent-soft);
+  color: var(--cu-accent-deep);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.cu-human__copy:hover {
+  border-color: var(--cu-accent);
+}
+.cu-human__hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  color: var(--cu-muted);
+}
+.cu-human__link {
+  color: var(--cu-accent-deep);
+  font-weight: 600;
+  text-decoration: none;
+}
+.cu-human__link:hover {
+  text-decoration: underline;
+}
+.cu-human__acts {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.cu-human__acts .cu-btn {
+  flex: 1;
+}
+
+/* 桌面：人工客服在右下，助手浮标横向排到它左边（此前两者完全重叠，点不到助手） */
+@media (min-width: 721px) {
+  .cu-kefu--right {
+    right: 16.75rem;
+  }
+  .cu-kefu--left {
+    left: 1.25rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .cu-human {
+    right: 0.75rem;
+    bottom: 0.75rem;
+    flex-direction: row-reverse;
+    align-items: center;
+  }
+  .cu-human__panel {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 5.75rem;
+    width: auto;
+    max-width: none;
+  }
+  .cu-human__fab span {
+    display: none;
+  }
+  .cu-human__fab {
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    justify-content: center;
+  }
+  .cu-kefu {
+    bottom: 0.75rem;
+    right: 0.75rem;
+  }
+  .cu-kefu--right {
+    right: 4.25rem;
+  }
+  .cu-step-block {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: 0 0.85rem;
+  }
+  .cu-step-block__no {
+    font-size: 1.5rem;
+  }
+}
