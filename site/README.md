@@ -68,7 +68,8 @@ markdown 编译成 `<template><div>…</div></template>` 并用 inline 渲染模
 | 项 | 值 |
 |---|---|
 | Pages 项目 | `claude-unlimited-site`（直接上传，生产分支 `master`，项目 ID `3b3e80aa-3a64-4d73-bdec-64ce9314ca83`） |
-| 线上地址 | https://claude-unlimited-site.pages.dev |
+| 正式域名 | https://claude-unlimited.aiautotools.com（自有域名 `aiautotools.com` 的子域；注册商阿里云，DNS 与 Pages 托管在 Cloudflare） |
+| 备用地址 | https://claude-unlimited-site.pages.dev（Pages 默认域，仍可访问，不做 SEO） |
 | 部署凭据 | 本机环境变量 `CLOUDFLARE_API_TOKEN`（与参考项目 Product 共用同一个 token；不要写进仓库） |
 | 源码备份 | https://github.com/futianren/claude-unlimited-site（公开仓库，`master` 分支；Pages 本身不依赖它，只作备份与协作）。**首次上线期间 `github.com:443` 从本机间歇性连不上（`api.github.com` 正常），若 `git push` 报连接失败，重试即可，Pages 不受影响** |
 | 部署前门禁 | `npm run build` 内含 `check_dist.mjs`（SSR 结构断言）+ `verify`（60+ 项 SEO / 组件 / 链接验收） |
@@ -103,14 +104,14 @@ pwsh -File scripts/deploy_claude_unlimited_site.ps1 -Branch preview -SkipNotify
 
 - OG 图：`public/og/{home,pricing,unlimited,faq}.png` 已由 `npm run gen:og` 生成（1200×630）。教程四页暂不出图（`transformHead` 会指向不存在的 `/og/guide*.png`，分享那几页时卡片空白，可接受）。
 - `config.mts` 里没有 Analytics 埋点占位，`REPLACE_WITH_CF_ANALYTICS_TOKEN` 那条已过期。
-- 域名：`config/site.ts` 的 `url` 现为 `https://claude-unlimited-site.pages.dev`，canonical / sitemap / robots / OG 全部跟随。**换自定义域时只改这一处**，然后重新部署；Pages 侧绑自定义域参考项目是给 Pages 加 domain（DNS 自动出 CNAME，再把同一 host 的 CNAME 指向 `<project>.pages.dev`）。
+- 域名：`config/site.ts` 的 `url` 现为 `https://claude-unlimited.aiautotools.com`，canonical / sitemap / robots / OG / llms.txt 全部跟随。**换域名时只改这一处**，然后重新部署。绑定流程：Pages 项目加 domain（POST `/pages/projects/<name>/domains`）→ 在 zone 里建同名 CNAME 指向 `<project>.pages.dev` 并开橙云代理（与参考项目 Product 的 `alibabadesignkit.aiautotools.com` 同款；Pages 加域时不会自动建 DNS）→ 等 Pages 签证书并把 status 推到 `active`。`docs/404.md` 里另有一处 canonical 要同步改。
 
 ## 本地 → 上线流程（改内容后照做）
 
 1. 改 `site/config/*.ts`（商品、联系方式、合作平台地址、FAQ、教程）或 `site/.vitepress/theme/*.vue`（版式）。
 2. `cd site && npm run build`：`check_dist.mjs` 结构门禁不过就不要继续；再 `npm run verify` 跑 60+ 项 SEO / 组件 / 链接验收。
 3. `pwsh -File scripts/deploy_claude_unlimited_site.ps1 -SkipNotify`（需要 `CLOUDFLARE_API_TOKEN`）。
-4. 线上核对：`curl -sI https://claude-unlimited-site.pages.dev/guide | grep -i location` 看是否 308 到无后缀；首页看 `grep -o 'data-cta="[a-z_]*"'`；404 看 title / robots noindex。
+4. 线上核对：`curl -sI https://claude-unlimited.aiautotools.com/guide | grep -i location` 看是否 308 到无后缀；首页看 `grep -o 'data-cta="[a-z_]*"'`；404 看 title / robots noindex。
 5. 提交并推送备份仓库（`git push`；本机到 `github.com:443` 曾出现间歇性连不上，失败时重试或改用 SSH 传输，`gh api repos/futianren/claude-unlimited-site/commits/master` 可查远端状态）。
 
 ## 已知问题

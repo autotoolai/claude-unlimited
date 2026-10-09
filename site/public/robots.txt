@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://claude-unlimited-site.pages.dev/sitemap.xml
+Sitemap: https://claude-unlimited.aiautotools.com/sitemap.xml

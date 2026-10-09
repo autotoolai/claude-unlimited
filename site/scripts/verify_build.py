@@ -110,7 +110,7 @@ def main():
         body = raw.decode('utf-8', errors='ignore')
         # 真实页面标题带站名，404 页标题是「404 | 站名」；用标题判定比找布局 class 稳
         titles = re.findall(r'<title>([^<]*)</title>', body)
-        is_real = (not u.endswith('.html')) or (bool(titles) and not titles[0].startswith('404'))
+        is_real = (not u.endswith('.html')) or (bool(titles) and not titles[0].startswith('404') and not titles[0].startswith('页面不存在'))
         check(f'{u:16} {st}', st == 200 and is_real, '' if is_real else f'实际标题 {titles[:1]}')
 
     print('\nOG 图（社交分享卡片）')
@@ -211,7 +211,7 @@ def main():
     try:
         st, raw = get(base, '/no-such-page')
         body = raw.decode('utf-8', errors='ignore')
-        check('404 命中 not-found 模板且标题为 404', st == 200 and '<title>404' in body and 'PAGE NOT FOUND' not in body, re.findall(r'<title>([^<]*)</title>', body)[:1])
+        check('404 是自定义模板页（标题以「页面不存在」开头，不是 VitePress 默认的 404 / PAGE NOT FOUND）', st == 200 and '<title>页面不存在' in body and 'PAGE NOT FOUND' not in body, re.findall(r'<title>([^<]*)</title>', body)[:1])
     except Exception as e:
         check('404 命中 not-found 模板', False, str(e))
 

@@ -1,7 +1,7 @@
 # ===== 敏感配置（含明文密码 / Bearer token / 登录态），禁止提交 =====
-config/agent_session.json
-config/agent_storage_state.json
-config/mcp_playwright_config.json
+vpns_beer_agent/config/agent_session.json
+vpns_beer_agent/config/agent_storage_state.json
+vpns_beer_agent/config/mcp_playwright_config.json
 config/local/
 config/seo_secrets.env
 .env

@@ -76,7 +76,7 @@ export const siteConfig: SiteConfig = {
   tagline: '一个 Key，Claude 不限量用',
   description:
     'Claude 无限卡官网：订阅期内 Claude API 不按 token 计费，支持 Claude Code、Cursor、Cline 等主流工具。本站只做介绍与答疑，购买跳转第三方发卡站。',
-  url: 'https://claude-unlimited-site.pages.dev',
+  url: 'https://claude-unlimited.aiautotools.com',  // 自定义域（Pages 域 claude-unlimited-site.pages.dev 仍可访问）
 
   partners: [
     {

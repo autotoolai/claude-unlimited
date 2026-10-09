@@ -4,14 +4,14 @@
 
 ## 页面
 
-- [首页](https://claude-unlimited-site.pages.dev/): 无限额度与按量计费的差别、套餐、合作平台入口
-- [套餐定价](https://claude-unlimited-site.pages.dev/pricing): 套餐内容、包含与不包含、退款说明
-- [无限额度](https://claude-unlimited-site.pages.dev/unlimited): 无限额度定义、支持模型与能力、公平使用
-- [使用教程](https://claude-unlimited-site.pages.dev/guide): 五步从卡密到跑起来：兑换 → CC Switch → 一键导入 → 添加模型 → 启用检测
-- [接入与模型](https://claude-unlimited-site.pages.dev/guide/clients): 终端 claude 命令、VS Code 官方插件、Cursor / Cline 自定义端点
-- [模型与切换](https://claude-unlimited-site.pages.dev/guide/models): 常用 model ID、/model 指令、新模型上线怎么办
-- [CC Switch 详解](https://claude-unlimited-site.pages.dev/guide/ccswitch): 手动配置字段填法与排错清单
-- [常见问题](https://claude-unlimited-site.pages.dev/faq): 全量 FAQ（商品 / 购买支付 / 使用配置 / 接入使用 / 限速封号 / 数据安全 / 关于我们）
+- [首页](https://claude-unlimited.aiautotools.com/): 无限额度与按量计费的差别、套餐、合作平台入口
+- [套餐定价](https://claude-unlimited.aiautotools.com/pricing): 套餐内容、包含与不包含、退款说明
+- [无限额度](https://claude-unlimited.aiautotools.com/unlimited): 无限额度定义、支持模型与能力、公平使用
+- [使用教程](https://claude-unlimited.aiautotools.com/guide): 五步从卡密到跑起来：兑换 → CC Switch → 一键导入 → 添加模型 → 启用检测
+- [接入与模型](https://claude-unlimited.aiautotools.com/guide/clients): 终端 claude 命令、VS Code 官方插件、Cursor / Cline 自定义端点
+- [模型与切换](https://claude-unlimited.aiautotools.com/guide/models): 常用 model ID、/model 指令、新模型上线怎么办
+- [CC Switch 详解](https://claude-unlimited.aiautotools.com/guide/ccswitch): 手动配置字段填法与排错清单
+- [常见问题](https://claude-unlimited.aiautotools.com/faq): 全量 FAQ（商品 / 购买支付 / 使用配置 / 接入使用 / 限速封号 / 数据安全 / 关于我们）
 
 ## 事实要点
 
