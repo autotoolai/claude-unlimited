@@ -1,15 +1,16 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  构建并部署 Claude 无限卡官网到 Cloudflare Pages（直接上传模式），随后可选通知搜索引擎。
+  Build the Claude unlimited-card site and deploy dist to Cloudflare Pages (direct upload).
 .DESCRIPTION
-  托管抽象层：Pages / Workers Static Assets 的差异全部收敛在本文件，站点源码无需改动即可切换托管方式。
-  与仓库根目录无关，只依赖 site/ 自身；可从任意目录调用。
+  Hosting abstraction only: the Pages / Workers Static Assets differences are confined to this file.
+  Chinese notes live in scripts/deploy_claude_unlimited_site.md, because PowerShell 5.1 reads BOM-less
+  .ps1 files as ANSI and any non-ASCII char (even inside a comment) may trigger a ParserError.
 #>
 param(
   [switch]$SkipNotify,
   [string]$ProjectName = 'claude-unlimited-site',
-  # 部署到生产分支才会更新 <project>.pages.dev；传 -Branch 得到的是预览地址。
+  # Only the production branch updates <project>.pages.dev; any other branch yields a preview URL.
   [string]$Branch = 'master'
 )
 
@@ -18,25 +19,25 @@ $SiteDir = Split-Path -Parent $PSScriptRoot
 Set-Location $SiteDir
 
 if (-not $env:CLOUDFLARE_API_TOKEN) {
-  throw '缺少环境变量 CLOUDFLARE_API_TOKEN。请在本机 PowerShell 配置文件 / 会话里设置（参考项目 Product 用的同一个 token），不要写进仓库。'
+  throw 'Missing env var CLOUDFLARE_API_TOKEN. Set it in your PowerShell profile / session (same token as the Product project); never commit it.'
 }
 
 npm run build
-if ($LASTEXITCODE -ne 0) { throw 'build 失败，已中止部署' }
+if ($LASTEXITCODE -ne 0) { throw 'build failed, deploy aborted' }
 
-# --commit-dirty=true：当前仓库尚未设置 git remote，wrangler 拿不到提交信息，不加这个参数会直接拒绝部署。
+# --commit-dirty=true: required when the working tree is dirty or the repo has no commit metadata yet.
 npx --yes wrangler@4 pages deploy .vitepress/dist --project-name=$ProjectName --branch=$Branch --commit-dirty=true
-if ($LASTEXITCODE -ne 0) { throw 'wrangler 部署失败' }
+if ($LASTEXITCODE -ne 0) { throw 'wrangler deploy failed' }
 
 Write-Host ''
-Write-Host "线上地址（分支 $Branch）：https://$ProjectName.pages.dev"
-Write-Host '自定义域、GitHub 备份、ICP 备案等上线后事项见 site/README.md「上线前必须确认」。'
+Write-Host "Online URL (branch ${Branch}): https://${ProjectName}.pages.dev"
+Write-Host 'Custom domain, GitHub backup, ICP filing and other post-launch items: see site/README.md'
 
 if (-not $SkipNotify) {
   $seo = Join-Path $PSScriptRoot 'claude_unlimited_seo_notify.ps1'
   if (Test-Path $seo) {
     pwsh -NoProfile -File $seo
   } else {
-    Write-Host '跳过 SEO 通知：未找到 claude_unlimited_seo_notify.ps1（首版未内置，需要时按参考项目 scripts/marketing_seo_notify.ps1 复制一份）'
+    Write-Host 'Skip SEO notify: claude_unlimited_seo_notify.ps1 not found (not bundled in v1; copy from the reference project Product/scripts/marketing_seo_notify.ps1 when needed).'
   }
 }

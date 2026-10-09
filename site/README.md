@@ -10,7 +10,7 @@ Claude 无限卡的展示型官网：介绍商品与接入方式，把购买导�
 | 样式 | 原生 CSS + CSS 变量：`.vitepress/theme/styles/*.css`（按区块拆分的全站样式，浅色/深色两套 token）+ `.vitepress/theme/shell_extra.css`（页脚 / 教程步骤块 / 人工客服浮标），全部在 `theme/index.ts` 顶层 import，构建期抽成独立 CSS 进 `<head>` |
 | 组件 | 自研 Vue 组件（PageShell 外壳 + Hero/卡片/步骤/套餐卡/对比表/FAQ/助手等），无图标库、无动画库、无 Tailwind |
 | 页面 | 八个 `.vue` 页面组件（`.vitepress/theme/index.vue`、`guide_index.vue` 等），`docs/` 下的 `.md` 只作路由壳；组件必须在 `theme/index.ts` 的 `themePages` 里注册，否则 `frontmatter.layout` 解析不到 |
-| 部署 | Cloudflare Pages（托管方式抽象在 `scripts/deploy_claude_unlimited_site.ps1`，可切 Workers Static Assets） |
+| 部署 | Cloudflare Pages **直接上传模式**（本机构建后 `wrangler pages deploy` 推 dist，不绑 Git；托管方式抽象在 `scripts/deploy_claude_unlimited_site.ps1`，可切 Workers Static Assets） |
 | 图床 | 二期接 Cloudflare R2；`imgCdn` 留空时回落打包资源 |
 
 ## 目录
@@ -63,22 +63,51 @@ markdown 编译成 `<template><div>…</div></template>` 并用 inline 渲染模
 当普通元素原样写进 SSR HTML，markdown-it 对 `<script>` 块的切分又会随空行变化把正文降级成字面量 `<pre><code>`。
 迁移前的 markdown 原文在 `archive/docs_before_20261008/`，仅供对照。
 
+## 上线现状（2026-10-09）
+
+| 项 | 值 |
+|---|---|
+| Pages 项目 | `claude-unlimited-site`（直接上传，生产分支 `master`，项目 ID `3b3e80aa-3a64-4d73-bdec-64ce9314ca83`） |
+| 线上地址 | https://claude-unlimited-site.pages.dev |
+| 部署凭据 | 本机环境变量 `CLOUDFLARE_API_TOKEN`（与参考项目 Product 共用同一个 token；不要写进仓库） |
+| 源码备份 | https://github.com/futianren/claude-unlimited-site（公开仓库，`master` 分支；Pages 本身不依赖它，只作备份与协作） |
+| 部署前门禁 | `npm run build` 内含 `check_dist.mjs`（SSR 结构断言）+ `verify`（60+ 项 SEO / 组件 / 链接验收） |
+| 类型检查 | `npm run typecheck` 会报 24 条 TS7016，**全部来自 `node_modules/vitepress` 内部的 `.vue` 文件**，站点源码 0 条；VitePress 1.6.4 自身不带 `.js` 模块声明，`skipLibCheck` 管不到 `.vue`，所以只能过滤：`grep -v "node_modules/vitepress" temp/typecheck.log` 应为空 |
+
+因为是直接上传模式，Cloudflare 后台的「构建命令 / 输出目录 / Node 版本」对线上站点不生效，那些只在切到 Git 集成时才需要填。
+
 ## 部署
 
 ```powershell
-pwsh -File scripts/deploy_claude_unlimited_site.ps1
+# 需要本机已设置 CLOUDFLARE_API_TOKEN；脚本会先 npm run build（失败即中止），再 wrangler 推到生产分支
+cd site
+pwsh -File scripts/deploy_claude_unlimited_site.ps1 -SkipNotify
+
+# 只发到预览地址（不更新 pages.dev）
+pwsh -File scripts/deploy_claude_unlimited_site.ps1 -Branch preview -SkipNotify
 ```
 
-先在 Cloudflare 建 Pages 项目（构建命令 `npm run build`，输出目录 `.vitepress/dist`，Node 20）并配置环境变量 `CLOUDFLARE_API_TOKEN`。
+脚本已重写为只依赖 `site/` 自身（不再硬编码仓库根路径），并对 PowerShell 5.1 做了兼容：**注释里只能出现 ASCII**（中文注释在无 BOM 的 .ps1 里会被 5.1 按系统 ANSI 代码页读成乱码，可能触发 ParserError），`Write-Host` 里拼变量要用 `${Branch}` 而不是 `$Branch:`。
 
 ## 上线前必须确认
 
-1. 正式主域名：改 `config/site.ts` 的 `url`，Pages 绑定自定义域，sitemap / canonical / OG 自动跟随。
-2. 商品文案：改 `config/site.ts` 的 `products[0]`（名称、价格、周期、卖点）。
-3. 首页数据条：`config/site.ts` 的 `stats` 只用可核实数字，否则删掉整块。
-4. **卡密兑换与 API Key 的网址**：改 `config/site.ts` 的 `partners` 里 `id: 'activation'` 的 `url`。现在留空，首页「合作与兑换」卡片与教程里第 1、3 步拿不到链接，补上即可，无需改代码。`purchase`（发卡站）与 `ccswitch`（下载站）同理。
-5. 客服：改 `config/site.ts` 的 `contact`（`wechatId` / `wechatQr` / `qq` / `qqGroup` / `email` / `hours`）。把微信二维码图片放到 `docs/assets/` 或 `public/`，文件名填进 `wechatQr`；现在留空，人工客服面板显示占位框但「复制微信号 / QQ / QQ 群」已经可用。
-6. Cloudflare Analytics token：`config.mts` 里的 `REPLACE_WITH_CF_ANALYTICS_TOKEN`。
-7. OG 图：`public/og/*.png` 目前**缺失**，社交分享卡片会是空白。需按 1200×630 出图（品牌底色 + 标题 + 价格）。`npm run verify` 会把缺失项报成 FAIL。教程页可暂不出图。
-8. 法务确认：退款规则、限速数字、免责声明措辞（`config/faq.ts` 与 `config/site.ts` 的 `disclaimer`）；`legal.icp` / `legal.company` 填备案号与运营主体。
-9. 教程内容核对：`config/guide.ts` 的「五步总览」按卖家教程站 `https://wx.bbyy.site/` 提炼重写，截图已裁掉品牌栏与二维码；上线前对照自家流程核一遍措辞与截图。
+已随首版上线、现在只剩「待用户决定」或「待内容核对」的项：
+
+1. **卡密兑换与 API Key 的网址**（最影响转化）：`config/site.ts` 的 `partners` 里 `id: 'activation'` 的 `url` 现在是空字符串。首页「合作平台」卡片会降级成一句「入口待补充」（组件已做空值处理，不会出现空链接），但教程第 1 步、第 3 步的「一键导入」没有入口，用户只能自己找到兑换页。补上 URL 即可，无需改代码，然后重新部署。`purchase`（`catfk.com`）与 `ccswitch`（`ccswitch.io`）已填。
+2. **微信二维码图片**：把图片放到 `site/docs/assets/` 或 `site/public/`，文件名填进 `config/site.ts` 的 `contact.wechatQr`。现在留空，人工客服面板显示占位框，但「复制微信号 / QQ / QQ 群」已经可用。
+3. **法务确认**：退款规则、限速数字（单 Key 并发 20、60 次/分钟、300k token/分钟）、免责声明措辞（`config/faq.ts` 与 `config/site.ts` 的 `disclaimer`）；`legal.icp` / `legal.company` 填 ICP 备案号与运营主体，填了才会出现在页脚。
+4. **教程内容核对**：`config/guide.ts` 的「五步总览」与 `config/faq.ts` 的「使用与配置」分类是按卖家教程站 `https://wx.bbyy.site/` 的内容重写的，截图已裁掉品牌栏与二维码。买家到底是走自己的兑换页还是卖家站，措辞要按实际情况调一遍。
+5. **SEO 提交**：`scripts/claude_unlimited_seo_notify.ps1` 未内置（部署脚本会跳过）。需要时照参考项目 `Product/scripts/marketing_seo_notify.ps1` 复制一份，密钥放 `config/local/seo_secrets.env`（已 gitignore）。
+
+已经处理掉的（首版上线时改的）：
+
+- OG 图：`public/og/{home,pricing,unlimited,faq}.png` 已由 `npm run gen:og` 生成（1200×630）。教程四页暂不出图（`transformHead` 会指向不存在的 `/og/guide*.png`，分享那几页时卡片空白，可接受）。
+- `config.mts` 里没有 Analytics 埋点占位，`REPLACE_WITH_CF_ANALYTICS_TOKEN` 那条已过期。
+- 域名：`config/site.ts` 的 `url` 现为 `https://claude-unlimited-site.pages.dev`，canonical / sitemap / robots / OG 全部跟随。**换自定义域时只改这一处**，然后重新部署；Pages 侧绑自定义域参考项目是给 Pages 加 domain（DNS 自动出 CNAME，再把同一 host 的 CNAME 指向 `<project>.pages.dev`）。
+
+## 已知问题
+
+- 兑换页地址为空（见上面第 1 条），这是当前唯一影响用户走通流程的缺口。
+- `.wrangler/` 是 wrangler 在**仓库根**写的本地缓存（只存 account_id），已加进根 `.gitignore`；参考项目 Product 里也有同名目录并同样忽略。
+- 生产构建的 dist 每页仍有一条 `Hydration completed but contains mismatches` 控制台警告（dev 下没有），原因与现状见 `temp/hydration_mismatch.md`，不影响功能。
+
