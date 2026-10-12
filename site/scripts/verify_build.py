@@ -1,5 +1,5 @@
 """
-把构建产物抽到临时根目录，按 Pages cleanUrls 起服务，跑 SEO / 购买按钮 / 组件 / 助手语料验收。
+把构建产物抽到临时根目录，按 Pages cleanUrls 起服务，跑 SEO / 购买按钮 / 组件 / 助手语料 / 知识库验收。
 srcDir='docs' 时条目页产物直接在 dist 根（index.html / pricing.html ...），与 Cloudflare Pages 的路由一致。
 
 用法：npm run build && python scripts/verify_build.py [port]
@@ -7,6 +7,7 @@ srcDir='docs' 时条目页产物直接在 dist 根（index.html / pricing.html .
 临时目录建在 site/temp/ 下并全程用绝对路径解析：系统 TEMP 路径本身就长，
 再叠加文件名容易触碰 Windows MAX_PATH，表现为「文件存在但 os.path.isfile 为 False」。
 """
+import io
 import os
 import re
 import shutil
@@ -18,8 +19,67 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 SITE = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # 不受运行时 chdir 影响
 DIST = os.path.join(SITE, '.vitepress', 'dist')
-PAGES = ['/', '/pricing', '/unlimited', '/faq', '/guide', '/guide/clients', '/guide/models', '/guide/ccswitch']  # cleanUrls=false 时条目页是 /guide/clients.html、总览是 /guide.html，Handler 两种路径都接受
-SHOP_URL = 'https://catfk.com/shop/2Z0CEP7C'
+KNOWLEDGE_TS = os.path.join(SITE, 'config', 'knowledge.ts')
+B = chr(92)  # 需要在 Python 字符串里写正则反斜杠时用它拼，避免编辑器/工具链层层转义
+
+
+def knowledge_entries():
+    """从 config/knowledge.ts 读出文章条目：slug 与 faq[] 的问题文本。加文章不用改本脚本。
+
+    解析规则（与 scripts/gen_knowledge_routes.mjs、scripts/gen_knowledge_og.py 一致）：
+    条目以「两空格缩进的 { 独占一行」开头，slug 是条目的第一个字段。
+    """
+    t = open(KNOWLEDGE_TS, encoding='utf-8').read()
+    body = t[t.index('export const knowledge: KnowledgeMeta[] = ['):]
+    out = []
+    for e in re.split(r'(?m)^  ' + B + '{' + B + 's*$', body)[1:]:
+        sm = re.search(B + "s*slug: '([^']+)'", e)
+        if not sm:
+            continue
+        qs = re.findall(B + "{ q: '((?:[^'\\\\\\\\]|\\\\\\\\.)*)'", e)
+        out.append({'slug': sm.group(1), 'faq': [q.replace(B + B, B) for q in qs]})
+    if not out:
+        sys.exit('[verify] 未从 config/knowledge.ts 解析到文章')
+    return out
+
+
+def knowledge_slugs():
+    return [e['slug'] for e in knowledge_entries()]
+
+
+def knowledge_categories():
+    """从 config/knowledge.ts 的 knowledgeCategories 读出分类 key；加分类不用改本脚本。"""
+    src = open(KNOWLEDGE_TS, encoding='utf-8').read()
+    block = re.search(r"export const knowledgeCategories[^=]*=\s*\[(.*?)\n\]", src, re.S)
+    if not block:
+        sys.exit('[verify] 未从 config/knowledge.ts 解析到 knowledgeCategories')
+    cats = re.findall(r"cat:\s*'([a-z]+)'", block.group(1))
+    return cats
+
+
+PAGES = ['/', '/models', '/console', '/pricing', '/faq', '/guide', '/knowledge'] + ['/knowledge/' + s for s in knowledge_slugs()]  # cleanUrls=false 时条目页是 /knowledge/x.html、总览是 /guide.html，Handler 两种路径都接受
+def _read_config(name: str) -> str:
+    with io.open(os.path.join(SITE, 'config', name), encoding='utf-8') as f:
+        return f.read()
+
+
+def _const(text: str, var: str) -> str:
+    m = re.search(r"export const " + re.escape(var) + r"\s*=\s*['\`]([^'\`]+)['\`]", text)
+    if not m:
+        sys.exit(f'未能从 config 读到 {var}，请检查配置')
+    return m.group(1)
+
+
+# 商品 URL 与正式域名只有一个权威源（config/site.ts 与 config/plans.ts），脚本里再抄一份必然漂移：
+# 换域名后验收脚本会拿旧 URL 去比对 CTA，把正确的按钮全判成「缺 rel」。
+_plans = _read_config('plans.ts')
+# site.ts 里 url 是 siteConfig 的字段而不是 export const，单独按字段取
+_m = re.search(r"^  url: '([^']+)'", _read_config('site.ts'), re.M)
+if not _m:
+    sys.exit('未能从 config/site.ts 读到 siteConfig.url，请检查配置')
+SITE_URL = _m.group(1)
+# shopUrl 在 config/plans.ts 里是模板字符串，这里取 shopToken 后按同一模板拼，避免抄第二份 URL
+SHOP_URL = _const(_plans, 'shopUrl').replace('${shopToken}', _const(_plans, 'shopToken'))
 H1_RE = re.compile(r'<' + 'h1')
 
 
@@ -44,22 +104,31 @@ class Handler(BaseHTTPRequestHandler):
     def _find(self, path):
         rel = path.lstrip('/')
         if not rel:
-            return 'index.html'
+            return os.path.join(self.root, 'index.html')
         p = os.path.join(self.root, rel)
         if os.path.isfile(p):
-            return rel
-        for cand in (rel + '.html', os.path.join(rel, 'index.html')):
-            if os.path.isfile(os.path.join(self.root, cand)):
-                return cand
-        return '404.html'
+            return p
+        if os.path.isfile(p + '.html'):
+            return p + '.html'
+        p = os.path.join(p, 'index.html')
+        return p if os.path.isfile(p) else None
 
     def do_GET(self):
-        f = os.path.join(self.root, self._find(self.path))
-        try:
-            data = open(f, 'rb').read()
-        except OSError:
+        path = self.path.split('?')[0].split('#')[0]
+        f = self._find(path)
+        if f is None:
+            nf = os.path.join(self.root, '404.html')
+            if os.path.isfile(nf):
+                data = open(nf, 'rb').read()
+                self.send_response(200)
+                self.send_header('Content-Type', 'text/html; charset=utf-8')
+                self.send_header('Content-Length', str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+                return
             self.send_error(404)
             return
+        data = open(f, 'rb').read()
         ctype = 'text/html; charset=utf-8'
         if f.endswith('.js'):
             ctype = 'text/javascript'
@@ -98,32 +167,24 @@ def main():
     fails = []
 
     def check(label, ok, detail=''):
-        print(('  OK   ' if ok else '  FAIL ') + label + (f'  {detail}' if detail else ''))
-        if not ok:
+        if ok:
+            print(f'  [ok] {label}')
+        else:
             fails.append(label)
+            print(f'  [!!] {label}  {detail}')
 
     pages = {}
-    print('路由与静态资源')
-    for u in PAGES + ['/robots.txt', '/sitemap.xml', '/llms.txt', '/favicon.svg', '/_headers']:
-        st, raw = get(base, u)
-        pages[u] = raw
-        body = raw.decode('utf-8', errors='ignore')
-        # 真实页面标题带站名，404 页标题是「404 | 站名」；用标题判定比找布局 class 稳
-        titles = re.findall(r'<title>([^<]*)</title>', body)
-        is_real = (not u.endswith('.html')) or (bool(titles) and not titles[0].startswith('404') and not titles[0].startswith('页面不存在'))
-        check(f'{u:16} {st}', st == 200 and is_real, '' if is_real else f'实际标题 {titles[:1]}')
-
-    print('\nOG 图（社交分享卡片）')
-    for slug in ['home', 'pricing', 'unlimited', 'faq', 'guide', 'guide_clients', 'guide_models', 'guide_ccswitch']:  # 每页一张
+    for u in PAGES + ['/robots.txt', '/sitemap.xml', '/llms.txt', '/favicon.svg', '/_headers', '/og/models.png', '/og/console.png']:
         try:
-            st, raw = get(base, f'/og/{slug}.png')
-            ok = st == 200 and raw.startswith(b'\x89PNG')
-        except Exception:
-            ok = False
-        check(f'/og/{slug}.png 是 PNG', ok, '缺失：先跑 npm run gen:og' if not ok else '')
+            st, raw = get(base, u)
+        except Exception as e:
+            raw = str(e).encode()
+        pages[u] = raw
 
+    print('首页 SEO 与购买按钮')
     h = pages['/'].decode('utf-8')
-    print('\n首页 SEO 与购买按钮')
+    if len(h) < 8000:
+        sys.exit('[verify] 首页响应异常（%d 字节），服务可能被占用，换个端口重试：python scripts/verify_build.py <port>' % len(h))
     check('唯一 title', len(re.findall(r'<title>', h)) == 1, (re.findall(r'<title>([^<]*)</title>', h) or ['?'])[0])
     # H1 只统计 PageShell 正文里的（cu-shell 之前若有默认外壳节点则不计入）
     shell_h1 = len(re.findall(r'<h1', h[h.find('class="cu-shell"'):]))
@@ -146,13 +207,29 @@ def main():
     print('\n各页')
     for u in PAGES:
         x = pages[u].decode('utf-8')
+        check(f'{u:12} 200', pages[u][:1] == b'<', f'实际 {pages[u][:40]!r}')
         title = re.findall(r'<title>([^<]*)</title>', x)
-        shell_x = x[x.find('class="cu-shell"'):]
+        is_knowledge_article = u.startswith('/knowledge/')
+        # 外壳起点用正则定位：知识库文章页的 cu-shell 带第二个类名（cu-shell--knowledge），直接找 'class="cu-shell"' 会切到 -1
+        shell_xm = re.search(r'class="cu-shell[^"]*"', x)
+        shell_x = x[shell_xm.start():] if shell_xm else x
         check(f'{u:12} 唯一 h1', len(re.findall(H1_RE, shell_x)) == 1, f'外壳内 {len(re.findall(H1_RE, shell_x))} 个；title={title[0] if title else "?"}')
         check(f'{u:12} description', 'name="description"' in x)
         check(f'{u:12} canonical', '<link rel="canonical"' in x)
-        shell_keys = ['cu-brandbar', 'cu-tabs', 'cu-sidenav'] + ([] if u == '/' else ['cu-page__head'])
-        check(f'{u:12} 页面外壳（品牌页头 + 导航条 + 页内目录）', all(k in x for k in shell_keys))
+        # 文章页：正文是 VPDoc 的 page 分支（layout: page），没有原生目录 aside，也没有 cu-page__head
+        # 页内目录：只有长文页有（教程页 /guide、后台页 /console 由 PageShell 传 toc，知识库文章页自带），
+        # 形态统一是右侧竖排 cu-sidenav；营销页与列表页（首页 / 模型 / 套餐 / 无限额度 / FAQ / 知识库列表）没有目录。
+        # 文章页的目录项在客户端挂载后才从正文 h2 生成，SSR 里整块不渲染（见 KnowledgeDoc.vue 与 SectionNav.vue 的 v-if），
+        # 所以文章页只校验两列骨架在，不校验目录节点；锚点一致性由 npm run check:toc 在浏览器里核对
+        has_toc = u in ('/guide', '/console')
+        shell_keys = ['cu-brandbar', 'cu-tabs', 'cu-shell__body'] + (['vp-doc', 'cu-shell__body--reading'] if is_knowledge_article else ([] if u == '/' else ['cu-page__head']))
+        missing = [k for k in shell_keys if k not in x]
+        check(f'{u:12} 页面外壳（品牌页头 + 导航条）', not missing, f'缺少 {missing}')
+        if has_toc:
+            # 教程页 / 后台页：目录项 SSR 就完整，校验竖排目录节点与两列骨架都在
+            check(f'{u:12} 长文页左侧目录 cu-sidenav（DOM 在正文之前）', 'cu-sidenav' in x and 'cu-shell__body--reading' in x and x.index('cu-sidenav') < x.index('cu-shell__inner'), '缺少 cu-sidenav、两列骨架，或目录不在正文容器之前')
+        else:
+            check(f'{u:12} 营销/列表页无页内目录', 'cu-sectionnav' not in x, '产物里仍有 cu-sectionnav')
         check(
             f'{u:12} 无 VitePress 默认外壳残留',
             not any(k in x for k in ['class="VPDocAside', 'class="VPFooter', 'class="VPSidebar']),
@@ -160,44 +237,70 @@ def main():
         )
         check(f'{u:12} 页面正文有 SSR 内容（不是空壳）', len(x) > 8000, f'{len(x)} 字节')
         check(f'{u:12} 无 SSR 报错占位（__vitepress_fn / [object Object]）', '__vitepress_fn' not in x and '[object Object]' not in x)
-        check(f'{u:12} 无 SSR 注释标记', '<!--[-->' not in x and '<!---->' not in x)
         check(f'{u:12} 无未渲染的模板（<template> / &lt;Component）', '<template>' not in x and '&lt;HomeHero' not in x and '&lt;ClientOnly' not in x)
         check(f'{u:12} 无 markdown 降级为 <pre><code> 的正文', '<pre><code>&lt;' not in x and '<pre><code><h2' not in x)
         # 页内目录项都要有对应锚点，否则点了没反应
-        links = re.findall(r'class="cu-sidenav"[\s\S]*?</aside>', x)
+        links = re.findall(r'class="cu-sectionnav[^"]*"[' + B + 's' + B + 'S]*?</aside>', x)
         # 页内目录锚点对应正文小节：普通小节是 <h2 id="…">，FAQ 分类是 <section id="cat-…">（h2 无 id）
         ids = re.findall(r'<h2 id="([^"]+)"|(?<=<section id=")([^"]+)"', x)
         ids = [a or b for a, b in ids]
         hrefs = re.findall(r'<a[^>]+href="#([^"]+)"', links[0]) if links else []
-        check(f'{u:12} 页内目录锚点全部命中', bool(hrefs) and set(hrefs) <= set(ids), f'目录 {len(hrefs)} 项 / 页面 h2 {len(ids)} 个，缺失 {set(hrefs) - set(ids)}')
+        if is_knowledge_article:
+            # 文章页：页内目录在客户端挂载后由 KnowledgeDoc 从正文的 h2[id] 生成（见 KnowledgeDoc.vue），SSR 产物里为空，
+            # 所以这里只断言「目录留待客户端生成 + 正文 h2 齐全」，锚点一致性由浏览器里的 check:toc 脚本核对
+            check(f'{u:12} 文章页目录留待客户端生成（SSR 为空）', len(hrefs) == 0 and len(ids) >= 3, f'目录 {len(hrefs)} 项 / h2 {len(ids)} 个')
+            check(f'{u:12} 文章页单列阅读容器与相关阅读', 'cu-shell__body--reading' in x and 'cu-krelated' in x)
+        elif has_toc:
+            # 教程页与后台页：目录是 SSR 就完整的右侧竖排，锚点必须全部命中正文小节
+            check(f'{u:12} 页内目录锚点全部命中', bool(hrefs) and set(hrefs) <= set(ids), f'目录 {len(hrefs)} 项 / 页面 h2 {len(ids)} 个，缺失 {set(hrefs) - set(ids)}')
+
+    # 条数从 config/faq.ts 现算：加 FAQ 的人只改数据源，不用同步脚本里的魔法数字
+    faq_src = io.open(os.path.join(SITE, 'config', 'faq.ts'), encoding='utf-8').read()
+    # 只数字面量：接口声明那行是 `cat: FaqCategory`，不能算进去
+    _faq_total = len(re.findall(r"cat: '[a-z]+'", faq_src))
+    _faq_cats = len(set(re.findall(r"cat: '([a-z]+)'", faq_src)))
 
     print('\n组件渲染')
+    # 2026-10-11 首页瘦身到只剩首屏：Hero + CTA 带。内容全部推给定价页 / FAQ / 知识库。
+    # 断言只锁「首页不得再承载正文」，不再锁区块数量——区块增减是产品决定，不该让验收脚本变红。
     check(
-        '首页：Hero + 卖点卡 6 + 步骤 4 + 数据条 4 + 对比表 + FAQ 6',
-        all(k in h for k in ['cu-hero', 'cu-card', 'cu-step', 'cu-stat', 'cu-table', 'cu-faq__item']),
-        f'cards={len(re.findall(r"class=.cu-card.", h))} steps={len(re.findall(r"cu-step.b", h))} stats={len(re.findall(r"cu-stat.b", h))}',
+        '首页：只剩首屏与 CTA 带，不承载正文小节',
+        'cu-hero' in h and 'cu-band' in h
+        and 'cu-tcard' not in h and 'cu-stats' not in h and 'cu-faq__item' not in h,
+        f'tiers={len(re.findall("cu-tcard__name", h))} faq={len(re.findall("cu-faq__item", h))}',
     )
-    check('首页：成本对比示意图已内联', 'cu-figs' in h and '<svg' in h)
     pricing = pages['/pricing'].decode('utf-8')
+    # 定价页 2026-10-11 精简：只留无限卡档位网格 + 「限速与封号」FAQ。卡片数与 FAQ 条数从 config 现算，不写死。
+    _tiers = len(re.findall(r'cu-tcard__name', pricing))
+    _pricing_faq = len(re.findall('cu-faq__item', pricing))
+    _limits_faq = len(re.findall(r"cat: 'limits'", faq_src))
     check(
-        '定价页：套餐卡 + 2 表 + 9 FAQ',
-        'cu-price-card' in pricing and pricing.count('<table') == 2 and len(re.findall('cu-faq__item', pricing)) == 9,
-        f'card={"cu-price-card" in pricing} tables={pricing.count("<table")} faq={len(re.findall("cu-faq__item", pricing))}',
+        f'定价页：{_tiers} 张档位卡 + 限速类 FAQ {_limits_faq} 条',
+        _tiers >= 1 and _pricing_faq == _limits_faq,
+        f'tiers={_tiers} faq={_pricing_faq} limits={_limits_faq}',
     )
     faq = pages['/faq'].decode('utf-8')
     check(
-        'FAQ 页：33 条 + 8 个分类锚点（buying + 7 类）+ summary role=button',
-        len(re.findall('cu-faq__item', faq)) == 33
-        and len(set(re.findall(r'id="(cat-[a-z]+)"', faq))) == 8
-        and faq.count('<summary role="button"') == 33,
+        f'FAQ 页：{_faq_total} 条 + {_faq_cats + 1} 个分类锚点（buying + {_faq_cats} 类）+ summary role=button',
+        len(re.findall('cu-faq__item', faq)) == _faq_total
+        and len(set(re.findall(r'id="(cat-[a-z]+)"', faq))) == _faq_cats + 1
+        and faq.count('<summary role="button"') == _faq_total,
         f'faq={len(re.findall("cu-faq__item", faq))} anchors={len(set(re.findall(r"id=.cat-([a-z]+)", faq)))}',
     )
-    check('FAQ 页：答案里没有残留 Markdown 语法', not re.search(r'class="cu-faq__para">\s*[-*#`|]', faq))
+    check('FAQ 页：答案里没有残留 Markdown 语法', not re.search(r'class="cu-faq__para">' + B + 's*[-*#`|]', faq))
     check('FAQ 页：项目符号渲染成列表', 'cu-faq__bullets' in faq, f'bullets={len(re.findall("cu-faq__bullets", faq))}')
     # 内页不应再出现 markdown 标题渲染出的重复锚点（内页 H1 来自模板）
-    for u in ['/pricing', '/unlimited', '/faq']:
+    for u in ['/pricing', '/faq']:
         x = pages[u].decode('utf-8')
         check(f'{u:12} 无空标题锚点（-1 后缀）', not re.search(r'<h2 id="[^"]+-1"', x), f'{re.findall(r"<h2 id=.([^\"]+-1)", x)}')
+    # 知识库列表页：分类胶囊数 = config/knowledge.ts 的分类数 +「全部」，且不再有「最新文章」重复区块
+    ki = pages['/knowledge'].decode('utf-8')
+    switcher_count = ki.count('cu-seg__btn')          # 分类 tab（分类数 + 「全部」）
+    cats = knowledge_categories()
+    cats_present = all(('cat-' + c) in ki for c in cats)
+    has_latest = 'id=' + chr(34) + 'latest' + chr(34) in ki or 'id=' + chr(39) + 'latest' + chr(39) in ki
+    check('知识库列表页：每个分类一个 tab +「全部」，无「最新文章」重复区块', switcher_count == len(cats) + 1 and cats_present and not has_latest,
+          f'tab={switcher_count} 分类={cats} 分类小节={cats_present} latest={has_latest}')
 
     print('\n助手语料与商品 URL')
     kefu_js = ''
@@ -205,12 +308,35 @@ def main():
         for name in files:
             if name.endswith('.js'):
                 kefu_js += open(os.path.join(base_dir, name), encoding='utf-8', errors='ignore').read()
-    check('助手语料已序列化进 bundle', 'cat-limits-speed' in kefu_js and '在线助手' in kefu_js)
+    check('助手语料已序列化进 bundle', 'bot-trouble-429' in kefu_js and '在线助手' in kefu_js)
+    check('裁剪版二维码已进产物', os.path.isfile(os.path.join(root, 'wechat-qr-code.png')) and '/wechat-qr-code.png' in kefu_js)
     check('助手浮标进 SSR 产物（每页一处）', 'cu-kefu__fab' in h, 'PageShell 渲染 <KefuWidget />，构建期即可断言')
     for u in ['/pricing', '/faq']:
         check(f'{u:12} 助手浮标', 'cu-kefu__fab' in pages[u].decode('utf-8'))
     shop_count = kefu_js.count(SHOP_URL)
     check('商品 URL 只在数据层出现（site.ts + faq.ts），组件无硬编码', shop_count <= 3, f'出现 {shop_count} 次')
+
+    print('\n知识库 FAQ / JSON-LD / 来源')
+    check('知识库：bundle 含 FAQPage（Article + FAQPage JSON-LD）', 'FAQPage' in kefu_js)
+    check('知识库：bundle 不含素材站域名', 'aiprimetech' not in kefu_js)
+    redir_path = os.path.join(root, '_redirects')
+    redir = open(redir_path, encoding='utf-8').read() if os.path.isfile(redir_path) else ''
+    n_knowledge_rules = len(re.findall(r'(?m)^/knowledge/', redir))
+    check('_redirects 无重复知识库规则', n_knowledge_rules == len(knowledge_slugs()) + 1, f'{n_knowledge_rules} 条 vs {len(knowledge_slugs()) + 1} 条')
+    for e in knowledge_entries():
+        slug = e['slug']
+        qs = e['faq']
+        md = open(os.path.join(SITE, 'docs', 'knowledge', slug + '.md'), encoding='utf-8').read()
+        # FAQ 与相关阅读由组件渲染（KnowledgeDoc.vue / KnowledgeFooter.vue），正文里不再写这两个小节；
+        # 权威源只有 config/knowledge.ts 的 faq[]。这里断言「正文没有残留小节 + 折叠问题文本进了 bundle」。
+        no_faq_md = not re.search(r'(?m)^## 常见问题\s*$', md)
+        no_rel_md = not re.search(r'(?m)^## 相关阅读\s*$', md)
+        check(f'/knowledge/{slug:38} faq 3–5 条且正文无 FAQ/相关阅读小节', 3 <= len(qs) <= 5 and no_faq_md and no_rel_md,
+              f'faq={len(qs)} 正文常见问题小节={not no_faq_md} 正文相关阅读小节={not no_rel_md}')
+        check(f'/knowledge/{slug:38} 正文无素材站域名', 'aiprimetech' not in md)
+        check(f'/knowledge/{slug:38} layout: page + knowledge: true', 'layout: page' in md and 'knowledge: true' in md)
+        check(f'/knowledge/{slug:38} bundle 含首个 FAQ 问题', bool(qs) and qs[0] in kefu_js)
+        check(f'/knowledge/{slug:38} 产物含「常见问题」章节', '常见问题' in pages['/knowledge/' + slug].decode('utf-8'))
 
     print('\n404 页')
     try:

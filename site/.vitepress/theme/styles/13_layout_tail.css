@@ -1,6 +1,5 @@
-/* 收尾：Layout.vue 已不用默认外壳的 Layout（VPApp/VPContent/VPNav/VPLocalNav…），（从 custom.css 拆出，改这个文件而不是 custom.css） */
-/* 深色模式兜底：默认主题靠 html.dark 上的 --vp-c-* 变量着色，本站的表单控件、滚动条仍引用它们，
-   这里映射到自己的色板，避免漏进来的元素（输入框、边框）在深色下变成近黑。 */
+/* 深色兜底：VitePress 默认主题的输入框、滚动条、代码块等还引用 --vp-c-*，
+   这里把它们映射到本站色板，避免任何漏进来的默认控件在深色下变成近黑。 */
 html.dark {
   --vp-c-text-1: var(--cu-ink);
   --vp-c-text-2: var(--cu-ink-2);
@@ -11,4 +10,58 @@ html.dark {
   --vp-c-divider: var(--cu-line);
   --vp-c-border: var(--cu-line-strong);
   --vp-c-gutter: var(--cu-bg);
+  --vp-c-brand-1: var(--cu-accent);
+  --vp-c-brand-2: var(--cu-accent-deep);
 }
+
+/* VitePress 内置 markdown 代码块（知识库正文里的 ```）：跟随本站代码底色，圆角跟卡片语言 */
+.vp-doc div[class*='language-'] {
+  border-radius: var(--cu-r-sm) !important;
+}
+
+html.dark .vp-doc div[class*='language-'] {
+  background: var(--cu-code-bg) !important;
+}
+
+html.dark .vp-doc div[class*='language-'] code {
+  color: var(--cu-ink-2);
+}
+
+/* 代码块：VitePress 默认高亮背景用的是主题色板（带色相的代码语法高亮），这里换成中性底 + 细边框，
+   语法色由 shiki 产出的 inline style 保留，只动背景与边框 */
+html:not(.dark) .vp-doc div[class*='language-'] {
+  background: var(--cu-code-bg) !important;
+}
+
+/* VitePress 1.6 的 markdown 代码块在 .vp-doc 里默认 min-width: 100% + padding（内容盒含 padding），
+   窄屏时比正文列宽出两倍 padding，撑出 8px 横向滚动：改成 border-box 并显式内边距。 */
+.vp-doc div[class*='language-'],
+.vp-doc div[class*='language-'] > pre.cu-scroll-none,
+.cu-page--doc .vp-doc div[class*='language-'] > pre {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.vp-doc div[class*='language-'] > pre {
+  margin: 0;
+  padding: 1rem 1.15rem;
+  background: transparent !important;
+  /* VitePress 的代码高亮主题脚本会给 <pre> 写内联 overflow-x: auto（内联优先级高于类选择器）：
+     这里只保证它能滚，轨道由同一条规则里的 scrollbar 隐藏（见下面 .cu-scroll-none 那条） */
+  overflow-x: auto;
+}
+
+/* 藏掉代码块的横向滚动条。必须是独立的 !important 规则：上面的 overflow-x !important 与主题脚本写的
+   内联 !important 同级，inline 赢，所以隐藏轨道只能靠同级的 scrollbar-width / ::-webkit-scrollbar !important。 */
+.vp-doc div[class*='language-'] > pre.cu-scroll-none,
+.vp-doc div[class*='language-'] > pre {
+  scrollbar-width: none !important;
+}
+
+.vp-doc div[class*='language-'] > pre::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+

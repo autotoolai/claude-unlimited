@@ -1,7 +1,19 @@
-/* 外壳：品牌页头 / 导航条 / 正文列 / 右侧目录（从 custom.css 拆出，改这个文件而不是 custom.css） */
+/* 外壳：单行吸顶导航 + 正文 + 右侧吸顶小节目录。
+   正文默认单栏占满 --cu-wrap（营销页与列表页）；传了 toc 的长文页（.cu-shell__body--reading）
+   收成「正文限宽列 + 右侧目录」两列，与知识库文章页同一套骨架。
+   目录窄屏由下面的媒体查询退回正文上方的横排标签条。 */
+
+/* VitePress 默认主题给 .VPContent 加了 padding-top: var(--vp-nav-height)（64px），
+   那是为它自己的 VPNav 预留的。我们不用 VPNav，PageShell / KnowledgeDoc 自己画了吸顶顶栏，
+   这段预留就变成页首一条 64px 空白带：进页面时顶栏被推到 64px 处，滚动后 sticky 吸到 0 才消失，
+   于是看起来"页首顶栏很宽、下滑后变窄"。这里归零。
+   优先级要压过默认主题的 .VPContent[data-v-xxx]：用两层类 + !important 双保险，
+   避免依赖本文件与默认主题 CSS 的先后顺序。 */
+.VPContent.VPContent {
+  padding-top: 0 !important;
+}
+
 .cu-shell {
-  /* 100dvh 而非 100vh：手机浏览器地址栏收起/展开时 100vh 会超出可视区，
-     底部 CTA / 助手面板的 min(…, 100vh - …) 随之抖动 */
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -12,38 +24,45 @@
   min-width: 0;
 }
 
-/* —— 品牌页头 —— */
+/* —— 吸顶导航 —— */
 .cu-brandbar {
   position: sticky;
   top: 0;
   z-index: 40;
-  height: var(--cu-brandbar-h);
-  background: var(--cu-brandbar-bg);
-  backdrop-filter: saturate(140%) blur(8px);
+  height: var(--cu-nav-h);
+  /* 实心底色：原先 85% 透明 + blur，背后的 Hero 光晕会透上来，在顶栏下沿形成一条
+     色带（首页最明显，正文区是 --cu-bg-soft，顶栏区是 --cu-bg，差 7 个灰阶）。
+     顶栏区域在所有页面都应是同一块颜色，不该被下方内容影响。 */
+  background: var(--cu-bg);
   border-bottom: 1px solid var(--cu-line);
+  transition: box-shadow 0.45s var(--cu-ease);
 }
 
-.cu-brandbar__inner,
-.cu-tabs__inner,
-.cu-page {
-  width: min(1160px, 100% - 2.5rem);
-  margin-inline: auto;
+/* 分隔线常驻，只把阴影留给滚动后：滚动时顶栏压住内容，需要一点高度感 */
+.cu-brandbar.is-scrolled {
+  box-shadow: var(--cu-shadow-nav);
 }
 
+/* 顶栏容器比正文（--cu-wrap 1140px）宽一档：导航 5 项撑不满 1140px 时，
+   链接组与右侧工具组之间会空出 700px+，视觉上像"导航居中"。
+   顶栏单独放宽到 1320px 可把这段空洞压掉；正文宽度不受影响。 */
 .cu-brandbar__inner {
+  width: min(1320px, 100% - 3rem);
   height: 100%;
+  margin-inline: auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 1rem;
+  position: relative;
 }
 
 .cu-brand {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.6rem;
+  flex: 0 0 auto;
   text-decoration: none;
-  color: var(--cu-accent);
+  color: var(--cu-ink);
 }
 
 .cu-brand:hover {
@@ -52,180 +71,259 @@
 
 .cu-brand__text strong {
   display: block;
-  font-size: 1.12rem;
+  font-size: 1.02rem;
   font-weight: 800;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   color: var(--cu-ink);
   line-height: 1.2;
-}
-
-.cu-brand__text small {
-  display: block;
-  font-size: 0.72rem;
-  color: var(--cu-muted);
-  letter-spacing: 0.02em;
-}
-
-.cu-brandbar__note {
-  margin: 0;
-  font-size: 0.78rem;
-  color: var(--cu-muted);
-  text-align: right;
-  line-height: 1.6;
   white-space: nowrap;
 }
 
-/* —— 主导航条 —— */
+/* —— 主导航链接 ——：紧跟品牌区靠左排布，不设 margin-left:auto；
+   推右的任务交给右侧工具组的 margin-left:auto（参考 aiprimetech.io 的单行导航） */
 .cu-tabs {
-  position: sticky;
-  top: var(--cu-brandbar-h);
-  z-index: 39;
-  background: color-mix(in srgb, var(--cu-bg) 92%, transparent);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--cu-line);
-}
-
-.cu-tabs__inner {
-  height: var(--cu-tabs-h);
+  flex: 0 1 auto;
+  min-width: 0;
   display: flex;
   align-items: center;
-  gap: 1.6rem;
-  /* 390px 下「三个导航 + 立即购买」自然宽度超过容器，flex 项默认不收缩又把文字压成两行，
-     整页因此多出 22px 横向滚动；这里固定为单行并把溢出收进导航条内部 */
-  white-space: nowrap;
-  overflow-x: auto;
-  scrollbar-width: none;
 }
 
-.cu-tabs__inner::-webkit-scrollbar {
-  display: none;
+.cu-tabs__inner.cu-scroll-none {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  white-space: nowrap;
+  overflow-x: auto;
+  /* 窄屏：横向滚动条会占 15px 并把整页撑出横向滚动，这里隐藏它，
+     导航链接仍有 padding 的点击区，且可用左右滑动切换 */
+  
 }
+
+
 
 .cu-tabs__link {
   position: relative;
   display: inline-flex;
   align-items: center;
   flex: 0 0 auto;
-  min-height: 44px;
-  /* 扩大点击区到 44px 高（窄屏下同行还有购买 CTA，44px 高会让导航条撑到 88px） */
-  padding-block: 0.5rem;
-  font-size: 0.95rem;
-  font-weight: 600;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--cu-r-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
   color: var(--cu-muted);
   text-decoration: none;
-  padding: 0 0.2rem;
-  border-bottom: 2px solid transparent;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  transition: color 0.25s var(--cu-ease), background-color 0.25s var(--cu-ease);
   white-space: nowrap;
 }
 
 .cu-tabs__link:hover {
   color: var(--cu-ink);
+  background: var(--cu-card);
 }
 
 .cu-tabs__link.is-active {
   color: var(--cu-ink);
-  border-bottom-color: var(--cu-accent);
+  font-weight: 600;
 }
 
-.cu-tabs__cta {
+/* 当前项：底部一条短横线，比整块胶囊底更克制（参考站的导航就是纯文字 + 加粗） */
+.cu-tabs__link.is-active::after {
+  content: '';
+  position: absolute;
+  left: 0.7rem;
+  right: 0.7rem;
+  bottom: 0.1rem;
+  height: 1.5px;
+  border-radius: 2px;
+  background: var(--cu-ink);
+}
+
+.cu-tabs__cta,
+.cu-tabs__console {
   flex: 0 0 auto;
   white-space: nowrap;
+}
+
+
+/* —— 导航右侧：主题切换 —— */
+.cu-navtools {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
   margin-left: auto;
-  min-height: 40px;
-  padding: 0.35rem 1rem;
-  font-size: 0.88rem;
 }
 
-.cu-tabs__cta .cu-btn__price {
-  padding-left: 0.45rem;
+.cu-navtoggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-sm);
+  background: transparent;
+  color: var(--cu-muted);
+  cursor: pointer;
+  line-height: 1;
+  transition: background-color 0.25s var(--cu-ease), color 0.25s var(--cu-ease), transform 0.25s var(--cu-ease);
 }
 
-/* —— 主体两列 —— */
+.cu-navtoggle:hover {
+  background: var(--cu-card);
+  color: var(--cu-ink);
+}
+
+.cu-navtoggle:active {
+  transform: scale(0.94);
+}
+
+.cu-navtoggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 太阳只在深色模式出现，月亮只在浅色模式出现 */
+html.dark .cu-navtoggle .cu-icon-sun {
+  display: none;
+}
+
+html:not(.dark) .cu-navtoggle .cu-icon-moon {
+  display: none;
+}
+
+.cu-tabs__console {
+  min-height: 34px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.84rem;
+}
+
+/* —— 主体：单栏满宽 ——
+   grid-template-columns 留在这里，窄屏时由 14_knowledge.css 切回单列（阅读页）与下面的媒体查询切回单列。 */
 .cu-shell__body {
-  flex: 1;
-  width: min(1160px, 100% - 2.5rem);
+  width: min(var(--cu-wrap), 100% - 3rem);
   margin-inline: auto;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 208px;
-  gap: 3.5rem;
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
 }
 
 .cu-page {
   width: 100%;
-  padding: 3.5rem 0 5rem;
+  padding: 3rem 0 5rem;
 }
 
+/* —— 页面头（内页）：居中，参考站的 section-head —— */
 .cu-page__head {
-  margin-bottom: 3rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid var(--cu-line);
+  margin-bottom: 1rem;
+  padding: 1.5rem 0 0.5rem;
+  text-align: center;
 }
 
+/* eyebrow：短标签。中文不做 uppercase 与大字距（中文小字号大字距会散） */
 .cu-eyebrow {
-  margin: 0 0 0.75rem;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--cu-accent);
+  margin: 0 0 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.28rem 0.7rem;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-pill);
+  background: var(--cu-bg-soft);
+  font-size: 0.76rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--cu-ink-2);
 }
 
 .cu-page h1 {
   margin: 0;
   font-family: var(--cu-serif);
-  font-size: clamp(2.1rem, 4.5vw, 3.1rem);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  line-height: 1.18;
+  font-size: clamp(2.1rem, 4.6vw, 3.15rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.16;
   color: var(--cu-ink);
+  text-wrap: balance;
 }
 
 .cu-page__lead {
-  margin: 1rem 0 0;
-  max-width: 46rem;
-  font-size: 1.12rem;
-  line-height: 1.8;
+  margin: 1rem auto 0;
+  max-width: 44rem;
+  font-size: 1.08rem;
+  line-height: 1.75;
   color: var(--cu-ink-2);
+  text-wrap: pretty;
 }
 
+/* —— 正文排版 —— */
+/* 正文直属 h2 = 一节的分节头：居中衬线标题，紧随其后的那段话是这一节的说明（居中、次级色）。
+   卡片 / 表格 / 套餐等块跟在说明之后，因此能铺满 1140px；段落本身仍限宽 44rem 保证可读。
+   注意：这组选择器比组件里的类选择器（FAQ 分类头、知识库分类头）优先级更高，
+   它们的 h2 是分类标题而不是分节头，已在 10_faq.css / 14_knowledge.css 里显式改回左对齐。 */
 .cu-page h2 {
-  margin: 4rem 0 1rem;
+  margin: var(--cu-section-y-lg) 0 0;
   font-family: var(--cu-serif);
-  font-size: clamp(1.4rem, 2.6vw, 1.75rem);
-  font-weight: 700;
+  font-size: clamp(1.5rem, 2.6vw, 2.05rem);
+  font-weight: 600;
   letter-spacing: -0.01em;
-  line-height: 1.35;
+  line-height: 1.3;
   color: var(--cu-ink);
-  scroll-margin-top: calc(var(--cu-nav-h) + 20px);
+  text-align: center;
+  text-wrap: balance;
+  scroll-margin-top: calc(var(--cu-nav-h) + 24px);
 }
 
-.cu-page h2 .header-anchor {
-  color: var(--cu-accent);
-  opacity: 0;
-  transition: opacity 0.15s ease;
+.cu-page h2 + p {
+  margin: 0.9rem auto 0;
+  max-width: 42rem;
+  text-align: center;
+  font-size: 1.02rem;
+  line-height: 1.75;
+  color: var(--cu-muted);
+  text-wrap: pretty;
 }
 
-.cu-page h2:hover .header-anchor {
-  opacity: 1;
+/* 卡片里的 h2 是卡片标题，不是分节头 */
+.cu-card h2 {
+  margin: 0 0 0.5rem;
+  text-align: left;
+  font-family: var(--cu-sans);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.cu-page h3 {
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--cu-ink);
+  line-height: 1.5;
 }
 
 .cu-page p {
-  margin: 0.9rem 0;
-  font-size: 1rem;
-  line-height: 1.85;
-  color: var(--cu-ink-2);
+  /* 自动居中 + 限宽 44rem（--cu-content-w）：标题是居中的，宽屏下段落贴左会显得没对齐。
+     折叠目录的长文页（--wide）段落要跟卡片、表格一起吃满整列，否则左右会空一大片，
+     那里由 01_shell_toc.css 的 html.cu-toc-collapsed 规则解除。 */
   max-width: var(--cu-content-w);
+  margin: 0.9rem auto;
+  text-align: left; /* 抵消 .cu-page__head 的继承居中：胶囊条与正文都左对齐 */
+  font-size: 1.04rem;
+  line-height: 1.8;
+  color: var(--cu-ink-2);
+  text-wrap: pretty;
 }
 
 .cu-page ul,
 .cu-page ol {
-  margin: 0.9rem 0;
-  padding-left: 1.25rem;
   max-width: var(--cu-content-w);
+  margin: 0.9rem auto;
+  padding-left: 1.25rem;
   color: var(--cu-ink-2);
-  line-height: 1.85;
+  line-height: 1.8;
 }
 
 .cu-page li {
@@ -237,16 +335,26 @@
 }
 
 .cu-page a {
-  color: var(--cu-accent-deep);
-  font-weight: 600;
+  color: var(--cu-ink);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: var(--cu-line-strong);
   text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 0.2s var(--cu-ease), color 0.2s var(--cu-ease);
+}
+
+.cu-page a:hover {
+  color: var(--cu-ink);
+  text-decoration-color: var(--cu-ink);
 }
 
 .cu-page code {
-  font-size: 0.88em;
-  padding: 0.1em 0.35em;
+  font-size: 0.87em;
+  padding: 0.12em 0.38em;
   border-radius: 5px;
   background: var(--cu-code-bg);
+  color: var(--cu-ink);
 }
 
 .cu-page strong {
@@ -254,120 +362,49 @@
   color: var(--cu-ink);
 }
 
-.cu-page .cu-notice a,
-.cu-page .cu-notice li a {
-  color: inherit;
+.cu-page .header-anchor {
+  color: var(--cu-accent);
+  opacity: 0;
+  transition: opacity 0.15s ease;
 }
 
-/* —— 右侧页内目录 —— */
-.cu-sidenav {
-  position: sticky;
-  top: calc(var(--cu-nav-h) + 1.5rem);
-  padding: 3.9rem 0 1rem;
-  font-size: 0.88rem;
-  max-height: calc(100vh - var(--cu-nav-h) - 2rem);
-  overflow-y: auto;
+/* 鼠标停在标题上不再冒出 # 号：始终隐藏并取消链接热区，
+   同时覆盖 VitePress 自带的 h1:hover .header-anchor 规则 */
+.cu-page .header-anchor,
+.cu-page .header-anchor:hover,
+.cu-page h1:hover .header-anchor,
+.cu-page h2:hover .header-anchor,
+.cu-page h3:hover .header-anchor,
+.cu-page h4:hover .header-anchor {
+  opacity: 0;
+  pointer-events: none;
 }
 
-.cu-sidenav__title {
-  margin: 0 0 0.6rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--cu-muted);
-}
+/* 左侧目录与 1280 / 1180 / 1040 断点：见 01_shell_toc.css（内容独立，单独一个文件更好维护） */
 
-.cu-sidenav ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border-left: 1px solid var(--cu-line);
-}
-
-.cu-sidenav a {
-  display: block;
-  padding: 0.32rem 0.85rem;
-  margin-left: -1px;
-  border-left: 2px solid transparent;
-  color: var(--cu-muted) !important;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.15s ease, border-color 0.15s ease;
-}
-
-.cu-sidenav a:hover {
-  color: var(--cu-ink) !important;
-}
-
-.cu-sidenav a.is-active {
-  color: var(--cu-accent-deep) !important;
-  border-left-color: var(--cu-accent);
-  font-weight: 700;
-}
-
-@media (max-width: 900px) {
-  /* 品牌页头在窄屏只留 logo + 站名，右侧声明让位给 CTA */
-  .cu-brandbar__text small {
-    display: none;
+@media (max-width: 820px) {
+  /* 窄屏只留 logo + 购买 + 主题切换：导航可横滚，后台入口让位；
+     overflow: hidden 让 .cu-tabs__inner 的横向溢出被裁在导航行内，不把整页撑宽 */
+  .cu-brandbar__inner {
+    gap: 0.6rem;
+    overflow: hidden;
   }
-  .cu-brandbar__note {
-    font-size: 0.7rem;
-  }
-}
 
-@media (max-width: 620px) {
-  .cu-brandbar__note {
-    display: none;
-  }
-  .cu-tabs__link {
-    font-size: 0.9rem;
-  }
-}
-
-@media (max-width: 1100px) {
-  .cu-shell__body {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
-  }
-  .cu-sidenav {
-    position: static;
-    max-height: none;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid var(--cu-line);
-    order: -1;
-  }
-  .cu-sidenav__title {
-    display: none;
-  }
-  .cu-sidenav ul {
-    display: flex;
-    gap: 0.4rem;
-    overflow-x: auto;
-    border-left: none;
-    padding-bottom: 0.25rem;
-  }
-  .cu-sidenav a {
-    white-space: nowrap;
-    padding: 0.3rem 0.7rem;
-    border: 1px solid var(--cu-line);
-    border-radius: 999px;
+  .cu-tabs {
     margin-left: 0;
   }
-  .cu-sidenav a.is-active {
-    border-color: var(--cu-accent);
-    background: var(--cu-accent-soft);
-  }
-  .cu-page {
-    padding-top: 2rem;
-  }
 }
 
-@media (max-width: 620px) {
-  .cu-brandbar__inner,
-  .cu-tabs__inner,
-  .cu-page {
-    width: min(1160px, 100% - 1.75rem);
+@media (max-width: 720px) {
+  .cu-brandbar__inner {
+    width: min(1320px, 100% - 2rem);
+  }
+
+  .cu-shell__body {
+    width: min(var(--cu-wrap), 100% - 2rem);
+  }
+
+  .cu-page__head {
+    padding-top: 1rem;
   }
 }
-

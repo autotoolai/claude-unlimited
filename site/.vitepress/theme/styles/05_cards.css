@@ -1,69 +1,121 @@
-/* 卖点卡片（从 custom.css 拆出，改这个文件而不是 custom.css） */
+/* 卖点卡片：底色比页面背景深一档 + 1px 细边框，静息无阴影，hover 上浮 4px 并投影。
+   卡片内部用 flex 列，让描述段撑满余量，保证一排卡片的要点行对齐。 */
+
 .cu-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin: 1.5rem 0;
+  gap: 1.25rem;
+  margin: 1.75rem 0;
 }
 
 .cu-card {
-  padding: 1.3rem 1.35rem;
+  display: flex;
+  flex-direction: column;
+  padding: 1.75rem 1.6rem;
   border: 1px solid var(--cu-line);
-  border-radius: 6px;
+  border-radius: var(--cu-r-lg);
   background: var(--cu-card);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: transform var(--cu-dur) var(--cu-ease), box-shadow var(--cu-dur) var(--cu-ease),
+    background-color 0.3s var(--cu-ease), border-color 0.3s var(--cu-ease);
 }
 
 .cu-card:hover {
-  border-color: var(--cu-accent-soft);
-  transform: translateY(-2px);
+  background: var(--cu-card-hover);
+  border-color: var(--cu-line-strong);
+  transform: translateY(-4px);
+  box-shadow: var(--cu-shadow-lift);
+}
+
+/* 整张卡可点时（教程 / 知识库入口）：去掉标题链接的装饰，hover 走卡片的位移 */
+.cu-card--link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.cu-card--link:hover {
+  text-decoration: none;
 }
 
 .cu-card h3 {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin: 0.9rem 0 0.4rem;
+  gap: 0.55rem;
+  margin: 0 0 0.5rem;
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--cu-ink);
+  line-height: 1.5;
 }
 
 .cu-card__no {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 6px;
-  background: var(--cu-accent-soft);
+  flex: 0 0 auto;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  padding: 0 0.4rem;
+  border-radius: 7px;
+  background: var(--cu-bg-solid, var(--cu-card-solid));
+  border: 1px solid var(--cu-line);
   color: var(--cu-accent-deep);
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-family: var(--cu-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 .cu-card p {
-  margin: 0;
+  margin: 0 0 0.9rem;
   font-size: 0.92rem;
   line-height: 1.75;
   color: var(--cu-muted);
+}
+
+.cu-card > p:last-child {
+  margin-bottom: 0;
+}
+
+/* 卡片底部按钮（合作伙伴卡）贴底对齐 */
+.cu-card > .cu-btn,
+.cu-card > .cu-hint {
+  margin-top: auto;
 }
 
 .cu-card__icon {
   width: 40px;
   height: 40px;
   display: block;
+  margin-bottom: 0.9rem;
 }
 
-@media (max-width: 900px) {
+/* 两列 / 四列变体 */
+.cu-cards--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.cu-cards--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cu-cards--four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 1000px) {
+  .cu-cards--four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .cu-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 560px) {
-  .cu-cards {
+  .cu-cards,
+  .cu-cards--two,
+  .cu-cards--three,
+  .cu-cards--four {
     grid-template-columns: 1fr;
   }
 }
-

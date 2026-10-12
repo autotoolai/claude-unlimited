@@ -1,11 +1,46 @@
+# 无限额度页已并入套餐定价（2026-10-10），保留 301 不让外链与收录失效
+/unlimited /pricing 301
+
+# 教程三个子页已并入 /guide 的分步小节（2026-10-11），保留 301 不让外链与收录失效
+/guide_models /guide 301
+/guide_clients /guide 301
+/guide_ccswitch /guide 301
+
 # 带尾斜杠 -> 无尾斜杠（Pages 自己会把 .html 308 到无后缀，这里直接 301 少一跳）
 /pricing/ /pricing 301
-/unlimited/ /unlimited 301
 /faq/ /faq 301
 /guide/ /guide 301
-/guide/clients/ /guide/clients 301
-/guide/models/ /guide/models 301
-/guide/ccswitch/ /guide/ccswitch 301
+/models/ /models 301
+/console/ /console 301
+
+# 百度验证文件：产物里存的是无后缀文件（Pages 对 *.html 会 308 到无后缀，百度不跟随重定向会判失败）
+/baidu_verify_codeva-qwMtn09UKI.html /baidu_verify_codeva-qwMtn09UKI 200
 
 # 旧域名（正式域确认后启用）
 # /old-path /new-path 301
+
+# >>> knowledge routes (auto-generated, do not edit)
+/knowledge/ /knowledge 301
+/knowledge/claude-code-tutorial/ /knowledge/claude-code-tutorial 301
+/knowledge/claude-code-mcp-config/ /knowledge/claude-code-mcp-config 301
+/knowledge/claude-code-make-video/ /knowledge/claude-code-make-video 301
+/knowledge/claude-code-plan-mode/ /knowledge/claude-code-plan-mode 301
+/knowledge/claude-code-permission-modes/ /knowledge/claude-code-permission-modes 301
+/knowledge/claude-md-guide/ /knowledge/claude-md-guide 301
+/knowledge/claude-code-cli-cheatsheet/ /knowledge/claude-code-cli-cheatsheet 301
+/knowledge/claude-code-subagents/ /knowledge/claude-code-subagents 301
+/knowledge/claude-code-skills/ /knowledge/claude-code-skills 301
+/knowledge/why-agents-cost-more-tokens/ /knowledge/why-agents-cost-more-tokens 301
+/knowledge/claude-code-startup-tokens/ /knowledge/claude-code-startup-tokens 301
+/knowledge/prompt-caching-explained/ /knowledge/prompt-caching-explained 301
+/knowledge/claude-api-pricing-explained/ /knowledge/claude-api-pricing-explained 301
+/knowledge/reduce-token-usage-tips/ /knowledge/reduce-token-usage-tips 301
+/knowledge/choose-claude-model/ /knowledge/choose-claude-model 301
+/knowledge/claude-code-vs-codex/ /knowledge/claude-code-vs-codex 301
+/knowledge/claude-code-prompt-too-long-fix/ /knowledge/claude-code-prompt-too-long-fix 301
+/knowledge/claude-code-429-rate-limit/ /knowledge/claude-code-429-rate-limit 301
+/knowledge/claude-code-529-overloaded/ /knowledge/claude-code-529-overloaded 301
+/knowledge/claude-code-401-403/ /knowledge/claude-code-401-403 301
+/knowledge/claude-code-connection-lost/ /knowledge/claude-code-connection-lost 301
+/knowledge/claude-code-usage-limit-reached/ /knowledge/claude-code-usage-limit-reached 301
+# <<< knowledge routes

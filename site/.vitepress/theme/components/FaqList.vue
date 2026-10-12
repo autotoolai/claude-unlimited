@@ -5,12 +5,12 @@
  *
  * 可访问性：details 自带展开/收起语义，这里把 summary 绑成按钮（role="button"，aria-expanded
  * 跟随 open），并监听 toggle 事件同步 aria-expanded —— 原生 <summary> 在部分屏幕阅读器里读不出
- * 当前是否已展开。Esc 收起由外层 keydown 处理；「展开全部 / 收起全部」用一条 ref 状态驱动。
+ * 当前是否已展开。Esc 一次性收起由外层 keydown 处理。
  *
  * 默认展开：defaultOpen 条（0 = 全收起）；openFirst 只是 defaultOpen=1 的旧写法别名。
  * 在页面（/faq、内嵌 FAQ）里开，在助手语料里不开——助手走 KbEntry，不经过本组件。
  */
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import type { FaqItem } from '../../../config/faq'
 import { categoryLabels } from '../../../config/faq'
 
@@ -36,13 +36,11 @@ function toggleItem(e: Event, idx: number) {
   if (open && idx >= openCount.value) openCount.value = idx + 1
   else if (!open && idx < openCount.value) openCount.value = idx
 }
-function setAll(open: boolean) {
-  openCount.value = open ? props.items.length : 0
+function collapseAll() {
+  openCount.value = 0
 }
-/** 「收起」只在全展开后还留在页面里：手动收起一条（openCount < 长度但不是 0）时不再显示 */
-const allOpen = computed(() => openCount.value >= props.items.length)
 function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'Escape') setAll(false)
+  if (e.key === 'Escape') collapseAll()
 }
 </script>
 
@@ -63,7 +61,7 @@ function onKeydown(e: KeyboardEvent) {
       <div class="cu-faq__body">
         <template v-for="(para, pi) in it.a.split('\n')" :key="pi">
           <ul v-if="para.startsWith('- ')" class="cu-faq__bullets">
-            <li v-for="(li, lj) in para.split('\n')" :key="lj">{{ li.slice(2) }}</li>
+            <li :key="para">{{ para.slice(2) }}</li>
           </ul>
           <p v-else-if="para.trim()" class="cu-faq__para">{{ para }}</p>
         </template>
@@ -76,11 +74,8 @@ function onKeydown(e: KeyboardEvent) {
             >{{ l.text }}</a>
           </li>
         </ul>
-        <pre v-if="showCode && it.code?.length" class="cu-faq__code"><code>{{ it.code.join('\n') }}</code></pre>
+        <pre v-if="showCode && it.code?.length" class="cu-faq__code cu-scroll-none"><code>{{ it.code.join('\n') }}</code></pre>
       </div>
     </details>
-    <p v-if="items.length > 1 && (openCount < items.length || allOpen)" class="cu-faq__more">
-      <button type="button" @click="setAll(!allOpen)">{{ allOpen ? '全部收起' : `展开全部 ${items.length} 条` }}</button>
-    </p>
   </div>
 </template>

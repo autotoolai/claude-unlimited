@@ -1,215 +1,574 @@
-/* 在线助手（从 custom.css 拆出，改这个文件而不是 custom.css） */
-.cu-kefu {
-  position: fixed;
-  bottom: 1.25rem;
-  z-index: 40;
-}
+/* 在线助手（从 custom.css 拆出，改这个文件而不是 custom.css）
+   全站唯一的客服浮标：在线助手本身 + 面板里的客服卡。
+   设计取向：沿用 shadcn/ui Bubble / Intercom 挂件的交互惯例（单一对话流、用户右 / 助手左），
+   视觉只用本站 --cu-* token，深浅色由 00_base.css 的 .dark 变体接管，不引第三方库。
 
-.cu-kefu--right {
-  right: 1.25rem;
+   尺寸策略：面板宽 420px、高 78vh 跟随视口；浮标高度用 --cu-kefu-fab-h 声明在 .cu-kefu 上，面板底偏移靠变量算。
+
+   布局（2026-10-11）：助手消息统一走「浅色卡片 + 圆点列表 + 链接」的会话版式（.cu-kefu__answer），
+   欢迎语是助手发的第一条普通消息、渲染路径与答案一致；开场跟一行「快捷问题」胶囊。
+   面板不做分类与追问——站内已有 /faq 页与知识库。 */
+/* 按钮最小高度随屏幕变宽（WCAG 2.5.8） */
+.cu-kefu {
+  --cu-kefu-fab-h: 48px;
+  --cu-kefu-gap: 12px;
+  --cu-kefu-inset: 20px;
+  position: fixed;
+  right: var(--cu-kefu-inset);
+  bottom: var(--cu-kefu-inset);
+  z-index: 45;
 }
 
 .cu-kefu--left {
-  left: 1.25rem;
+  right: auto;
+  left: var(--cu-kefu-inset);
 }
 
-.cu-kefu__fab {
+/* —— 浮标 —— */
+.cu-kefu .cu-kefu__fab {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  min-height: 48px;
-  padding: 0.7rem 1.15rem;
+  height: var(--cu-kefu-fab-h);
+  padding: 0 1.15rem;
   border: none;
-  border-radius: 3px;
-  background: var(--cu-accent);
-  color: #fff6ec;
+  border-radius: 999px;
+  background: var(--cu-contrast);
+  color: var(--cu-contrast-fg);
   font-family: var(--cu-sans);
   font-weight: 700;
   font-size: 0.92rem;
   cursor: pointer;
-  box-shadow: 0 12px 28px rgba(200, 90, 30, 0.32);
-  transition: transform 0.16s ease, background 0.16s ease;
+  box-shadow: var(--cu-shadow-pop);
+  transition: transform 0.3s var(--cu-ease), background 0.25s var(--cu-ease);
 }
 
-.cu-kefu__fab:hover {
-  transform: translateY(-1px);
-  background: var(--cu-accent-deep);
+/* hover 只动背景不动位移：面板位置是跟着浮标算的，浮标上浮会让面板底边跟着跳 */
+.cu-kefu .cu-kefu__fab:hover {
+  background: var(--cu-ink);
+  opacity: 0.92;
 }
 
+.cu-kefu__fab-label {
+  min-width: 3.5em;
+  text-align: left;
+}
+
+/* —— 面板 —— */
 .cu-kefu__panel {
   position: fixed;
-  right: 1.25rem;
-  bottom: calc(1.25rem + 48px + 0.75rem);
-  width: min(380px, calc(100vw - 2.5rem));
-  height: min(560px, calc(100dvh - 160px));
+  right: var(--cu-kefu-inset);
+  bottom: calc(var(--cu-kefu-inset) + var(--cu-kefu-fab-h) + var(--cu-kefu-gap));
+  width: min(420px, calc(100vw - var(--cu-kefu-inset) * 2));
+  height: min(78vh, calc(100dvh - var(--cu-kefu-inset) * 2 - var(--cu-kefu-fab-h) - var(--cu-kefu-gap)));
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--cu-line);
-  border-radius: 6px;
-  background: var(--cu-card);
-  box-shadow: var(--cu-shadow);
+  border: 1px solid var(--cu-line-strong);
+  border-radius: var(--cu-r-md);
+  background: var(--cu-bg);
+  color: var(--cu-ink);
+  font-family: var(--cu-sans);
+  box-shadow: var(--cu-shadow-pop);
   overflow: hidden;
-  z-index: 41;
+  z-index: 46;
+  animation: cu-kefu-in 0.35s var(--cu-ease);
+}
+
+.cu-kefu--left .cu-kefu__panel {
+  right: auto;
+  left: var(--cu-kefu-inset);
+}
+
+@keyframes cu-kefu-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .cu-kefu__head {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.9rem 1rem;
-  background: var(--cu-accent-soft);
-  border-bottom: 1px solid var(--cu-line);
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.85rem 1rem;
+  background: var(--cu-contrast);
+  color: var(--cu-contrast-fg);
 }
 
-.cu-kefu__head strong {
-  display: block;
-  color: var(--cu-ink);
+.cu-kefu__avatar {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
 }
 
-.cu-kefu__head small {
-  display: block;
-  margin-top: 0.15rem;
-  font-size: 0.78rem;
-  color: var(--cu-muted);
-}
-
-.cu-kefu__close {
-  border: none;
-  background: transparent;
-  font-size: 1.5rem;
-  line-height: 1;
-  color: var(--cu-muted);
-  cursor: pointer;
-  padding: 0 0.4rem;
-  min-width: 32px;
-}
-
-.cu-kefu__body {
+.cu-kefu__title {
   flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
+  min-width: 0;
 }
 
-.cu-kefu__intro p,
-.cu-kefu__answer p,
-.cu-kefu__msg {
-  font-size: 0.9rem;
-  line-height: 1.75;
-  color: var(--cu-ink-2);
-  margin: 0 0 0.4rem;
+.cu-kefu__title strong {
+  display: block;
+  font-size: 0.98rem;
+  line-height: 1.3;
 }
 
-.cu-kefu__quick {
-  list-style: none;
-  margin: 0.75rem 0 0;
-  padding: 0;
-  display: grid;
-  gap: 0.5rem;
+.cu-kefu__title small {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: rgba(255, 246, 236, 0.85);
 }
 
-.cu-kefu__quick button {
-  width: 100%;
-  text-align: left;
-  min-height: 44px;
-  padding: 0.6rem 0.85rem;
-  border: 1px solid var(--cu-line);
-  border-radius: 4px;
+.cu-kefu__icon-btn {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
   background: transparent;
-  color: var(--cu-ink);
-  font-family: var(--cu-sans);
-  font-size: 0.88rem;
+  color: inherit;
+  opacity: 0.85;
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: background 0.15s ease, opacity 0.15s ease;
 }
 
-.cu-kefu__quick button:hover {
-  border-color: var(--cu-accent);
-  background: var(--cu-accent-soft);
+.cu-kefu__icon-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  opacity: 1;
 }
 
-.cu-kefu__answer-cat {
-  display: inline-block;
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.12rem 0.55rem;
-  border-radius: 3px;
-  background: var(--cu-accent);
-  color: #fff6ec;
+/* —— 对话区 —— */
+.cu-kefu__body.cu-scroll-none {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1rem 0.9rem 0.5rem;
+  overscroll-behavior: contain;
 }
 
-.cu-kefu__answer h4 {
-  margin: 0.5rem 0 0.5rem;
-  font-size: 1rem;
+/* —— 消息 —— */
+.cu-kefu__msg {
+  margin-bottom: 0.85rem;
+}
+
+.cu-kefu__bubble--user {
+  max-width: 86%;
+  margin-left: auto;
+  padding: 0.55rem 0.8rem;
+  border-radius: 10px 10px 2px 10px;
+  background: var(--cu-contrast);
+  color: var(--cu-contrast-fg);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  word-break: break-word;
+}
+
+/* 助手消息：浅色卡片（--cu-card-solid），跟用户气泡一眼分得开；欢迎语、答案、兜底、客服说明共用 */
+.cu-kefu__answer {
+  max-width: 100%;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 10px 10px 10px 2px;
+  background: var(--cu-card-solid);
   color: var(--cu-ink);
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+
+.cu-kefu__answer .cu-kefu__tag {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--cu-muted);
+}
+
+.cu-kefu__answer .cu-kefu__q {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.cu-kefu__answer a {
+  color: inherit;
+  font-weight: 600;
+}
+
+/* 答案里的圆点列表（kefu_bot.ts 里以「- 」开头的行） */
+.cu-kefu__list {
+  list-style: none;
+  margin: 0.3rem 0 0.5rem;
+  padding: 0;
+}
+
+.cu-kefu__list li {
+  position: relative;
+  padding-left: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.cu-kefu__list li::before {
+  content: '';
+  position: absolute;
+  left: 0.15rem;
+  top: 0.72em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--cu-muted);
+}
+
+.cu-kefu__para {
+  margin: 0 0 0.45rem;
+  white-space: pre-wrap;
+}
+
+.cu-kefu__para:last-child {
+  margin-bottom: 0;
+}
+
+/* —— 开场快捷问题 —— */
+.cu-kefu__popular {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: -0.35rem 0 1rem;
+  padding: 0;
+}
+
+.cu-kefu__chip {
+  display: inline-block;
+  padding: 0.32rem 0.7rem;
+  border: 1px dashed var(--cu-line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--cu-ink-2);
+  font-family: var(--cu-sans);
+  font-size: 0.8rem;
   line-height: 1.5;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+/* 键盘聚焦：胶囊与按钮给一条与 --cu-contrast 保持 3:1 的环，和按钮 hover 规则区分开 */
+.cu-kefu__chip:focus-visible,
+.cu-kefu__hint:focus-visible,
+.cu-kefu__btn:focus-visible,
+.cu-kefu__input button:focus-visible {
+  outline: 2px solid var(--cu-contrast);
+  outline-offset: 2px;
+}
+
+.cu-kefu__chip:hover {
+  border-style: solid;
+  border-color: var(--cu-contrast);
+  background: var(--cu-accent-soft);
+  color: var(--cu-ink);
+}
+
+.cu-kefu__code.cu-scroll-none {
+  margin: 0.6rem 0 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 6px;
+  background: var(--cu-code-bg);
+  color: var(--cu-ink);
+  font-family: var(--cu-mono);
+  font-size: 0.8rem;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+
+.cu-kefu__code code {
+  background: transparent;
+  padding: 0;
 }
 
 .cu-kefu__links {
-  margin: 0.6rem 0 0;
-  padding-left: 1.1rem;
-  font-size: 0.88rem;
-}
-
-.cu-kefu__log .cu-kefu__msg {
-  margin-bottom: 0.4rem;
-  padding: 0.55rem 0.8rem;
-  border-radius: 4px;
-}
-
-.cu-kefu__msg--user {
-  background: var(--cu-accent-soft);
-  color: var(--cu-ink);
-  margin-left: 2.5rem !important;
-}
-
-.cu-kefu__msg--bot {
-  margin-right: 2.5rem !important;
-}
-
-.cu-kefu__fallback {
+  list-style: none;
   display: flex;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin: 0.6rem 0 0;
+  padding: 0.55rem 0 0;
+  border-top: 1px solid var(--cu-line);
+  font-size: 0.85rem;
 }
 
-.cu-kefu__fallback button,
-.cu-kefu__fallback a {
-  min-height: 40px;
-  padding: 0.4rem 0.9rem;
-  border: 1px solid var(--cu-line-strong);
-  border-radius: 8px;
-  background: var(--cu-card);
-  color: var(--cu-ink) !important;
-  font-family: var(--cu-sans);
-  font-size: 0.85rem;
-  cursor: pointer;
+.cu-kefu__links a {
+  color: var(--cu-accent-deep);
+  font-weight: 600;
   text-decoration: none;
+}
+
+.cu-kefu__links a::after {
+  content: ' ›';
+}
+
+.cu-kefu__links a:hover {
+  text-decoration: underline;
+}
+
+/* —— 「正在输入」 —— */
+.cu-kefu__typing {
   display: inline-flex;
   align-items: center;
+  gap: 0.3rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 10px 10px 10px 2px;
+  background: var(--cu-card-solid);
 }
 
+.cu-kefu__typing i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cu-muted);
+  animation: cu-kefu-blink 1.1s infinite ease-in-out;
+}
+
+.cu-kefu__typing i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.cu-kefu__typing i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes cu-kefu-blink {
+  0%,
+  70%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+/* —— 答不上来时的引导问题：只是三行文字链接，不做成 chip 墙 —— */
+.cu-kefu__hints {
+  list-style: none;
+  margin: 0.65rem 0 0;
+  padding: 0;
+  border-left: 2px solid var(--cu-accent-soft);
+}
+
+.cu-kefu__hint {
+  display: block;
+  width: 100%;
+  padding: 0.28rem 0 0.28rem 0.7rem;
+  border: none;
+  background: transparent;
+  color: var(--cu-accent-deep);
+  font-family: var(--cu-sans);
+  font-size: 0.86rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cu-kefu__hint:hover {
+  color: var(--cu-ink);
+  text-decoration: underline;
+}
+
+/* —— 操作 —— */
+.cu-kefu__acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.cu-kefu__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 40px;
+  padding: 0.45rem 0.95rem;
+  border: 1px solid var(--cu-line-strong);
+  border-radius: 999px;
+  background: var(--cu-card);
+  color: var(--cu-ink);
+  font-family: var(--cu-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.cu-kefu__btn:hover {
+  border-color: var(--cu-line-strong);
+  color: var(--cu-ink);
+  background: var(--cu-bg-soft);
+  text-decoration: none;
+}
+
+.cu-kefu__btn--primary {
+  border-color: transparent;
+  background: var(--cu-contrast);
+  color: var(--cu-contrast-fg);
+}
+
+.cu-kefu__btn--primary:hover {
+  background: var(--cu-contrast);
+  opacity: 0.88;
+  color: var(--cu-contrast-fg);
+}
+
+.cu-kefu__btn--sm {
+  min-height: 34px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.cu-kefu__btn--block {
+  width: 100%;
+}
+
+/* —— 客服卡 —— */
+.cu-kefu__human-body {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  margin-top: 0.7rem;
+}
+
+/* 码区外面垫一层纯白底：二维码在浅色面板上直接贴着暖纸底会降低识别率，深色模式尤其明显 */
+.cu-kefu__qr-wrap {
+  flex: none;
+  display: inline-flex;
+  padding: 0.35rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.cu-kefu__qr {
+  display: block;
+  width: 140px;
+  height: 140px;
+}
+
+.cu-kefu__human-side {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+  align-self: stretch;
+}
+
+.cu-kefu__human-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--cu-muted);
+}
+
+.cu-kefu__wechat {
+  display: block;
+  padding: 0.35rem 0.6rem;
+  border: 1px dashed var(--cu-line-strong);
+  border-radius: 6px;
+  background: var(--cu-code-bg);
+  color: var(--cu-ink);
+  font-family: var(--cu-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-align: center;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+/* —— 输入区 —— */
 .cu-kefu__foot {
+  flex: none;
+  padding: 0.7rem 0.9rem 0.8rem;
   border-top: 1px solid var(--cu-line);
-  padding: 0.75rem;
+  background: var(--cu-card);
 }
 
 .cu-kefu__input {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.45rem;
+}
+
+/* 底部常驻人工出口：常驻在面板底部，用户不需要先失败、也不需要猜「人工」这个词 */
+.cu-kefu__exit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  margin-top: 0.6rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed var(--cu-line);
+}
+
+.cu-kefu__exit-text {
+  margin: 0;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: var(--cu-muted);
+}
+
+/* —— 窄屏：点按目标不小于 44px，表单控件一样 —— */
+@media (pointer: coarse) {
+  .cu-kefu__input input {
+    min-height: 48px;
+  }
+
+  .cu-kefu__chip {
+    padding: 0.55rem 0.85rem;
+    font-size: 0.85rem;
+  }
+
+  .cu-kefu__hint {
+    padding: 0.5rem 0 0.5rem 0.7rem;
+  }
+
+  .cu-kefu__btn--sm {
+    min-height: 44px;
+    padding: 0.5rem 0.9rem;
+  }
 }
 
 .cu-kefu__input input {
   flex: 1;
   min-width: 0;
   min-height: 44px;
-  padding: 0.5rem 0.8rem;
+  padding: 0.5rem 0.85rem;
   border: 1px solid var(--cu-line-strong);
-  border-radius: 4px;
+  border-radius: 999px;
   background: var(--cu-bg);
   color: var(--cu-ink);
   font-size: 0.9rem;
   font-family: var(--cu-sans);
+}
+
+.cu-kefu__input input::placeholder {
+  color: var(--cu-muted);
 }
 
 .cu-kefu__input input:focus {
@@ -220,70 +579,82 @@
 
 .cu-kefu__input button {
   flex: none;
-  min-height: 44px;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  background: var(--cu-accent);
-  color: #fff6ec;
-  font-family: var(--cu-sans);
-  font-size: 0.88rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.cu-kefu__contact {
-  display: flex;
-  flex-wrap: wrap;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.6rem;
-  font-size: 0.78rem;
-  color: var(--cu-muted);
-}
-
-.cu-kefu__copy {
-  border: 1px dashed var(--cu-line-strong);
-  border-radius: 7px;
-  background: transparent;
-  color: var(--cu-muted);
-  font-family: var(--cu-sans);
-  font-size: 0.78rem;
-  padding: 0.25rem 0.5rem;
-  min-height: 30px;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: var(--cu-contrast);
+  color: var(--cu-contrast-fg);
   cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
 }
 
-.cu-kefu__copy:hover {
-  color: var(--cu-accent-deep);
-  border-color: var(--cu-accent);
+.cu-kefu__input button:hover:not(:disabled) {
+  opacity: 0.85;
 }
 
-.cu-kefu__muted {
-  opacity: 0.6;
+.cu-kefu__input button:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
+/* —— 移动端：面板贴底全屏，浮标变成圆形 —— */
 @media (max-width: 560px) {
-  .cu-kefu--right,
-  .cu-kefu--left {
-    right: 1rem;
-    left: auto;
+  .cu-kefu {
+    --cu-kefu-fab-h: 52px;
+    --cu-kefu-inset: 14px;
   }
+
+  /* 贴底全屏：浮标在面板上层，点它就是「收起」，面板之外没有可点的空白，不需要额外遮罩 */
   .cu-kefu__panel {
-    right: 1rem;
-    left: 1rem;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
     width: auto;
-    bottom: calc(1rem + 48px + 0.75rem);
-    height: min(70dvh, calc(100dvh - 140px));
+    height: auto;
+    border: none;
+    border-radius: 0;
   }
+
+  .cu-kefu__panel .cu-kefu__fab {
+    display: none;
+  }
+
+  .cu-kefu__fab {
+    width: var(--cu-kefu-fab-h);
+    padding: 0;
+    justify-content: center;
+  }
+
   .cu-kefu__fab-label {
     display: none;
   }
-  .cu-kefu__fab {
-    width: 52px;
-    height: 52px;
-    padding: 0;
-    justify-content: center;
-    border-radius: 50%;
+
+  .cu-kefu__human-body {
+    gap: 0.7rem;
   }
+
+  .cu-kefu__qr {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cu-kefu__panel {
+    animation: none;
+  }
+
+  .cu-kefu__typing i {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+/* 教程分段切换（两条轨）的面板：切换后第一块是 h2，去掉额外的上边距 */
+.cu-guide-rail > div > h2:first-of-type {
+  margin-top: 0.5rem;
 }

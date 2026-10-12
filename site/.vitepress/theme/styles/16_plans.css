@@ -1,0 +1,391 @@
+/* 套餐档位卡 / 档位网格（16_plans.css） */
+
+/* —— 档位卡（2026-10-11 重做 · 布局版）——
+   这次只动布局，不动内容：三档卖点是同 4 条，差别全在「周期 + 价格」。
+   所以卡片的任务是把「周期递增 / 价格递减」这条阶梯画出来，而不是把每张卡装饰得不一样。
+
+   层级做法换掉了原先的反白实心：三张卡同底同宽，中间那张如果整块墨底，
+   视觉上就变成「两张便宜的 + 一张很贵的」，阶梯断裂。
+   现在主推卡靠三处轻量信号：顶部 3px 墨色压边、更强的抬升阴影、角标反白。
+   卡片底色用 --cu-card-solid（比 --cu-card 更亮），让卡从页底色上浮起来。 */
+.cu-tcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1.4rem 1.4rem;
+  background: var(--cu-card-solid);
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-lg);
+  overflow: hidden;
+  transition: transform var(--cu-dur) var(--cu-ease), box-shadow var(--cu-dur) var(--cu-ease),
+    border-color 0.3s var(--cu-ease);
+}
+
+.cu-tcard:hover {
+  transform: translateY(-3px);
+  border-color: var(--cu-line-strong);
+  box-shadow: var(--cu-shadow-pop);
+}
+
+/* 主推卡：顶部压边 + 更强阴影。压边用 ::before 而不是 border-top，
+   因为 border-top 会把卡片内容整体下推，三卡的「周期」行就对不齐了。 */
+.cu-tcard--featured {
+  box-shadow: var(--cu-shadow-lift);
+}
+
+.cu-tcard--featured::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--cu-contrast);
+}
+
+/* 卡头：档位名 + 周期同一行。周期是三档唯一的差异点（1 / 7 / 30 天），
+   必须在首行和价格挨着看，读者才能先建立「越往后越长」的预期再看钱。 */
+.cu-tcard__head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding-right: 4.2rem;
+}
+
+.cu-tcard__name {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--cu-ink);
+  border: none;
+}
+
+.cu-tcard__head .cu-tcard__period {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--cu-muted);
+}
+
+/* 角标：绝对定位到卡片右上角，不占流内高度。
+   卡头因此不用为它留 min-height，三张卡的档位名基线天然对齐。 */
+.cu-tcard__badge {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.4rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: var(--cu-r-pill);
+  background: var(--cu-bg-soft);
+  color: var(--cu-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.cu-tcard--featured .cu-tcard__badge {
+  background: var(--cu-contrast);
+  color: var(--cu-contrast-fg);
+}
+
+/* 价格行：金额 + 均价锚点同行。
+   「约 ¥13.5 → ¥10.0 → ¥4.2 / 天」的递减阶梯是本页最强的说服点，
+   原先单独占一行小灰字，权重被埋掉了；做成小徽标后它和金额共享一条视觉基线。 */
+.cu-tcard__price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 0.85rem 0 0;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--cu-line);
+}
+
+.cu-tcard__price strong {
+  font-size: 2.35rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--cu-accent-deep);
+}
+
+.cu-tcard__perday {
+  padding: 0.12rem 0.5rem;
+  border-radius: var(--cu-r-pill);
+  background: var(--cu-bg-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--cu-ink-2);
+  white-space: nowrap;
+}
+
+/* 卖点：去掉默认圆点，改成小方块。四条卖点三张卡完全相同，
+   紧凑的列表能保证价格行和按钮行在三张卡之间落在同一水平线上。 */
+.cu-tcard__features {
+  flex: 1;
+  margin: 1.05rem 0 1.25rem;
+  padding: 0;
+  list-style: none;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: var(--cu-ink-2);
+}
+
+.cu-tcard__features li {
+  position: relative;
+  padding-left: 1rem;
+  margin-top: 0.55rem;
+}
+
+.cu-tcard__features li:first-child {
+  margin-top: 0;
+}
+
+.cu-tcard__features li::before {
+  content: '';
+  position: absolute;
+  top: 0.55em;
+  left: 0.15rem;
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+  background: var(--cu-ink);
+  opacity: 0.55;
+}
+
+/* 底部按钮通栏：三条卖点区块高度不定，flex:1 撑开后按钮一定贴在卡底。 */
+.cu-tcard__foot {
+  margin-top: auto;
+}
+
+.cu-tcard__foot .cu-btn {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 非主推卡的按钮用描边态，和主推卡的实心态形成「一步到位 / 先试试」的主次。 */
+.cu-tcard:not(.cu-tcard--featured):not(.cu-tcard--soon) .cu-btn--ghost {
+  background: transparent;
+  border-color: var(--cu-line-strong);
+  color: var(--cu-ink) !important;
+}
+
+.cu-tcard:not(.cu-tcard--featured):not(.cu-tcard--soon) .cu-btn--ghost:hover {
+  background: var(--cu-bg-soft);
+  border-color: var(--cu-ink);
+}
+
+/* —— 网格 —— */
+.cu-tgrid {
+  display: grid;
+  gap: 1.1rem;
+  margin: 1.5rem 0 0.75rem;
+}
+
+/* 列数由 PlanGrid 写进 --cu-tgrid-cols（1–3 档铺满一行，4 档以上固定三列），
+   换档位不用改这里。三列时每列下限 190px：低于这个宽度价格和卖点会开始折行，
+   窄屏由下方媒体查询收到两列 / 一列。 */
+.cu-tgrid {
+  grid-template-columns: repeat(var(--cu-tgrid-cols, 3), minmax(0, 1fr));
+}
+
+.cu-tgrid-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 2rem;
+}
+
+.cu-tgrid-head h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  border: none;
+}
+
+.cu-tgrid-badge {
+  padding: 0.05rem 0.55rem;
+  border: 1px solid var(--cu-line-strong);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--cu-muted);
+}
+
+.cu-tgrid-desc {
+  margin: 0.4rem 0 0;
+  max-width: 52rem;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--cu-ink-2);
+}
+
+.cu-tgrid-hint {
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 900px) {
+  .cu-tgrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .cu-tgrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* —— 套餐分组切换：分段胶囊（2026-10-10）——
+   定价页把三组套餐从平铺改为切换，首屏只看一组。
+   选中态用 --cu-contrast 反白（墨色底 + 米白字），与全站无彩体系一致，
+   不引入任何彩色。胶囊圆角必须用 --cu-r-pill。 */
+.cu-seg-wrap {
+  margin: 1.5rem 0 0;
+}
+
+.cu-seg.cu-scroll-none {
+  display: inline-flex;
+  max-width: 100%;
+  gap: 0.2rem;
+  padding: 0.28rem;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-pill);
+  background: var(--cu-bg-soft);
+  overflow-x: auto;
+  
+}
+
+
+
+.cu-seg__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+  padding: 0.5rem 1.05rem;
+  border: none;
+  border-radius: var(--cu-r-pill);
+  background: transparent;
+  color: var(--cu-ink-2);
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--cu-dur) var(--cu-ease), color var(--cu-dur) var(--cu-ease);
+}
+
+.cu-seg__btn:hover {
+  color: var(--cu-ink);
+}
+
+.cu-seg__btn.is-active {
+  background: var(--cu-contrast);
+  color: var(--cu-contrast-fg);
+  font-weight: 700;
+}
+
+.cu-seg__btn:focus-visible {
+  outline: 2px solid var(--cu-ink);
+  outline-offset: 2px;
+}
+
+.cu-seg__badge {
+  padding: 0.05rem 0.45rem;
+  border-radius: var(--cu-r-pill);
+  background: var(--cu-card);
+  color: var(--cu-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.cu-seg__btn.is-active .cu-seg__badge {
+  background: var(--cu-bg-soft);
+  color: var(--cu-ink-2);
+}
+
+.cu-seg__desc {
+  margin: 0.85rem 0 0;
+  max-width: 52rem;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--cu-ink-2);
+}
+
+/* 胶囊条内的网格不再额外顶边距，跟描述段连成一块 */
+.cu-seg__desc + .cu-tgrid-wrap .cu-tgrid {
+  margin-top: 0.5rem;
+}
+
+/* —— 待上线档位（2026-10-10）——
+   周期卡 / 额度卡还没有真实档位与价格，用虚线灰卡占位而不是「¥0 可下单」。
+   全站无彩墨色体系，所以「弱化」靠虚线 + 降透明 + 灰字实现，不引入任何彩色。
+   待上线与主推高亮互斥：--featured 的选择器排除了 --soon，
+   否则一张还没定价的卡会被高亮成主推，反而像在推销。 */
+.cu-tcard--soon {
+  border-style: dashed;
+  border-color: var(--cu-line);
+  opacity: 0.62;
+}
+
+.cu-tcard--soon:hover {
+  transform: none;
+  border-color: var(--cu-line);
+  box-shadow: none;
+}
+
+/* 待上线徽标：改绝对定位后这里要显式清掉主推卡的实心底，
+   否则 soon 卡恰好带 --featured 时会命中 .cu-tcard--featured .cu-tcard__badge。 */
+.cu-tcard__badge--soon {
+  border: 1px dashed var(--cu-line-strong);
+  background: transparent;
+  color: var(--cu-muted);
+  font-weight: 600;
+}
+
+.cu-tcard--soon .cu-tcard__badge {
+  background: transparent;
+}
+
+/* 待上线卡的周期与卖点一并弱化，价格区的分隔线也压淡 */
+.cu-tcard--soon .cu-tcard__period,
+.cu-tcard--soon .cu-tcard__features {
+  color: var(--cu-muted);
+}
+
+.cu-tcard--soon .cu-tcard__features li::before {
+  background: var(--cu-muted);
+}
+
+/* 未定价：不用强调色的大号金额，改成弱化灰字，避免「待定」被读成真实价格 */
+.cu-tcard__price--tbd strong {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--cu-muted);
+}
+
+.cu-tcard--soon .cu-tcard__name {
+  color: var(--cu-muted);
+}
+
+/* 不可点的按钮。基型仍用 .cu-btn 保证尺寸与文字排版一致，只去掉交互反馈。 */
+.cu-btn--disabled {
+  cursor: not-allowed;
+  background: var(--cu-bg-soft);
+  color: var(--cu-muted) !important;
+  border-color: var(--cu-line);
+  box-shadow: none;
+  transform: none;
+}
+
+/* 胶囊上的「即将上线」徽标 */
+.cu-seg__badge--soon {
+  border: 1px dashed var(--cu-line-strong);
+  background: transparent;
+  font-weight: 600;
+}
+
+.cu-seg__btn.is-active .cu-seg__badge--soon {
+  background: transparent;
+  border-color: currentColor;
+}

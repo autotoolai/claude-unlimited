@@ -6,6 +6,6 @@ defineProps<{ title?: string; lines: string[] }>()
 <template>
   <div class="cu-term">
     <div class="cu-term__bar"><i /><i /><i /><span>{{ title || 'Terminal' }}</span></div>
-    <pre><code>{{ lines.join('\n') }}</code></pre>
+    <pre class="cu-scroll-none"><code>{{ lines.join('\n') }}</code></pre>
   </div>
 </template>

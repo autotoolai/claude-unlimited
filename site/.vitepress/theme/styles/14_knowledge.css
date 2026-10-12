@@ -1,0 +1,645 @@
+/* 知识库（/knowledge）：列表页卡片、文章页正文、页内元信息。
+   只用 var(--cu-*)，深浅色由 00_base.css 的 :root / .dark / @media (prefers-color-scheme: dark) 控制。 */
+
+/* ---------- 列表页：精选大卡 ---------- */
+.cu-kfeature {
+  margin: 1.5rem 0 2.5rem;
+}
+
+.cu-kfeature__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.6rem 1.55rem;
+}
+
+.cu-kfeature__card h3 {
+  margin: 0;
+  font-size: 1.12rem;
+  line-height: 1.4;
+}
+
+.cu-kfeature__card p {
+  flex: 1;
+  font-size: 0.94rem;
+  color: var(--cu-muted);
+}
+
+.cu-kfeature__meta {
+  font-size: 0.82rem;
+  color: var(--cu-muted);
+}
+
+/* ---------- 列表页：最新文章 / 分类小节列表 ---------- */
+.cu-klist {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1rem 0 2.25rem;
+}
+
+.cu-kcard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.05rem 1.2rem;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-sm);
+  background: var(--cu-card);
+  transition: border-color 0.3s var(--cu-ease), background-color 0.3s var(--cu-ease),
+    transform var(--cu-dur) var(--cu-ease), box-shadow var(--cu-dur) var(--cu-ease);
+  color: inherit;
+  text-decoration: none;
+}
+
+.cu-kcard:hover {
+  border-color: var(--cu-line-strong);
+  background: var(--cu-card-hover);
+  transform: translateY(-3px);
+  box-shadow: var(--cu-shadow-lift);
+}
+
+.cu-kcard__top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.cu-kcard__badge {
+  display: inline-block;
+  padding: 0.12rem 0.5rem;
+  border-radius: var(--cu-r-pill);
+  background: var(--cu-card-solid);
+  border: 1px solid var(--cu-line);
+  color: var(--cu-accent-deep);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.cu-kcard__title {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--cu-ink);
+  line-height: 1.45;
+}
+
+.cu-kcard__desc {
+  font-size: 0.9rem;
+  color: var(--cu-muted);
+  line-height: 1.7;
+}
+
+.cu-kcard__meta {
+  font-size: 0.8rem;
+  color: var(--cu-muted);
+}
+
+.cu-kcat {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--cu-line);
+}
+
+.cu-kcat__desc {
+  margin: 0.35rem 0 1rem;
+  font-size: 0.95rem;
+  color: var(--cu-muted);
+}
+
+.cu-kcat__empty {
+  font-size: 0.9rem;
+  color: var(--cu-muted);
+}
+
+/* ---------- 文章页：正文上方元信息 ---------- */
+.cu-kdoc__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.86rem;
+  color: var(--cu-muted);
+}
+
+.cu-kdoc__crumb {
+  color: var(--cu-muted);
+  text-decoration: none;
+}
+
+.cu-kdoc__crumb:hover {
+  color: var(--cu-accent-deep);
+}
+
+.cu-kdoc__badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--cu-r-pill);
+  background: var(--cu-bg-soft);
+  color: var(--cu-ink-2);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ---------- 文章页：markdown 正文（.vp-doc） ---------- */
+/* 文章页没有 cu-page__head，H1 来自 markdown；给正文一个与 PageShell 一致的顶部间距 */
+.cu-page--doc {
+  padding-top: 3.5rem;
+}
+
+.cu-page--doc .vp-doc h1 {
+  margin: 0 0 1rem;
+  font-family: var(--cu-serif);
+  font-size: clamp(2rem, 4.2vw, 2.9rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--cu-ink);
+}
+
+.cu-page--doc .vp-doc h2 {
+  margin: 3rem 0 1rem;
+  font-family: var(--cu-serif);
+  font-size: clamp(1.35rem, 2.4vw, 1.65rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  color: var(--cu-ink);
+  scroll-margin-top: calc(var(--cu-nav-h) + 24px);
+}
+
+.cu-page--doc .vp-doc h3 {
+  margin: 2rem 0 0.75rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--cu-ink);
+  scroll-margin-top: calc(var(--cu-nav-h) + 24px);
+}
+
+.cu-page--doc .vp-doc p {
+  margin: 0.9rem 0;
+  font-size: 1rem;
+  line-height: 1.85;
+  color: var(--cu-ink-2);
+  max-width: var(--cu-content-w);
+}
+
+.cu-page--doc .vp-doc ul,
+.cu-page--doc .vp-doc ol {
+  margin: 0.9rem 0;
+  padding-left: 1.25rem;
+  max-width: var(--cu-content-w);
+  color: var(--cu-ink-2);
+  line-height: 1.85;
+}
+
+.cu-page--doc .vp-doc li {
+  margin: 0.3rem 0;
+}
+
+.cu-page--doc .vp-doc li::marker {
+  color: var(--cu-accent);
+}
+
+.cu-page--doc .vp-doc a {
+  color: var(--cu-accent-deep);
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+
+.cu-page--doc .vp-doc code {
+  font-size: 0.88em;
+  padding: 0.1em 0.35em;
+  border-radius: 5px;
+  background: var(--cu-code-bg);
+}
+
+.cu-page--doc .vp-doc pre.cu-scroll-none,
+.cu-page--doc .vp-doc div[class*='language-'] > pre {
+  margin: 1.1rem 0;
+  padding: 1rem 1.15rem;
+  border-radius: var(--cu-r-sm);
+  background: var(--cu-code-bg);
+  /* 同 13_layout_tail.css：主题脚本写的内联 !important 赢，所以轨道靠下面同级 !important 的 scrollbar 规则藏 */
+  overflow-x: auto;
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.cu-page--doc .vp-doc div[class*='language-'] > pre,
+.cu-page--doc .vp-doc pre.cu-scroll-none {
+  scrollbar-width: none !important;
+}
+
+.cu-page--doc .vp-doc div[class*='language-'] > pre::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+.cu-page--doc .vp-doc pre code {
+  padding: 0;
+  background: transparent;
+}
+
+.cu-page--doc .vp-doc blockquote {
+  margin: 1.1rem 0;
+  padding: 0.9rem 1.15rem;
+  border-left: 3px solid var(--cu-accent-line);
+  background: var(--cu-bg-soft);
+  border-radius: 0 var(--cu-r-sm) var(--cu-r-sm) 0;
+  color: var(--cu-ink-2);
+  font-size: 0.98rem;
+  line-height: 1.75;
+  max-width: var(--cu-content-w);
+}
+
+.cu-page--doc .vp-doc blockquote p {
+  margin: 0;
+  max-width: none;
+}
+
+/* markdown 里的裸 <table>：套一层可横滚容器（overflow-x: auto），并用 .cu-scroll-none 隐藏滚动条。
+   内层由 .cu-table-wrap.cu-scroll-none 的通用规则提供，这里只补阅读页需要的边距。 */
+.cu-page--doc .vp-doc div[class*='table-wrap'] {
+  margin: 1.1rem 0;
+}
+
+.cu-page--doc .vp-doc table {
+  width: 100%;
+  margin: 1.1rem 0;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  color: var(--cu-ink-2);
+}
+
+.cu-page--doc .vp-doc th,
+.cu-page--doc .vp-doc td {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--cu-line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.cu-page--doc .vp-doc thead th {
+  background: var(--cu-accent-soft);
+  font-weight: 700;
+  color: var(--cu-ink);
+}
+
+.cu-page--doc .vp-doc strong {
+  font-weight: 700;
+  color: var(--cu-ink);
+}
+
+/* ---------- 文章页尾 ---------- */
+.cu-kfoot {
+  margin-top: 3rem;
+}
+
+.cu-kfoot__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--cu-line);
+  font-size: 0.86rem;
+  color: var(--cu-muted);
+}
+
+.cu-krelated {
+  margin: 2rem 0;
+}
+
+.cu-krelated h2 {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+  color: var(--cu-ink);
+}
+
+/* ---------- 窄屏 ---------- */
+@media (max-width: 900px) {
+  .cu-kdoc__meta,
+  .cu-kfoot__meta {
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+}
+
+@media (max-width: 620px) {
+  .cu-kfeature__card,
+  .cu-kcard {
+    padding: 0.95rem 1rem;
+  }
+  .cu-page--doc {
+    padding-top: 2.5rem;
+  }
+}
+
+/* ---------- 列表页：分类胶囊条（Hero 下方） ---------- */
+.cu-kswitcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0 0 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--cu-line);
+}
+
+.cu-kswitcher__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 999px;
+  background: var(--cu-card);
+  color: var(--cu-ink);
+  text-decoration: none;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.cu-kswitcher__item:hover {
+  border-color: var(--cu-accent-soft);
+  background: var(--cu-accent-soft);
+  transform: translateY(-1px);
+}
+
+.cu-kswitcher__badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--cu-accent-deep);
+}
+
+.cu-kswitcher__count {
+  min-width: 1.4rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 999px;
+  background: var(--cu-code-bg);
+  color: var(--cu-muted);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+/* ---------- 列表页：分类小节头（名称 + 篇数） ---------- */
+.cu-kcat__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cu-kcat__head h2 {
+  margin-bottom: 0;
+}
+
+.cu-kcat__count {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  color: var(--cu-muted);
+}
+
+/* ---------- 长文页：两列阅读容器（左侧目录 / 正文） ----------
+   知识库文章页、教程页（PageShell toc="side"）、后台页（toc="wide"）共用。
+   DOM 顺序是「目录 → 正文」，网格第一列是目录（01_shell_toc.css 里 224px），第二列是正文。
+   1080px 以下切单列的规则在 01_shell_toc.css 的媒体查询里。 */
+.cu-shell__body--reading {
+  grid-template-columns: 224px minmax(0, 1fr);
+  gap: 3.5rem;
+  /* 不居中：正文靠左，与吸顶导航的左边缘对齐；居中会整块浮在半空、右侧多出大片空白 */
+  justify-content: start;
+}
+
+/* 正文列容器。默认不限宽：营销页与列表页（首页 / 模型 / 套餐 / 无限额度 / FAQ / 知识库列表）
+   也用这个容器，它们要占满 --cu-wrap（1140px），限宽只加在 --reading 上。 */
+.cu-shell__inner {
+  width: 100%;
+  min-width: 0;
+}
+
+/* 窄列长读：教程页与知识库文章页。约 736px（--cu-content-w 的 44rem = 704px 加一点余量），
+   正文段落的 44rem 限宽由 .cu-page 的规则控制，这里管的是整块内容的宽度。 */
+.cu-shell__body--reading .cu-shell__inner {
+  max-width: 42rem;
+}
+
+/* 后台页（toc="wide"）：功能卡是 3 列网格，46rem 会把它压成 2 列，这里放宽到 54rem */
+.cu-shell__body--reading .cu-shell__inner--wide {
+  max-width: 54rem;
+}
+
+.cu-shell__body--reading .cu-page {
+  padding-bottom: 1rem;
+}
+
+.cu-shell__body--reading .cu-kfoot {
+  margin-top: 2.5rem;
+}
+
+/* 1280px 以下的单列回落（网格列 + 正文限宽解除）在 01_shell_toc.css 的媒体查询里：
+   本文件在它之后加载，同等优先级下本文件胜出，所以这里也写一遍，避免单列规则被这行 --reading 网格覆盖。 */
+@media (max-width: 1080px) {
+  .cu-shell__body--reading {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* 折叠态（本文件在 01_shell_toc.css 之后加载，同优先级下这里胜出，所以折叠的网格列也要再写一遍）：
+   目录收成 40px 竖条在左，正文吃满右边；上面的单列规则在 ≤1080px 时会覆盖掉它。 */
+@media (min-width: 1081px) {
+  html.cu-toc-collapsed .cu-shell__body.cu-shell__body--reading {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  /* 折叠后正文吃满整列：同样要在本文件再写一遍，否则 46rem / 54rem 的阅读限宽会留着 */
+  html.cu-toc-collapsed .cu-shell__inner--reading {
+    max-width: none;
+  }
+}
+
+/* ---------- 列表页：分类 tab 条（2026-10-10 改版，取代四个纵向小节） ----------
+   胶囊外观复用 16_plans.css 的 .cu-seg / .cu-seg__btn（定价页已在用），这里只补外层间距与说明行。
+   tab 按钮里带 .cu-kswitcher__count 复用旧胶囊条的篇数徽标样式。 */
+.cu-kfilters {
+  margin: 1.5rem 0 1.75rem;
+}
+
+/* 列表页有五个分类，比定价页的分段控件多，容器必须撑满并均分，
+   否则 inline-flex 会让整条胶囊漂在中间、宽度忽长忽短。
+   .cu-seg / .cu-seg__btn 是定价页（2–3 项）的样式，这里只做列表页的局部覆盖。 */
+.cu-kfilters .cu-seg {
+  display: flex;
+  width: 100%;
+  gap: 0.25rem;
+  padding: 0.3rem;
+}
+
+.cu-kfilters .cu-seg__btn {
+  flex: 1 1 0;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 0;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+/* 篇数徽标：默认淡底，选中态反白时改成描边，避免出现深色实心圆点 */
+.cu-kfilters .cu-kswitcher__count {
+  min-width: 1.35rem;
+  padding: 0.02rem 0.32rem;
+  background: var(--cu-card);
+  border: 1px solid transparent;
+  color: var(--cu-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.cu-kfilters .cu-seg__btn.is-active .cu-kswitcher__count {
+  background: transparent;
+  border-color: var(--cu-contrast-fg);
+  color: var(--cu-contrast-fg);
+}
+
+/* 说明句是正文辅助信息，跟定价页 .cu-seg__desc 一致走左对齐限宽，
+   不做居中：居中只留给 hero / 页头 / CTA 横幅这类独立区块。 */
+.cu-kfilters__desc {
+  /* 这几句说明都是一行短句，要压住从 .cu-page p 继承来的三条声明。
+     Chrome 实测（本机 1600px、.cu-page p 44rem 限宽）：只要 white-space 不是 nowrap，
+     段落块就被限在 704px，这段字（nowrap 下 637px）会被折成两行。
+     同理 margin 也必须 !important —— 规则级 !important 不加，.cu-page p 的 auto 照样赢。 */
+  max-width: none !important;
+  margin: 0.85rem 0 0 !important;
+  white-space: nowrap !important; /* 窄屏由上面的媒体查询放开，会正常换行 */
+  text-align: left; /* 与上方胶囊条同起点 */
+  font-size: 0.92rem;
+  color: var(--cu-muted);
+  line-height: 1.7;
+}
+
+/* ---------- 列表页：图文卡片网格 ---------- */
+.cu-kgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+  margin: 0 0 2.5rem;
+}
+
+.cu-ktile {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-md);
+  background: var(--cu-card);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.3s var(--cu-ease), background-color 0.3s var(--cu-ease),
+    transform var(--cu-dur) var(--cu-ease), box-shadow var(--cu-dur) var(--cu-ease);
+}
+
+.cu-ktile:hover {
+  border-color: var(--cu-line-strong);
+  background: var(--cu-card-hover);
+  transform: translateY(-3px);
+  box-shadow: var(--cu-shadow-lift);
+}
+
+.cu-ktile__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-bottom: 1px solid var(--cu-line);
+  background: var(--cu-bg-soft);
+}
+
+.cu-ktile__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.05rem 1.2rem 1.15rem;
+}
+
+.cu-ktile__cat {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--cu-accent-deep);
+}
+
+.cu-ktile__title {
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--cu-ink);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.cu-ktile__desc {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--cu-muted);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+.cu-ktile__foot {
+  margin-top: 0.15rem;
+  font-size: 0.8rem;
+  color: var(--cu-muted);
+}
+
+@media (max-width: 620px) {
+  .cu-kfilters {
+    margin: 1rem 0 1.5rem;
+  }
+
+  /* 窄屏放行换行：上面用 !important 强制的 nowrap / max-width 在这里解除 */
+  .cu-kfilters__desc {
+    max-width: none !important;
+    white-space: normal !important;
+  }
+
+  /* 窄屏不均分，横向滚动，一项一项读 */
+  .cu-kfilters .cu-seg {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+  }
+
+  .cu-kfilters .cu-seg__btn {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    padding: 0.45rem 0.85rem;
+  }
+
+  .cu-kgrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* 知识库文章「常见问题」区块：客户端填充的 section（在 .vp-doc 之后、页尾之前），SSR 时为空 */
+.cu-kdoc__faq {
+  margin-top: 0.5rem;
+}
+
+.cu-kdoc__faq:empty {
+  display: none;
+}
+
+.cu-kdoc__faq h2 {
+  margin: 2rem 0 1rem;
+  font-size: 1.25rem;
+  color: var(--cu-ink);
+}

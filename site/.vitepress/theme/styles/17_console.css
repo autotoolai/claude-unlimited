@@ -1,0 +1,127 @@
+/* 管理后台介绍页：功能卡网格 / 备用域名（17_console.css） */
+
+.cu-console-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 0 2rem;
+  padding: 1.4rem 1.5rem;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-md);
+  background: var(--cu-card);
+  overflow: hidden;
+}
+
+.cu-console-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 60% 100% at 0% 0%, var(--cu-accent-soft), transparent 70%);
+}
+
+.cu-console-hero p {
+  flex: 1;
+  min-width: 240px;
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--cu-ink-2);
+}
+
+.cu-cgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.cu-ccard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem 1.3rem;
+  background: var(--cu-card);
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-md);
+  transition: transform var(--cu-dur) var(--cu-ease), box-shadow var(--cu-dur) var(--cu-ease),
+    border-color 0.3s var(--cu-ease);
+}
+
+.cu-ccard:hover {
+  transform: translateY(-3px);
+  border-color: var(--cu-line-strong);
+  box-shadow: var(--cu-shadow-lift);
+}
+
+.cu-ccard__head {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.cu-ccard__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border-radius: 11px;
+  background: var(--cu-card-solid);
+  border: 1px solid var(--cu-line);
+  color: var(--cu-accent-deep);
+  font-family: var(--cu-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.cu-ccard__name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--cu-ink);
+}
+
+.cu-ccard__what,
+.cu-ccard__when {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--cu-ink-2);
+}
+
+.cu-ccard__when {
+  color: var(--cu-muted);
+  font-size: 0.85rem;
+}
+
+.cu-ccard__when::before {
+  content: '什么时候用：';
+  font-weight: 700;
+  color: var(--cu-accent-deep);
+}
+
+/* 备用域名 */
+.cu-domains {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1rem 0;
+}
+
+.cu-domain {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.45rem 0.3rem 0.8rem;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-pill);
+  background: var(--cu-card);
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.85rem;
+}

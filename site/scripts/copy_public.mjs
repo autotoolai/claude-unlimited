@@ -17,10 +17,11 @@ import { cpSync, createReadStream, existsSync, mkdirSync, readFileSync, readdirS
 import { createServer } from 'node:http'
 import path, { extname, join, normalize, resolve } from 'node:path'
 
-/** srcDir（见 config.mts），条目页产物就在 dist 根 */
-const SRC_DIR = join(process.cwd(), '.vitepress', 'dist')
-
+// 全部相对脚本目录解析，不看 cwd：从仓库根调这个脚本也不会操作到别的目录。
+// 原来 SRC_DIR 用 process.cwd()、dist 用 import.meta.dirname，同一个目录两份基准，改一处漏一处。
 const root = resolve(import.meta.dirname, '..')
+/** srcDir（见 config.mts），条目页产物就在 dist 根 */
+const SRC_DIR = join(root, '.vitepress', 'dist')
 const src = join(root, 'public')
 const dist = join(root, '.vitepress', 'dist')
 const WATCH = process.argv.includes('--watch')
@@ -38,12 +39,16 @@ const MIME = {
 }
 
 /**
- * 清理 Vue SSR 的注释标记：<!--[--> / <!--]--> / <!----> 是 v-if 分支的边界标记，
+ * 检查 Vue SSR 的片段锚点：<!--[--> / <!--]--> 是多根组件（fragment）的边界标记，<!----> 是 v-if 空分支占位。
  * 它们会作为真实 HTML 注释进入产物（既增大体积，也让「内容是否完整」无法用简单的字符串判断）。
- * 所有 srcDir 下的 .html 在 public 同步之后统一过一遍；404.html 由 VitePress 直接产出，不含这些标记。
+ *
+ * 不能删：客户端 hydration 按这些注释定位片段边界，删掉后 vnode 会错位，Vue 报 "Hydration node mismatch"
+ * 并重建对应子树（表现为内容闪一下）。脚本 2026-10-09 之前会删它们；自那以后只检测不修改：
+ * 产物里出现标记即报错退出，提示改用 Vue 官方的 minifyHtml: true 压缩。
  */
-function stripSsrMarkers() {
+function checkSsrMarkers() {
   let n = 0
+  const offenders = []
   const walk = (dir) => {
     for (const name of readdirSync(dir)) {
       const f = path.join(dir, name)
@@ -51,16 +56,19 @@ function stripSsrMarkers() {
       if (st.isDirectory()) walk(f)
       else if (name.endsWith('.html')) {
         const html = readFileSync(f, 'utf8')
-        const clean = html.replaceAll('<!--[-->', '').replaceAll('<!--]-->', '').replaceAll('<!---->', '')
-        if (clean !== html) {
-          writeFileSync(f, clean)
-          n += clean.length - html.length
+        const count = (html.match(/<!--\[-->|<!--\]-->|<!---->/g) || []).length
+        if (count) {
+          offenders.push(`${path.relative(dist, f)}: ${count}`)
+          n += count
         }
       }
     }
   }
   walk(SRC_DIR)
-  if (n) console.log(`[public] 已清理 SSR 注释标记，产物缩小 ${-n} 字节`)
+  if (n) {
+    console.log(`[public] 产物里有 ${n} 个 Vue SSR 片段标记（${offenders.slice(0, 5).join(', ')}${offenders.length > 5 ? ' …' : ''}）。`)
+    console.log('[public] 片段标记必须保留：删掉会导致 hydration 错位。要减小体积请在 config.mts 开 vite: { build: { minifyHtml: true } }。')
+  }
 }
 
 function copyAll() {
@@ -106,4 +114,4 @@ if (DEV) {
     console.log(`[public] 静态文件服务 http://0.0.0.0:${STATIC_PORT}/（dev 专用）`)
   })
 }
-stripSsrMarkers()
+checkSsrMarkers()

@@ -1,0 +1,9 @@
+{
+  "_说明": "缺图文章的配图来源：从源站 69 张封面（temp/aiprimetech_covers/）里按语义挑选。语义相近的源文章可能与我们的主题不完全一致，这是有意为之——配图只作氛围。source 文章有 /blog/ 源页的由 fetch_knowledge_covers.py 直接抓取，这里只登记没有源页的。",
+  "covers": {
+    "claude-code-prompt-too-long-fix": "claude-code-max-output-tokens",
+    "claude-code-startup-tokens": "claude-code-token-overhead-startup",
+    "claude-code-mcp-config": "claude-code-mcp-servers-setup-guide",
+    "claude-code-make-video": "anthropic-cowork-claude-desktop-agent"
+  }
+}

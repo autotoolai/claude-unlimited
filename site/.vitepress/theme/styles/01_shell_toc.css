@@ -1,0 +1,325 @@
+/* —— 左侧目录：长文页（.cu-shell__body--reading 两列布局）——
+   知识库文章页、教程页（toc="side"）、后台页（toc="wide"）共用。
+   DOM 顺序在正文之前（PageShell.vue / KnowledgeDoc.vue），窄屏塌成横排条不需要 order。
+   墨色系：不用彩色、不用反色块；当前项用左侧 2px 竖条（与 .cu-tabs a.is-active 同一套逻辑），hover 用 --cu-accent-soft 底。
+   折叠态挂在 <html class="cu-toc-collapsed"> 上（见 use_shell.ts 的 useTocCollapse + config.mts 的 head 脚本），
+   这样 <aside> 的 class 是静态的，校验脚本里 class="cu-sectionnav cu-sidenav" 的精确匹配不会被打破。 */
+.cu-sidenav.cu-scroll-none {
+  position: sticky;
+  align-self: start; /* 网格项默认 stretch 会让 sticky 失效 */
+  top: calc(var(--cu-nav-h) + 1rem);
+  /* 顶部对齐正文的 h1（.cu-page--doc 的 padding-top 3.5rem + .vp-doc h1 自身没有上边距，
+     所以 h1 顶边离网格顶约 3.5rem）；目录抓的是 h2 起的标题，天然比 h1 低一层，
+     这 3rem 的空白就是那层偏移量，缩到 0 就跟胶囊标签、meta 行错位了。 */
+  padding: 3rem 0 1.5rem;
+  font-size: 0.875rem;
+  max-height: calc(100dvh - var(--cu-nav-h) - 4.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* 标题行：左边「本页目录」小字，右边折叠按钮 */
+.cu-sidenav__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0 0 0.6rem;
+}
+
+.cu-sidenav__title {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--cu-muted);
+}
+
+/* 阅读进度：2px，底色 --cu-accent-line，前景 --cu-accent，宽度由 JS 写 --cu-toc-progress */
+.cu-sidenav__progress {
+  height: 2px;
+  margin: 0 0 0.7rem;
+  border-radius: 2px;
+  background: var(--cu-accent-line);
+  overflow: hidden;
+}
+
+.cu-sidenav__progress i {
+  display: block;
+  height: 100%;
+  width: var(--cu-toc-progress, 0%);
+  background: var(--cu-accent);
+  transition: width 0.15s linear;
+}
+
+/* 折叠按钮：24px 方块，无边框，hover 淡底 */
+.cu-sidenav__toggle {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  margin: -4px -4px -4px 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--cu-r-sm);
+  background: transparent;
+  color: var(--cu-muted);
+  cursor: pointer;
+  transition: background-color 0.2s var(--cu-ease), color 0.2s var(--cu-ease);
+}
+
+.cu-sidenav__toggle:hover {
+  background: var(--cu-accent-soft);
+  color: var(--cu-ink);
+}
+
+.cu-sidenav__toggle svg {
+  width: 14px;
+  height: 14px;
+}
+
+.cu-sidenav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 1px solid var(--cu-line);
+}
+
+.cu-sidenav a {
+  display: block;
+  padding: 0.32rem 0.7rem;
+  margin-left: -1px;
+  border-left: 2px solid transparent;
+  border-radius: 0 var(--cu-r-sm) var(--cu-r-sm) 0;
+  color: var(--cu-muted) !important;
+  text-decoration: none;
+  font-weight: 500;
+  line-height: 1.5;
+  transition: color 0.2s var(--cu-ease), border-color 0.2s var(--cu-ease), background-color 0.2s var(--cu-ease);
+}
+
+.cu-sidenav a:hover {
+  color: var(--cu-ink) !important;
+  background: var(--cu-accent-soft);
+}
+
+.cu-sidenav a.is-active {
+  color: var(--cu-ink) !important;
+  border-left-color: var(--cu-accent);
+  font-weight: 600;
+}
+
+/* 三级项（教程页的「1.1 选套餐」等）：缩进 + 小一号，与 h2 级区分 */
+.cu-sidenav a.cu-sidenav__sub {
+  padding-left: 1.6rem;
+  font-size: 0.8125rem;
+}
+
+/* —— 折叠态（html.cu-toc-collapsed 由 useTocCollapse 挂到 <html>，只对宽屏有意义）：
+   目录列收成 40px 竖条（内含 24px 的展开按钮），正文列吃掉整行，.cu-shell__inner 的窄列限宽同时解除。 */
+@media (min-width: 1081px) {
+  html.cu-toc-collapsed .cu-shell__body.cu-shell__body--reading {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  html.cu-toc-collapsed .cu-shell__inner--reading {
+    max-width: none;
+  }
+
+  /* 折叠后正文吃满整列，段落也跟着吃满（否则 44rem 的居中段落会在宽列里左右各空一大片） */
+  html.cu-toc-collapsed .cu-page p,
+  html.cu-toc-collapsed .cu-page ul,
+  html.cu-toc-collapsed .cu-page ol {
+    max-width: none;
+  }
+
+  html.cu-toc-collapsed .cu-sidenav {
+    width: 40px;
+    max-width: 40px;
+    padding-right: 0;
+    overflow: hidden;
+  }
+
+  html.cu-toc-collapsed .cu-sidenav__title,
+  html.cu-toc-collapsed .cu-sidenav__progress,
+  html.cu-toc-collapsed .cu-sidenav ul {
+    display: none;
+  }
+
+  html.cu-toc-collapsed .cu-sidenav__head {
+    margin-bottom: 0;
+  }
+
+  html.cu-toc-collapsed .cu-sidenav__toggle {
+    margin: -4px 0;
+  }
+}
+
+/* —— 窄屏抽屉 —— */
+/* 窄屏（≤1080px）不再把目录铺成正文上方的一排标签：条目一多就把正文整体推近 300px，
+   而且那排标签和顶部导航长得一样，分不清哪个是导航哪个是页内跳转。
+   改成一个「本页目录」按钮（带上当前小节名）+ 从右侧滑入的浮层，首屏正文接近满屏。
+   ≥1081px 时下面这些全部隐藏，宽屏形态（左侧竖排列）完全不受影响。 */
+
+/* 抽屉入口按钮：窄屏显示在正文标题上方一行，通栏，点击打开浮层 */
+.cu-sidenav__drawer-btn {
+  display: none;
+  width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-sm);
+  background: var(--cu-card);
+  color: var(--cu-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+/* 当前小节名：省略号截断，占满剩余空间，把「我在哪一节」始终摆在眼前 */
+.cu-sidenav__drawer-btn b {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--cu-ink);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cu-sidenav__drawer-btn svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+
+/* 遮罩：半透明墨色，不用彩色；z-index 高于吸顶导航（--cu-nav-h 对应的层级） */
+.cu-sidenav__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: color-mix(in srgb, var(--cu-ink) 45%, transparent);
+}
+
+/* 关闭按钮：与折叠按钮同款方块，宽屏隐藏 */
+.cu-sidenav__close {
+  display: none;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  margin: -4px 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--cu-r-sm);
+  background: transparent;
+  color: var(--cu-muted);
+  cursor: pointer;
+}
+
+.cu-sidenav__close svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* —— 断点 ——
+   1080 的来历：左侧两列的最小需求 = 目录 224 + 间距 56 + 正文 42rem(672) = 952，
+   加容器左右各 24px 安全边 = 1000，留 80px 余量定在 1080。
+   之前的 1280 是按 46rem 正文估的，实际富余很大，白扔了 200px。 */
+@media (max-width: 1080px) {
+  .cu-shell__body--reading {
+    grid-template-columns: minmax(0, 1fr);
+    justify-content: start;
+  }
+
+  /* 单列里 .cu-shell__inner 若还挂着 max-width 会吃掉整列宽度把正文挤扁，这里解除 */
+  .cu-shell__body--reading .cu-shell__inner--reading {
+    max-width: none;
+  }
+
+  /* 目录本身不再占据网格列（否则是一个空行），改由下面的 fixed 抽屉承担 */
+  .cu-shell__body--reading .cu-sidenav {
+    position: static;
+    max-height: none;
+    padding: 0;
+    margin: 0 0 1.25rem;
+  }
+
+  /* 侧栏变成抽屉面板：脱离文档流，固定在右侧。宽 82vw 封顶 320px，
+     窄到 400px 的手机上也能留出遮罩提示「这是浮层不是页面」。 */
+  .cu-shell__body--reading .cu-sidenav ul,
+  .cu-shell__body--reading .cu-sidenav__progress {
+    display: none;
+  }
+
+  .cu-shell__body--reading .cu-sidenav__drawer-btn {
+    display: flex;
+  }
+
+  /* 抽屉展开态：只有 .cu-sidenav 自身跟着变 fixed，head 里的按钮/标题跟着一起走，
+     所以下面用父级 html 上的标记来控制浮层出现 —— 见 SectionNav 的 drawerOpen。 */
+  html.cu-sidenav-drawer-open .cu-sidenav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    z-index: 61;
+    width: min(82vw, 320px);
+    max-height: none;
+    padding: 1.1rem 1rem 2rem;
+    overflow-y: auto;
+    background: var(--cu-bg);
+    border-left: 1px solid var(--cu-line);
+    box-shadow: var(--cu-shadow-lift);
+  }
+
+  html.cu-sidenav-drawer-open .cu-sidenav__drawer-btn {
+    display: none;
+  }
+
+  html.cu-sidenav-drawer-open .cu-sidenav__head {
+    display: flex;
+  }
+
+  html.cu-sidenav-drawer-open .cu-sidenav__close {
+    display: grid;
+  }
+
+  /* 抽屉里的列表恢复竖排：宽屏那套左边框 + 当前项竖条，墨色体系保持一致 */
+  html.cu-sidenav-drawer-open .cu-sidenav ul {
+    display: block;
+  }
+
+  html.cu-sidenav-drawer-open .cu-sidenav a,
+  html.cu-sidenav-drawer-open .cu-sidenav a.cu-sidenav__sub {
+    border: 0;
+    border-left: 2px solid transparent;
+    border-radius: 0 var(--cu-r-sm) var(--cu-r-sm) 0;
+    margin-left: 0;
+    padding: 0.45rem 0.7rem;
+    font-size: 0.9rem;
+  }
+
+  html.cu-sidenav-drawer-open .cu-sidenav a.is-active {
+    border-color: var(--cu-accent-line);
+    background: var(--cu-accent-soft);
+  }
+
+  /* 抽屉里的折叠按钮（收成 40px 竖条）没有意义，只留关闭按钮 */
+  html.cu-sidenav-drawer-open .cu-sidenav__toggle {
+    display: none;
+  }
+}
+
+@media (max-width: 1180px) {
+  /* 导航项放不下时先让位后台入口，保证链接不出现横向滚动 */
+  .cu-tabs__console {
+    display: none;
+  }
+}

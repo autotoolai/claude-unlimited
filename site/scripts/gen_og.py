@@ -3,7 +3,9 @@
 用法：python scripts/gen_og.py
 依赖：Pillow。字体用系统自带的 Segoe UI Bold / Consolas；中文回退到 msyh.ttc（微软雅黑）。
 """
+import io
 import os
+import re
 import sys
 
 from PIL import Image, ImageDraw, ImageFont
@@ -18,7 +20,6 @@ INK = '#16130F'
 INK2 = '#403A33'
 MUTED = '#6C6459'
 ACCENT = '#C85A1E'
-ACCENT_SOFT = 'rgba'  # 用 draw 时直接混色，避免依赖 alpha 合成
 SOFT = '#F2E6D6'
 LINE = '#E3DAC8'
 
@@ -27,8 +28,19 @@ FONTS = {
     'regular': [r'C:\Windows\Fonts\segoeui.ttf', r'C:\Windows\Fonts\arial.ttf'],
     'serif': [r'C:\Windows\Fonts\georgiab.ttf', r'C:\Windows\Fonts\timesbd.ttf'],
     'mono': [r'C:\Windows\Fonts\consolab.ttf', r'C:\Windows\Fonts\cour.ttf'],
-    'cjk': [r'C:\Windows\Fonts\msyhbd.ttc', r'C:\Windows\Fonts\msyh.ttc', r'C:\Windows\Fonts\simhei.ttf'],
+    # 中文标题/副标题的主字体（拉丁与汉字同源，混排不会跳基线）
+    'cjk': [r'C:\Windows\Fonts\msyhbd.ttc', r'C:\Windows\Fonts\msyh.ttc',
+            r'C:\Windows\Fonts\simhei.ttf',
+            '/System/Library/Fonts/PingFang.ttc',
+            '/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc'],
 }
+
+
+def faq_count():
+    """FAQ 条数直接从 config/faq.ts 数，避免卡片文案与数据脱钩。"""
+    src = os.path.join(ROOT, 'config', 'faq.ts')
+    with io.open(src, encoding='utf-8') as f:
+        return sum(1 for line in f if line.strip().startswith("cat: '"))
 
 
 def font(kind, size):
@@ -100,14 +112,12 @@ def draw_page(slug, title, subtitle, eyebrow, chips):
 
 
 PAGES = [
-    ('home', '一个 Key，Claude 不限量用', ['订阅期内调用 Claude 不按 token 计费。', '改一个 Base URL 加一个 Key 即可接入。'], '固定订阅价 ¥298 / 30 天', ['Claude Code / Cursor / Cline', '200k 长上下文', '单 Key 并发 20']),
-    ('pricing', '套餐定价', ['只有一种套餐：订阅期内不按 token 计费。', '包含什么、不包含什么、退款规则一次说清。'], '最终价格以下单页为准', ['¥298 / 30 天', '7 天内可申请退款', '不自动续费']),
-    ('unlimited', '无限额度到底无限到什么程度', ['1 千 token 和 20 万 token 的调用，成本相同。', '支持 Opus / Sonnet / Haiku / Fable。'], '取消计费压力，不取消流控', ['Anthropic + OpenAI 兼容端点', '工具调用 / 扩展思考', '20 并发 · 60 次/分钟']),
-    ('faq', '常见问题', ['关于商品、购买、接入、限速、数据安全的全部问题。', '退款规则、限速数字、申诉流程都写清楚。'], '点右下角在线助手，关键词秒回', ['33 条问答', '退款规则', '限速具体数字']),
-    ('guide', '使用教程', ['五步从卡密到跑起来。', 'CC Switch 一键导入，VS Code / Cursor 直接用。'], '每一步都有截图', ['兑换卡密', '安装 CC Switch', '/model 切换']),
-    ('guide_clients', '接入与模型', ['终端、VS Code、Cursor 怎么接。', 'Base URL 与 API Key 填法。'], '改两个值即可', ['claude 命令', '官方插件', 'OpenAI 兼容端点']),
-    ('guide_models', '模型与切换', ['常用 model ID 与 /model 指令。', '新模型上线不用换 Key。'], '同一订阅价', ['claude-opus-4-8', 'claude-sonnet-5', 'claude-fable-5']),
-    ('guide_ccswitch', 'CC Switch 详解', ['手动新增供应商的字段填法。', '一键导入没反应怎么排查。'], '高手路径', ['URL 不带 /v1', '获取模型列表', '检测链路']),
+    ('home', '一个 Key，Claude 不限量用', ['有效期内不限次数调用，不按 token 计费。', '改一个 Base URL 加一个 Key 即可接入。'], '¥49 起 / 7 天 · 不限次数', ['Claude Code / Cursor / Cline', '不限次数调用', '单 Key 并发 20']),
+    ('pricing', '套餐定价', ['无限卡三档在售，周期卡与额度卡筹备中。', '包含什么、不包含什么、退款规则一次说清。'], '价格与规格看商品页', ['¥49 起 / 7 天', '退款按已用天数折算', '不自动续费']),
+    ('models', '模型广场', ['Claude 全系模型，不限次数调用。', '点复制拿 model ID。'], '有效期内 Opus / Sonnet / Fable 通用', ['6 个常用模型', '不限次数调用', '新模型自动提供']),
+    ('console', '管理后台', ['兑换卡密、提取 Key、一键导入配置。', '用量、公告、图像生成都在后台。'], '买完卡密后的第一站', ['一键导入配置', '用量图表', '备用域名']),
+    ('faq', '常见问题', ['关于商品、购买、接入、限速、数据安全的全部问题。', '退款规则、限速数字、申诉流程都写清楚。'], '点右下角在线助手，关键词秒回', [f'{faq_count()} 条问答', '退款规则', '限速具体数字']),
+    ('guide', '使用教程', ['从还没买到跑起来。', '后台一键导入，VS Code / Cursor 直接用。'], '每一步都有截图', ['扫码下单', '后台兑换', '/model 切换']),
 ]
 
 if __name__ == '__main__':

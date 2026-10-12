@@ -1,0 +1,97 @@
+/**
+ * 首屏终端逐字打字：元素上的 data-type 是行号（1..N），进入视口后按顺序把每行的文本
+ * 一段段塞进去，打完加 .is-on 让该行从 0 宽展开（宽度过渡在 02_hero.css），行尾跟一个闪烁光标。
+ *
+ * 约定：JS 挂载时才给容器加 .cu-hero__term--type（未播放的行才压成 0 宽），
+ * SSR 首帧与无脚本环境下终端都是完整静态文本；prefers-reduced-motion 下不挂这个类。
+ */
+import { onMounted, onUnmounted } from 'vue'
+
+/** 暂停用：预留在标签页不可见时冻结计时，退回标签页继续 */
+const sleep = (ms: number) => {
+  const left = () => (document.visibilityState === 'visible' ? 0 : 250)
+  return new Promise((r) => setTimeout(r, ms))
+}
+const visible = () => document.visibilityState === 'visible'
+
+export function useTerminalType(selector = '.cu-hero__term') {
+  let observer: IntersectionObserver | null = null
+  let cancelled = false
+
+  onMounted(() => {
+    const term = document.querySelector<HTMLElement>(selector)
+    if (!term || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const lines = [...term.querySelectorAll<HTMLElement>('[data-type]')].sort(
+      (a, b) => Number(a.dataset.type) - Number(b.dataset.type),
+    )
+    if (!lines.length) return
+    term.classList.add('cu-hero__term--type')
+    // 原文只在这里抓一次：后面每轮重放都从 dataset.full 还原
+    for (const el of lines) el.dataset.full = el.textContent || ''
+
+    observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return
+        observer?.disconnect()
+        void play()
+      },
+      { threshold: 0.3 },
+    )
+    observer.observe(term)
+
+    // 每轮都从 dataset.full 重建内容，不用「上一轮结束时的文本」当下一轮的原文
+    const reset = () => {
+      for (const el of lines) {
+        el.dataset.full ||= el.textContent || ''
+        el.textContent = el.dataset.full
+        el.classList.add('is-on')
+        el.classList.remove('cu-term__typing')
+      }
+    }
+
+    async function play() {
+      // 循环播放：一轮打完停留 3.5 秒，清空再打一遍。终端在首屏下方（900px 视口里看不全），
+      // 播放前先等它真正进入视口，否则 IntersectionObserver 回调里那一次 scrollIntoView 不会触发。
+      // 回调触发时 term 可能已被卸载（ref 置空），取局部快照并提前返回，避免运行时空指针
+      const box = term
+      if (!box) return
+      for (;;) {
+        while (!visible() && !cancelled) await sleep(200)
+        while (box.getBoundingClientRect().top > innerHeight * 0.92 && !cancelled) {
+          reset() // 等的过程中先把内容补回去，避免下面的读取拿到空文本
+          await sleep(300)
+        }
+        if (cancelled) return
+        await sleep(600)
+        for (const el of lines) {
+          if (cancelled) return
+          const full = el.dataset.full || ''
+          el.textContent = ''
+          el.classList.remove('is-on')
+          el.classList.add('cu-term__typing')
+          // 按 2~4 个字符一段吐出，模拟逐字
+          let i = 0
+          while (i < full.length) {
+            const n = 2 + Math.floor(Math.random() * 3)
+            el.textContent = full.slice(0, i + n)
+            i += n
+            await sleep(14 + Math.random() * 20)
+          }
+          el.classList.remove('cu-term__typing')
+          el.classList.add('is-on')
+          await sleep(240)
+        }
+        await sleep(3500)
+        if (cancelled) return
+        box.classList.add('cu-term__fading')
+        await sleep(320)
+        box.classList.remove('cu-term__fading')
+      }
+    }
+  })
+
+  onUnmounted(() => {
+    cancelled = true
+    observer?.disconnect()
+  })
+}

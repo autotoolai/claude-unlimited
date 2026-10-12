@@ -1,4 +1,5 @@
 import { partnerUrl } from './site'
+import { limitBullets } from './rules'
 
 /**
  * FAQ 唯一数据源 —— 同时驱动：
@@ -8,11 +9,11 @@ import { partnerUrl } from './site'
  *   4. /faq 页的 FAQPage JSON-LD
  *
  * 2026-10-09 新增「使用与配置」分类（setup）：教程来源为卖家教程站 https://wx.bbyy.site/，
- * 问题按买家「买完之后做什么」重写，答案里给 /guide/* 的链接。
+ * 问题按买家「买完之后做什么」重写，答案里给 /guide 与 /guide#锚点 的链接。
  *
  * 改一处，四处同步，不会出现「页面写的和机器人答的不一样」。
  *
- * 差异化重点：「限速与封号」的退款与申诉、「购买与支付」的退款规则 ——
+ * 差异化重点：「限速与封号」的退款与申诉 ——
  * 竞品全站不给具体速率数字，FAQ 也不涉及退款和申诉。
  *
  * 写作规范：a 的第一句必须是结论；多段用换行分隔（模板字符串里直接换行）。
@@ -21,7 +22,7 @@ import { partnerUrl } from './site'
  * TODO R10：涉及退款、申诉、隐私的答案需法务确认后再上线。
  */
 
-export type FaqCategory = 'product' | 'purchase' | 'setup' | 'usage' | 'limits' | 'security' | 'about'
+export type FaqCategory = 'product' | 'setup' | 'usage' | 'limits' | 'security' | 'about'
 
 export interface FaqLink {
   text: string
@@ -46,7 +47,6 @@ export interface FaqItem {
 
 export const categoryLabels: Record<FaqCategory, string> = {
   product: '关于商品',
-  purchase: '购买与支付',
   setup: '使用与配置',
   usage: '接入与使用',
   limits: '限速与封号',
@@ -59,9 +59,9 @@ export const faqItems: FaqItem[] = [
   {
     cat: 'product',
     id: 'cat-product-official',
-    keywords: ['官方', 'anthropic', '是不是官方', '正品', '真假', '和anthropic什么关系'],
+    keywords: ['官方', 'anthropic', '是不是官方', '正品', '真假', '和anthropic什么关系', '冒牌', '山寨', '授权'],
     q: '你们是 Anthropic 官方吗？',
-    a: '不是：本站是独立的第三方 API 网关服务，与 Anthropic 无隶属关系、未获其背书或赞助。Claude 与 Anthropic 是 Anthropic, Inc. 的商标，本站仅通过兼容接口转发起调用。',
+    a: '不是：本站是独立的第三方 API 网关服务，仅通过兼容接口转发起调用。',
   },
   {
     cat: 'product',
@@ -76,14 +76,14 @@ export const faqItems: FaqItem[] = [
   {
     cat: 'product',
     id: 'cat-product-models',
-    keywords: ['模型', '支持哪些模型', 'opus', 'sonnet', 'haiku', 'fable', '版本', '新模型'],
+    keywords: ['模型', '支持哪些模型', 'opus', 'fable', '5.5', '5.1', '版本', '新模型'],
     q: '支持哪些模型？新模型上线要换 Key 吗？',
-    a: `覆盖当前 Claude 主要模型层级：Opus、Sonnet、Haiku、Fable，均在同一订阅价内，不因选择 Opus 产生额外费用。
+    a: `本卡承诺 Fable 5.1 与 Opus 5.5 两个模型，均在同一订阅价内，不因选择 Opus 产生额外费用。
 
-常见的具体型号有 claude-opus-4-8（复杂推理）、claude-sonnet-5（日常主力）、claude-fable-5（创意写作），建议至少把这三个加进 CC Switch。
+model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与 claude-opus-5-5（复杂推理、架构设计、深度代码分析），两个都建议加进 CC Switch。
 
-Anthropic 发布新版本后，网关会以新的 model identifier 提供访问。你的 Key 不需要重新生成，只需在工具配置里把 model ID 更新为最新版本。`,
-    links: [{ text: '模型与切换', url: '/guide/models' }],
+以 CC Switch「获取模型列表」实际返回的 ID 为准：若返回的 ID 与上面不同，说明网关侧命名有变，更新工具配置里的 model ID 即可，Key 不需要重新生成。`,
+    links: [{ text: '获取并保存模型 · 教程 4', url: '/guide#models' }],
   },
   {
     cat: 'product',
@@ -98,66 +98,24 @@ Anthropic 发布新版本后，网关会以新的 model identifier 提供访问�
   {
     cat: 'product',
     id: 'cat-product-period',
-    keywords: ['有效期', '多久', '天数', '到期', '过期', '续费', '自动续费', '30天'],
+    keywords: ['有效期', '多久', '天数', '到期会怎样', '过期会怎样', '自动续费', '30天'],
     q: '有效期怎么算？到期会怎样？',
-    a: `从支付成功起算对应周期（当前套餐 30 天），以商品页标注的周期为准。到期后访问权限结束，不自动续费，需要重新下单。
+    a: `从支付成功起算所购档位标注的周期，以商品页标注为准。到期后访问权限结束，不自动续费，需要重新下单。
 
 若购买多张卡，卡密独立计算有效期，不合并。`,
   },
 
-  // ---------- 购买与支付 ----------
-  {
-    cat: 'purchase',
-    id: 'cat-purchase-where',
-    keywords: ['在哪买', '怎么购买', '下单', '购买链接', '去哪里买', '发卡', '卡密'],
-    q: '在哪里买？',
-    a: `本站只做介绍与答疑，不处理支付。下单在官方发卡站完成：商品页选规格 → 付款 → 自动获取卡密。
 
-点任意「立即购买」按钮会直接跳转到发卡站。`,
-    links: [{ text: '前往下单页', url: partnerUrl('purchase'), external: true }],
-  },
-  {
-    cat: 'purchase',
-    id: 'cat-purchase-pay',
-    keywords: ['支付', '付款', '怎么付', '支付宝', '微信', 'paypal', '信用卡', '付款方式'],
-    q: '支持哪些付款方式？',
-    a: `发卡站支持的付款方式以其页面为准。下单成功后系统自动发货卡密，不需要人工审核、不需要排队等待。`,
-  },
-  {
-    cat: 'purchase',
-    id: 'cat-purchase-delivery',
-    keywords: ['多久到账', '发货', '到账', '多久', '瞬间', '立即', '卡密什么时候'],
-    q: '买完多久能用？',
-    a: `通常是分钟级。支付成功后卡密自动生成，拿到后在接入页兑换成额度即可，不存在等待名单或人工审核期。`,
-    // 「接入指南」页二期上线后再加链接
-  },
-  {
-    cat: 'purchase',
-    id: 'cat-purchase-refund',
-    keywords: ['退款', '退', '能退吗', '退钱', '不想要了', '未激活', '售后', '投诉'],
-    q: '能退款吗？',
-    a: `可以，但仅限以下情形，需在购买后 7 个自然日内提出，并提供卡密尾号与订单号：
 
-1. 卡密未激活、无法兑换；
-2. 兑换后因网关故障导致服务连续不可用超过 24 小时；
-3. 实际提供的模型或能力与本页描述明显不符。
 
-已激活并正常使用的卡密、以及因个人使用习惯产生的「买多买少」，不支持无理由退款。审核结果 3 个工作日内通过你留下的联系方式反馈。`,
-    code: ['申请时提供：订单号 / 卡密尾号 / 问题描述 / 截图'],
-  },
-  {
-    cat: 'purchase',
-    id: 'cat-purchase-invoice',
-    keywords: ['发票', '开票', '合同', '企业', '报销'],
-    q: '能开发票或签合同吗？',
-    a: `个人购买默认不提供发票。企业用户需要发票或签合同，请在购买前联系客服说明主体信息与开票需求，确认后再下单。`,
-  },
 
-  // ---------- 使用与配置（教程来源：卖家教程站 https://wx.bbyy.site/，按问答重写；链接指向 /guide/*） ----------
+
+
+  // ---------- 使用与配置（教程来源：卖家教程站 https://wx.bbyy.site/，按问答重写；链接指向 /guide#锚点） ----------
   {
     cat: 'setup',
     id: 'cat-setup-ccswitch',
-    keywords: ['ccswitch', 'cc switch', '配置软件', '配置工具', '导入配置', '一键导入'],
+    keywords: ['ccswitch', 'cc switch', 'cc是什么', 'cc switch 介绍', '配置软件', '配置工具'],
     q: 'CC Switch 是什么？必须装吗？',
     a: `CC Switch 是一个专门管理 Claude Code、Codex、Gemini API 供应商配置的小工具（Windows / macOS，安装包不到 10 MB），支持一键导入、获取模型列表、链路检测。
 
@@ -175,17 +133,26 @@ Anthropic 发布新版本后，网关会以新的 model identifier 提供访问�
 2. API Key：sk- 开头的字符串，等同于官方 Key 的用法。
 
 这两行复制下来就能配。`,
-    links: [{ text: '五步教程', url: '/guide' }],
+    links: [{ text: '使用教程', url: '/guide' }],
   },
   {
     cat: 'setup',
     id: 'cat-setup-import',
-    keywords: ['一键导入', '导入', '导入配置', '点击没反应', '导入失败'],
+    keywords: ['一键导入', '导入', '导入配置', '点击没反应', '导入失败', '点了没反应'],
     q: '「一键导入配置」点了没反应怎么办？',
     a: `多数情况是 CC Switch 还没启动：先打开 CC Switch，再回到兑换页点「一键导入配置」，导入窗口会自动弹出，Base URL 和 API Key 已填好，确认后保存。
 
-同名配置会覆盖，不会叠加。`,
-    links: [{ text: '五步教程', url: '/guide#workflow' }],
+同名配置会覆盖，不会叠加。不想装 CC Switch，直接把两个值写进 Claude Code 的用户配置文件 %USERPROFILE%\.claude\settings.json（Windows）也一样能用。`,
+    code: [
+      'Windows（%USERPROFILE%\.claude\settings.json）',
+      '{',
+      '  "env": {',
+      '    "ANTHROPIC_BASE_URL": "网关根地址，不带 /v1",',
+      '    "ANTHROPIC_API_KEY": "sk-你的Key"',
+      '  }',
+      '}',
+    ],
+    links: [{ text: '教程 · 一键导入配置', url: '/guide#import' }],
   },
   {
     cat: 'setup',
@@ -194,12 +161,12 @@ Anthropic 发布新版本后，网关会以新的 model identifier 提供访问�
     q: '在 CC Switch 里怎么获取模型列表？推荐加哪些？',
     a: `在 CC Switch 里进入已导入的 Claude 配置，点「高级选项」→「获取模型列表」，会列出网关实际可用的模型。
 
-建议至少添加三个：claude-opus-4-8（复杂推理）、claude-sonnet-5（日常主力）、claude-fable-5（创意写作）。勾选后一定点「保存」。
+建议至少添加两个：claude-fable-5-1（速度与质量均衡，日常主力）、claude-opus-5-5（复杂推理与架构设计）。勾选后一定点「保存」。
 
 列表为空通常是 Base URL 或 Key 填错，回上一步核对。`,
     links: [
-      { text: '模型与切换', url: '/guide/models' },
-      { text: 'CC Switch 详解', url: '/guide/ccswitch' },
+      { text: 'CC Switch 一键导入 · 教程 3', url: '/guide#import' },
+      { text: '获取并保存模型 · 教程 4', url: '/guide#models' },
     ],
   },
   {
@@ -210,7 +177,7 @@ Anthropic 发布新版本后，网关会以新的 model identifier 提供访问�
     a: `「启用」把这份配置设为当前生效的供应商，终端里的 claude、VS Code 里的 Claude Code 插件都会指向它。
 
 「检测链路」发一次测试请求确认网关可达，显示正常就配置完成。检测失败先看第 4、5 步的截图与排错清单。`,
-    links: [{ text: '排错清单', url: '/guide/ccswitch#troubleshoot' }],
+    links: [{ text: '排错速查 · 教程', url: '/guide#errors' }],
   },
   {
     cat: 'setup',
@@ -218,18 +185,18 @@ Anthropic 发布新版本后，网关会以新的 model identifier 提供访问�
     keywords: ['vscode', 'vs code', '插件', '扩展', '侧边栏', '编辑器插件'],
     q: 'VS Code 里怎么用 Claude Code？',
     a: `CC Switch 配好后，在 VS Code 扩展面板（Ctrl+Shift+X / Cmd+Shift+X）搜索 Claude Code，认准发布者为 Anthropic 的官方插件并安装。首次打开选择「使用已有的 API 配置 / API Key」登录，不需要登录 Anthropic 账号。`,
-    links: [{ text: '接入与模型', url: '/guide/clients#vscode' }],
+    links: [{ text: '编辑器接入 · 高手教程', url: '/guide#editors' }],
   },
   {
     cat: 'setup',
     id: 'cat-setup-model-switch',
-    keywords: ['切换模型', 'model 指令', '/model', '换模型', '切模型', 'fable', 'sonnet', 'opus'],
+    keywords: ['切换模型', 'model 指令', '/model', '换模型', '切模型', 'fable', 'opus'],
     q: '怎么切换模型？新模型上线要换 Key 吗？',
-    a: `在 Claude Code 会话里输入 /model 打开列表，或直接输入 /model claude-fable-5 切到指定模型。
+    a: `在 Claude Code 会话里输入 /model 打开列表，或直接输入 /model claude-fable-5-1 切到指定模型。
 
 所有模型都在同一订阅价内，选 Opus 不会多花钱。Anthropic 上线新模型后网关会以新的 model ID 提供访问，Key 不需要换，只要在 CC Switch 里刷新模型列表再 /model 切过去。`,
-    code: ['/model', '/model claude-fable-5'],
-    links: [{ text: '模型与切换', url: '/guide/models' }],
+    code: ['/model', '/model claude-fable-5-1'],
+    links: [{ text: '获取并保存模型 · 教程 4', url: '/guide#models' }],
   },
   {
     cat: 'setup',
@@ -239,7 +206,7 @@ Anthropic 发布新版本后，网关会以新的 model identifier 提供访问�
     a: `先确认 CC Switch 里配置处于「已启用」状态，再重开一个终端窗口。
 
 如果仍然找不到命令，看「接入与模型」页的 VS Code / 终端部分，Windows 上可以在 PowerShell 里直接运行 claude。`,
-    links: [{ text: '接入与模型', url: '/guide/clients' }],
+    links: [{ text: '编辑器接入 · 高手教程', url: '/guide#editors' }],
   },
 
   // ---------- 接入与使用 ----------
@@ -266,7 +233,7 @@ OpenAI SDK、LangChain、LiteLLM、Cursor：填带 /v1 的地址，它会拼 /v1
   {
     cat: 'usage',
     id: 'cat-usage-claudecode',
-    keywords: ['claude code', 'cc', '命令行', 'cli', '终端', 'anthropic code', 'claude_code'],
+    keywords: ['claude code', 'cc怎么用', '命令行', 'cli', '终端', 'anthropic code', 'claude_code', 'claudecode', '怎么安装 claude code'],
     q: '怎么接入 Claude Code？',
     a: `四步：装 Claude Code → 设两个环境变量（Base URL + Key）→ 验证生效 → 正常用。
 
@@ -277,7 +244,7 @@ OpenAI SDK、LangChain、LiteLLM、Cursor：填带 /v1 的地址，它会拼 /v1
   {
     cat: 'usage',
     id: 'cat-usage-openai',
-    keywords: ['openai', '兼容', 'sdk', 'python', 'typescript', 'go', '开发', 'api'],
+    keywords: ['openai', '兼容', 'sdk', 'python', 'typescript', 'go', '调用接口'],
     q: '支持 OpenAI 兼容接口吗？',
     a: `支持。网关同时提供 Anthropic 兼容端点和 OpenAI 兼容端点（/v1/chat/completions），现有 OpenAI SDK 代码只需改 Base URL 即可跑，不必重写。
 
@@ -296,11 +263,11 @@ Key 不需要因为模型升级而更换——新模型上线只改 model ID。`
   {
     cat: 'usage',
     id: 'cat-usage-context',
-    keywords: ['上下文', 'context', '200k', '1m', '长文本', 'token', '窗口', '最大'],
+    keywords: ['上下文', 'context', '200k', '1m', '长文本', 'token', '窗口', '最大', '多大'],
     q: '上下文窗口多大？',
-    a: `标准为 200k token 长上下文窗口，适合读取大型代码片段、分析长日志、处理技术 PDF。
+    a: `Claude Code 这类 agent 工具的官方标准窗口是 200k token，读取大型代码片段、分析长日志与长 PDF 够用。
 
-部分模型提供 1M 窗口档位，需要在工具里显式选择该变体；选错会出现「该模型需要额外用量」类提示。`,
+我们没有实测过每一档模型的实际上限，网关 /v1/models 上标的数字不一定准。想要准确值，在工具里跑 /context 看当前会话报告的窗口即可；标着 1M 的变体在本网关实测与普通档相同，不要选需要额外用量的变体。`,
   },
 
   // ---------- 限速与封号（差异化重点） ----------
@@ -311,9 +278,7 @@ Key 不需要因为模型升级而更换——新模型上线只改 model ID。`
     q: '限速和并发的具体数字是多少？',
     a: `为保证所有用户稳定访问，网关设有公平使用速率限制，具体数值会随上游容量调整：
 
-- 单 Key 并发：默认 20 路，可按需申请提升；
-- 请求速率：默认 60 次/分钟；
-- Token 吞吐：默认 300k token/分钟。
+${limitBullets().join('\n')}
 
 对编码、调试、代码审查、文档生成、agent 多步执行这类正常个人开发场景，上述数值通常不构成障碍。数字调整时会公告。`,
     // 「公平使用与限制」页二期上线后再加链接：一期保持纯文本，避免死链
@@ -321,11 +286,17 @@ Key 不需要因为模型升级而更换——新模型上线只改 model ID。`
   {
     cat: 'limits',
     id: 'cat-limits-429',
-    keywords: ['429', '限流', 'rate limit', 'too many requests', 'retry-after', '请求太频繁', '被限速了'],
-    q: '遇到 429 怎么办？',
-    a: `429 表示触发了速率限制，不是额度用完。网关会返回 Retry-After 头，告诉你需要等多少秒。
+    keywords: ['429', '限流', 'rate limit', 'too many requests', 'retry-after', '请求太频繁', '被限速了', '要等多久', '429 要等多久', '限速了会怎样', '会不会被限速', '会限速吗', '正常用会限速吗', '重度使用会限速吗', '并发多少够用', '会丢请求吗'],
+    q: '重度使用会限速吗？触到 429 怎么办？',
+    a: `会限速，但限的是「每分钟请求与吞吐」，不是「每月 token 总量」，也不是一个会累积的额度包。
 
-Claude Code、Cursor、Cline、Aider 等主流工具都有内置重试逻辑，会自动等待后重新发起，请求可能短暂停顿但不会丢失任务上下文。手工处理时：等待 Retry-After 指定的秒数再重试，不要立即循环重试。`,
+${limitBullets().join('\n')}
+
+这套数字的用途是防止单个用户独占网关容量、保证所有人响应速度。日常编码、调试、代码审查、文档生成、agent 多步执行这类正常个人开发，通常不构成障碍；你真正会撞上的是每分钟成千上万次的自动循环、死循环重试或无人值守脚本持续打满上下文。
+
+触到时网关返回 429 并在 Retry-After 头里写明需要等多少秒，等待窗口每分钟重置，不是当天额度用尽。
+
+Claude Code、Cursor、Cline、Roo Code、Aider 等主流工具都有内置重试逻辑，会自动等待后重新发起，请求可能短暂停顿但不会丢失任务上下文。手工处理时：等 Retry-After 指定的秒数再重试，不要立即循环重试。`,
   },
   {
     cat: 'limits',
@@ -355,7 +326,7 @@ Claude Code、Cursor、Cline、Aider 等主流工具都有内置重试逻辑，�
   {
     cat: 'security',
     id: 'cat-security-store',
-    keywords: ['存储', '存不存', '日志', '记录', '保存多久', '数据留存', '隐私'],
+    keywords: ['存储', '存不存', '日志', '记录', '保存多久', '数据留存', '隐私', '存', '留存'],
     q: '我的请求内容会被存储吗？',
     a: `我们以提供服务与排查故障所必需的限度记录用量元数据（调用时间、模型、状态、消耗、请求标识），不记录你的 prompt 正文与模型输出。
 
@@ -384,16 +355,16 @@ Claude Code、Cursor、Cline、Aider 等主流工具都有内置重试逻辑，�
   {
     cat: 'about',
     id: 'cat-about-who',
-    keywords: ['你们是谁', '主体', '公司', '运营', '谁在卖', '团队'],
+    keywords: ['你们是谁', '主体是谁', '运营', '谁在卖'],
     q: '你们是谁？',
-    a: `本站由独立的 API 网关服务运营方提供，用于 Claude 系列模型的统一接入与订阅销售。站点本身只做介绍与答疑，不处理支付、不保存账号。`,
+    a: `本站由独立的 API 网关服务运营方提供，用于 Claude 系列模型的统一接入与订阅销售。`,
   },
   {
     cat: 'about',
     id: 'cat-about-contact',
-    keywords: ['联系', '客服', '联系方式', '邮箱', 'qq', 'telegram', '微信', '找人'],
+    keywords: ['联系方式', '微信', '加微信', '微信号', '怎么联系你们'],
     q: '怎么联系你们？',
-    a: `点右下角的在线助手，它内置了常见问题的关键词速答；答不上来点「人工客服」复制微信号或 QQ 联系我们。
+    a: `点右下角的在线助手，它内置了常见问题的关键词速答；面板底部常驻「联系客服」按钮，点一下直接发来客服微信二维码，微信号可一键复制。
 
 紧急故障（服务完全不可用）请附上账号标识与报错原文，能显著加快处理。`,
   },
@@ -414,4 +385,5 @@ export function faqByCategory(cat: FaqCategory): FaqItem[] {
   return faqItems.filter((x) => x.cat === cat)
 }
 
-export const faqCategories: FaqCategory[] = ['product', 'purchase', 'setup', 'usage', 'limits', 'security', 'about']
+// 顺序与 pages/data.ts 的 faqGroupOrder 保持一致（买之前最关心什么在前）
+export const faqCategories: FaqCategory[] = ['product', 'limits', 'setup', 'usage', 'security', 'about']

@@ -1,0 +1,291 @@
+{
+  "fetched_at": "2026-10-10T19:19:29+08:00",
+  "source": "https://rsxermu666.cn/v1/models",
+  "total": 31,
+  "brands": {
+    "anthropic": 19,
+    "openai": 11,
+    "xai": 1
+  },
+  "models": [
+    {
+      "id": "codex-auto-review",
+      "brand": "anthropic",
+      "context_window": 2000000,
+      "context_display": "2M",
+      "source": "mapping",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "gpt-5.6-sol-codex",
+      "brand": "anthropic",
+      "context_window": 2000000,
+      "context_display": "2M",
+      "source": "mapping",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "claude-fable-5-1",
+      "brand": "anthropic",
+      "context_window": 1000000,
+      "context_display": "1M",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "claude-opus-4-6 (1M)",
+      "brand": "anthropic",
+      "context_window": 1000000,
+      "context_display": "1M",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "claude-opus-4-7 (1M)",
+      "brand": "anthropic",
+      "context_window": 1000000,
+      "context_display": "1M",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "claude-opus-4-8 (1M)",
+      "brand": "anthropic",
+      "context_window": 1000000,
+      "context_display": "1M",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "claude-opus-5",
+      "brand": "anthropic",
+      "context_window": 1000000,
+      "context_display": "1M",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "claude-opus-5 (1M)",
+      "brand": "anthropic",
+      "context_window": 1000000,
+      "context_display": "1M",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "claude-opus-5-5",
+      "brand": "anthropic",
+      "context_window": 1000000,
+      "context_display": "1M",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "claude-opus-5-thinking",
+      "brand": "anthropic",
+      "context_window": 1000000,
+      "context_display": "1M",
+      "source": "builtin",
+      "is_thinking": true,
+      "is_long_context": true
+    },
+    {
+      "id": "claude-sonnet-4-6 (1M)",
+      "brand": "anthropic",
+      "context_window": 1000000,
+      "context_display": "1M",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "claude-haiku-4-5",
+      "brand": "anthropic",
+      "context_window": 200000,
+      "context_display": "200K",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": false
+    },
+    {
+      "id": "claude-opus-4-6",
+      "brand": "anthropic",
+      "context_window": 200000,
+      "context_display": "200K",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": false
+    },
+    {
+      "id": "claude-opus-4-6-thinking",
+      "brand": "anthropic",
+      "context_window": 200000,
+      "context_display": "200K",
+      "source": "builtin",
+      "is_thinking": true,
+      "is_long_context": false
+    },
+    {
+      "id": "claude-opus-4-7",
+      "brand": "anthropic",
+      "context_window": 200000,
+      "context_display": "200K",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": false
+    },
+    {
+      "id": "claude-opus-4-7-thinking",
+      "brand": "anthropic",
+      "context_window": 200000,
+      "context_display": "200K",
+      "source": "builtin",
+      "is_thinking": true,
+      "is_long_context": false
+    },
+    {
+      "id": "claude-opus-4-8",
+      "brand": "anthropic",
+      "context_window": 200000,
+      "context_display": "200K",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": false
+    },
+    {
+      "id": "claude-opus-4-8-thinking",
+      "brand": "anthropic",
+      "context_window": 200000,
+      "context_display": "200K",
+      "source": "builtin",
+      "is_thinking": true,
+      "is_long_context": false
+    },
+    {
+      "id": "claude-sonnet-4-6",
+      "brand": "anthropic",
+      "context_window": 200000,
+      "context_display": "200K",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": false
+    },
+    {
+      "id": "gpt-5.6-sol",
+      "brand": "openai",
+      "context_window": 1050000,
+      "context_display": "1.05M",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "gpt-5.6-terra",
+      "brand": "openai",
+      "context_window": 1050000,
+      "context_display": "1.05M",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "gpt-5.3-codex-spark",
+      "brand": "openai",
+      "context_window": 1000000,
+      "context_display": "1M",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "gpt-5.6-luna",
+      "brand": "openai",
+      "context_window": 1000000,
+      "context_display": "1M",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "gpt-6-astra",
+      "brand": "openai",
+      "context_window": 1000000,
+      "context_display": "1M",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "gpt-5.1-codex",
+      "brand": "openai",
+      "context_window": 400000,
+      "context_display": "400K",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": false
+    },
+    {
+      "id": "gpt-5.2",
+      "brand": "openai",
+      "context_window": 400000,
+      "context_display": "400K",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": false
+    },
+    {
+      "id": "gpt-5.4",
+      "brand": "openai",
+      "context_window": 400000,
+      "context_display": "400K",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": false
+    },
+    {
+      "id": "gpt-5.4-mini",
+      "brand": "openai",
+      "context_window": 400000,
+      "context_display": "400K",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": false
+    },
+    {
+      "id": "gpt-5.5",
+      "brand": "openai",
+      "context_window": 400000,
+      "context_display": "400K",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": false
+    },
+    {
+      "id": "gpt-image-2",
+      "brand": "openai",
+      "context_window": 0,
+      "context_display": "—",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": false
+    },
+    {
+      "id": "grok-4.5",
+      "brand": "xai",
+      "context_window": 500000,
+      "context_display": "500K",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": false
+    }
+  ]
+}

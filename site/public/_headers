@@ -10,8 +10,25 @@
 /brand-logo.svg
   Cache-Control: public, max-age=86400
 
+# 以下资源由 copy_public.mjs 直接落到 dist 根目录，不走 /assets/* 的 immutable 规则，
+# 且文件名不含 hash（改了图 URL 不变），必须显式给短缓存，否则 CDN 与浏览器会长期拿旧图
+/og/*
+  Cache-Control: public, max-age=86400, must-revalidate
+
+/knowledge/*
+  Cache-Control: public, max-age=86400, must-revalidate
+
+/llms.txt
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/robots.txt
+  Cache-Control: public, max-age=3600, must-revalidate
+
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: SAMEORIGIN
   Strict-Transport-Security: max-age=31536000; includeSubDomains
+# sitemap 与 IndexNow 校验文件不能被 CDN 缓存住：缓存一命中，搜索引擎读到的就是旧 URL 清单
+/sitemap.xml
+  Cache-Control: public, max-age=0, must-revalidate

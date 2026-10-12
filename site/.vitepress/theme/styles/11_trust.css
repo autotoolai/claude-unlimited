@@ -1,4 +1,6 @@
-/* 信任背书 / CTA 横条 / 声明（从 custom.css 拆出，改这个文件而不是 custom.css） */
+/* 信任背书 / CTA 横条 / 声明。
+   CTA 条是全站结尾的行动区：比页面背景更深的卡片 + 顶部极淡光晕，圆角用大档，hover 不位移（它不是卡片列表）。 */
+
 .cu-trust {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -7,10 +9,11 @@
 }
 
 .cu-trust__item {
-  padding: 1.2rem 1.3rem;
-  border-left: 3px solid var(--cu-accent);
+  padding: 1.4rem 1.5rem;
+  border: 1px solid var(--cu-line);
+  border-left: 2px solid var(--cu-ink);
   background: var(--cu-card);
-  border-radius: 0 14px 14px 0;
+  border-radius: 0 var(--cu-r-md) var(--cu-r-md) 0;
 }
 
 .cu-trust__item h3 {
@@ -28,52 +31,54 @@
 }
 
 .cu-band {
-  margin: 3.5rem 0 0;
-  padding: 2.75rem 1.75rem;
-  border-radius: 22px;
-  background:
-    radial-gradient(ellipse 70% 90% at 0% 0%, var(--cu-accent-soft), transparent 60%),
-    var(--cu-card);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  margin: var(--cu-section-y-lg) 0 0;
+  padding: 4rem 2rem;
+  border-radius: var(--cu-r-lg);
+  background: var(--cu-card);
   border: 1px solid var(--cu-line);
   text-align: center;
 }
 
+.cu-band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 70% 90% at 50% 0%, var(--cu-accent-soft), transparent 62%);
+}
+
 .cu-band h2 {
   margin: 0;
-  font-size: clamp(1.35rem, 2.8vw, 1.75rem);
-  border: none;
+  font-family: var(--cu-serif);
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
   color: var(--cu-ink);
+  text-wrap: balance;
 }
 
 .cu-band p {
-  margin: 0.6rem auto 0;
+  margin: 0.75rem auto 0;
   max-width: 36rem;
   line-height: 1.8;
   color: var(--cu-ink-2);
+  text-wrap: pretty;
 }
 
 .cu-band .cu-cta-row {
-  margin-top: 1.5rem;
-}
-
-.cu-notice {
-  margin: 2.5rem 0 0;
-  padding: 1rem 1.2rem;
-  border: 1px dashed var(--cu-line-strong);
-  border-radius: 6px;
-  font-size: 0.85rem;
-  line-height: 1.8;
-  color: var(--cu-muted);
-}
-
-.cu-notice p {
-  margin: 0;
-  max-width: none;
+  margin-top: 1.75rem;
 }
 
 @media (max-width: 720px) {
   .cu-trust {
     grid-template-columns: 1fr;
   }
-}
 
+  .cu-band {
+    padding: 2.5rem 1.25rem;
+  }
+}

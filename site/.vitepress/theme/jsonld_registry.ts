@@ -18,4 +18,5 @@ declare global {
 
 globalThis.__cuJsonLd = registry
 
-export const jsonLdRegistry = registry
+// 空导出：这个文件必须算作 ES module，`declare global` 才会把 __cuJsonLd 的类型挂到全局
+export {}

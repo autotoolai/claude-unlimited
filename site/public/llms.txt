@@ -5,28 +5,52 @@
 ## 页面
 
 - [首页](https://claude-unlimited.aiautotools.com/): 无限额度与按量计费的差别、套餐、合作平台入口
-- [套餐定价](https://claude-unlimited.aiautotools.com/pricing): 套餐内容、包含与不包含、退款说明
-- [无限额度](https://claude-unlimited.aiautotools.com/unlimited): 无限额度定义、支持模型与能力、公平使用
-- [使用教程](https://claude-unlimited.aiautotools.com/guide): 五步从卡密到跑起来：兑换 → CC Switch → 一键导入 → 添加模型 → 启用检测
-- [接入与模型](https://claude-unlimited.aiautotools.com/guide/clients): 终端 claude 命令、VS Code 官方插件、Cursor / Cline 自定义端点
-- [模型与切换](https://claude-unlimited.aiautotools.com/guide/models): 常用 model ID、/model 指令、新模型上线怎么办
-- [CC Switch 详解](https://claude-unlimited.aiautotools.com/guide/ccswitch): 手动配置字段填法与排错清单
+- [模型广场](https://claude-unlimited.aiautotools.com/models): Fable 5.1 与 Opus 5.5 两个模型一览，可复制 model ID，含分工、完整列表获取与切换方法
+- [套餐定价](https://claude-unlimited.aiautotools.com/pricing): 无限额度卡当前在售天卡与月卡两档，价格与发卡站在售商品同步，含退款规则；周期卡与额度卡尚未定价
+- [管理后台](https://claude-unlimited.aiautotools.com/console): 激活码兑换、API Key 提取、一键导入配置、用量查询与图表、GPT 图像生成、公告与备用域名（后台本体为独立站点 rsxermu666.cn）
+- [使用教程（三步）](https://claude-unlimited.aiautotools.com/guide): 一页三步：第一步买卡拿激活码（发卡站下单支付、订单号后 6 位换激活码、后台兑换提取 Key）；第二步配置密钥（CC Switch 一键导入 / 手动新增 / 环境变量三条路径、VS Code 与 Cursor 自定义端点）；第三步开始使用（Claude Code 安装命令、第一次会话 /init 与 CLAUDE.md、终端命令与斜杠命令、/plugin 插件与技能、/model 切换模型、自检 curl、401/429/529/prompt too long 排错速查）
 - [常见问题](https://claude-unlimited.aiautotools.com/faq): 全量 FAQ（商品 / 购买支付 / 使用配置 / 接入使用 / 限速封号 / 数据安全 / 关于我们）
+- [Claude 知识库](https://claude-unlimited.aiautotools.com/knowledge): Claude Code 的用法、原理、成本与报错排查，按四个主题分类查
 
 ## 事实要点
 
 - 计费方式：订阅期内不按 token 计费，固定订阅价
-- 支持模型层级：Claude Opus / Sonnet / Haiku / Fable，常用型号 claude-opus-4-8、claude-sonnet-5、claude-fable-5（以 CC Switch「获取模型列表」实际返回为准）
+- 支持模型：Fable 5.1 与 Opus 5.5（商品承诺的两个模型）；网关实际可用的 model ID 以 CC Switch「获取模型列表」实际返回为准
 - 支持工具：Claude Code、Cursor、Cline、Roo Code、Aider、Continue、Zed、JetBrains、VS Code 官方插件、官方 SDK
 - 接口：Anthropic 兼容端点 + OpenAI 兼容端点（/v1/chat/completions）
-- 上下文：标准 200k token
-- 退款：购买后 7 个自然日内，仅限卡密未激活、兑换后连续不可用超 24 小时、实际能力与描述明显不符三种情形
-- 公平使用：单 Key 并发默认 20、请求速率默认 60 次/分钟、Token 吞吐默认 300k token/分钟
-- 购买：第三方发卡站 catfk.com，本站不处理支付
+- 退款：与发卡站商品详情一致——未激活全额退；天卡激活 1 小时内全额退、过期不退；月卡激活 1 小时内全额退、超 3 小时按 15 元/天折算；虚拟商品不支持无理由退货
+- 公平使用：同时 1 个会话窗口、单会话并发 20、请求速率默认 60 次/分钟、Token 吞吐默认 300k token/分钟
+- 购买：第三方发卡站 catfk.com
 - 配置工具：CC Switch（ccswitch.io），支持一键导入与链路检测
-- 人工客服：微信 bn23923 / QQ 1351315（见站点右下角「人工客服」入口，可一键复制）
-- 接入与购买流程：首页「从买到用起来」四步；教程「五步总览」含兑换卡密、安装 CC Switch、一键导入、获取模型列表、启用与检测链路
+- 人工客服：微信 ren_mo_mo（点右下角在线助手 →「联系人工客服」，可一键复制微信号）
+- 管理后台：rsxermu666.cn，独立站点；主域名不可达时切换备用域名 bxcv.store，API Key 无需更换
+- 接入与购买流程：首页「从买到用起来」四步；教程「三步」——第一步购买激活码（发卡站 catfk.com 下单支付、交易订单号后 6 位换激活码、后台 rsxermu666.cn 兑换提取 Key）、第二步配置密钥（CC Switch 一键导入或环境变量 ANTHROPIC_BASE_URL + ANTHROPIC_API_KEY）、第三步安装 Claude Code 并使用（/model 切模型、换模型不用换 Key）
+
+## 知识库文章
+
+- [Claude Code 教程：第一次会话之后怎么用](https://claude-unlimited.aiautotools.com/knowledge/claude-code-tutorial): 配置完成后怎么把 Claude Code 用顺手：CLAUDE.md、工作流、常用命令。
+- [Claude Code MCP 怎么配：命令、scope 与避坑](https://claude-unlimited.aiautotools.com/knowledge/claude-code-mcp-config): claude mcp add 命令、三种 scope、Windows 坑、归档包避坑、连不上排查。
+- [Opus 5.5 做视频教程：Remotion 出第一条 MP4](https://claude-unlimited.aiautotools.com/knowledge/claude-code-make-video): 刷屏的「一句话出视频」背后是 Remotion：八步跑通第一条 MP4。
+- [Claude Code 计划模式怎么用：四种权限模式的区别](https://claude-unlimited.aiautotools.com/knowledge/claude-code-plan-mode): plan / manual / acceptEdits / auto 的差别，何时先要计划再动手。
+- [Claude Code 权限模式有哪些](https://claude-unlimited.aiautotools.com/knowledge/claude-code-permission-modes): 六种权限模式的差别与无人值守任务的配置边界。
+- [CLAUDE.md 怎么写：写什么、放哪](https://claude-unlimited.aiautotools.com/knowledge/claude-md-guide): CLAUDE.md 写什么放哪，AGENTS.md 何时被读，.claude 目录各文件用途。
+- [Claude Code 命令与参数速查：会话内和命令行](https://claude-unlimited.aiautotools.com/knowledge/claude-code-cli-cheatsheet): 启动方式、常用参数、会话内斜杠命令表，脚本与 CI 用法。
+- [Claude Code 子代理怎么用](https://claude-unlimited.aiautotools.com/knowledge/claude-code-subagents): 子代理的独立上下文、定义方式、委派方式与并行上限。
+- [Claude Code 技能怎么写](https://claude-unlimited.aiautotools.com/knowledge/claude-code-skills): 渐进式披露、三个加载位置、marketplace 与写好技能的要点。
+- [为什么 Agent 比聊天更烧 token](https://claude-unlimited.aiautotools.com/knowledge/why-agents-cost-more-tokens): 输入 token 按轮次平方增长，工具输出是大头，四种控制历史的模式。
+- [Claude Code 启动时那 33k token 去了哪](https://claude-unlimited.aiautotools.com/knowledge/claude-code-startup-tokens): 33k 启动 token 的构成，三个可控杠杆，以及它与提示缓存的关系。
+- [提示缓存原理：什么时候省钱、什么时候白花](https://claude-unlimited.aiautotools.com/knowledge/prompt-caching-explained): 按前缀命中的计费逻辑、cache_control 用法、命中验证与不省的情况。
+- [Claude API 怎么计费：token 构成与估算](https://claude-unlimited.aiautotools.com/knowledge/claude-api-pricing-explained): 输入与输出 token 的构成、缓存价，以及一个可复用的估算公式。
+- [降低 Claude 用量的工程方法：先测量再优化](https://claude-unlimited.aiautotools.com/knowledge/reduce-token-usage-tips): 分段记账、路由预算、检索裁剪、结构化摘要、输出 schema 与诚实衡量。
+- [按任务选模型：Opus、Sonnet、Haiku 怎么选](https://claude-unlimited.aiautotools.com/knowledge/choose-claude-model): 三档模型的任务边界，先降一档再升级，以及用自己任务做评测。
+- [Claude Code 与 Codex CLI 怎么选](https://claude-unlimited.aiautotools.com/knowledge/claude-code-vs-codex): 三个终端 agent 的七项对照，以及差别到底在哪里。
+- [prompt too long 报错怎么处理](https://claude-unlimited.aiautotools.com/knowledge/claude-code-prompt-too-long-fix): 先 /context 看构成，再按固定成本、单次输出、正常增长三种情况分别处理。
+- [Claude Code 报 429 限流怎么办](https://claude-unlimited.aiautotools.com/knowledge/claude-code-429-rate-limit): 429 的三个上限、Agent 更容易撞上的原因、六步处理顺序。
+- [Claude 报错 529 overloaded 怎么处理](https://claude-unlimited.aiautotools.com/knowledge/claude-code-529-overloaded): 529 是容量问题：五步处理，以及它与 500、429 的区别。
+- [Claude Code 报错 401 / 403 怎么解决](https://claude-unlimited.aiautotools.com/knowledge/claude-code-401-403): 先确认发的是哪个凭据，再分 Key 与端点不匹配、OAuth token、403 来源三类处理。
+- [Claude Code 连接中断、等待 API 响应怎么处理](https://claude-unlimited.aiautotools.com/knowledge/claude-code-connection-lost): 两分钟自查法、退避超时变量、代理与企业 TLS 中间人证书的处理。
+- [Claude 提示用量上限：分清是哪个计量器](https://claude-unlimited.aiautotools.com/knowledge/claude-code-usage-limit-reached): 四类用量消息的区分与处理，/status 是排查账单问题的第一步。
 
 ## 声明
 
-本站为第三方 API 网关服务，与 Anthropic 无隶属关系。Claude 与 Anthropic 为 Anthropic, Inc. 的商标。
+本站为独立的第三方 API 网关服务。

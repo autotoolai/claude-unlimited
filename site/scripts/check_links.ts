@@ -13,6 +13,14 @@ if (!existsSync(dist)) {
   process.exit(1)
 }
 
+// 只跑过 vitepress build 时，总览页的复制脚本（copy_dir_overviews.mjs）还没跑，
+// /guide 与 /knowledge 会误报成死链。检测到这种情况直接退出，避免把「构建没跑完」误当成死链。
+const missingOverview = ['guide.html', 'knowledge.html'].filter((f) => !existsSync(join(dist, f)))
+if (missingOverview.length) {
+  console.error(`[links] dist 缺少 ${missingOverview.join('、')}，构建未跑完（npm run build 才会复制总览页），跳过死链检查`)
+  process.exit(0)
+}
+
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((f) => {
     const p = join(dir, f)

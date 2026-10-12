@@ -6,19 +6,36 @@
 | 文件 | layout | 页面组件 |
 |---|---|---|
 | `index.md` | `index` | `.vitepress/theme/index.vue` |
-| `pricing.md` | `pricing` | `.vitepress/theme/pricing.vue` |
-| `unlimited.md` | `unlimited` | `.vitepress/theme/unlimited.vue` |
+| `pricing.md` | `pricing` | `.vitepress/theme/pricing.vue`（含原 `/unlimited` 的内容） |
 | `faq.md` | `faq` | `.vitepress/theme/faq.vue` |
-| `guide/index.md` | `guide_index` | `.vitepress/theme/guide_index.vue` |
-| `guide/clients.md` | `guide_clients` | `.vitepress/theme/guide_clients.vue` |
-| `guide/models.md` | `guide_models` | `.vitepress/theme/guide_models.vue` |
-| `guide/ccswitch.md` | `guide_ccswitch` | `.vitepress/theme/guide_ccswitch.vue` |
+| `models.md` | `models` | `.vitepress/theme/models.vue` → `components/PageModels.vue` |
+| `console.md` | `console` | `.vitepress/theme/console.vue` → `components/PageConsole.vue` |
+| `guide/index.md` | `guide_index` | `.vitepress/theme/guide_index.vue`（教程只有这一页） |
 
 **页面组件必须在 `.vitepress/theme/index.ts` 的 `themePages` 里注册。** `frontmatter.layout` 的解析发生在默认主题的
 `VPContent.vue`（`<component :is="frontmatter.layout" />`），它只认 `enhanceApp` 里 `app.component()` 注册过的名字。
 只在 `theme/` 下建文件、不 import 进 `theme/index.ts`，构建不会报错，但产物会 SSR 成空的 `<div>`（HTML 里只有
 `<guide_index></guide_index>`），而且会被 `check_dist.mjs` 的「外壳内 H1 数量」断言拦下。
-页面组件里的文件名、slug 的对应关系：`docs/guide/clients.md` → `layout: guide_clients` → `theme/guide_clients.vue` → `slug: '/guide/clients'`。
+页面组件里的文件名、layout 的对应关系：`docs/guide/index.md` → `layout: guide_index` → `theme/guide_index.vue` → 渲染 `config/guide.ts` 的单页 `/guide`。
+
+## 知识库怎么写
+
+知识库（`/knowledge`）是文章模块，与教程页不同：
+
+- **正文在 `docs/knowledge/<slug>.md`**（原生 markdown），不是 `config/*.ts`。
+- 文章页写 `layout: page` + frontmatter `knowledge: true`，由 `theme/components/KnowledgeDoc.vue` 渲染 VPDoc 的 page 分支输出；H1 来自 markdown 自己的 `# 标题`。
+- 列表页 `docs/knowledge/index.md` 仍是路由壳（`layout: knowledge_index`），页面组件是 `theme/knowledge_index.vue`；结构为分类胶囊条 + 精选大卡 + 四个分类小节。
+- 元数据（列表卡片、Article + FAQPage JSON-LD、OG、页脚）在 `config/knowledge.ts`（四个分类按用户旅程：start / how / cost / troubleshoot）；页内目录复用 `components/SectionNav.vue`，目录项在客户端挂载后从正文的 `h2[id]` 读取（SSR 为空，由 `npm run check:toc` 在浏览器里核对），不走 `sections.ts`。
+- 源站原文与抓取信息在 `config/knowledge_sources.ts`，由 `scripts/gen_sources.py` 复制到 `archive/knowledge_source_20261009/<slug>/`；`npm run check:sources` 校验逐字一致。PAGES（check_dist.mjs / verify_build.py）从 `config/knowledge.ts` 动态读取。
+- 新增文章的完整流程与写作规范见 `docs/knowledge_writing_guide.md`。
+
+## 内容结构约定（2026-10-10）
+
+全站页面各只回答一个问题，模块分工、页面职责与「同一段内容只存在于一个页面」的硬规则见
+[`content_structure.md`](content_structure.md)。新增模块或页面时先读它，确认它属于哪个页面，
+避免再次出现同一段内容在两页各写一遍的情况。
+
+限流数字、套餐边界、退款窗口只在 `config/rules.ts` 出现；页面表格、FAQ 答案、首页卖点都从它派生，改数字只改那一处。
 
 ## FAQ 怎么写
 
@@ -26,22 +43,22 @@
 （购买 → 商品 → 限速 → 配置 → 接入 → 安全 → 我们）决定，`components/sections.ts` 的 `SECTION_NAV.faq` 要与之一致
 （`check_dist.mjs` 会逐页断言）。`/faq` 顶部「买之前」区块取 `buyingQuestions` 里列出的条目 id，
 这些条目不会再在下面的分类里重复出现。改 FAQ 条数要同步 `check_dist.mjs` 的 `CU_FAQ_COUNT`（默认 33）。
+「限速与封号」里的具体速率数字由 `config/rules.ts` 的 `limitBullets()` 插值生成，不要在答案里另写一份。
 
 ## 教程页怎么写
 
-教程正文**不在 md 里，也不在页面组件里**，而在 `config/guide.ts`：四个 `GuidePage` 数据对象（总览 / 接入与模型 / 模型与切换 / CC Switch 详解）。
-`guide_*.vue` 只是把 slug 传给 `GuidePage.vue`，后者按 `config/guide.ts` 的 `blocks[]` 渲染：段落、列表、要点框、命令块、表格、步骤块（序号 + 段落 + 提示 + 截图）。
-页内目录、页脚「教程」列、首页「使用教程」卡片、`/guide` 互链全部从同一份数据生成，改一处四处同步。
+教程正文**不在 md 里，也不在页面组件里**，而在 `config/guide.ts`：一个 `GuidePage` 数据对象（`/guide`）。2026-10 重构后购买章节整段删除，客服入口已下线正文里的客服条，统一走右下角在线助手浮标，正文分两条轨——`tab: 'novice'` 的八步小白教程（默认）与 `tab: 'pro'` 的五节高手教程，由 `guideTabs` 驱动页内分段切换；不带 `tab` 的块（`contact` 除外）在两条轨下面都显示。
+`guide_index.vue` 直接渲染 `GuidePage.vue`，后者按 `config/guide.ts` 的 `blocks[]` 渲染：段落、列表、要点框、命令块、表格、步骤块（序号 + 段落 + 提示 + 截图）、按钮行（`cta`）。
+页内目录（`components/sections.ts` 按 tab 分组）、页脚「教程」列（`pages/data.ts` 的 `guideNavItems`）全部从同一份数据生成，改一处两处同步（首页的教程入口已于 2026-10-10 改为「继续了解」链接条）。
 
 改教程的入口只有一个：`config/guide.ts`。
 
 ## 教程截图
 
 - 放在 `.vitepress/theme/assets/guide/`，在 `theme/components/GuideShot.vue` 里登记成静态 import，
-  `config/guide.ts` 的每个截图只写文件名（如 `src: 'guide_get_apikey.jpg'`）。**图片不能放在 `docs/` 下**：
+  `config/guide.ts` 的每个截图只写文件名（如 `src: 'guide_onekey_import.png'`）。**图片不能放在 `docs/` 下**：
   那里的非 .md 文件不会被 Vite 打包，也不会复制进 dist。
-- 来源是卖家教程站 `https://wx.bbyy.site/` 的 10 张 PNG，原始文件在 `Token_Platform/temp/website_capture/images/`（不入库），
-  已裁掉顶部品牌栏、去掉含二维码的图片，转码成 JPG 入库。
+- 来源是发给买家的腾讯文档《AI工具使用教程》里的 9 张真实截图（2026-10 替换原先卖家教程站的示意图），每张都是买家实际操作后拍的界面，用户按官网图文做能在卖家文档里找到同一步。
 
 ## 历史
 
@@ -54,7 +71,7 @@ HTML，markdown-it 对 `<script>` 块的切分又会随空行变化把正文降�
 
 `theme/Layout.vue` 是薄壳，只渲染一个 `<VPContent />`，不用默认主题的 `Layout`（`VPApp/VPNav/VPLocalNav/VPSidebar` 全部不渲染）：
 VitePress 渲染 md → `VPContent` 按 `frontmatter.layout` 选页面组件 → 页面组件用 `PageShell`
-画品牌页头、主导航、正文、页内目录、页脚、两个客服浮标。
+画品牌页头、主导航、正文、页内目录、页脚，以及右下角的在线助手浮标（人工客服已并入助手面板，不再有第二个浮标）。
 
 `VPContent` 必须直接 import 内部路径：`import VPContent from 'vitepress/dist/client/theme-default/components/VPContent.vue'`。
 `DefaultTheme.VPContent` 与 `import { VPContent } from 'vitepress/theme'` 都是 undefined / 无导出，会让整页空白（Vue 报 `Invalid vnode type: undefined`）。

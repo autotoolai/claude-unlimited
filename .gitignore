@@ -27,6 +27,11 @@ site/.vitepress/cache/
 # ===== 通用 =====
 *.log
 .DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== 根目录截图（调试产物属于 temp/，根目录不该出现图片） =====
+/*.png
 
 # ===== Cloudflare wrangler 本地状态（pages.json 只存 account_id） =====
 .wrangler/

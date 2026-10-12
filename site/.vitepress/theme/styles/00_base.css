@@ -1,114 +1,199 @@
-/* Claude 无限卡官网 · 设计 token + 全站样式
-   风格：暖纸底 + 墨黑正文 + 品牌橙点缀；衬线做标题/数字，无衬线做正文，代码用等宽。
-   布局：自定义 PageShell（品牌页头 68px + 导航条 64px + 正文列 + 右侧页内目录），VitePress 默认
-   导航栏、页脚、aside 全部关闭（见 config.mts 的 themeConfig）。
-   断点：1100px 隐藏右侧目录；900px Hero/卡片塌一列；720px 步骤竖排；560px 按钮全宽。
-*/
+/* Claude 无限卡官网 · 设计 token + 全站基底
+   ------------------------------------------------------------------
+   设计语言（对齐 aiprimetech.io 的视觉语法，适配中文）：
+   1. 色相：近乎无彩。暖纸底 + 墨色文字，品牌色只出现在 hero 徽标一处淡蓝细边；
+      链接、列表符号、目录高亮、角标一律用墨色，靠字重与明度而非色相区分层级；
+   2. 层次：靠明度差（底 → 卡片比底深一档）而不是阴影制造结构，细边框统一 rgba 低透明度；
+   3. 形状：圆角只用 10 / 12 / 14 / 999 四档，阴影只在 hover 与浮层出现；
+   4. 字体：正文无衬线 Inter、标题衬线 Lora（中文回落系统宋体）、代码与终端等宽；
+   5. 动效：统一缓动 --cu-ease，区块进入视口淡入上移，导航滚动后显形。
+   布局：单行吸顶导航（PageShell）+ 正文列 + 右侧页内目录。
+   ------------------------------------------------------------------ */
 
 :root {
-  --vp-c-brand-1: #c85a1e;
-  --vp-c-brand-2: #a8480f;
-  --vp-c-brand-3: #8f3c12;
-  --vp-c-brand-soft: rgba(200, 90, 30, 0.12);
+  /* —— 强调色：墨色，不是彩色。历史上这里是品牌橙（#c2541a），铺满链接、列表符号、
+     目录高亮、FAQ 展开、套餐角标与客服浮标，全站发「促销感」而非技术产品感。
+     现在改成墨色：所有 --cu-accent* 的调用点（100+ 处）零改动就整体退场。 —— */
+  --cu-accent: #141413;
+  --cu-accent-deep: #141413;
+  --cu-accent-soft: rgba(20, 20, 19, 0.06);
+  --cu-accent-line: rgba(20, 20, 19, 0.22);
+  --vp-c-brand-1: var(--cu-accent);
+  --vp-c-brand-2: var(--cu-accent-deep);
+  --vp-c-brand-soft: var(--cu-accent-soft);
 
-  --cu-accent: #c85a1e;
-  --cu-accent-deep: #a8480f;
-  --cu-ink: #16130f;
-  --cu-ink-2: #403a33;
-  --cu-muted: #6c6459;
-  --cu-bg: #f5f1e8;
-  --cu-card: #fffdf8;
-  --cu-line: rgba(22, 19, 15, 0.09);
-  --cu-line-strong: rgba(22, 19, 15, 0.22);
-  --cu-accent-soft: rgba(200, 90, 30, 0.09);
-  --cu-code-bg: #f0ead9;
-  --cu-hero-line: rgba(22, 19, 15, 0.07);
-  --cu-brandbar-bg: color-mix(in srgb, var(--cu-card) 88%, transparent);
-  --cu-figure-frame: rgba(22, 19, 15, 0.18);
-  --cu-shadow: 0 18px 40px rgba(22, 19, 15, 0.1);
-  --cu-shadow-soft: 0 8px 24px rgba(22, 19, 15, 0.07);
-  --cu-brandbar-h: 64px;
-  --cu-tabs-h: 62px;
-  --cu-nav-h: 126px; /* 品牌页头 + 导航条，供标题锚点定位 */
-  --cu-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Songti SC', 'Noto Serif SC', Georgia, 'Times New Roman', serif;
-  --cu-sans: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
-  --cu-mono: ui-monospace, 'Cascadia Code', Consolas, 'SF Mono', Menlo, monospace;
+  /* —— 全站唯一的彩色：hero 徽标的淡蓝细边，对齐参考站 —— */
+  --cu-signal: #2563eb;
+
+  /* —— 暖纸底色阶：bg → card 比底深一档 → card-hover 再深一档 —— */
+  --cu-bg: #faf9f5;
+  --cu-bg-soft: #f3f1ea;
+  --cu-card: #ede8dc;
+  --cu-card-hover: #e6e0d1;
+  --cu-card-solid: #fbfaf6;
+
+  /* —— 墨色文字四级 —— */
+  --cu-ink: #141413;
+  --cu-ink-2: #3d3d3a;
+  --cu-muted: #8f8d85;
+
+  /* —— 细边框 —— */
+  --cu-line: rgba(20, 20, 19, 0.12);
+  --cu-line-strong: rgba(20, 20, 19, 0.2);
+
+  --cu-code-bg: #ece7db;
+  --cu-term-bg: #1f1e1d;
+  --cu-grid-line: rgba(20, 20, 19, 0.04);
+
+  /* —— 反差色：浮标头、分段控件选中态这类「实心块 + 反白文字」的底色。
+     accent 现在是墨色，深色模式下会翻成米色（那样就变成浅底白字，读不清），
+     所以单独给一个始终与 --cu-bg 拉开明度反差的变量。 —— */
+  --cu-contrast: #141413;
+  --cu-contrast-fg: #faf9f5;
+
+  /* —— 形状：四档圆角，对齐参考站的 10 / 12 / 14 —— */
+  --cu-r-sm: 10px;
+  --cu-r-md: 12px;
+  --cu-r-lg: 14px;
+  --cu-r-pill: 999px;
+
+  /* —— 阴影：静息不用，只在 hover / 浮层 / 吸顶导航出现 —— */
+  --cu-shadow-lift: 0 24px 48px -32px rgba(20, 20, 19, 0.45);
+  --cu-shadow-nav: 0 10px 30px -26px rgba(20, 20, 19, 0.5);
+  --cu-shadow-pop: 0 20px 50px -24px rgba(20, 20, 19, 0.35);
+  /* 终端窗口：参考站的双层阴影（长投影 + 1px 描边环） */
+  --cu-shadow-term: rgba(20, 20, 19, 0.55) 0 40px 80px -24px, rgba(20, 20, 19, 0.06) 0 0 0 1px;
+
+  /* —— 节奏：动效统一缓动与时长 —— */
+  --cu-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --cu-dur: 0.55s;
+
+  /* —— 尺寸 —— */
+  --cu-nav-h: 60px; /* 单行吸顶导航高度，锚点定位与目录 sticky 都按它算 */
+  --cu-wrap: 1140px; /* 主容器宽度 */
+  --cu-content-w: 44rem; /* 正文列限宽，保证长文可读 */
+  --cu-narrow: 46rem; /* 知识库阅读列 */
+
+  /* —— 分区节奏：参考站每个 section 上下各 80px —— */
+  --cu-section-y: 5rem;
+  --cu-section-y-lg: 6.5rem;
+
+  --cu-serif: 'Lora', 'Songti SC', 'Noto Serif SC', 'Source Han Serif SC', Georgia, 'Times New Roman', serif;
+  --cu-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
+  --cu-mono: ui-monospace, 'JetBrains Mono', 'Cascadia Code', Consolas, 'SF Mono', Menlo, monospace;
 }
 
-/*
- * 深色色板。html.dark 由 Layout.vue 依据 VitePress 的 isDark 写入（跟随系统偏好），
- * prefers-color-scheme 那条让「系统为深色但还没挂载 JS」的 SSR 首帧也是深色，避免白闪。
- */
-.dark,
+/* 深色：暖黑反相，与浅色同源（同一套明度关系换到暖黑底）。
+   html.dark 由 Layout.vue 依据本地存储写入；
+   prefers-color-scheme 那条保证「系统深色但 JS 未挂载」的 SSR 首帧也是深色，不白闪。 */
+html.dark,
 html:not(.light):has(.dark) {
-  --cu-accent: #e08a5f;
-  --cu-accent-deep: #f0a97f;
-  --cu-ink: #ede6d6;
-  --cu-ink-2: #c9c1b1;
-  --cu-muted: #a49a89;
-  --cu-bg: #17150f;
-  --cu-card: #211e16;
-  --cu-line: rgba(237, 230, 214, 0.12);
-  --cu-line-strong: rgba(237, 230, 214, 0.28);
-  --cu-accent-soft: rgba(224, 138, 95, 0.12);
-  --cu-code-bg: #262219;
-  --cu-hero-line: rgba(237, 230, 214, 0.08);
-  --cu-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
-  --cu-shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.35);
-  --cu-brandbar-bg: color-mix(in srgb, var(--cu-card) 82%, transparent);
-  --cu-figure-frame: rgba(237, 230, 214, 0.2);
+  --cu-accent: #f3f0e8;
+  --cu-accent-deep: #f3f0e8;
+  --cu-accent-soft: rgba(243, 240, 232, 0.08);
+  --cu-accent-line: rgba(243, 240, 232, 0.28);
+  --cu-signal: #6b93f0;
+
+  --cu-bg: #1a1a19;
+  --cu-bg-soft: #222120;
+  --cu-card: #242220;
+  --cu-card-hover: #2c2a27;
+  --cu-card-solid: #1e1d1b;
+
+  --cu-ink: #f3f0e8;
+  --cu-ink-2: #d8d4c9;
+  --cu-muted: #a29d90;
+
+  --cu-line: rgba(243, 240, 232, 0.12);
+  --cu-line-strong: rgba(243, 240, 232, 0.24);
+
+  --cu-code-bg: #282623;
+  --cu-term-bg: #111110;
+  --cu-grid-line: rgba(243, 240, 232, 0.04);
+
+  --cu-contrast: #f3f0e8;
+  --cu-contrast-fg: #1a1a19;
+
+  --cu-shadow-lift: 0 24px 48px -32px rgba(0, 0, 0, 0.7);
+  --cu-shadow-nav: 0 10px 30px -26px rgba(0, 0, 0, 0.8);
+  --cu-shadow-pop: 0 20px 50px -24px rgba(0, 0, 0, 0.6);
+  --cu-shadow-term: rgba(0, 0, 0, 0.7) 0 40px 80px -24px, rgba(243, 240, 232, 0.06) 0 0 0 1px;
 }
 
 @media (prefers-color-scheme: dark) {
   html:not(.light) {
-    --cu-accent: #e08a5f;
-    --cu-accent-deep: #f0a97f;
-    --cu-ink: #ede6d6;
-    --cu-ink-2: #c9c1b1;
-    --cu-muted: #a49a89;
-    --cu-bg: #17150f;
-    --cu-card: #211e16;
-    --cu-line: rgba(237, 230, 214, 0.12);
-    --cu-line-strong: rgba(237, 230, 214, 0.28);
-    --cu-accent-soft: rgba(224, 138, 95, 0.12);
-    --cu-code-bg: #262219;
-    --cu-hero-line: rgba(237, 230, 214, 0.08);
-    --cu-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
-    --cu-shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.35);
-    --cu-brandbar-bg: color-mix(in srgb, var(--cu-card) 82%, transparent);
-    --cu-figure-frame: rgba(237, 230, 214, 0.2);
+    --cu-accent: #f3f0e8;
+    --cu-accent-deep: #f3f0e8;
+    --cu-accent-soft: rgba(243, 240, 232, 0.08);
+    --cu-accent-line: rgba(243, 240, 232, 0.28);
+    --cu-signal: #6b93f0;
+
+    --cu-bg: #1a1a19;
+    --cu-bg-soft: #222120;
+    --cu-card: #242220;
+    --cu-card-hover: #2c2a27;
+    --cu-card-solid: #1e1d1b;
+
+    --cu-ink: #f3f0e8;
+    --cu-ink-2: #d8d4c9;
+    --cu-muted: #a29d90;
+
+    --cu-line: rgba(243, 240, 232, 0.12);
+    --cu-line-strong: rgba(243, 240, 232, 0.24);
+
+    --cu-code-bg: #282623;
+    --cu-term-bg: #111110;
+    --cu-grid-line: rgba(243, 240, 232, 0.04);
+
+    --cu-contrast: #f3f0e8;
+    --cu-contrast-fg: #1a1a19;
+
+    --cu-shadow-lift: 0 24px 48px -32px rgba(0, 0, 0, 0.7);
+    --cu-shadow-nav: 0 10px 30px -26px rgba(0, 0, 0, 0.8);
+    --cu-shadow-pop: 0 20px 50px -24px rgba(0, 0, 0, 0.6);
+    --cu-shadow-term: rgba(0, 0, 0, 0.7) 0 40px 80px -24px, rgba(243, 240, 232, 0.06) 0 0 0 1px;
   }
 }
 
-/* 正文可读宽度：约 70 个中文字符。卡片、表格、图示用满栏，只有段落与列表限宽。 */
-.cu-page {
-  --cu-content-w: 44rem;
-}
-
-/* 小节标题前的上款短线：替代巨大字号差做层级 */
-.cu-page h2 {
-  scroll-margin-top: calc(var(--cu-nav-h) + 20px);
-}
-
-.cu-page h2::before {
-  content: '';
-  display: block;
-  width: 2.25rem;
-  height: 3px;
-  margin-bottom: 0.75rem;
-  background: var(--cu-accent);
-}
-
+/* —— 排版基线 —— */
 html {
   scroll-behavior: smooth;
-  /* 页内锚点跳转时给吸顶的品牌页头+导航条让位 */
-  scroll-padding-top: calc(var(--cu-nav-h) + 16px);
+  scroll-padding-top: calc(var(--cu-nav-h) + 24px);
+  -webkit-text-size-adjust: 100%;
+}
+
+/* 内滚容器（目录、表格、助手面板、导航横滚）一律不画滚动条：内容仍可滚动、滚轮可用，
+   只是轨道不出现。这类容器不承担「显示自己在哪一段」的功能，轨道反而是噪点。 */
+.cu-scroll-none {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* 旧 Edge */
+}
+
+.cu-scroll-none::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* 容器版本：把「不画滚动条」传给后代里所有内滚容器（表格、代码块、嵌套表格…）。
+   VitePress 给这些元素写的是内联 overflow + !important，类选择器压不住 overflow，
+   但 scrollbar-width / ::-webkit-scrollbar 用同级 !important 能盖住默认轨道。 */
+.cu-scroll-wrap * {
+  scrollbar-width: none !important;
+}
+
+.cu-scroll-wrap *::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
 }
 
 body {
   font-family: var(--cu-sans);
   background: var(--cu-bg);
   color: var(--cu-ink);
+  line-height: 1.6;
+  font-feature-settings: 'cv02', 'cv03', 'cv04';
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -118,15 +203,50 @@ kbd,
 pre,
 samp {
   font-family: var(--cu-mono);
+  font-variant-ligatures: none;
 }
 
 ::selection {
-  background: var(--vp-c-brand-soft);
+  background: var(--cu-accent-soft);
+  color: var(--cu-ink);
 }
 
 :focus-visible {
-  outline: 2px solid var(--cu-accent);
-  outline-offset: 2px;
+  outline: 2px solid var(--cu-ink);
+  outline-offset: 3px;
   border-radius: 4px;
 }
 
+/* 首屏入场：JS 挂载后由 useHeroReveal 给 .cu-hero__badge / .cu-hero__title 等首屏元素打上，
+   未挂载（SSR 首帧、无脚本）时内容默认可见，不依赖动画才可读。 */
+.cu-reveal-block {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.9s var(--cu-ease), transform 0.9s var(--cu-ease);
+  transition-delay: var(--cu-reveal-delay, 0.6s);
+}
+
+.cu-reveal-block.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  /* 终端逐字打字与首屏逐词上浮都关掉：文字必须完整可见（02_hero.css 负责） */
+  .cu-reveal-block {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.08s !important;
+  }
+}

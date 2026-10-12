@@ -4,22 +4,24 @@
  * 约定：
  * - 所有平台地址（购买、兑换、CC Switch 下载）只在 partners 里出现，组件内禁止硬编码。
  * - 商品购买按钮的 URL 从 products[].shopUrl 取（= partners.purchase.url）。
- * - 客服浮标二维码、微信号、QQ、QQ 群从 contact 取；二维码留空时组件自动降级为「复制微信号」。
+ * - 客服浮标二维码、微信号从 contact 取；二维码留空时组件自动降级为「复制微信号」。
  * - 改价格 / 名称 / 周期只改本文件一处；周期天数 days 与首屏承诺 promise 也在这里，页面不另写。
  *
  * TODO（上线前必须替换，见 README「上线前必须确认」）：
  * - R1 正式主域名 url
  * - R2 商品名称 / 价格 / 周期的最终文案
- * - R3 客服微信号 / 微信二维码 / QQ / QQ 群 / 邮箱
+ * - R3 客服微信号 / 微信二维码 / 邮箱
  * - R4 运营主体与 ICP 备案号
  *
  * 文案约定：页面上任何「N 天」「分钟级」表述都从 products[].days / products[].promise 派生，
  * 不在组件或 config/faq.ts 里再写一遍；改价格或周期只改本文件。
  */
 
+import { entryTier, entryTierDays, shopUrl as purchaseUrl } from './plans'
+
 export interface Partner {
   /** 稳定标识：组件里按 id 取，不写死 URL */
-  id: 'purchase' | 'activation' | 'ccswitch'
+  id: 'purchase' | 'console' | 'ccswitch'
   name: string
   /** 站点用途的一句话说明，教程页直接显示 */
   desc: string
@@ -56,30 +58,24 @@ export interface NavItem {
 export interface HumanService {
   wechatId: string
   wechatQr: string
-  qq: string
-  qqGroup: string
   email: string
-  hours: string
 }
 
 export interface SiteConfig {
   name: string
   tagline: string
+  /** tagline 按短语切分后的数组：首页 H1 逐词上浮入场用（不改变 tagline 本身） */
+  taglinePhrases: string[]
   description: string
   /** 正式域名，构建期用于 canonical / sitemap / OG。TODO R1 */
   url: string
   /** 合作平台地址：购买 / 兑换 / CC Switch */
   partners: Partner[]
   nav: NavItem[]
-  stats: { value: string; label: string }[]
   products: Product[]
   featuredProductId: string
   contact: HumanService
   legal: { icp?: string; company?: string }
-  /** 页脚固定声明 */
-  disclaimer: string
-  /** 免责声明的前半句（关联声明），后半句从 disclaimer 里拆不动，保持原样 */
-  shortDisclaimer: string
   /** 全站提示语（Hero 按钮下方、公告位） */
   notice: string
 }
@@ -87,6 +83,7 @@ export interface SiteConfig {
 export const siteConfig: SiteConfig = {
   name: 'Claude 无限卡',
   tagline: '一个 Key，Claude 不限量用',
+  taglinePhrases: ['一个 Key，', 'Claude', '不限量用'],
   description:
     'Claude 无限卡官网：订阅期内 Claude API 不按 token 计费，支持 Claude Code、Cursor、Cline 等主流工具。本站只做介绍与答疑，购买跳转第三方发卡站。',
   url: 'https://claude-unlimited.aiautotools.com',  // 自定义域（Pages 域 claude-unlimited-site.pages.dev 仍可访问）
@@ -95,16 +92,14 @@ export const siteConfig: SiteConfig = {
     {
       id: 'purchase',
       name: '购买与发卡',
-      desc: '选规格 → 付款 → 自动发货卡密。本站不处理支付，下单与支付都在这里完成。',
-      url: 'https://catfk.com/shop/2Z0CEP7C',
+      desc: '选规格 → 付款 → 自动发货卡密，下单与支付都在发卡站完成。',
+      url: purchaseUrl,
     },
     {
-      id: 'activation',
-      name: '卡密兑换与 API Key',
-      desc: '输入买到的卡密兑换额度，并在同一页查看网关地址（Base URL）与 API Key；页面里还有「一键导入配置」按钮，能直接导入 CC Switch。',
-      // TODO R5：卡密兑换页地址（Base URL + API Key 获取页）。拿到后填这里，首页卡片、教程第 1/3 步、
-      // 人工客服面板会自动跟随；留空时这三处显示「兑换入口即将开放」，不会出现点不动的按钮。
-      url: '',
+      id: 'console',
+      name: '管理后台',
+      desc: '独立的后台页面：兑换卡密、提取 API Key、一键导入配置、查用量与公告。买完卡密后的所有操作都在这里完成。',
+      url: 'https://rsxermu666.cn/',
     },
     {
       id: 'ccswitch',
@@ -115,53 +110,50 @@ export const siteConfig: SiteConfig = {
     },
   ],
 
+  // 主导航只放「内容页」：模型广场 / 套餐定价 / 使用教程 / 知识库。
+  // 无限额度已并入套餐定价；管理后台是外部站点，页头「进入后台」按钮与页脚「服务」列已有入口。
   nav: [
+    { text: '模型广场', link: '/models', enabled: true },
     { text: '套餐定价', link: '/pricing', enabled: true },
-    { text: '无限额度', link: '/unlimited', enabled: true },
     { text: '使用教程', link: '/guide', enabled: true },
-    { text: '常见问题', link: '/faq', enabled: true },
-    { text: '文章库', link: '/articles', enabled: false },
-    { text: '关于我们', link: '/about', enabled: false },
+    { text: '知识库', link: '/knowledge', enabled: true },
   ],
+
 
   /**
-   * 首屏数据条。动态项（从买到接入）由 pages/data.ts 从商品 days / promise 派生，
-   * 这里只放稳定的数字，避免促销语改动时要改两处。
+   * 主推商品。展示价与周期从 config/plans.ts 的最低档（无限卡周卡）派生，
+   * 真实档位与价格只改 plans.ts 一处；features 供 JSON-LD Product 描述使用。
+   * 页面上的多档展示走 plans.ts，不走这里。
    */
-  stats: [
-    { value: '10+', label: '主流客户端开箱即用' },
-    { value: '0', label: '按 token 计费' },
-    { value: '200k', label: '单次上下文上限' },
-  ],
-
   products: [
     {
-      id: 'claude-unlimited-standard',
+      id: 'claude-unlimited-card',
       name: 'Claude 无限卡',
-      price: '¥298',
-      period: '30 天',
-      days: 30,
+      price: entryTier.price,
+      period: entryTier.period,
+      // 天数从最低档派生，不写死：价格与周期每次同步发卡站都会变，
+      // 写死 7 天会出现「¥13.5 起 / 最低 1 天档」但 JSON-LD 标 7 天的跨档错配。
+      days: entryTierDays,
       promise: '买完即用，分钟级跑起第一请求',
-      shopUrl: 'https://catfk.com/shop/2Z0CEP7C',
+      shopUrl: purchaseUrl,
       highlighted: true,
       features: [
-        '订阅期内不按 token 计费，Opus / Sonnet / Fable 通用',
+        '有效期内不限次数调用，不按 token 计费，Fable 5.1 与 Opus 5.5 通用',
         '一个 Key 通吃 Claude Code、Cursor、Cline、Aider 等主流工具',
         '支持流式输出、工具调用、扩展思考、视觉输入、长上下文',
         '买完即用，不排队、不审核，分钟级拿到卡密并激活',
       ],
     },
   ],
-  featuredProductId: 'claude-unlimited-standard',
+  featuredProductId: 'claude-unlimited-card',
 
-  // TODO R3：换成真实联系方式。二维码图片放 site/docs/assets/ 或 public/，填这里的文件名。
+  // 联系方式（二维码图片放 site/public/，填以 / 开头的路径）。全站唯一数据源：在线助手的「联系人工客服」卡
+  // 直接读这里，人工客服浮标已于 2026-10-09 撤掉。
   contact: {
-    wechatId: 'bn23923',
-    wechatQr: '',
-    qq: '1351315',
-    qqGroup: '1193964',
+    wechatId: 'ren_mo_mo',
+    // 纯码图，由 scripts/crop_wechat_qr.py 从 public/wechat-qr.jpg（手机截图）裁出；整张截图保留作底稿
+    wechatQr: '/wechat-qr-code.png',
     email: '',
-    hours: '每天 9:00 – 22:00',
   },
 
   legal: {
@@ -169,10 +161,7 @@ export const siteConfig: SiteConfig = {
     company: '', // TODO R4 运营主体名称
   },
 
-  disclaimer:
-    '本站为第三方 API 网关服务，与 Anthropic 无隶属关系、未获其背书。Claude 与 Anthropic 为 Anthropic, Inc. 的商标。本站不处理支付与账号，商品信息与最终价格以下单页为准。',
-  shortDisclaimer: '第三方 API 网关 · 与 Anthropic 无隶属关系',
-  notice: '支付后分钟级自动发货卡密，不排队、不人工审核。最终价格与库存以下单页为准。',
+  notice: '支付后分钟级自动发货卡密，不排队、不人工审核。',
 }
 
 /** 取当前主推商品；组件用它渲染购买按钮 */
@@ -194,14 +183,6 @@ export function partnerUrl(id: Partner['id']): string {
 
 export function partner(id: Partner['id']): Partner {
   return siteConfig.partners.find((p) => p.id === id) ?? { id, name: '', desc: '', url: '' }
-}
-
-/**
- * 兑换页（id='activation'）是否已就绪。首页合作平台卡、教程第 1/3 步、人工客服面板都用它：
- * 地址为空时显示「兑换入口即将开放」而不是一个点不动的按钮。
- */
-export function activationReady(): boolean {
-  return !!partnerUrl('activation')
 }
 
 /** 已启用的导航项；TabBar 在此基础上补一个「首页」 */

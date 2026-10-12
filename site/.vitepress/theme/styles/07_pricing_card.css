@@ -1,31 +1,32 @@
-/* 套餐卡（从 custom.css 拆出，改这个文件而不是 custom.css） */
+/* 套餐卡（首页 / 定价页的单张卡）：与卖点卡同一套卡片语言，主推档加一圈强调边框与「推荐」角标 */
 .cu-price-card {
   display: flex;
   flex-direction: column;
   margin: 1.5rem 0;
-  padding: 1.75rem;
+  padding: 1.9rem;
   border: 1px solid var(--cu-line);
-  border-radius: 6px;
+  border-radius: var(--cu-r-lg);
   background: var(--cu-card);
   max-width: 480px;
+  transition: transform var(--cu-dur) var(--cu-ease), box-shadow var(--cu-dur) var(--cu-ease),
+    border-color 0.3s var(--cu-ease);
+}
+
+.cu-price-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--cu-shadow-lift);
 }
 
 .cu-price-card--featured {
-  border-color: var(--cu-accent);
-  box-shadow: 0 12px 28px rgba(200, 90, 30, 0.1);
+  border-color: var(--cu-ink);
+  box-shadow: var(--cu-shadow-lift);
 }
 
-.cu-price-card__name {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: var(--cu-ink);
-}
-
+.cu-price-card__name,
 .cu-price-card__head h3 {
   margin: 0;
-  font-size: 1.15rem;
-  font-weight: 800;
+  font-size: 1.1rem;
+  font-weight: 700;
   color: var(--cu-ink);
 }
 
@@ -69,4 +70,3 @@
   color: var(--cu-muted);
   text-align: center;
 }
-

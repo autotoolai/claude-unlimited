@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
   Build the Claude unlimited-card site and deploy dist to Cloudflare Pages (direct upload).
@@ -34,10 +34,11 @@ Write-Host "Online URL (branch ${Branch}): https://${ProjectName}.pages.dev"
 Write-Host 'Custom domain, GitHub backup, ICP filing and other post-launch items: see site/README.md'
 
 if (-not $SkipNotify) {
-  $seo = Join-Path $PSScriptRoot 'claude_unlimited_seo_notify.ps1'
+  # 部署成功后通知 IndexNow / Bing / GSC（百度未配 token 会自动跳过）
+  $seo = Join-Path $PSScriptRoot 'seo_notify.ps1'
   if (Test-Path $seo) {
     pwsh -NoProfile -File $seo
   } else {
-    Write-Host 'Skip SEO notify: claude_unlimited_seo_notify.ps1 not found (not bundled in v1; copy from the reference project Product/scripts/marketing_seo_notify.ps1 when needed).'
+    Write-Host 'Skip SEO notify: scripts/seo_notify.ps1 not found.'
   }
 }

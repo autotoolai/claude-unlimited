@@ -1,46 +1,82 @@
-/* 按钮（从 custom.css 拆出，改这个文件而不是 custom.css） */
+/* 按钮：两种基型（墨底实心 / 描边幽灵），三档尺寸。静息无阴影，hover 上浮并投影，按下有轻微缩放。 */
+
 .cu-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  min-height: 48px;
-  padding: 0.8rem 1.4rem;
-  border-radius: 999px;
+  min-height: 44px;
+  padding: 0.7rem 1.35rem;
+  border-radius: var(--cu-r-sm);
   font-family: var(--cu-sans);
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 0.95rem;
+  font-weight: 600;
   text-decoration: none;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+  transition: transform 0.3s var(--cu-ease), box-shadow 0.3s var(--cu-ease), background-color 0.25s var(--cu-ease),
+    color 0.25s var(--cu-ease), border-color 0.25s var(--cu-ease);
 }
 
 .cu-btn:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.cu-btn:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 0.12s;
 }
 
 .cu-btn--sm {
-  min-height: 44px;
-  padding: 0.45rem 1.1rem;
-  font-size: 0.9rem;
+  min-height: 38px;
+  padding: 0.4rem 0.95rem;
+  font-size: 0.88rem;
+  border-radius: var(--cu-r-sm);
 }
 
 .cu-btn--md {
-  min-height: 48px;
+  min-height: 44px;
 }
 
 .cu-btn--lg {
-  min-height: 56px;
-  padding: 0.95rem 1.8rem;
-  font-size: 1.08rem;
+  min-height: 54px;
+  padding: 0.875rem 1.75rem;
+  font-size: 1rem;
+  border-radius: var(--cu-r-md);
 }
 
-/* 「和按量计费的差别」三条：左橙线引用块，与信任背书区分 */
+/* 主按钮：墨底，不是橙底。橙色留给文字强调，实心按钮统一用墨色，页面里只有一个视觉重心 */
+.cu-btn--primary,
+.cu-btn--solid {
+  background: var(--cu-ink);
+  color: var(--cu-bg) !important;
+}
+
+.cu-btn--primary:hover,
+.cu-btn--solid:hover {
+  box-shadow: var(--cu-shadow-lift);
+  opacity: 0.92;
+}
+
+.cu-btn--ghost {
+  background: var(--cu-card);
+  color: var(--cu-ink) !important;
+  border-color: var(--cu-line);
+}
+
+.cu-btn--ghost:hover {
+  border-color: var(--cu-line-strong);
+  background: var(--cu-card-hover);
+}
+
+/* 「和按量计费的差别」引用块 */
 .cu-compare {
   margin: 1.25rem 0;
   padding: 0.1rem 1.25rem;
-  border-left: 3px solid var(--cu-accent);
+  border-left: 2px solid var(--cu-line-strong);
+  background: var(--cu-bg-soft);
+  border-radius: 0 var(--cu-r-md) var(--cu-r-md) 0;
 }
 
 .cu-compare p {
@@ -60,40 +96,10 @@
   margin-bottom: 0.85rem;
 }
 
-.cu-btn--primary {
-  background: var(--cu-accent);
-  color: #fff6ec !important;
-  box-shadow: 0 10px 24px rgba(200, 90, 30, 0.28);
-}
-
-.cu-btn--primary:hover {
-  background: var(--cu-accent-deep);
-}
-
-.cu-btn--ghost {
-  background: transparent;
-  color: var(--cu-ink) !important;
-  border-color: var(--cu-line-strong);
-}
-
-.cu-btn--ghost:hover {
-  border-color: var(--cu-accent);
-  color: var(--cu-accent-deep) !important;
-  background: var(--cu-accent-soft);
-}
-
-.cu-btn__price {
-  font-size: 0.8em;
-  font-weight: 600;
-  opacity: 0.9;
-  padding-left: 0.55rem;
-  border-left: 1px solid rgba(255, 246, 236, 0.4);
-}
-
 @media (max-width: 560px) {
-  /* 居中排列的 CTA 行（底部横条）按钮保持自身宽度并排，全宽会显得松散 */
+  /* 居中排列的 CTA 行（Hero、底部 CTA 条）按钮保持自身宽度并排，全宽会显得松散；
+     靠左排列的（如教程小节内的次级按钮组）才全宽 */
   .cu-cta-row:not(.cu-cta-row--center) .cu-btn {
     width: 100%;
   }
 }
-

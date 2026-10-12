@@ -16,7 +16,7 @@ withDefaults(
       <div class="cu-step__body">
         <h3>{{ s.title }}</h3>
         <p>{{ s.desc }}</p>
-        <pre v-if="s.code" class="cu-step__code"><code>{{ s.code }}</code></pre>
+        <pre v-if="s.code" class="cu-step__code cu-scroll-none"><code>{{ s.code }}</code></pre>
       </div>
     </li>
   </ol>

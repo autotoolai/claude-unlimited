@@ -6,26 +6,27 @@
 }
 
 .cu-foot {
-  margin-top: 3rem;
-  border-top: 2px solid var(--cu-ink);
-  background: var(--cu-card);
+  margin-top: 4rem;
+  border-top: 1px solid var(--cu-line);
+  background: var(--cu-bg-soft);
 }
 .cu-foot__inner {
-  width: min(1160px, 100% - 2.5rem);
+  width: min(var(--cu-wrap), 100% - 3rem);
   margin-inline: auto;
-  padding: 2rem 0 2.5rem;
+  padding: 3rem 0 2.75rem;
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
-  gap: 2rem;
+  grid-template-columns: 1.4fr repeat(4, 1fr);
+  gap: 2.5rem 2rem;
 }
 .cu-foot__brand p {
-  margin: 0.7rem 0 0;
-  font-size: 0.85rem;
-  line-height: 1.8;
+  margin: 0.8rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.85;
   color: var(--cu-muted);
-  max-width: 34ch;
+  max-width: 36ch;
 }
-.cu-foot h4 {
+.cu-foot h4,
+.cu-foot__h {
   margin: 0 0 0.6rem;
   font-size: 0.74rem;
   letter-spacing: 0.14em;
@@ -45,16 +46,16 @@
   color: var(--cu-ink-2);
   text-decoration: none;
   font-size: 0.9rem;
+  transition: color 0.2s var(--cu-ease);
 }
 .cu-foot a:hover {
   color: var(--cu-accent-deep);
-  text-decoration: underline;
 }
 .cu-foot__bottom {
   border-top: 1px solid var(--cu-line);
 }
 .cu-foot__bottom > div {
-  width: min(1160px, 100% - 2.5rem);
+  width: min(var(--cu-wrap), 100% - 3rem);
   margin-inline: auto;
   padding: 0.9rem 0 1.5rem;
   display: flex;
@@ -65,16 +66,27 @@
   line-height: 1.7;
 }
 
+@media (max-width: 1000px) {
+  .cu-foot__inner {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 720px) {
+  .cu-foot__inner,
+  .cu-foot__bottom > div {
+    width: min(1160px, 100% - 2rem);
+  }
   .cu-foot__inner {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+    padding: 2.25rem 0 2rem;
   }
 }
 
 .cu-steps-block {
   margin: 2.5rem 0;
-  border-top: 2px solid var(--cu-ink);
+  border-top: 1px solid var(--cu-line);
   border-bottom: 1px solid var(--cu-line);
 }
 
@@ -99,7 +111,7 @@
   line-height: 1;
   font-weight: 700;
   color: var(--cu-accent);
-  border-right: 1px solid var(--cu-line-strong);
+  border-right: 1px solid var(--cu-line);
   padding-top: 0.1rem;
 }
 
@@ -121,9 +133,10 @@
 
 .cu-step-block__do {
   margin: 0.85rem 0 0;
-  padding: 0.7rem 0.9rem;
-  border-left: 3px solid var(--cu-accent);
-  background: var(--cu-accent-soft);
+  padding: 0.8rem 1rem;
+  border-left: 3px solid var(--cu-accent-line);
+  background: var(--cu-bg-soft);
+  border-radius: 0 var(--cu-r-sm) var(--cu-r-sm) 0;
   font-size: 0.9rem;
   line-height: 1.8;
   color: var(--cu-ink-2);
@@ -131,10 +144,10 @@
 .cu-step-block__do-label {
   display: inline-block;
   margin-right: 0.5rem;
-  padding: 0.05rem 0.4rem;
-  border-radius: 3px;
-  background: var(--cu-accent);
-  color: #fff6ec;
+  padding: 0.05rem 0.45rem;
+  border-radius: 5px;
+  background: var(--cu-contrast);
+  color: var(--cu-contrast-fg);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -164,8 +177,9 @@
   width: 100%;
   height: auto;
   border: 1px solid var(--cu-figure-frame);
-  border-radius: 2px;
-  background: var(--cu-card);
+  border-radius: var(--cu-r-sm);
+  background: var(--cu-card-solid);
+  box-shadow: var(--cu-shadow-soft, 0 8px 24px rgba(0, 0, 0, 0.08));
 }
 .cu-shot figcaption {
   margin-top: 0.45rem;
@@ -183,8 +197,8 @@
 
 .cu-term {
   margin: 1rem 0;
-  border: 1px solid var(--cu-line-strong);
-  border-radius: 4px;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-sm);
   background: var(--cu-code-bg);
   overflow: hidden;
 }
@@ -208,7 +222,11 @@
 .cu-term__bar i:first-child {
   background: var(--cu-accent);
 }
-.cu-term pre {
+
+.cu-term__bar i:nth-child(2) {
+  background: color-mix(in srgb, var(--cu-muted) 60%, transparent);
+}
+.cu-term pre.cu-scroll-none {
   margin: 0;
   padding: 0.75rem 0.9rem;
   overflow-x: auto;
@@ -230,16 +248,21 @@
 }
 .cu-next a {
   display: block;
-  padding: 0.9rem 1rem;
+  padding: 1rem 1.1rem;
   border: 1px solid var(--cu-line);
-  border-radius: 4px;
+  border-radius: var(--cu-r-md);
+  background: var(--cu-card);
   text-decoration: none;
   color: var(--cu-ink-2);
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: transform var(--cu-dur) var(--cu-ease), box-shadow var(--cu-dur) var(--cu-ease),
+    border-color 0.3s var(--cu-ease), background-color 0.3s var(--cu-ease);
 }
 .cu-next a:hover {
-  border-color: var(--cu-accent);
-  background: var(--cu-accent-soft);
+  transform: translateY(-3px);
+  border-color: var(--cu-line-strong);
+  background: var(--cu-card-hover);
+  box-shadow: var(--cu-shadow-lift);
+  text-decoration: none;
 }
 .cu-next small {
   display: block;
@@ -262,190 +285,7 @@
   color: var(--cu-muted);
 }
 
-.cu-human {
-  position: fixed;
-  bottom: 1.25rem;
-  right: 1.25rem;
-  z-index: 45;
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: flex-end;
-  gap: 0.6rem;
-}
-
-.cu-human__fab {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  min-height: 46px;
-  padding: 0.6rem 1.05rem;
-  border: 1px solid var(--cu-line-strong);
-  border-radius: 3px;
-  background: var(--cu-card);
-  color: var(--cu-ink);
-  font-family: var(--cu-sans);
-  font-weight: 700;
-  font-size: 0.9rem;
-  cursor: pointer;
-  box-shadow: var(--cu-shadow-soft);
-  transition: transform 0.16s ease, border-color 0.16s ease;
-}
-.cu-human__fab:hover {
-  transform: translateY(-1px);
-  border-color: var(--cu-accent);
-}
-.cu-human__fab svg {
-  color: #1aad19;
-}
-
-.cu-human__panel {
-  width: 300px;
-  max-width: calc(100vw - 2.5rem);
-  border: 1px solid var(--cu-line-strong);
-  border-radius: 4px;
-  background: var(--cu-card);
-  box-shadow: var(--cu-shadow);
-  overflow: hidden;
-}
-.cu-human__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.7rem 0.85rem;
-  border-bottom: 1px solid var(--cu-line);
-}
-.cu-human__head strong {
-  font-size: 0.95rem;
-  color: var(--cu-ink);
-}
-.cu-human__head small {
-  display: block;
-  font-size: 0.75rem;
-  color: var(--cu-muted);
-}
-.cu-human__close {
-  border: none;
-  background: none;
-  font-size: 1.25rem;
-  line-height: 1;
-  color: var(--cu-muted);
-  cursor: pointer;
-  padding: 0.2rem 0.35rem;
-}
-.cu-human__close:hover {
-  color: var(--cu-ink);
-}
-
-.cu-human__body {
-  padding: 0.9rem 0.85rem 1rem;
-  text-align: center;
-}
-.cu-human__qr {
-  width: 200px;
-  height: 200px;
-  margin: 0 auto 0.7rem;
-  border: 1px solid var(--cu-line);
-  border-radius: 2px;
-  background: #fff;
-  object-fit: contain;
-  padding: 6px;
-}
-.cu-human__qr--empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  background: var(--cu-code-bg);
-  color: var(--cu-muted);
-  font-size: 0.82rem;
-  line-height: 1.7;
-  text-align: center;
-  white-space: pre-line;
-}
-.cu-human__name {
-  margin: 0 0 0.15rem;
-  font-weight: 700;
-  color: var(--cu-ink);
-}
-.cu-human__copy {
-  margin-left: 0.4rem;
-  padding: 0.1rem 0.45rem;
-  border: 1px solid var(--cu-line);
-  border-radius: 3px;
-  background: var(--cu-accent-soft);
-  color: var(--cu-accent-deep);
-  font-size: 0.75rem;
-  cursor: pointer;
-}
-.cu-human__copy:hover {
-  border-color: var(--cu-accent);
-}
-.cu-human__hint {
-  margin: 0 0 0.75rem;
-  font-size: 0.78rem;
-  line-height: 1.7;
-  color: var(--cu-muted);
-}
-.cu-human__link {
-  color: var(--cu-accent-deep);
-  font-weight: 600;
-  text-decoration: none;
-}
-.cu-human__link:hover {
-  text-decoration: underline;
-}
-.cu-human__acts {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-.cu-human__acts .cu-btn {
-  flex: 1;
-}
-
-/* 桌面：人工客服在右下，助手浮标横向排到它左边（此前两者完全重叠，点不到助手） */
-@media (min-width: 721px) {
-  .cu-kefu--right {
-    right: 16.75rem;
-  }
-  .cu-kefu--left {
-    left: 1.25rem;
-  }
-}
-
 @media (max-width: 720px) {
-  .cu-human {
-    right: 0.75rem;
-    bottom: 0.75rem;
-    flex-direction: row-reverse;
-    align-items: center;
-  }
-  .cu-human__panel {
-    position: fixed;
-    left: 0.75rem;
-    right: 0.75rem;
-    bottom: 5.75rem;
-    width: auto;
-    max-width: none;
-  }
-  .cu-human__fab span {
-    display: none;
-  }
-  .cu-human__fab {
-    width: 50px;
-    height: 50px;
-    padding: 0;
-    justify-content: center;
-  }
-  .cu-kefu {
-    bottom: 0.75rem;
-    right: 0.75rem;
-  }
-  .cu-kefu--right {
-    right: 4.25rem;
-  }
   .cu-step-block {
     grid-template-columns: 2.25rem minmax(0, 1fr);
     gap: 0 0.85rem;
@@ -453,4 +293,13 @@
   .cu-step-block__no {
     font-size: 1.5rem;
   }
+}
+
+/* 教程三大步的步骤标签：H2 下方的短行（如「第一步 · 购买激活码」） */
+.cu-step-kicker {
+  margin: -0.5rem 0 0.9rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--cu-accent);
 }

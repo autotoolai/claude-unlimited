@@ -1,15 +1,31 @@
 <script setup lang="ts">
-/** 套餐定价页：包含什么 / 不包含什么 / 公平使用具体数字 / 退款规则 / 关于价格 / 购买与限速 FAQ。 */
+/**
+ * 套餐定价页（决策页）：回答「多少钱、买的是什么、边界在哪」。
+ * 2026-10-11 精简版：暂时只展示无限额度卡，分组切换胶囊（周期卡 / 额度卡）与
+ * 「购买后怎么用 / 包含什么 / 不包含什么 / 公平使用 / 和按量计费差在哪 / 关于价格」已下线，
+ * 等这两类卡真实定价上线后再按需恢复。
+ * 同日再次精简：价格同步说明、跳转提示、「退款规则」整节一并下线，页面只留档位网格与常见问题。
+ * 同日第三次精简：「购买与支付」FAQ 分类整体下线，本页 FAQ 只保留「限速与封号」。
+ * 首屏不再重复「选择套餐」小标题，套餐要点全部收进 lead，网格直接接在说明之后。
+ * 2026-10-12 曾在档位网格与 FAQ 之间插入 UnlimitedValue 区块（结论两条 + 用法场景 + 免责），
+ * 同日按页面精简决定撤回：本页只回答「有哪些档位、多少钱、点了买什么」，其余疑虑一律去 /faq 查。
+ * 页内不再挂 FAQ 组件——限速、429、封号规则都在 /faq 的「限速与封号」分类里，只有一份维护。
+ * 价格与额度全部来自 config/plans.ts。
+ */
 import PageShell from './components/PageShell.vue'
 import JsonLd from './components/JsonLd.vue'
-import PricingCard from './components/PricingCard.vue'
-import CtaBand from './components/CtaBand.vue'
-import FaqList from './components/FaqList.vue'
-import { faqByCategory } from '../../config/faq'
-import { jsonLdPricing, product, siteConfig } from './pages/data'
+import PlanGrid from './components/PlanGrid.vue'
+import { modelIds, recommendedIds } from '../../config/models'
+import { jsonLdPricing, siteConfig } from './pages/data'
 
-const purchaseFaq = faqByCategory('purchase')
-const limitsFaq = faqByCategory('limits')
+/**
+ * 档位名从 config/models.ts 派生：文案里不再手写模型名单。
+ * 手写过一次就会随上游更新漂移（曾出现 pricing 页写「Sonnet、Haiku」而商品实际只有 Fable 与 Opus）。
+ *
+ * 只取 recommendedIds（pick=primary）而不是全量 modelIds：模型广场会列出网关实际可用的全部档位，
+ * 但商品详情只承诺 Fable 5.1 与 Opus 5.5。定价页是下单页，列全量属于过度承诺。
+ */
+const tierNames = modelIds.filter((m) => recommendedIds.includes(m.id)).map((m) => m.tier).join('、')
 </script>
 
 <template>
@@ -18,74 +34,9 @@ const limitsFaq = faqByCategory('limits')
   <PageShell
     slug="pricing"
     title="套餐定价"
-    lead="Claude 无限卡只有一种套餐：订阅期内不按 token 计费，Opus / Sonnet / Haiku / Fable 都在同一订阅价内。"
+    :lead="`付一次钱，在有效期内想用多少用多少：${tierNames} 全部可用，不按 token 计费，也不自动续费。`"
   >
-    <PricingCard :product="product" note="最终价格与库存以下单页为准" cta="pricing_main" />
+    <PlanGrid group-id="unlimited" :show-group-head="false" />
 
-    <h2 id="includes">包含什么</h2>
-    <ul>
-      <li>订阅期内全部 Claude 模型调用，不按 token 单独计费；</li>
-      <li>Claude Code、Cursor、Cline、Roo Code、Aider、Continue、Zed、JetBrains、VS Code，以及官方 Python / TypeScript / Go SDK；</li>
-      <li>Anthropic API 的主要能力：流式响应、工具调用、扩展思考、视觉输入、PDF 处理、200k 长上下文；</li>
-      <li>Anthropic 兼容端点 + OpenAI 兼容端点（/v1/chat/completions）；</li>
-      <li>Anthropic 发布新模型后自动提供新 model identifier，Key 不需要重新购买。</li>
-    </ul>
-
-    <h2 id="excludes">不包含什么</h2>
-    <p>写清楚边界比包装更重要，以下情况不在套餐范围内：</p>
-    <div class="cu-table-wrap">
-      <table class="cu-table cu-table--plain">
-        <thead>
-          <tr><th scope="col">情况</th><th scope="col">说明</th></tr>
-        </thead>
-        <tbody>
-          <tr><th scope="row">生产环境流量</th><td>套餐面向个人开发。上线服务、多用户共享、对外 API 属于生产流量，不在范围内</td></tr>
-          <tr><th scope="row">超并发压测</th><td>超过公平使用速率限制（默认 20 并发、60 次/分钟）的压测、扫描、批量抓取</td></tr>
-          <tr><th scope="row">二次转卖</th><td>转卖、二次分发 Key，或将 Key 共享给多个用户</td></tr>
-          <tr><th scope="row">Anthropic 官方服务</th><td>本卡不提供 claude.ai 网页版、Claude Desktop 等官方产品的订阅权益</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h2 id="fair-use">公平使用：具体数字</h2>
-    <p>限速与并发限制是为了保证所有用户稳定访问，不是隐藏的收费阈值。默认值：</p>
-    <div class="cu-table-wrap">
-      <table class="cu-table cu-table--plain">
-        <thead>
-          <tr><th scope="col">指标</th><th scope="col">默认值</th><th scope="col">说明</th></tr>
-        </thead>
-        <tbody>
-          <tr><th scope="row">单 Key 并发</th><td>20 路</td><td>可按需申请提升</td></tr>
-          <tr><th scope="row">请求速率</th><td>60 次/分钟</td><td>429 时会返回 Retry-After</td></tr>
-          <tr><th scope="row">Token 吞吐</th><td>300k token/分钟</td><td>按所有请求合计计算</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p>这些数值对编码、调试、代码审查、文档生成、agent 多步执行等正常个人开发场景通常不构成障碍。触发限速后会等待自动恢复，不额外扣费。数字调整时会公告，完整条款见<a href="/faq#cat-limits">常见问题</a>页的「限速与封号」分类。</p>
-
-    <h2 id="refund">退款规则</h2>
-    <p>可以退，但仅限以下情形，需在购买后 <strong>7 个自然日内</strong>提出并提供订单号与卡密尾号：</p>
-    <ol>
-      <li>卡密未激活、无法兑换；</li>
-      <li>兑换后因网关故障导致服务连续不可用超过 24 小时；</li>
-      <li>实际提供的模型或能力与本页描述明显不符。</li>
-    </ol>
-    <p>已激活并正常使用的卡密、以及买多买少这类个人使用习惯，不支持无理由退款。审核结果 3 个工作日内通过你留下的联系方式反馈。</p>
-
-    <h2 id="about-price">关于价格</h2>
-    <ul>
-      <li>本站不处理支付，下单在第三方发卡站完成，<strong>最终价格与库存以下单页为准</strong>；</li>
-      <li>支付成功后分钟级自动发货卡密，不排队、不人工审核；</li>
-      <li>有效期从支付成功起算 {{ product.days }} 天，到期后访问权限结束，<strong>不自动续费</strong>；</li>
-      <li>企业用户需要发票或签合同，请在购买前联系客服确认后再下单。</li>
-    </ul>
-
-    <h2 id="faq">购买与限速相关常见问题</h2>
-    <FaqList :items="purchaseFaq" :default-open="2" />
-    <FaqList :items="limitsFaq" />
-
-    <CtaBand title="看价格不如先看懂无限额度怎么算" />
-
-    <div class="cu-notice">{{ siteConfig.disclaimer }}</div>
   </PageShell>
 </template>

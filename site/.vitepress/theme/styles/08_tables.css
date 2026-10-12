@@ -1,9 +1,9 @@
-/* 表格（从 custom.css 拆出，改这个文件而不是 custom.css） */
-.cu-table-wrap {
+/* 表格：卡片式外框（比底深一档），表头用背景色块而非橙底，行 hover 浅底 */
+.cu-table-wrap.cu-scroll-none {
   overflow-x: auto;
-  margin: 1.25rem 0;
-  border: 1px solid var(--cu-line-strong);
-  border-radius: 6px;
+  margin: 1.5rem 0;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-lg);
   background: var(--cu-card);
 }
 
@@ -31,14 +31,21 @@
   vertical-align: top;
   line-height: 1.7;
   color: var(--cu-ink-2);
+  transition: background-color 0.25s var(--cu-ease);
+}
+
+.cu-table tbody tr:hover td,
+.cu-table tbody tr:hover th {
+  background: var(--cu-card-hover);
 }
 
 .cu-table thead th {
   border-top: none;
-  background: var(--cu-accent-soft);
+  background: var(--cu-bg-soft);
   font-weight: 700;
   color: var(--cu-ink);
-  font-size: 0.9rem;
+  font-size: 0.86rem;
+  letter-spacing: 0.02em;
 }
 
 .cu-table__label {
@@ -61,4 +68,3 @@
 .cu-table--plain tbody th {
   width: 22%;
 }
-

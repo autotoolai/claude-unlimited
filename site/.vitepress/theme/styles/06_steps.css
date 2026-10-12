@@ -1,43 +1,60 @@
-/* 步骤条（从 custom.css 拆出，改这个文件而不是 custom.css） */
+/* 步骤条：四步横排，序号圆点带连接线（用相邻项的伪元素画），hover 时序号高亮 */
 .cu-steps {
   list-style: none;
   margin: 1.5rem 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
+  gap: 1.1rem;
+  counter-reset: cu-step;
 }
 
 .cu-step {
   position: relative;
   display: flex;
   gap: 0.85rem;
-  padding: 1.25rem;
+  padding: 1.5rem 1.4rem;
   border: 1px solid var(--cu-line);
-  border-radius: 6px;
+  border-radius: var(--cu-r-lg);
   background: var(--cu-card);
+  transition: transform var(--cu-dur) var(--cu-ease), box-shadow var(--cu-dur) var(--cu-ease),
+    border-color 0.3s var(--cu-ease);
+}
+
+.cu-step:hover {
+  transform: translateY(-3px);
+  border-color: var(--cu-line-strong);
+  box-shadow: var(--cu-shadow-lift);
 }
 
 .cu-step__no {
   flex: none;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--cu-accent);
-  color: #fff6ec;
-  font-family: var(--cu-serif);
+  background: var(--cu-contrast);
+  color: var(--cu-contrast-fg);
+  font-family: var(--cu-mono);
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
+  transition: background-color 0.3s var(--cu-ease), color 0.3s var(--cu-ease), transform 0.3s var(--cu-ease);
+}
+
+.cu-step:hover .cu-step__no {
+  background: var(--cu-accent);
+  color: var(--cu-contrast-fg);
+  transform: scale(1.08);
 }
 
 .cu-step__body h3 {
-  margin: 0.35rem 0 0.35rem;
+  margin: 0.3rem 0 0.35rem;
   font-size: 1rem;
   font-weight: 700;
   color: var(--cu-ink);
+  line-height: 1.5;
 }
 
 .cu-step__body p {
@@ -47,12 +64,12 @@
   color: var(--cu-muted);
 }
 
-.cu-step__code {
+.cu-step__code.cu-scroll-none {
   margin: 0.75rem 0 0;
   padding: 0.7rem 0.8rem;
-  border-radius: 4px;
+  border-radius: var(--cu-r-sm);
   background: var(--cu-code-bg);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   line-height: 1.6;
   overflow-x: auto;
 }
@@ -74,4 +91,3 @@
     grid-template-columns: 1fr;
   }
 }
-

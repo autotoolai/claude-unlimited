@@ -1,5 +1,8 @@
 import { defineConfig } from 'vitepress'
+import type { HeadConfig } from 'vitepress'
 import { siteConfig } from '../config/site'
+import { knowledge } from '../config/knowledge'
+import { publicDirPlugin } from './theme/middleware'
 
 /**
  * 站点形态：营销页（首页 / 套餐定价 / 无限额度 / 常见问题）+ 教程页（使用教程总览 / 模型与切换 / 接入与模型 / CC Switch），
@@ -19,20 +22,49 @@ export default defineConfig({
    */
   transformHead({ page }) {
     const base = SITE_URL
-    const path = page.replace(/\.md$/, '').replace(/index$/, '')
+    let path = page.replace(/\.md$/, '').replace(/index$/, '')
+    // 目录总览页路由是 /guide、/knowledge（无尾斜杠，public/_redirects 把带斜杠的 301 过来）。
+    // 去掉 replace 后的尾斜杠，否则 transformHead 产出的 canonical / og:url 与 sitemap、导航、页脚不一致，
+    // 三套 URL 信号互相矛盾，搜索引擎会去收录实际返回 301 的那个地址。
+    path = path.replace(/\/$/, '')
     const url = base + (path ? '/' + path : '/')
-    const ogImage = `${base}/og/${path || 'home'}.png`
-    return [
+    const ogImage = `${base}/og/${(path || 'home').replace(/\//g, '_')}.png`
+    const head: HeadConfig = [
       ['link', { rel: 'canonical', href: url }],
       ['meta', { property: 'og:url', content: url }],
       ['meta', { property: 'og:image', content: ogImage }],
       ['meta', { name: 'twitter:image', content: ogImage }],
     ]
+    // 知识库文章页的 keywords：全站只有 head 里一条全局 keywords 的话，20 篇文章共用同一串词，
+    // 对中文 SEO 没有区分度。这里按路由从 config/knowledge.ts 反查该篇的 tags（列表页卡片已渲染这组词），
+    // 覆盖掉全局那条。tags 是人工维护的真实搜索词，不是堆砌。
+    // 长文页的目录折叠态：首帧就把 <html> 的类补上，避免 SSR 先铺开目录、挂载后再收起的跳动。
+    // 同步内联脚本，VitePress 渲染在 <head> 里，样式生效前执行；try/catch 兜住隐私模式下 localStorage 抛异常。
+    if (path === 'guide' || path === 'console' || path.startsWith('knowledge/')) {
+      head.push([
+        'script',
+        {},
+        'try{if(localStorage.getItem("cu-toc-collapsed")==="1"&&window.matchMedia("(min-width:1281px)").matches)document.documentElement.classList.add("cu-toc-collapsed")}catch(e){}',
+      ])
+    }
+    if (path.startsWith('knowledge/')) {
+      const slug = path.slice('knowledge/'.length)
+      const meta = knowledge.find((k) => k.slug === slug)
+      if (meta?.tags?.length) {
+        head.push(['meta', { name: 'keywords', content: meta.tags.join(',') }])
+      }
+    }
+    return head
   },
+
   title: siteConfig.name,
   titleTemplate,
   description: siteConfig.description,
   srcDir: 'docs',
+  // 知识库文章页在 components/KnowledgeDoc.vue 里用官方的 <Content /> 渲染 markdown 正文（layout: page）。
+  // VitePress 只对 themeDir（theme）里的组件解析内置主题别名 'vitepress'，页面组件目录在 srcDir 下不在其中，
+  // 直接 import { Content } from 'vitepress' 会在 SSR 阶段报 MODULE_NOT_FOUND（产物里正文整块不渲染）。
+  themePackages: [{ name: '@internal/theme-default', root: './.vitepress/theme' }],
   // srcDir 用子目录（而非 '.'）的原因：Vite 5 的依赖预构建在 srcDir='.' 时对顶层的 .md 路由走错分支，
   // 把 /index.md 当 html fallback 返回（text/html），浏览器按 module script 加载时 MIME 报错白屏。
   // 静态资源（favicon.svg / robots.txt / _headers / llms.txt / og/*.png）由 scripts/copy_public.mjs 复制进产物：
@@ -40,11 +72,32 @@ export default defineConfig({
   // resolveDir 接受，两种配置写法都拿不到 site/public。
   cleanUrls: false, // 产物用 /pricing.html、/guide/index.html；_redirects 把带尾斜杠的旧链接 301 到 .html
   lastUpdated: false,
-  srcExclude: ['README.md'],
+  // 内部文档不进产物：README 与知识库写作规范不该出现在 sitemap 与线上
+  // 内部文档：不进产物，因此也不进 sitemap（gen_sitemap 扫 dist）
+  srcExclude: ['README.md', 'knowledge_writing_guide.md', 'knowledge/SOP-写一篇新文章.md', 'content_structure.md', 'plans_sync.md'],
   ignoreDeadLinks: true,
   head: [
     ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
+    // 字体：正文 Inter（拉丁字形）+ 标题 Lora（拉丁衬线，中文回落到思源宋体/宋体）+ JetBrains Mono（代码与终端）。
+    // 只加载 latin 子集，中文不由网络字体承载，避免首屏被几百 KB 的 CJK 字体拖住。
+    ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
+    ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
+    [
+      'link',
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap',
+      },
+    ],
     ['meta', { name: 'theme-color', content: '#c85a1e' }],
+    // 站长平台验证 meta：content 从百度搜索资源平台 / Google Search Console 复制过来填上，
+    // 两处都不填时下面会整条跳过（VitePress 会把 content 为 undefined 的 meta 丢掉）。
+    // 百度搜索资源平台 -> 站点管理 -> 站点属性 -> 站长平台 -> HTML 标签验证；
+    // Google Search Console -> 设置 -> 网址前缀 -> HTML 标签验证。两处都填完再提交 sitemap.xml。
+    // 码值直接内联做兜底：vitepress 的 SSR 渲染跑在子进程里，process.env 在那一层拿不到 bash 里 set -a 导出的值，
+    // 只靠环境变量会出现「meta 偶尔凭空消失」。换码时改这里（或设同名环境变量覆盖）。
+    ['meta', { name: 'baidu-site-verification', content: process.env.BAIDU_VERIFY_CODE || 'fc6022a4ec1c7bb09bfa0e037e3f8496' }],
+    ...(process.env.GOOGLE_VERIFY_CODE ? [['meta', { name: 'google-site-verification', content: process.env.GOOGLE_VERIFY_CODE }]] : []),
     ['meta', { name: 'keywords', content: 'claude 无限额度,claude api 无限,claude 无限卡,claude code 国内,claude api 中转' }],
     ['meta', { property: 'og:site_name', content: siteConfig.name }],
     ['meta', { property: 'og:type', content: 'website' }],
@@ -75,14 +128,15 @@ export default defineConfig({
     imgCdn: '', // 二期接 R2 时填自定义域，如 https://img.example.com；留空则回落打包资源
     kefuPosition: 'right', // 移动端由 CSS 自动避让
     shopUrl: siteConfig.products[0]?.shopUrl ?? '',
-    // 人工客服浮标位置：'bottom-right' | 'bottom-left'；移动端一律并排底部（CSS 处理）
-    humanServicePosition: 'bottom-right' as const,
   } as any,
   markdown: {
     lineNumbers: false,
     theme: { light: 'github-light', dark: 'github-dark' },
   },
   vite: {
+    // dev 下把 site/public 吐出去：wechat-qr.jpg 这类新增静态文件在 dev 里要能直接访问。
+    // 生产不受影响（copy_public.mjs 在 build 时统一拷进 dist），这个插件只在 dev 的 configureServer 生效。
+    plugins: [publicDirPlugin()],
     /**
      * 开发期调试用：Vite 客户端把自身的 hmr 状态写进 globalThis.__HMR_INJECTED__ / __VP_HASH_MAP__ 等全局，
      * 生产构建里也会存在（VitePress 会注入 metadata 脚本）。这会让本页在 hydrate 时「服务端 HTML 与客户端
@@ -102,5 +156,9 @@ export default defineConfig({
       // 禁止把 WebP/SVG 内联成 data:（易导致裂图 / 超长属性）
       assetsInlineLimit: 0,
     },
-  },
+    // 诊断开关：CUP_HYDRATION_PROBE=1 npm run build 时打开 Vue 生产构建的 hydration 差异详情（打印不一致的元素与 vnode），
+    // 排查内容时用，平时留空。它会一并关掉 devtools，避免干扰控制台输出。
+    define: process.env.CUP_HYDRATION_PROBE
+      ? { __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'true', __VUE_PROD_DEVTOOLS__: 'false' }
+      : {},  },
 })
