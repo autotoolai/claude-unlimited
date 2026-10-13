@@ -26,7 +26,7 @@ export const consoleFeatures: ConsoleFeature[] = [
     mark: '提取',
     name: '提取 Key',
     what: '把激活码兑换成专属 API Key（sk- 开头），复制后填进 Claude Code、Cursor、CC Switch。Key 在首次发起 API 请求时自动激活。',
-    when: '拿到卡密后换 Key；Key 泄露或想换一把时重新提取。',
+    when: '拿到激活码后换 Key；Key 泄露或想换一把时重新提取。',
   },
   {
     mark: '详情',
@@ -93,9 +93,14 @@ export const consoleFaqs = [
     a: '后台「使用教程」页有实时连通性检测。主域名访问异常时切换到标记为「备用域名」的地址，API Key 无需更换。',
   },
   {
+    id: 'console-key-lost',
+    q: 'Key 忘了或页面刷新后找不到了？',
+    a: '激活码、已提取的 Key 和用量记录都保存在管理后台里。用同一把激活码回到「提取 Key」页面或「Key 详情」就能再看，不需要重新购买。建议第一次提取时就复制一份存进密码管理器。',
+  },
+  {
     id: 'console-refresh-key',
     q: 'Key 泄露了怎么办？',
-    a: '到「提取 Key」重新提取一把新的，旧的不再使用。提取次数与费用以发卡站商品说明为准。',
+    a: '到「提取 Key」用同一把激活码重新提取一把新的，旧的不再使用。提取次数与费用以发卡站商品说明为准。',
   },
   {
     id: 'console-infinite',

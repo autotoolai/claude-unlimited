@@ -37,11 +37,48 @@
 
 **处理**：`scripts/copy_public.mjs` 里已经没有删标记的逻辑。不要再加。「产物里不能有 SSR 标记」那条断言也曾让 `npm run build` 恒 exit 1，现已移除。
 
+### 源码里优先级更高的一条规则，浏览器却拿到低优先级那条的值
+
+**症状**：源码里明明写了 `padding-left: 0`（(0,1,0)）压过全局 `.cu-page ul, ol { padding-left: 1.25rem }`（(0,1,1)），
+dist 产物里那条规则文本也对，CSSOM 里 `document.styleSheets` 读出来也对，但 `getComputedStyle` 就是 20px。
+排查时用 CDP `CSS.getMatchedStylesForNode` 会看到同一元素匹配了四条 padding 规则，
+`.cu-page ul` 排在组件规则之后，样式表里同一条声明出现了两次（`padding-left:1.25rem` ×2）。
+
+**根因**：同一块里先写简写 `padding: 0` 再写 `padding-left: 0`。esbuild 把简写展开成长写法
+（`padding-top/right/bottom/left`）再追加 `padding-left: 0`，产物里就出现重复属性；
+页面 HTML 同时有 `<link rel="preload stylesheet">` 和 `<link rel="stylesheet">` 指向同一个文件，
+浏览器走的那条解析路径下重复属性不是「最后一个生效」，低优先级的规则赢了。写 `padding: 0; padding-left: 0` 永远不可靠。
+
+**处理**：清内缩只写单侧声明（`padding-top/right/bottom/left` 四条，不写 `padding: 0` 简写），
+或者把简写本身改掉（`padding: 0.45rem 0.85rem` 就别再补 `padding-left: 0`）。
+`npm run check:css`（`scripts/check_css_dup_props.mjs`）会拦住「简写 + 单侧混写」和同块重复声明。
+**教训**：样式问题先跑 `npm run check:css` 再看浏览器，别一上来就在 CDP 里挖。
+
 ### 生产构建每页一条 hydration mismatch 警告
 
 现状，已知可接受，原因见 `temp/hydration_mismatch.md`。dev 下不出现。
 
 ---
+
+### 坑：审计脚本量到的偏移数字随端口变（39 → 56 → 21 → 0）
+
+2026-10-13 改教程页块级提示样式时撞到。`node scripts/audit_guide_align.mjs` 报出来的偏移值在
+41777、41800 两个端口不一样，同一版代码一会儿过一会儿不过，改脚本改了好几轮都对不齐。
+
+原因：`firstCharLeft()` 原本用「中位字高」把 Range 的矩形分成文字矩形和整行矩形两类。字体回退后
+中文行盒与 li 行盒的高度常常只差 1px 以内，整行矩形被留在结果里，取最左就等于量到 li 的左缘。
+这个误差量多大取决于那一刻加载到的字体，于是换个端口（预构建的样式表命中系统字体回退、dev 下
+命中另一套）数字就变，看起来像自己的改动引起的。
+
+判断办法：**改 CSS 前后都跑一遍**，数字若与改动无关且随端口变，就是脚本的测量误差。
+探样式一定用 dev 端口 41800（`node temp/probe_*.mjs` 量计算值），不要信 vitepress preview——
+它进程启动时把 `/assets/*` 缓存在内存里，新构建的 hash 文件全部 404，页面不带样式，
+量到的根 token 全空，看着像「token 没生效」。产物要用静态服务直服 `dist/`（本次用的 41778）。
+`serve_dist.mjs` 不缓存 HTML 但 vitepress preview 缓存 assets，两回事。
+
+**Why**：把测量误差当成样式 bug，会一路去改本来正确的 CSS，越改越乱。
+**How to apply**：审计脚本报的偏移先和 git stash 后的基线比；两个端口都跑，数字不同就是脚本问题。
+正文列左边线用 `.cu-step-block__body` 盒子（grid 的 `minmax(0,1fr)` 那一列）当基准，不要用序号徽标。
 
 ## 二、类型检查
 

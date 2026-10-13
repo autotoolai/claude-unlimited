@@ -110,6 +110,27 @@
   font-weight: 600;
 }
 
+/* —— 形态分档（2026-10-13）：教程页与知识库文章页的目录密度分开 ——
+   档位由 <html class="cu-toc-variant-guide | cu-toc-variant-knowledge"> 表达
+   （SectionNav.vue 的 variant prop 挂上去，卸载时摘掉）。
+   <aside> 的静态 class 不动，check_dist.mjs:100/145 的精确匹配不受影响。
+
+   教程页（guide）：目录只有 h2、条目全展开，本来就短。三处压缩：
+   1) 顶部留白 3rem → 1.25rem。原来的 3rem 是为对齐 h1，但目录抓的是 h2、天然低一层，
+      这段空白纯属浪费，缩到 1.25rem 后目录顶与页内 kicker 齐平。
+   2) 阅读进度条隐藏（display:none）。教程只有两屏、滚动量很小，进度条没有信息量，
+      却白占一行（2px + 上下 margin ≈ 1rem）。
+   3) max-height 跟着放宽（原来还减 4.5rem，是为进度条留的位置）。
+   知识库（knowledge）：一切保持原样，走默认规则。 */
+html.cu-toc-variant-guide .cu-sidenav {
+  padding-top: 1.25rem;
+  max-height: calc(100dvh - var(--cu-nav-h) - 2.75rem);
+}
+
+html.cu-toc-variant-guide .cu-sidenav__progress {
+  display: none;
+}
+
 /* 三级项（教程页的「1.1 选套餐」等）：缩进 + 小一号，与 h2 级区分 */
 .cu-sidenav a.cu-sidenav__sub {
   padding-left: 1.6rem;
@@ -336,4 +357,101 @@
    SectionNav.vue 顶部注明 check_dist.mjs:48 精确匹配 `cu-sectionnav cu-sidenav`。 */
 .cu-shell__body--no-toc {
   grid-template-columns: minmax(0, 1fr);
+}
+
+/* —— 教程页轨选择器（.cu-grails，GuideRails.vue，2026-10-13）——
+   贴 h1 + lead 正下方、正文块之前的通栏分栏切换，取代原来渲染在正文中间的 SegmentedTabs 裸胶囊。
+   形态：两列大块等分。当前轨 --cu-contrast 反白（墨色底 + 米白字），未选轨只留描边 + 弱化文字，
+   全程不引入彩色，与全站无彩墨色体系一致。
+   断点：窄屏（≤640px）从两列塌成单列竖排，两轨各占一行，触控目标不至于太窄。 */
+.cu-grails {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0 0 2.25rem;
+}
+
+.cu-grails__item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  padding: 0.95rem 1.1rem 0.9rem;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-sm);
+  background: var(--cu-card);
+  color: var(--cu-ink-2);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--cu-dur) var(--cu-ease), border-color var(--cu-dur) var(--cu-ease),
+    color var(--cu-dur) var(--cu-ease);
+}
+
+.cu-grails__item:hover {
+  border-color: var(--cu-line-strong);
+  color: var(--cu-ink);
+}
+
+/* 选中态：左侧 2px 墨色竖条 + 加深底 + 墨色文字，与左侧目录当前项（.cu-sidenav a.is-active）
+   同一套语言。刻意不用 --cu-contrast 反白：轨名是 <strong>，而 01_shell.css 的 `.cu-page strong`
+   给全页 strong 钉了 `color: var(--cu-ink)`，反白底上墨色字 = 看不见（深色模式下反白底是浅色、
+   墨字也是深色，轨名直接消失）。竖条 + 深字这套不依赖任何反白对比，浅深色都稳。 */
+.cu-grails__item.is-active {
+  background: var(--cu-accent-soft);
+  border-color: var(--cu-line-strong);
+  border-left: 2px solid var(--cu-accent);
+  padding-left: calc(1.1rem - 1px);
+  color: var(--cu-ink);
+}
+
+.cu-grails__item:focus-visible {
+  outline: 2px solid var(--cu-ink);
+  outline-offset: 2px;
+}
+
+.cu-grails__name {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.cu-grails__desc {
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--cu-muted);
+}
+
+.cu-grails__meta {
+  margin-top: 0.15rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: var(--cu-r-pill);
+  background: var(--cu-bg-soft);
+  color: var(--cu-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* 选中态下轨名仍被 `.cu-page strong` 钉成 --cu-ink，这里显式重申一次（选择器更近，不依赖顺序）；
+   说明句与徽标从 muted 提到 ink-2，避免选中轨整块发灰。 */
+.cu-grails__item.is-active .cu-grails__name {
+  color: var(--cu-ink);
+}
+
+.cu-grails__item.is-active .cu-grails__desc {
+  color: var(--cu-ink-2);
+}
+
+.cu-grails__item.is-active .cu-grails__meta {
+  background: var(--cu-card);
+  border: 1px solid var(--cu-line-strong);
+  color: var(--cu-ink-2);
+}
+
+@media (max-width: 640px) {
+  .cu-grails {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

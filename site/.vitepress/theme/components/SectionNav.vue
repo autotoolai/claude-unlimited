@@ -22,7 +22,29 @@ export interface TocItem {
   group?: string
 }
 
-const props = defineProps<{ sections: TocItem[] }>()
+const props = defineProps<{
+  sections: TocItem[]
+  /**
+   * 目录形态档位（2026-10-13 拆开，两页各走各的，不再共用一套密度）：
+   * - 'guide'（默认）：教程页。只列 h2，且顶部留白压到 1.25rem、不画阅读进度条 ——
+   *   教程只有两屏，进度条没有信息量，却吃掉一行；条目全展开时高度也已经够紧凑。
+   * - 'knowledge'：知识库文章页。保持原样（3rem 顶部留白 + 阅读进度条），目录长、需要进度感。
+   *
+   * 形态差异靠 <html> 上的类表达（见下方 useTocShell），不用 :class 动 <aside> ——
+   * check_dist.mjs:100/145 精确匹配 `class="cu-sectionnav cu-sidenav"` 这段字面量。
+   */
+  variant?: 'guide' | 'knowledge'
+}>()
+
+/** 形态标记挂到 <html>：CSS 用 html.cu-toc-variant-guide / html.cu-toc-variant-knowledge 覆盖，
+ *  <aside> 的静态 class 不动。切路由时在 onUnmounted 摘掉，避免上一站的档位残留到下一站。 */
+const variant = props.variant || 'guide'
+function applyVariant() {
+  document.documentElement.classList.add('cu-toc-variant-' + variant)
+}
+function clearVariant() {
+  document.documentElement.classList.remove('cu-toc-variant-' + variant)
+}
 
 const active = ref(props.sections[0]?.id || '')
 /* 窄屏抽屉：≤1080px 时目录不再是正文上方的横排标签条（21 个条目会把正文整体推近 300px），
@@ -49,9 +71,13 @@ function onDrawerKey(e: KeyboardEvent) {
   if (e.key === 'Escape') closeDrawer()
 }
 
-onMounted(() => window.addEventListener('keydown', onDrawerKey))
+onMounted(() => {
+  applyVariant()
+  window.addEventListener('keydown', onDrawerKey)
+})
 onUnmounted(() => {
   window.removeEventListener('keydown', onDrawerKey)
+  clearVariant()
   document.documentElement.style.overflow = ''
 })
 const { collapsed, toggleToc } = useTocCollapse()

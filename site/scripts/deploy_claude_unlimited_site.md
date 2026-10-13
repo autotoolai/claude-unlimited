@@ -28,7 +28,7 @@ pwsh -File scripts/deploy_claude_unlimited_site.ps1 -Branch preview -SkipNotify
 1. 检查 `CLOUDFLARE_API_TOKEN`，缺则直接抛错。
 2. `npm run build`：VitePress 构建 → `gen_sitemap.ts` 生成 sitemap → `copy_public.mjs` 复制 `public/` 并清理 SSR 注释标记 → `check_dist.mjs` 结构门禁（外壳齐全、外壳内 H1 唯一、目录锚点全部命中、无未渲染模板）。任一步失败即中止，不部署。
 3. `wrangler@4 pages deploy .vitepress/dist --project-name=claude-unlimited-site --branch=master --commit-dirty=true`。
-4. 打印线上地址；若存在 `claude_unlimited_seo_notify.ps1` 则调用（首版未内置，脚本会提示跳过）。
+4. 打印线上地址；若存在 `seo_notify.ps1` 则调用（首版未内置，脚本会提示跳过）。
 
 ## Pages 项目
 

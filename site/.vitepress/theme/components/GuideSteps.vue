@@ -40,7 +40,7 @@ function shots(s: GuideStep) {
         <ul v-if="s.action?.length" class="cu-step-block__action">
           <li v-for="(a, j) in s.action" :key="j" v-html="renderInline(a)" />
         </ul>
-        <GuideUrl v-if="s.link" :url="s.link.href" :path="s.link.path" :label="s.link.label" :copy="s.link.copy" />
+        <GuideUrl v-if="s.link" :url="s.link.href" :path="s.link.path" :label="s.link.label" />
         <div v-if="s.cta?.length" class="cu-cta-row">
           <a
             v-for="(l, i) in s.cta"

@@ -25,40 +25,73 @@
   text-align: center;
 }
 
-/* 教程网址行：明文网址 + 复制 + 打开（09_figures.css 末尾，紧邻截图样式） */
-.cu-urlrow {
+/* 教程外链卡（GuideUrl）：整块可点的链接，不再带复制胶囊。
+   结构 = 左侧墨色方标 + 文字块（名称 + 等宽网址），hover 时方标实心、底色转浅、箭头微移。
+   padding 不用简写：.cu-page ul, ol 的 padding-left: 1.25rem 会把简写展开成长写法再覆盖，
+   产物里产生重复属性（见 check_css_dup_props.mjs）。 */
+.cu-linkbox {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
-  margin: 0.75rem 0;
-  padding: 0.45rem 0.5rem 0.45rem 0.85rem;
+  gap: 0.7rem;
+  margin: 0.9rem 0;
+  padding-top: 0.6rem;
+  padding-right: 0.7rem;
+  padding-bottom: 0.6rem;
+  padding-left: 0.6rem;
   border: 1px solid var(--cu-line);
   border-radius: var(--cu-r-sm);
   background: var(--cu-card-solid);
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.cu-urlrow__url {
-  font-family: var(--cu-mono);
-  font-size: 0.9rem;
+.cu-linkbox:hover {
+  border-color: var(--cu-line-strong);
+  background: var(--cu-bg-soft);
+}
+
+.cu-linkbox__mark {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--cu-accent-line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--cu-ink-2);
+  font-size: 0.8rem;
+  line-height: 1;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.cu-linkbox:hover .cu-linkbox__mark {
+  background: var(--cu-contrast);
+  border-color: var(--cu-contrast);
+  color: var(--cu-contrast-fg);
+}
+
+.cu-linkbox__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.cu-linkbox__label {
+  font-size: 0.85rem;
+  font-weight: 600;
   color: var(--cu-ink);
-  text-decoration: none;
-  border-bottom: 1px dashed var(--cu-line-strong);
+}
+
+.cu-linkbox__url {
+  font-family: var(--cu-mono);
+  font-size: 0.78rem;
+  color: var(--cu-muted);
   word-break: break-all;
 }
 
-.cu-urlrow__url:hover {
-  border-bottom-color: var(--cu-ink);
-}
-
-.cu-urlrow__open {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--cu-muted);
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.cu-urlrow__open:hover {
-  color: var(--cu-ink);
+.cu-linkbox:hover .cu-linkbox__url {
+  color: var(--cu-ink-2);
 }

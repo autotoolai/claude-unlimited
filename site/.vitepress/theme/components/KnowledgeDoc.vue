@@ -45,6 +45,13 @@ const sections = ref<{ id: string; label: string }[]>([])
  * （如果作者写了）连同折叠卡片一起搬进这个 section；页内目录对应项由 readHeadings() 读这个 section。
  */
 const faqItems = computed(() => article.value?.faq ?? [])
+
+/** 「更新于 YYYY-MM-DD」，仅当 updated 与 date 不同才出现。没改过就不显示，避免暗示全部都是新内容。 */
+const updatedLabel = computed(() => {
+  const a = article.value
+  if (!a || !a.updated || a.updated === a.date) return ''
+  return `更新于 ${a.updated}`
+})
 const FAQ_HEADING = '常见问题'
 const norm = (t: string) => (t || '').replace(/[​-‍﻿]/g, '').replace(/\s*#+$/, '').trim()
 
@@ -150,7 +157,7 @@ watch(() => route.path, () => nextTick(() => { mountFaq(); nextTick(readHeadings
 
     <div class="cu-shell__body cu-shell__body--reading">
       <!-- 目录在正文之前：宽屏是左侧一列，≤1280px 塌成正文上方的横排条（靠 DOM 顺序，不靠 order） -->
-      <SectionNav :sections="sections" />
+      <SectionNav :sections="sections" variant="knowledge" />
       <!-- --reading 修饰类：把正文列限宽到 46rem（教程页同款），单列回落时由 01_shell_toc.css 解除 -->
       <div class="cu-shell__inner cu-shell__inner--reading">
         <article class="cu-page cu-page--doc">
@@ -160,6 +167,11 @@ watch(() => route.path, () => nextTick(() => { mountFaq(); nextTick(readHeadings
             <a class="cu-kdoc__crumb" href="/knowledge">知识库</a>
             <span class="cu-kdoc__badge">{{ knowledgeCategoryShort(article.cat) }}</span>
             <span>约 {{ article.minutes }} 分钟</span>
+            <!-- 时效信号（2026-10-13 新增）：只在真改过（updated != date）时显示。
+                 列表页卡片继续不显示日期（视觉噪音），但文章页给一个「更新于」——
+                 GEO 场景下 AI 判断内容是否过期看的就是页面上可见的更新信号，
+                 只写进 JSON-LD 的 dateModified 对人类读者不可见。 -->
+            <span v-if="updatedLabel">{{ updatedLabel }}</span>
           </div>
           <!-- markdown 正文：VPDoc 的 page 分支（layout: page），只有 .vp-doc 没有原生 aside -->
           <!-- markdown 正文。VitePress 直接把 <table> 塞进 .vp-doc，表格本身就是 overflow-x: auto 的滚动容器，

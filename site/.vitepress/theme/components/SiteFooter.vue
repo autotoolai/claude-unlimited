@@ -40,6 +40,15 @@ const year = new Date().getFullYear()
           <li><a href="/faq#more">联系客服</a></li>
         </ul>
       </nav>
+      <nav aria-label="关于我们">
+        <p class="cu-foot__h">关于</p>
+        <ul>
+          <li><a href="/about">关于我们</a></li>
+          <li><a href="/terms">服务条款</a></li>
+          <li><a href="/privacy">隐私政策</a></li>
+          <li><a href="/changelog">变更历史</a></li>
+        </ul>
+      </nav>
       <nav aria-label="知识库目录">
         <p class="cu-foot__h">知识库</p>
         <ul>

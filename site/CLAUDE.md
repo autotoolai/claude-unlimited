@@ -29,6 +29,7 @@ npm run build                        # 含 check_dist.mjs 结构门禁，不过�
 npm run verify                       # SEO / 组件 / 链接验收
 npm run check:links                  # 死链
 npm run check:toc -- --slug=<新slug>  # 写了知识库文章才跑，不要漏
+npm run check:css                   # 改了 .vitepress/theme/**/*.css 必跑，拦「padding 简写 + 单侧」导致的样式失效
 ```
 
 **代码**

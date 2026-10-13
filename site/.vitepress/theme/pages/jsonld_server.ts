@@ -17,13 +17,23 @@ import { faqItems, faqByCategory } from '../../../config/faq'
 import { consoleFaqs } from '../../../config/console'
 import { guidePage } from '../../../config/guide'
 import { knowledge, knowledgeCategories } from '../../../config/knowledge'
+import { videos } from '../../../config/video_meta'
+import { trustPages, operator } from '../../../config/trust'
 import type { Product } from '../../../config/site'
 
 const BASE = siteConfig.url.replace(/\/+$/, '')
 
 /** 商品（取 featured，与 pages/data.ts 的 product 同一份推导） */
 const product: Product = siteConfig.products.find((x) => x.id === siteConfig.featuredProductId) ?? siteConfig.products[0]
-const org = { '@type': 'Organization', name: siteConfig.name, url: BASE + '/' }
+const org = {
+  '@type': 'Organization',
+  name: siteConfig.name,
+  // legalName 只在 config/site.ts 的 legal.company 真填了才写。编造主体名的信任损害
+  // 远大于留空，AI 与搜索引擎都倾向交叉验证主体真实性。
+  ...(siteConfig.legal.company ? { legalName: siteConfig.legal.company } : {}),
+  url: BASE + '/',
+  ...(operator.icp ? { taxID: operator.icp } : {}),
+}
 
 const faqJsonLd = (items: { q: string; a: string }[]) => ({
   '@context': 'https://schema.org',
@@ -162,6 +172,62 @@ function jsonLdKnowledgeIndex() {
   }
 }
 
+
+/**
+ * 面包屑（2026-10-13 新增）：二级以下页面统一挂一条 BreadcrumbList。
+ *
+ * 为什么加：GEO 场景下 AI 需要知道「这页在站点里的位置」才敢引用它的层级语境；Search Console 的
+ * 富媒体测试也会读面包屑。知识库文章的层级是 首页 > 知识库 > 分类 > 文章，分类从 config/knowledge.ts
+ * 推导，不写死。
+ */
+function breadcrumb(items: { name: string; url: string }[]) {
+  return {
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((it, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: it.name,
+      item: BASE + it.url,
+    })),
+  }
+}
+
+/** 全站面包屑：首页 > 当前页。根级页面（首页自己除外）用它。 */
+function breadcrumbFor(route: string) {
+  const segs = route.split('/')
+  const out = [{ name: siteConfig.name, url: '/' }]
+  const acc: string[] = []
+  for (const s of segs) {
+    acc.push(s)
+    const url = '/' + acc.join('/')
+    let name = s
+    if (acc.length === 1 && s === 'knowledge') name = 'Claude 知识库'
+    else if (acc.length === 1 && s === 'guide') name = '使用教程'
+    else if (acc.length === 1 && s === 'pricing') name = '套餐定价'
+    else if (acc.length === 1 && s === 'models') name = '模型广场'
+    else if (acc.length === 1 && s === 'faq') name = '常见问题'
+    out.push({ name, url })
+  }
+  return breadcrumb(out)
+}
+
+/** VideoObject：让 public/videos 下的 mp4 对爬虫可见（产物里 <video> 只有 data-src，读不到）。 */
+function videoObjectsFor(page: string) {
+  return videos
+    .filter((v) => v.page === page)
+    .map((v) => ({
+      '@type': 'VideoObject',
+      name: v.description.split('：')[0],
+      description: v.description,
+      contentUrl: `${BASE}/videos/${v.src}`,
+      thumbnailUrl: `${BASE}/videos/poster/${v.src.replace(/\.mp4$/, '.jpg')}`,
+      uploadDate: v.uploadDate,
+      duration: v.duration,
+      inLanguage: 'zh-CN',
+      isFamilyFriendly: true,
+    }))
+}
+
 /** /knowledge/<slug>：TechArticle + FAQPage */
 function jsonLdKnowledgeArticle(slug: string) {
   const e = knowledge.find((k) => k.slug === slug)
@@ -188,6 +254,16 @@ function jsonLdKnowledgeArticle(slug: string) {
       mainEntity: e.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
     })
   }
+  // 面包屑：首页 > 知识库 > 分类 > 文章（复用上面已算好的 catName，不重复声明）
+  graph.push(
+    breadcrumb([
+      { name: siteConfig.name, url: '/' },
+      { name: 'Claude 知识库', url: '/knowledge' },
+      ...(catName ? [{ name: catName, url: `/knowledge#${e.cat}` }] : []),
+      { name: e.title, url: '/knowledge/' + e.slug },
+    ]),
+  )
+  graph.push(...videoObjectsFor(e.slug))
   return { '@context': 'https://schema.org', '@graph': graph }
 }
 
@@ -197,12 +273,50 @@ function jsonLdKnowledgeArticle(slug: string) {
  */
 export function jsonLdForRoute(routePath: string): Record<string, unknown> | undefined {
   if (routePath === '') return jsonLdHome
-  if (routePath === 'pricing') return jsonLdPricing
-  if (routePath === 'models') return jsonLdModels
-  if (routePath === 'faq') return faqJsonLd(faqItems)
-  if (routePath === 'console') return faqJsonLd(consoleFaqs)
-  if (routePath === 'guide') return jsonLdGuide()
-  if (routePath === 'knowledge') return jsonLdKnowledgeIndex()
   if (routePath.startsWith('knowledge/')) return jsonLdKnowledgeArticle(routePath.slice('knowledge/'.length)) ?? undefined
-  return undefined
+  // 其余根级页面：原对象扁平（@type + 字段），统一包成 @graph 并补一条面包屑。
+  // 包 @graph 而不是往原对象塞字段，是为了让 gen_jsonld 的「按 @graph 读类型」逻辑对所有页面一致。
+  // switch 而不是嵌套三元：knowledge 分支要剥掉外层 @graph（只留 CollectionPage），
+  // 嵌套三元里塞这个操作类型收不拢，且读起来比 switch 难查。
+  let flat: Record<string, unknown> | undefined
+  switch (routePath) {
+    case 'pricing':
+      flat = jsonLdPricing
+      break
+    case 'models':
+      flat = jsonLdModels
+      break
+    case 'faq':
+      flat = faqJsonLd(faqItems)
+      break
+    case 'console':
+      flat = faqJsonLd(consoleFaqs)
+      break
+    case 'guide':
+      flat = { '@graph': jsonLdGuide()['@graph'] }
+      break
+    case 'knowledge':
+      flat = { '@graph': (jsonLdKnowledgeIndex()['@graph'] as Record<string, unknown>[]).slice(0, 1) }
+      break
+    default: {
+      const tp = trustPages[routePath as keyof typeof trustPages]
+      if (tp) {
+        flat = {
+          '@type': 'WebPage',
+          name: tp.title,
+          description: tp.description,
+          url: BASE + '/' + routePath,
+          inLanguage: 'zh-CN',
+          isPartOf: { '@id': BASE + '/#site' },
+          about: { '@id': BASE + '/#org' },
+        }
+      }
+    }
+  }
+  if (!flat) return undefined
+  const graph: Record<string, unknown>[] = Array.isArray(flat['@graph'])
+    ? (flat['@graph'] as unknown[]).map((x) => x as Record<string, unknown>)
+    : [{ ...flat }]
+  graph.push(breadcrumbFor(routePath))
+  return { '@context': 'https://schema.org', '@graph': graph }
 }

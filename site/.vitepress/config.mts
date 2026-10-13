@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 import type { HeadConfig } from 'vitepress'
 import { siteConfig } from '../config/site'
-import { knowledge } from '../config/knowledge'
+import { knowledge, knowledgeCategories } from '../config/knowledge'
 import { publicDirPlugin } from './theme/middleware'
 import { baiduHead, umamiHead } from './analytics_snippets'
 
@@ -54,6 +54,15 @@ export default defineConfig({
       if (meta?.tags?.length) {
         head.push(['meta', { name: 'keywords', content: meta.tags.join(',') }])
       }
+      // 文章页的 og:type 全站默认是 website（config.mts 的 head 里写死了），但文章是 article。
+      // og:type 声明错类型会让分享卡片与富媒体结果按网页而非文章处理；发布时间/更新时间同理，
+      // 它们和 JSON-LD 里的 datePublished/dateModified 是同一个权威源（config/knowledge.ts）。
+      if (meta) {
+        head.push(['meta', { property: 'og:type', content: 'article' }])
+        head.push(['meta', { property: 'article:published_time', content: meta.date }])
+        head.push(['meta', { property: 'article:modified_time', content: meta.updated ?? meta.date }])
+        head.push(['meta', { property: 'article:section', content: knowledgeCategories.find((c) => c.cat === meta.cat)?.name ?? meta.cat }])
+      }
     }
     return head
   },
@@ -75,7 +84,19 @@ export default defineConfig({
   lastUpdated: false,
   // 内部文档不进产物：README 与知识库写作规范不该出现在 sitemap 与线上
   // 内部文档：不进产物，因此也不进 sitemap（gen_sitemap 扫 dist）
-  srcExclude: ['README.md', 'knowledge_writing_guide.md', 'knowledge/SOP-写一篇新文章.md', 'content_structure.md', 'plans_sync.md', 'guide_design_spec.md'],
+  srcExclude: [
+    // 内部文档不进产物，因此也不进 sitemap（gen_sitemap 扫 dist）。
+    // 这份名单是黑名单，逐个列文件名，新增内部文档一定会漏。真正的兜底在 check_dist.mjs：
+    // 它断言「dist 里的每个 html 都必须在 sitemap.xml 里」且「sitemap 里每条都必须在 dist 里」，
+    // 所以漏写 srcExclude 会直接让 build 失败，而不是静默产生一个可索引页面。
+    'README.md',
+    'knowledge_writing_guide.md',
+    'knowledge/SOP-写一篇新文章.md',
+    'content_structure.md',
+    'plans_sync.md',
+    'guide_design_spec.md',
+    'troubleshooting_guide.md',
+  ],
   ignoreDeadLinks: true,
   head: [
     ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],

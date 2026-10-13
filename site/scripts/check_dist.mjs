@@ -12,7 +12,7 @@ const DIST = path.resolve(process.cwd(), '.vitepress', 'dist')
 const unregisterTsx = register()
 const knowledgeMod = await tsImport('../config/knowledge.ts', import.meta.url)
 const { faqItems, faqCategories } = await tsImport('../config/faq.ts', import.meta.url)
-const { guideShots, guideTabs } = await tsImport('../config/guide.ts', import.meta.url)
+const { guideShots, guideTabs, guidePages } = await tsImport('../config/guide.ts', import.meta.url)
 const { siteConfig } = await tsImport('../config/site.ts', import.meta.url)
 unregisterTsx()
 function knowledgePages() {
@@ -31,6 +31,8 @@ Object.assign(PAGES, Object.fromEntries(knowledgePages()))
 
 const fails = []
 const ok = (cond, msg) => { if (!cond) fails.push(msg) }
+/** 存在性读取：门禁要在文件缺失时给出可读报错，而不是抛 ENOENT */
+function readFileSafe(p, enc) { try { return fs.readFileSync(p, enc) } catch { return '' } }
 
 // —— 2026-10-13 样式链路断言 ——
 // 症状：整站页面看着像「没有样式」，居中 / 限宽 / 配色全部不生效。
@@ -191,14 +193,25 @@ for (const [route, file] of Object.entries(PAGES)) {
 // 教程是一页两条轨（2026-10 重构：删购买章节、页首客服条、小白六步 + 高级配置两节）：
 // 小白轨 6 步，每步内部再分子步骤；高级轨只用表格与网址行，没有步骤块。
 const guideHtml = fs.readFileSync(path.join(DIST, 'guide/index.html'), 'utf8')
+// 样式表：轨选择器的选中态必须能从产物里查到（2026-10-13 的反白→竖条改动）。
+const styleDir = path.join(DIST, 'assets')
+const guideCss = fs.readdirSync(styleDir)
+  .filter((f) => f.startsWith('style.'))
+  .map((f) => fs.readFileSync(path.join(styleDir, f), 'utf8'))
+  .join('\n')
 const guideSteps = count(guideHtml, /cu-step-block__no/g)
 ok(guideSteps >= 8, `/guide: 子步骤块数 ${guideSteps}，应 >= 8（小白轨第 6 步含「下载 VS Code」子步骤）`)
-// kicker 全页为 0：H2 已带序号，再画胶囊会重复（docs/guide_design_spec.md「坑位：kicker」）
+// 轨选择器（GuideRails，2026-10-13 取代 SegmentedTabs 的裸胶囊）：两列分栏，每列一个轨。
+// 断言轨数仍是 2 + 每个轨名都在产物里。轨名是文案契约，改轨名时这里要同步。
+ok(count(guideHtml, /cu-grails__item/g) === 2, `/guide: 轨选择器应有两个轨，实际 ${count(guideHtml, /cu-grails__item/g)}`)
+for (const segName of guideTabs.map((t) => t.name)) ok(guideHtml.includes(`>${segName}</strong>`), `/guide: 轨选择器里没有「${segName}」（轨名是文案契约：轨改名时这里要同步）`)
+// 选中态不能是反白填充：轨名是 <strong>，而 01_shell.css 的 `.cu-page strong` 给全页 strong 钉了
+// `color: var(--cu-ink)`，反白底 + 墨字会让轨名「看得见一条线、看不见字」。断言选中态用左侧竖条。
+ok(!new RegExp('\.cu-grails__item\.is-active\s*\{[^}]*--cu-contrast').test(guideCss), '/guide: 轨选择器选中态不该用 --cu-contrast 反白（轨名会被 .cu-page strong 钉成墨色而消失）')
+// kicker（h2 上方那行「小白教程 · 第 3 步」）全页为 0：序号已回到 h2，轨身份由页头的轨选择器表达。
+// 2026-10-13 定稿：h2 的序号管「轨内第几步」，再挂一层轨标签是同一句话说两遍。
 const GUIDE_KICKERS = 0
 ok(count(guideHtml, /cu-step-kicker/g) === GUIDE_KICKERS, `/guide: 步骤标签应为 ${GUIDE_KICKERS} 个，实际 ${count(guideHtml, /cu-step-kicker/g)}`)
-ok(count(guideHtml, /cu-seg__btn/g) === 2, `/guide: 分段切换应有两个胶囊，实际 ${count(guideHtml, /cu-seg__btn/g)}`)
-// 胶囊按钮里还包着说明文案（`>轨名 <!----></button>`），所以只匹配「>轨名 」这一段
-for (const segName of guideTabs.map((t) => t.name)) ok(guideHtml.includes(`>${segName} <!----></button>`), `/guide: 分段切换里没有「${segName}」胶囊（轨名是文案契约：轨改名时这里要同步）`)
 // 教程页首客服条（KefuBar）已删除：客服只走右下角在线助手浮标，这里断言它没被挂回来
 ok(!guideHtml.includes('cu-kefubar'), '/guide: 页首客服条（KefuBar）已下线，产物里不该再出现 cu-kefubar')
 // 小白轨 6 步 + 高级轨 2 节；锚点 id 是 /guide#锚点 深链契约（config/faq.ts、kefu_bot.ts 引用）
@@ -287,9 +300,152 @@ for (const k of knowledgeMod.knowledge) {
   }
 }
 
+/* ============================================================
+ * SEO / GEO 断言（2026-10-13 新增）
+ *
+ * 动机：srcExclude 是逐个文件名的黑名单，新增内部文档漏写就会产出一个可索引页面并进 sitemap。
+ * 真实事故：docs/troubleshooting_guide.md 漏排除，产物有 /troubleshooting_guide.html 并进了 sitemap，
+ * 全站零内链，稀释主题权重。这里用三条互相独立的断言堵：
+ *   1) dist 里每个 html（除 404）都必须在 sitemap 里 —— 内部文档没有 sitemap 条目就会被抓住
+ *   2) sitemap 里每个 URL 都必须在 dist 里有 html —— 反向堵死链
+ *   3) 每个可索引页恰好一条 canonical，且等于自己的无后缀 URL —— 挡住三套 URL 信号打架
+ * 外加 robots.txt / llms.txt 在场检查与关键 JSON-LD 类型检查。
+ * ============================================================ */
+{
+  const origin = siteConfig.url.replace(/\/+$/, '')
+  const sitemapPath = path.join(DIST, 'sitemap.xml')
+  ok(fs.existsSync(sitemapPath), 'dist 缺 sitemap.xml（gen_sitemap 没跑或写错位置）')
+  const sitemapXml = fs.existsSync(sitemapPath) ? fs.readFileSync(sitemapPath, 'utf8') : ''
+  const sitemapLocs = [...sitemapXml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim())
+  ok(sitemapLocs.length > 0, 'sitemap.xml 里一条 URL 都没有')
+
+  // 产物 html -> 对外 URL（映射规则必须与 gen_sitemap.ts 一致）
+  const relHtml = distHtmlFiles.map((f) => path.relative(DIST, f).split(path.sep).join('/'))
+  const routeOf = (rel) => {
+    if (rel === 'index.html') return '/'
+    if (rel.endsWith('/index.html')) return '/' + rel.replace(/index\.html$/, '').replace(/\/$/, '')
+    return '/' + rel.replace(/\.html$/, '')
+  }
+  // copy_dir_overviews.mjs 会把 guide/index.html 再复制成 guide.html、knowledge/index.html 复制成
+  // knowledge.html，两份内容相同，这里按 URL 去重后再比对，避免同一路由被算两次。
+  // robots.txt 里 Disallow 的入口壳（有产物但故意不收录）：/console 正文全靠客户端渲染，
+  // gen_sitemap.ts 已把它排除，两个断言都要跳过，否则会误报成「漏加 srcExclude」。
+  const robotsDisallowed = new Set(
+    fs.readFileSync(path.join(DIST, 'robots.txt'), 'utf8')
+      .split(/\r?\n/)
+      .map((l) => l.match(/^Disallow:\s*(\/[^\s#]*)/i))
+      .filter(Boolean)
+      .map((m) => m[1].replace(/\/$/, ''))
+      .filter((p) => p !== '/')
+  )
+  const distUrls = [...new Set(relHtml.filter((r) => r !== '404.html').map(routeOf))].filter(
+    (u) => ![...robotsDisallowed].some((d) => u === d || u.startsWith(d + '/'))
+  )
+  const sitemapSet = new Set(sitemapLocs.map((u) => u.replace(origin, '')))
+
+  for (const u of distUrls) {
+    ok(sitemapSet.has(u), `dist 里有 ${u} 但 sitemap.xml 里没有 —— 多半是内部文档漏加 config.mts 的 srcExclude`)
+  }
+  for (const u of sitemapSet) {
+    ok(distUrls.includes(u), `sitemap.xml 收了 ${u}，但 dist 里没有对应产物（死链）`)
+  }
+
+  // canonical：恰好一条，且等于自己的无后缀 URL
+  for (const f of distHtmlFiles) {
+    const rel = path.relative(DIST, f).split(path.sep).join('/')
+    if (rel === '404.html') continue
+    const html = fs.readFileSync(f, 'utf8')
+    const canonicals = [...html.matchAll(/<link[^>]*rel="canonical"[^>]*>/g)].map((m) => m[0])
+    ok(canonicals.length === 1, `${rel}: canonical 应恰好 1 条，实际 ${canonicals.length} 条`)
+    const want = origin + routeOf(rel)
+    ok(
+      canonicals.length === 1 && canonicals[0].includes(`href="${want}"`),
+      `${rel}: canonical 应为 ${want}，实际 ${canonicals[0] || '(缺失)'}`,
+    )
+  }
+
+  // robots.txt / llms.txt 在场；llms.txt 的限流数字必须与 config/rules.ts 同源
+  const robotsPath = path.join(DIST, 'robots.txt')
+  ok(fs.existsSync(robotsPath), 'dist 缺 robots.txt')
+  if (fs.existsSync(robotsPath)) {
+    const robots = fs.readFileSync(robotsPath, 'utf8')
+    ok(/^User-agent:\s*\*/m.test(robots), 'robots.txt 缺 User-agent: * 段')
+    ok(robots.includes(`${origin}/sitemap.xml`), `robots.txt 没有指向 ${origin}/sitemap.xml`)
+  }
+  const llmsPath = path.join(DIST, 'llms.txt')
+  ok(fs.existsSync(llmsPath), 'dist 缺 llms.txt')
+  if (fs.existsSync(llmsPath)) {
+    const llms = fs.readFileSync(llmsPath, 'utf8')
+    ok(llms.includes('## 知识库文章'), 'llms.txt 缺「## 知识库文章」段')
+    // 限流数字只允许在 config/rules.ts 出现一次，llms.txt 必须由它派生。抽 rpm 与会话数对一下。
+    const rulesSrc = readFileSafe(path.join(process.cwd(), 'config', 'rules.ts'), 'utf8')
+    const rpm = (rulesSrc.match(/rpm:\s*([\d_]+)/) || [])[1]
+    if (rpm) {
+      const n = Number(String(rpm).replace(/_/g, ''))
+      ok(
+        llms.split('\n').some((l) => l.includes('请求速率') && l.includes(' ' + n + ' ')),
+        `llms.txt 的「请求速率」一行没有出现 ${n} —— llms.txt 在漂移（应由 config/rules.ts 派生）`,
+      )
+    }
+    const sessions = (rulesSrc.match(/sessions:\s*([\d_]+)/) || [])[1]
+    if (sessions) {
+      const n = Number(String(sessions).replace(/_/g, ''))
+      ok(
+        // 按「标签 + 数字」判定，不正则：措辞与空格由 limitRows 派生会变，正则等于把门禁写成第二份文案。
+        llms.split('\n').some((l) => l.includes('会话窗口') && l.includes(' ' + n + ' ')),
+        `llms.txt 的「会话窗口」一行没有出现 ${n} —— llms.txt 在漂移（应由 config/rules.ts 派生）`,
+      )
+    }
+  }
+
+  // 关键 JSON-LD 类型在场（gen_jsonld.ts 注入在最后一个 </body> 前）
+  const readJsonLd = (f) => {
+    if (!fs.existsSync(f)) return null
+    const html = fs.readFileSync(f, 'utf8')
+    const m = html.match(/<script type="application\/ld\+json" data-cu-jsonld="">([\s\S]*?)<\/script>/)
+    if (!m) return null
+    try {
+      return JSON.parse(m[1])
+    } catch {
+      return null
+    }
+  }
+  const graphTypes = (ld) => ((ld && ld['@graph']) || []).map((x) => x['@type'])
+
+  const homeJsonLd = readJsonLd(path.join(DIST, 'index.html'))
+  ok(!!homeJsonLd, '首页没有 data-cu-jsonld 脚本（gen_jsonld 没跑）')
+  if (homeJsonLd) {
+    for (const t of ['Organization', 'WebSite', 'Product']) {
+      ok(graphTypes(homeJsonLd).includes(t), `首页 JSON-LD 缺 ${t}`)
+    }
+  }
+  // 知识库文章：TechArticle + FAQPage + BreadcrumbList + dateModified
+  for (const [route, rel] of knowledgePages()) {
+    const ld = readJsonLd(path.join(DIST, rel + '.html'))
+    if (!ld) {
+      ok(false, `${route}: 没有 data-cu-jsonld 脚本`)
+      continue
+    }
+    const types = graphTypes(ld)
+    for (const t of ['TechArticle', 'FAQPage', 'BreadcrumbList']) {
+      ok(types.includes(t), `${route}: JSON-LD 缺 ${t}`)
+    }
+    const art = (ld['@graph'] || []).find((x) => x['@type'] === 'TechArticle')
+    if (art) {
+      ok(!!art.dateModified, `${route}: TechArticle 缺 dateModified`)
+      ok(art.url === origin + route, `${route}: TechArticle.url 应为 ${origin + route}，实际 ${art.url}`)
+    }
+  }
+  const faqJsonLd = readJsonLd(path.join(DIST, 'faq.html'))
+  if (faqJsonLd) ok(graphTypes(faqJsonLd).includes('FAQPage'), '/faq: JSON-LD 缺 FAQPage')
+  const pricingJsonLd = readJsonLd(path.join(DIST, 'pricing.html'))
+  if (pricingJsonLd) ok(graphTypes(pricingJsonLd).includes('Product'), '/pricing: JSON-LD 缺 Product')
+}
+
+
 if (fails.length) {
   console.error('\n[x] 构建产物结构检查未通过:')
   for (const f of fails) console.error('    - ' + f)
   process.exit(1)
 }
-console.log('[x] 构建产物结构检查通过（四页外壳完整、外壳内 H1 唯一、目录锚点全部命中、无未渲染模板）')
+console.log('[x] 构建产物结构检查通过（外壳完整、H1 唯一、目录锚点命中、无未渲染模板；SEO：sitemap 与产物一一对应、canonical 正确、robots/llms 在场、JSON-LD 类型齐全）')

@@ -6,7 +6,7 @@
     "dev": "cross-env VITEPRESS_DEV=1 tsx scripts/gen_logo.ts && node scripts/copy_public.mjs --watch",
     "dev:site": "vitepress dev --host 0.0.0.0 --port 41800 --strictPort",
     "gen:logo": "tsx scripts/gen_logo.ts",
-    "build": "npm run check:kefu && npm run check:plans && npm run gen:logo && vitepress build && npm run gen:sitemap && node scripts/copy_dir_overviews.mjs && npm run gen:jsonld && node scripts/copy_public.mjs && node scripts/fix_css_links.mjs && node scripts/check_dist.mjs && node scripts/check_analytics.mjs",
+    "build": "npm run check:kefu && npm run check:plans && npm run gen:logo && vitepress build && npm run gen:sitemap && node scripts/copy_dir_overviews.mjs && npm run gen:llms && npm run gen:jsonld && node scripts/copy_public.mjs && node scripts/fix_css_links.mjs && python scripts/check_seo_meta.py && python scripts/check_geo_lint.py && node scripts/check_dist.mjs && node scripts/check_analytics.mjs && npm run check:links && npm run check:css",
     "preview": "node scripts/serve_dist.mjs",
     "serve:dist": "node scripts/serve_dist.mjs",
     "gen:sitemap": "tsx scripts/gen_sitemap.ts",
@@ -30,7 +30,11 @@
     "check:analytics": "node scripts/check_analytics.mjs",
     "sync:analytics": "python scripts/analytics/fetch_data.py",
     "gen:dashboard": "python scripts/analytics/build_dashboard.py",
-    "analytics": "npm run sync:analytics && npm run gen:dashboard"
+    "analytics": "npm run sync:analytics && npm run gen:dashboard",
+    "check:css": "node scripts/check_css_dup_props.mjs",
+    "gen:llms": "tsx scripts/gen_llms.ts",
+    "check:geo": "python scripts/check_geo_lint.py",
+    "gen:poster": "bash scripts/gen_video_poster.sh"
   },
   "engines": {
     "node": ">=20 <25"

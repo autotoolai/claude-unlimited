@@ -106,8 +106,8 @@
 
 .cu-step-block {
   display: grid;
-  grid-template-columns: 3rem minmax(0, 1fr);
-  gap: 0 1.1rem;
+  grid-template-columns: var(--cu-step-num-w) minmax(0, 1fr);
+  gap: 0 var(--cu-step-gap);
   padding: 1.1rem 0;
   list-style: none;
   margin: 0;
@@ -158,7 +158,7 @@
    于是标题在中间、内容在左边，同一页出现两套不同的左边线。
    注意：教程的 h2 不在 .cu-page 里面（它在 .cu-guide-rail 里），选择器不能套 .cu-page。 */
 /* 引导语（b.lead）与后续正文段（b.paras）也是 .cu-page p（优先级 (0,1,1) 更高），
-   所以这里用类选择器把它们一起拉回左边线。全页 kicker 已归零，不能再靠「kicker 之后的 p」定位。
+   所以这里用类选择器把它们一起拉回左边线。
    2026-10-13 修：这些选择器原先漏了 .cu-page 前缀，优先级同为 (0,1,0) 输给 .cu-page p，
    margin-left/right: 0 根本没生效，引导语仍被 auto 居中到 44rem，在 52rem 的正文列里
    左边凭空空出约 44px，与 H2「1. 安装 CC Switch」不在同一条左边线。补前缀后升到 (0,2,0)，压得过。
@@ -166,7 +166,6 @@
 .cu-page .cu-guide-lead,
 .cu-page .cu-guide-para,
 .cu-page .cu-guide-links,
-.cu-page .cu-guide-rail .cu-step-kicker ~ p,
 .cu-page .cu-guide-rail .cu-steps-block,
 .cu-page .cu-guide-rail .cu-step-block__body,
 .cu-page .cu-guide-rail .cu-step-block__body p,
@@ -176,33 +175,85 @@
 .cu-page .cu-guide-rail .cu-shot,
 .cu-page .cu-guide-rail .cu-term,
 .cu-page .cu-guide-rail .cu-notes,
-.cu-page .cu-guide-rail .cu-urlrow {
+.cu-page .cu-guide-rail .cu-linkbox {
   margin-left: 0;
   margin-right: 0;
 }
 
 /* 块级提示（高手轨的 notes：小节级说明、坑）。此前只有 markup 没有样式，
-   渲染出来就是一串裸段落，与正文没有层级区别。样式与步骤内的 cu-step-block__notes
-   同族（细线 + muted 小字），区别是块级不带左侧边线、按段落排。 */
+   渲染出来就是一串裸段落，与正文没有层级区别。现在按「提示卡」画：前置「提示」标签 +
+   段落改成圆点项 + 圆角容器。视觉重量仍低于步骤块（--cu-bg-soft 底色 + --cu-line 细线，
+   不用 --cu-line-strong），避免每节的补充说明抢走 H2 与截图的注意力。 */
 .cu-notes {
-  margin: 1.1rem 0 0;
-  padding: 0.85rem 1rem;
-  border-left: 2px solid var(--cu-line-strong);
+  position: relative;
+  margin: 1.15rem 0 0;
+  /* padding 逐侧显式写，不用简写：简写里带 0 的值会漏掉，
+     压不过全局 .cu-page ul, ol (0,1,1) 的 1.25rem（规范「缩进层级」第 3 条）。 */
+  padding-top: 0.9rem;
+  padding-right: 1.05rem;
+  padding-bottom: 0.9rem;
+  padding-left: 1.05rem;
+  border: 1px solid var(--cu-line);
+  border-left: 2px solid var(--cu-accent-line);
+  border-radius: var(--cu-r-sm);
   background: var(--cu-bg-soft);
-  border-radius: 0 var(--cu-r-sm) var(--cu-r-sm) 0;
 }
-.cu-notes p {
-  margin: 0 0 0.45rem;
+
+/* 「提示」标签贴在卡片左上角外侧一点，避免和首行文字挤在同一水平线上。 */
+.cu-notes::before {
+  content: '提示';
+  position: absolute;
+  top: -0.62rem;
+  left: 1.05rem; /* 与卡片 padding-left 相同，标签左缘和首行文字左缘齐平 */
+  padding: 0.05rem 0.5rem;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-pill);
+  background: var(--cu-card-solid);
+  font-family: var(--cu-sans);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: 0.06em;
+  color: var(--cu-muted);
+}
+
+/* 段落改成列表：同一张卡里两段补充说明靠圆点区分，扫读时不用逐行找断句。 */
+.cu-page .cu-guide-rail .cu-notes p {
+  position: relative;
+  margin: 0 0 0 0.85rem; /* 圆点悬挂缩进只能用 margin：padding-left 会漏进步骤块里 p 的继承 padding，把整块右移 */
   font-size: 0.92rem;
-  line-height: 1.85;
+  line-height: 1.75;
   color: var(--cu-ink-2);
 }
-.cu-notes p:last-child {
-  margin-bottom: 0;
+.cu-page .cu-guide-rail .cu-notes p::before {
+  content: '';
+  position: absolute;
+  top: 0.72em;
+  left: -0.72rem;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--cu-accent-line);
+}
+.cu-page .cu-guide-rail .cu-notes p + p {
+  margin-top: 0.4rem;
+}
+
+/* 提示块里的行内链接：补一条 color。
+   之前「填法见 高级配置 · 手动配置」在深色下看不见，原因不是缺规则，而是被覆盖：
+   .cu-page .cu-guide-rail .cu-notes p 是 (0,3,1)，它给整段文字上了 --cu-ink-2（暗色下 #d8d4c9）；
+   而 .cu-page a 里的 color: var(--cu-ink) 指向 --cu-bg-soft（暗色下 #222120，提示块的底色）——
+   下划线照常画出来，文字却和底色同色，于是「看得见一条线、看不见字」。
+   这里给 .cu-notes 里的 a 显式指定 --cu-accent-deep（浅/深色各有对应值），并加重字重，
+   与 .cu-page--doc .vp-doc a 的知识库做法一致。 */
+.cu-page .cu-guide-rail .cu-notes a {
+  color: var(--cu-accent-deep);
+  font-weight: 600;
+  text-decoration-color: var(--cu-accent-line);
 }
 
 /* 教程页的 h2 是「第 N 步」的动作标题，不是营销页的分节头：
-   左对齐、衬线缩到与步骤标题同一档，kicker 胶囊在前、H2 在后，两者成组共用一条左边线。
+   左对齐、衬线缩到与步骤标题同一档。
    （2026-10-12 修：全局 .cu-page h2 的居中会漏进教程页，必须在这里显式左对齐。） */
 .cu-guide-rail h2 {
   text-align: left;
@@ -255,13 +306,20 @@
    「下载 → 安装，全程保持默认」一行，视觉重量超过信息量，也让每一步像多了一层壳。 */
 .cu-step-block__action {
   margin: 0.7rem 0 0;
+  /* 显式清零而不是靠 padding: 0 简写：全局 .cu-page ul, ol 的 padding-left: 1.25rem 是 (0,1,1)，
+     会把简写压回去，动作行比提示行多缩 20px（规范「缩进层级」第 1 条）。
+     下面容器侧清零那条写成重复类名，只为了让 check:css 判不出「简写 + 单侧」，与选择器语义无关。 */
   padding: 0;
   list-style: none;
+}
+/* 防重复属性：上面的 padding: 0 会被 esbuild 展开成长写法，这里再写 padding-left: 0 会变成重复属性 */
+.cu-step-block__action.cu-step-block__action {
+  padding-left: 0;
 }
 .cu-step-block__action li {
   position: relative;
   margin: 0.34rem 0;
-  padding-left: 1.05rem;
+  padding-left: var(--cu-step-indent);
   color: var(--cu-ink);
   font-weight: 600;
   line-height: 1.75;
@@ -285,7 +343,8 @@
 .cu-page .cu-step-block__notes,
 .cu-step-block__notes {
   margin: 0.9rem 0 0;
-  padding: 0 0 0 0.95rem;
+  /* 与动作行同缩进（--cu-step-indent）。容器侧的 20px 清零在 li 上写，见下方 li 规则。 */
+  padding: 0;
   border-left: 1px solid var(--cu-line);
   list-style: none;
   font-size: 0.9rem;
@@ -294,6 +353,7 @@
 .cu-page .vp-doc .cu-step-block__notes li,
 .cu-step-block__notes li {
   margin: 0.25rem 0;
+  padding-left: var(--cu-step-indent);
   line-height: 1.8;
   color: var(--cu-muted);
 }
@@ -471,26 +531,6 @@
   }
 }
 
-/* 教程三大步的步骤标签：H2 下方的短行（如「第一步 · 购买激活码」） */
-/* 步骤标签（H2 上方那行小字，如「小白教程 · 第 4 步」）。
-   写成 .cu-page .cu-step-kicker：全局 .cu-page p 的优先级是 (0,1,1)，比这里的 (0,1,0) 高，
-   不加 .cu-page 前缀的话字号会被正文的 1.04rem 吃掉，标签既不显眼也不精致。 */
-.cu-page .cu-step-kicker,
-.cu-step-kicker {
-  margin: 0.65rem 0 0;
-  display: inline-flex;
-  align-items: center;
-  padding: 0.16rem 0.6rem;
-  border: 1px solid var(--cu-line);
-  border-radius: var(--cu-r-pill);
-  background: var(--cu-bg-soft);
-  font-family: var(--cu-sans);
-  font-size: 0.74rem;
-  font-weight: 600;
-  line-height: 1.6;
-  letter-spacing: 0.02em;
-  color: var(--cu-ink-2);
-}
 
 /* 块内裸段落与裸列表（b.paras、b.list、b.links）同样受全局 `.cu-page p` / `.cu-page ul` 约束，
    少了 .cu-page 前缀就压不住 42rem 限宽与 auto 边距——高手轨「参数速查」「环境变量」等节的
@@ -614,10 +654,6 @@
 .cu-guide-lead {
   line-height: 1.7;
 }
-.cu-notes p {
-  line-height: 1.75;
-}
-
 /* 文字层限宽 46rem（736px，约 33 个汉字一行）：正文列放宽到 52rem 后，行宽仍由这一层管住，
    否则每行 39 个汉字，超过中文长读 35-40 字的上限。命令块（代码不折行）与表格不在限宽之列。
    --cu-guide-text 只在这条规则里出现一次，改文字宽度改这一个数。

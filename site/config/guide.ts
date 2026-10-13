@@ -43,10 +43,37 @@ export const gatewayBaseUrl = baseUrl
 export type GuideTabId = 'novice' | 'pro'
 
 /** 教程页两条轨的分组，供 SegmentedTabs 与右侧目录共用 */
-export const guideTabs: { id: GuideTabId; name: string; desc: string }[] = [
-  { id: 'novice', name: '小白教程', desc: '没配过，跟着做就行：先装 CC Switch，再取 Key 并一键导入，每一步都有截图对照。' },
-  { id: 'pro', name: '高级配置', desc: '已经有卡密或 Key，自己填三个值：接口地址、API Key、模型名。' },
+export const guideTabs: GuideTab[] = [
+  {
+    id: 'novice',
+    name: '小白教程',
+    desc: '第一次用就走这条，六步把 Claude 跑起来',
+    meta: '6 步 · 一键导入',
+  },
+  {
+    id: 'pro',
+    name: '高级配置',
+    desc: '已经在用了，只讲手动工具要填哪三个值',
+    meta: '2 节 · 手动填',
+  },
 ]
+
+/** 教程轨条目：轨选择器的数据源（SegmentedTabs 的 groups 兼容这个形状，另外多一个 meta） */
+export interface GuideTab {
+  id: GuideTabId
+  name: string
+  /** 轨选择器上的定位句；空串不渲染 */
+  desc: string
+  /** 轨选择器右下角的小徽标：这条轨有多长、是什么形态 */
+  meta: string
+}
+
+/** 给一条轨的块按出现顺序加回 h2 的序号（「安装 CC Switch」→「1. 安装 CC Switch」）。
+ *  两条轨都从 1 开头，靠页头的轨选择器区分轨，h2 的序号管轨内第几步；
+ *  左侧目录的 label 取自 h2，所以目录项也一起带上序号。 */
+export function guideH2(title: string, index: number): string {
+  return `${index + 1}. ${title}`
+}
 
 export interface GuideShot {
   /** 图片文件名，对应 .vitepress/theme/assets/guide/<file>（GuideShot.vue 里有静态导入表） */
@@ -67,8 +94,8 @@ export interface GuideStep {
   goal?: string
   /** 要做的动作，一行或几行。全页唯一的强调形式，简单步骤只写一行 */
   action?: string[]
-  /** 明文网址行（可点开 + 可选一键复制）；与块级 `url` 同组件 */
-  link?: { href: string; path?: string; label?: string; copy?: boolean }
+  /** 外链卡（整块可点）；与块级 `url` 同组件 */
+  link?: { href: string; path?: string; label?: string }
   /** 步骤内的按钮（主动作）；块级用 GuideBlock.cta */
   cta?: { text: string; url: string; external?: boolean }[]
   /** 只在这一子步骤成立的提示 */
@@ -82,8 +109,6 @@ export interface GuideStep {
 export interface GuideBlock {
   id: string
   h2: string
-  /** H2 上方的步骤标签，如「小白教程 · 第 3 步」；不带则不渲染 */
-  kicker?: string
   /** 小节内第一段（可选，页内目录只到 h2） */
   lead?: string
   /** 段落 */
@@ -100,7 +125,7 @@ export interface GuideBlock {
   steps?: GuideStep[]
   /** 插图（单独一张） */
   shot?: GuideShot
-  /** 明文网址行（可点开 + 一键复制） */
+  /** 外链卡（整块可点） */
   url?: { href: string; path?: string; label?: string }
   /** 链接列表 */
   links?: { text: string; url: string; external?: boolean }[]
@@ -129,7 +154,7 @@ export interface GuidePage {
 
 const ccswitch = () => partnerUrl('ccswitch')
 
-/** VS Code 官网；小白轨第 6 步的下载子步骤用它（copy=false：点开型地址不给复制按钮） */
+/** VS Code 官网；小白轨第 6 步的下载子步骤用它 */
 const vscodeSite = 'https://code.visualstudio.com/'
 
 /** 建议加入的四个模型 ID，第 4 步与高级配置第 2 步共用，避免两处漂移 */
@@ -142,13 +167,13 @@ export const guidePages: GuidePage[] = [
     order: 1,
     title: '使用教程',
     eyebrow: '已经买好了，从这里开始',
-    lead: '已经买好了，这里只讲一件事：怎么把 Claude 跑起来。先挑一条轨：没配过、想照着做的走「小白教程」，六步带截图；已经有卡密或已经换到 Key 的走「高级配置」，自己填三个值。六步做完就能用。',
+    lead: '建议按照小白教程通过 CC Switch 一键完成配置，如果需要在其他 Agent 使用，可以按照高级教程自行配置。',
     desc: 'Claude 无限卡使用教程：获取 API Key、CC Switch 一键导入配置、获取并保存模型、启用并检测链路、在 VS Code 里开始使用；另附高级配置轨：提取 API Key，以及手动配置时接口地址 / API Key / 模型名的填法。',
     blocks: [
       // ---------------- 小白教程（逐条对齐腾讯文档第 3 章） ----------------
       {
         id: 'install-ccswitch',
-        h2: '1. 安装 CC Switch',
+        h2: guideH2('安装 CC Switch', 0),
         tab: 'novice',
         lead: 'CC Switch 是个很小的配置管理软件，专门管 Claude Code 的 API 配置。下载后安装，全部保持默认就行。',
         steps: [
@@ -156,36 +181,36 @@ export const guidePages: GuidePage[] = [
             title: '打开下载页，下载对应系统的安装包',
             goal: '它是管配置的小工具，装好只是先把软件准备好，这一步不用填任何东西。',
             action: ['打开下面的官网 → 挑自己系统的安装包（Windows / macOS 都有）→ 下载 → 安装，全程保持默认。'],
-            link: { href: ccswitch(), label: 'CC Switch 官网', copy: false },
+            link: { href: ccswitch(), label: 'CC Switch 官网' },
             notes: ['软件很小，不需要注册账号，装完先不用配置，下一步直接导入。', '杀毒软件提示未知来源时选「仍要运行」，这是开源小工具。'],
-            cta: [{ text: 'CC Switch 官网 ↗', url: ccswitch(), external: true }],
             shot: { src: 'guide_ccswitch_site.png', label: '图 01', caption: 'CC Switch 官网首页' },
           },
         ],
       },
       {
         id: 'get-key',
-        h2: '2. 换取 API Key',
+        h2: guideH2('换取 API Key', 1),
         tab: 'novice',
-        lead: '卡密在发货信息里，拿到后换成 API Key，后面全程只用它。',
+        lead: '卡密在发货信息里，拿到后先在后台激活，再换成一把 sk- 开头的 API Key，后面全程只用它。',
         steps: [
           {
             title: '在管理后台把卡密换成 API Key',
-            goal: '卡密只能兑换一次，换出来的这串 sk- 开头的密钥就是后面全程要用的 API Key。',
-            action: ['打开下面的管理后台 → 在「提取 Key」输入框里粘贴卡密 → 提交，页面顶部就会出现你的 Key。'],
+            goal: '这把 sk- 开头的密钥就是后面全程要用的 API Key；激活码、Key 都会留在后台里，刷新页面随时能再看。',
+            action: ['打开下面的管理后台 → 在「我的面板」或「提取 Key」页面粘贴激活码 → 提交激活 → 在「提取 Key」页面拿到你的 Key。'],
             link: { href: consoleUrl, label: '管理后台' },
-            notes: ['提交后立刻复制保存好，Key 只显示一次；页面刷新就看不到了。'],
+            notes: ['先复制保存一份到密码管理器；忘了也不要紧，回管理后台用同一把激活码随时能再看，刷新页面不会丢。'],
             shot: { src: 'guide_site.png', label: '图 02', caption: '管理后台首页，粘贴卡密的输入框在这里' },
           },
         ],
         notes: [
+          '激活码、API Key、用量记录都存在管理后台里：同一把激活码随时回来查看，刷新、换浏览器、换设备都不影响。',
           '主域名打不开时，用后台里的备用域名（' + consoleBackupDomains.join('、') + '），API Key 不用换。',
           '兑换得到的 Key 以 sk- 开头；后面 CC Switch、VS Code、终端都用它，不用再换。',
         ],
       },
       {
         id: 'import',
-        h2: '3. 一键导入配置',
+        h2: guideH2('一键导入配置', 2),
         tab: 'novice',
         lead: '管理后台里有「一键导入配置」按钮，不用手填 Base URL 和 Key。',
         steps: [
@@ -200,7 +225,7 @@ export const guidePages: GuidePage[] = [
       },
       {
         id: 'models',
-        h2: '4. 拉取并保存模型',
+        h2: guideH2('拉取并保存模型', 3),
         tab: 'novice',
         lead: '打开 CC Switch，点高级选项，获取模型列表，会显示获取到的模型。把你需要的模型都添加进去，添加后记得点击保存。',
         steps: [
@@ -228,7 +253,7 @@ export const guidePages: GuidePage[] = [
       },
       {
         id: 'enable',
-        h2: '5. 启用并检测链路',
+        h2: guideH2('启用并检测链路', 4),
         tab: 'novice',
         lead: '前面五步配完，配置已经在 CC Switch 里但还没生效。这一步启用并检测一下，显示运行正常就完成了。',
         steps: [
@@ -243,7 +268,7 @@ export const guidePages: GuidePage[] = [
       },
       {
         id: 'vscode',
-        h2: '6. 开始使用 Claude Code',
+        h2: guideH2('开始使用 Claude Code', 5),
         tab: 'novice',
         lead: '没用过 Claude Code 的，请按下方步骤通过 VS Code 官方插件使用：安装方便，图形界面比命令行更好上手。',
         notes: [
@@ -255,7 +280,7 @@ export const guidePages: GuidePage[] = [
             title: '没装过 VS Code 的先下载安装',
             goal: '开始使用要先有 VS Code 本体。',
             action: ['打开下面这个官网，挑自己电脑的系统下载，一路下一步保持默认安装。'],
-            link: { href: vscodeSite, label: 'VS Code 官网', copy: false },
+            link: { href: vscodeSite, label: 'VS Code 官网' },
             shot: { src: 'guide_vscode_site.png', label: '图 08', caption: 'VS Code 官网' },
             notes: ['已经装了 VS Code 的跳过这一步，直接装下面那个插件。'],
           },
@@ -272,20 +297,20 @@ export const guidePages: GuidePage[] = [
       // ---------------- 高级配置 ----------------
       {
         id: 'pro-key',
-        h2: '1. 提取 API Key',
+        h2: guideH2('提取 API Key', 0),
         tab: 'pro',
-        lead: '卡密在发货信息里。在管理后台把它换成一把 sk- 开头的 API Key，这一步只做一次，换出来的 Key 在 CC Switch、编辑器、终端里通用。',
+        lead: '激活码在发货信息里。在管理后台把它换成一把 sk- 开头的 API Key，换出来的 Key 在 CC Switch、编辑器、终端里通用，也一直留在后台里随时能查看。',
         url: { href: consoleUrl, path: '管理后台地址（主）', label: '打开管理后台' },
         shot: { src: 'guide_site.png', label: '图 10', caption: '管理后台首页，左侧「提取 Key」' },
         notes: [
-          '粘贴卡密提交后会生成一把 sk- 开头的 Key，复制下来存进密码管理器，别弄丢。',
-          '一个卡密只能兑换一次；Key 泄露或想换一把时，回这里重新提取。',
+          '粘贴激活码提交后会生成一把 sk- 开头的 Key。Key 一直保存在管理后台的「Key 详情」里，刷新页面、换浏览器都还能再看，建议同时复制一份存进密码管理器。',
+          'Key 泄露或想换一把时，回「提取 Key」重新提取一把新的。',
           '主域名打不开时换备用域名 ' + consoleBackupDomains.join('、') + '，内容和主域名一样，Key 不用重提。',
         ],
       },
       {
         id: 'params',
-        h2: '2. 手动配置',
+        h2: guideH2('手动配置', 1),
         tab: 'pro',
         lead: '不想用一键导入，或者已经熟悉别的工具，就自己填。CC Switch、编辑器、终端都只要三个值：接口地址、API Key、模型名。地址和模型名在管理后台首页顶部就能看到，Key 是上一步提取的那串。',
         table: {
@@ -293,18 +318,14 @@ export const guidePages: GuidePage[] = [
           columns: ['填什么', '去哪里拿'],
           rows: [
             { label: '接口地址（Base URL）', values: [baseUrl, '管理后台首页顶部那一行；打不开就换备用域名 ' + consoleBackupDomains.join('、')] },
-            { label: 'API Key', values: ['sk- 开头的密钥', '第 1 步提取的，复制保存过的那串'] },
-            { label: '模型名', values: [recommendedModels, '后台首页顶部，或工具里点「获取模型列表」'] },
+            { label: 'API Key', values: ['sk- 开头的密钥', '第 1 步提取的那把；忘了就回管理后台的「Key 详情」再看'] },
+            { label: '模型名', values: [recommendedModels, '网关实时返回，「获取模型列表」里能看到的都在；不确定用哪个看<a href="/models">模型广场</a>'] },
           ],
         },
         notes: [
           '接口地址不要自己加 /v1 结尾，也不要加 /chat/completions；Cursor 这类 OpenAI 兼容端点才带 /v1。填反了会 404。',
-          '模型不用背：工具里的「获取模型列表」是网关实时返回的，最全也最新；CC Switch 里拉一次就会存下来。',
+          '模型不用背：工具里的「获取模型列表」是网关实时返回的，最全也最新；CC Switch 里拉一次就会存下来。上面四个是起步够用的主力，完整的档位与适用场景见<a href="/models">模型广场</a>。',
           '拿不准怎么填、或者还没装 CC Switch，照 <a href="#install-ccswitch">小白教程</a>走即可，两边用的是同一把 Key。',
-        ],
-        links: [
-          { text: '环境变量怎么设', url: '/knowledge/claude-code-tutorial' },
-          { text: '接不通怎么查', url: '/knowledge/claude-code-401-403' },
         ],
       },
     ],

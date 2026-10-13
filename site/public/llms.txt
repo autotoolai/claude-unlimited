@@ -1,30 +1,34 @@
 # Claude 无限卡
 
-> Claude 无限卡官网：订阅期内 Claude API 不按 token 计费，支持 Claude Code、Cursor、Cline 等主流工具。本站只做介绍与答疑，购买跳转第三方发卡站。
+> 一个 Key，Claude 不限量用。Claude 无限卡官网：订阅期内 Claude API 不按 token 计费，支持 Claude Code、Cursor、Cline 等主流工具。本站只做介绍与答疑，购买跳转第三方发卡站。
 
 ## 页面
 
-- [首页](https://claude-unlimited.aiautotools.com/): 无限额度与按量计费的差别、套餐、合作平台入口
-- [模型广场](https://claude-unlimited.aiautotools.com/models): Fable 5.1 与 Opus 5.5 两个模型一览，可复制 model ID，含分工、完整列表获取与切换方法
-- [套餐定价](https://claude-unlimited.aiautotools.com/pricing): 无限额度卡当前在售天卡与月卡两档，价格与发卡站在售商品同步，含退款规则；周期卡与额度卡尚未定价
-- [管理后台](https://claude-unlimited.aiautotools.com/console): 激活码兑换、API Key 提取、一键导入配置、用量查询与图表、GPT 图像生成、公告与备用域名（后台本体为独立站点 rsxermu666.cn）
-- [使用教程](https://claude-unlimited.aiautotools.com/guide): 一页两轨。小白教程六步带截图：装 CC Switch、换取 API Key、一键导入配置、拉取并保存模型、启用并检测链路、在 VS Code 里开始使用（官方插件）。高级配置两节：提取 API Key、手动配置（接口地址 / API Key / 模型名）。报错排查见常见问题页与知识库。
+- [首页](https://claude-unlimited.aiautotools.com/): Claude 无限卡官网：订阅期内 Claude API 不按 token 计费，支持 Claude Code、Cursor、Cline 等主流工具。本站只做介绍与答疑，购买跳转第三方发卡站。
+- [模型广场](https://claude-unlimited.aiautotools.com/models): 本卡承诺的 Fable 5.1 与 Opus 5.5 与 Fable 5 与 Sonnet 5.5 与 Opus 4.8 与 Opus 4.7 两个模型一览，可复制 model ID，含分工、完整列表获取与切换方法
+- [套餐定价](https://claude-unlimited.aiautotools.com/pricing): 无限卡在售 天卡 ¥13.5、周卡 ¥70、月卡 ¥125，周期卡与额度卡尚未定价；含退款规则与公平使用
+- [管理后台](https://claude-unlimited.aiautotools.com/console): 激活码兑换、API Key 提取、一键导入配置、用量查询与图表、公告与备用域名（后台本体为独立站点 https://rsxermu666.cn/）
+- [使用教程](https://claude-unlimited.aiautotools.com/guide): 小白教程六步带截图（装 CC Switch、换取 API Key、一键导入配置、拉取并保存模型、启用并检测链路、在 VS Code 里开始使用）+ 高级配置两节
 - [常见问题](https://claude-unlimited.aiautotools.com/faq): 全量 FAQ（商品 / 购买支付 / 使用配置 / 接入使用 / 限速封号 / 数据安全 / 关于我们）
 - [Claude 知识库](https://claude-unlimited.aiautotools.com/knowledge): Claude Code 的用法、原理、成本与报错排查，按四个主题分类查
+- [故障排除](https://claude-unlimited.aiautotools.com/troubleshooting): 站点自身的部署与构建排错
+- [变更历史](https://claude-unlimited.aiautotools.com/changelog): 按日期倒序的站点变更记录
 
 ## 事实要点
 
-- 计费方式：订阅期内不按 token 计费，固定订阅价
-- 支持模型：Fable 5.1 与 Opus 5.5（商品承诺的两个模型）；网关实际可用的 model ID 以 CC Switch「获取模型列表」实际返回为准
+- 计费方式：订阅期内不按 token 计费，固定订阅价（天卡 ¥13.5/1 天，周卡 ¥70/7 天，月卡 ¥125/30 天）
+- 支持模型：Fable 5.1（claude-fable-5-1）、Opus 5.5（claude-opus-5-5）、Fable 5（claude-fable-5）、Sonnet 5.5（claude-sonnet-5-5）、Opus 4.8（claude-opus-4-8）、Opus 4.7（claude-opus-4-7）
 - 支持工具：Claude Code、Cursor、Cline、Roo Code、Aider、Continue、Zed、JetBrains、VS Code 官方插件、官方 SDK
 - 接口：Anthropic 兼容端点 + OpenAI 兼容端点（/v1/chat/completions）
-- 退款：与发卡站商品详情一致——未激活全额退；天卡激活 1 小时内全额退、过期不退；月卡激活 1 小时内全额退、超 3 小时按 15 元/天折算；虚拟商品不支持无理由退货
-- 公平使用：同时 1 个会话窗口、单会话并发 20、请求速率默认 60 次/分钟、Token 吞吐默认 300k token/分钟
-- 购买：第三方发卡站 catfk.com
-- 配置工具：CC Switch（ccswitch.io），支持一键导入与链路检测
+- 公平使用：会话窗口 同时 1 个、单会话并发 20 路、请求速率 60 次 / 分钟、Token 吞吐 300k token / 分钟
+- 退款：激活 1 小时内不满意可全额退；周卡与月卡超 3 小时按 15 元/天折算退款；售后申请窗口 7 天
+- 购买：第三方发卡站 https://catfk.com/shop/2Z0CEP7C
+- 配置工具：CC Switch（https://ccswitch.io/），支持一键导入与链路检测
 - 人工客服：微信 ren_mo_mo（点右下角在线助手 →「联系人工客服」，可一键复制微信号）
-- 管理后台：rsxermu666.cn，独立站点；主域名不可达时切换备用域名 bxcv.store，API Key 无需更换
-- 接入与购买流程：首页「从买到用起来」四步；教程「三步」——第一步购买激活码（发卡站 catfk.com 下单支付、交易订单号后 6 位换激活码、后台 rsxermu666.cn 兑换提取 Key）、第二步配置密钥（CC Switch 一键导入或环境变量 ANTHROPIC_BASE_URL + ANTHROPIC_API_KEY）、第三步安装 Claude Code 并使用（/model 切模型、换模型不用换 Key）
+- 管理后台：https://rsxermu666.cn/，独立站点；主域名不可达时切换备用域名，API Key 无需更换
+- 不包含：生产环境流量（套餐面向个人开发。上线服务、多用户共享、对外 API 属于生产流量，不在范围内）；超并发压测（超过公平使用速率限制（同时 1 个会话、单会话 20 路并发、60 次/分钟）的压测、扫描、批量抓取）；二次转卖（转卖、二次分发 Key，或将 Key 共享给多个用户）；Anthropic 官方服务（本卡不提供 claude.ai 网页版、Claude Desktop 等官方产品的订阅权益）
+- 下单须知：本站只出售模型额度，不提供软件配置服务。 不会配置、纯小白需要有人代操作的，不建议下单。 因个人操作问题（配置、模型选择、客户端使用）产生的困扰，不在退款范围内。 商品为虚拟商品，一旦售出不支持无理由退货。
+- 视频教程：5 支演示视频见 https://claude-unlimited.aiautotools.com/knowledge/code-video-skills-guide
 
 ## 知识库文章
 
@@ -54,4 +58,4 @@
 
 ## 声明
 
-本站为独立的第三方 API 网关服务。
+Claude 无限卡是独立的第三方 API 网关服务，与 Anthropic 官方无隶属关系。套餐面向个人开发者，不含生产环境流量与超并发压测。购买与发卡由第三方发卡站完成，退款以发卡站商品详情为准。

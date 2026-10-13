@@ -117,8 +117,9 @@ useReveal()
       class="cu-shell__body"
       :class="{ 'cu-shell__body--reading': !!toc, 'cu-guide-wrap': slug.replace(/^\//, '') === 'guide', 'cu-shell__body--no-toc': !sections.length }"
     >
-      <!-- 目录在正文之前：宽屏是左侧一列，≤1280px 塌成正文上方的横排条（靠 DOM 顺序，不靠 order） -->
-      <SectionNav :sections="sections" />
+      <!-- 目录在正文之前：宽屏是左侧一列，窄屏塌成抽屉（靠 DOM 顺序，不靠 order）。
+           variant="guide"：教程页目录形态（压顶部留白、去进度条），与知识库文章页分开。 -->
+      <SectionNav :sections="sections" variant="guide" />
       <div class="cu-shell__inner" :class="toc ? `cu-shell__inner--reading${toc === 'wide' ? ' cu-shell__inner--wide' : ''}` : ''">
         <article class="cu-page">
           <header v-if="title" class="cu-page__head">

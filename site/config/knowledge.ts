@@ -142,7 +142,7 @@ export const knowledge: KnowledgeMeta[] = [
     slug: 'code-video-skills-guide',
     cat: 'how',
     title: '代码做视频：四个技能实测与分场景选型',
-    desc: '用代码把每一帧画出来再渲染成 MP4。本文实测 video-shotcraft / anything2explainer / video-talkcraft / claude-motion-design 四个开源技能，按宣传片、科普、教程、纯动效四类场景给出选型表，每支样片列出开拍前要准备的素材，附踩坑清单。',
+    desc: '实测四个开源代码渲染视频技能：video-shotcraft、anything2explainer、video-talkcraft、claude-motion-design，按宣传片、科普、教程、纯动效给出选型表。',
     summary: '四个代码渲染技能实测，按场景选型，附素材清单与踩坑。',
     date: '2026-10-13',
     kicker: '视频',

@@ -1,4 +1,19 @@
+# robots.txt —— 唯一手写维护的文件（没有生成脚本，因为它不含任何会漂移的事实）。
+# 内容全部是路径规则，不含价格、模型名等易变事实，所以不派生自 config/。
+#
+# 立场（2026-10-13 定）：对 AI 检索类爬虫全站开放，不针对训练类爬虫写任何 Disallow。
+#   检索类（GPTBot / ClaudeBot / Claude-SearchBot / Claude-User / PerplexityBot / Google-Extended 等）
+#   走下面的 User-agent: * 即可，无需单列规则——单列反而容易在维护时漏掉新出的 UA。
+#   训练类同样不禁用：本业务的价值就是「被 AI 检索到并引用」，禁用训练类不可逆、
+#   对已抓内容无效，而且会永久失去进入模型语料的机会。若将来要退出，应走各厂商官方渠道
+#   （如 Anthropic / OpenAI 的 crawler 退出设置），而不是在这里表达一个对多数爬虫不起作用的意图。
+#
+# 注意：不写「允许 AI 但实际拦训练」的伪装规则。robots.txt 只有被目标爬虫认同时才有意义，
+# 与其写无效的意图，不如保持一致：全站开放。
+
 User-agent: *
 Allow: /
+# 后台本体在独立站点 rsxermu666.cn，本站的 /console 只是入口页，无独立可索引内容
+Disallow: /console/
 
 Sitemap: https://claude-unlimited.aiautotools.com/sitemap.xml

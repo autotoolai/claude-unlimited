@@ -71,10 +71,12 @@ const themePages = {
   knowledge_index: PageKnowledgeIndex,
   models: PageModels,
   console: PageConsole,
+  trust: PageTrust,
 }
 import PageModels from './models.vue'
 import VideoPlayer from './components/VideoPlayer.vue'
 import PageConsole from './console.vue'
+import PageTrust from './trust.vue'
 import NotFoundPage from './components/NotFoundPage.vue'
 
 /* ---------- 主题 ---------- */

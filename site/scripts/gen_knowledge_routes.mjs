@@ -1,10 +1,10 @@
 /**
  * 从 config/knowledge.ts 生成「需要与文章数同步」的两类产物，消除手工遗漏：
  * 1. public/_redirects 的知识库尾斜杠 301（与 check_dist.mjs / verify_build.py 的 PAGES 一一对应）
- * 2. public/llms.txt 的「## 知识库文章」列表（用 summary 短摘要）
  *
  * 用法：node scripts/gen_knowledge_routes.mjs
  * 加新文章后跑一遍即可，不会动到知识库以外的行。
+ * llms.txt / llms-full.txt 已改由 scripts/gen_llms.ts 统一生成，本脚本不再碰它们。
  *
  * 解析规则（与 gen_knowledge_og.py、verify_build.py 一致）：条目以「两空格缩进的 { 独占一行」开头，
  * slug 是条目的第一个字段；其余字段（title / desc / summary / date / kicker / minutes）按名字查找，不依赖顺序。
@@ -93,18 +93,6 @@ writeFileSync(redirectsPath, redirects, 'utf8')
 console.log(`[routes] _redirects 已更新 ${articles.length + 1} 条知识库规则`)
 
 /* ---------- llms.txt ---------- */
-const llmsPath = path.join(root, 'public', 'llms.txt')
-let llms = readFileSync(llmsPath, 'utf8')
-const list = articles.map((a) => `- [${a.title}](${siteUrl}/knowledge/${a.slug}): ${a.summary}`).join('\n')
-const llmsStart = '## 知识库文章'
-if (llms.includes(llmsStart)) {
-  const before = llms.slice(0, llms.indexOf(llmsStart))
-  const rest = llms.slice(llms.indexOf(llmsStart))
-  const nextSection = rest.indexOf('\n## ')
-  const after = nextSection >= 0 ? rest.slice(nextSection) : '\n'
-  llms = before + `${llmsStart}\n\n${list}\n` + after
-} else {
-  llms = llms.replace('\n## 声明', `\n${llmsStart}\n\n${list}\n\n## 声明`)
-}
-writeFileSync(llmsPath, llms, 'utf8')
-console.log(`[routes] llms.txt 已更新 ${articles.length} 条知识库文章`)
+// 2026-10-13 起 llms.txt 改由 scripts/gen_llms.ts 从 config/ 全量生成（页面清单 + 事实要点 + 文章清单）。
+// 本脚本只管 _redirects；知识库文章清单的同步也交给 gen_llms，避免两处写 llms.txt。
+console.log('[routes] llms.txt 由 gen_llms 维护，本脚本不再写')
