@@ -15,6 +15,9 @@ const { faqItems, faqCategories } = await tsImport('../config/faq.ts', import.me
 const { guideShots, guideTabs, guidePages } = await tsImport('../config/guide.ts', import.meta.url)
 const { siteConfig } = await tsImport('../config/site.ts', import.meta.url)
 unregisterTsx()
+/** 产物里允许存在的 mp4 总量上限（MB）。视频在 R2，public/ 只做上传源。 */
+const VIDEO_MP4_BUDGET_MB = 150
+
 function knowledgePages() {
   return knowledgeMod.knowledge.map((k) => [`/knowledge/${k.slug}`, `knowledge/${k.slug}`])
 }
@@ -442,6 +445,23 @@ for (const k of knowledgeMod.knowledge) {
   if (pricingJsonLd) ok(graphTypes(pricingJsonLd).includes('Product'), '/pricing: JSON-LD 缺 Product')
 }
 
+
+// 视频体积门禁：视频本体走 R2（config/media_cdn.ts），public/videos/ 下的 mp4 只是上传源，
+// 不该进部署包。这里守住「源目录别无声膨胀」——真要加新视频先确认它上了 R2。
+{
+  const vdir = path.join(DIST, 'videos')
+  if (fs.existsSync(vdir)) {
+    let total = 0
+    let count = 0
+    for (const f of fs.readdirSync(vdir)) {
+      if (!f.endsWith('.mp4')) continue
+      total += fs.statSync(path.join(vdir, f)).size
+      count++
+    }
+    const mb = total / 1048576
+    ok(mb <= VIDEO_MP4_BUDGET_MB, `videos: 产物里有 ${count} 个 mp4 共 ${mb.toFixed(1)}MB，超过 ${VIDEO_MP4_BUDGET_MB}MB 上限（视频应走 R2，见 config/media_cdn.ts）`)
+  }
+}
 
 if (fails.length) {
   console.error('\n[x] 构建产物结构检查未通过:')

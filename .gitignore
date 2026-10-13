@@ -35,3 +35,6 @@ desktop.ini
 
 # ===== Cloudflare wrangler 本地状态（pages.json 只存 account_id） =====
 .wrangler/
+
+# 视频源文件走 R2 托管（media.claude-unlimited.aiautotools.com），不进 git 也不进 Pages 部署包
+site/public/videos/*.mp4

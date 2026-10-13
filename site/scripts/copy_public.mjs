@@ -36,6 +36,8 @@ const MIME = {
   '.xml': 'application/xml; charset=utf-8',
   '.webp': 'image/webp',
   '.ico': 'image/x-icon',
+  // dev 下 4198 静态服务要靠这张表给 mp4 正确 content-type，缺了浏览器会拒绝解码
+  '.mp4': 'video/mp4',
 }
 
 /**

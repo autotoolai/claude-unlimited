@@ -166,6 +166,14 @@ function Submit-Baidu {
   }
 }
 
+# 把 dotenv 里读到的代理变量显式传给 python 子进程。PowerShell 5.1 的子进程默认继承父进程环境变量，
+# 但如果调用方（如某些 IDE 终端）自身带了空的 HTTP(S)_PROXY，会把 dotenv 里的真值盖掉，
+# 结果是 gsc_submit_sitemap.py 直连 oauth2.googleapis.com 超时。显式设置后不再依赖继承。
+foreach ($name in 'HTTPS_PROXY', 'HTTP_PROXY', 'https_proxy', 'http_proxy') {
+  $v = [System.Environment]::GetEnvironmentVariable($name)
+  if ($v) { Set-Item -Path "Env:$name" -Value $v -Force }
+}
+
 function Resolve-SeoPython {
   $candidates = @(
     (Join-Path $SiteDir 'temp\seo_probe\.venv\Scripts\python.exe')

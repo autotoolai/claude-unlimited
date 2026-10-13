@@ -15,6 +15,10 @@
 /knowledge/*
   Cache-Control: public, max-age=86400, must-revalidate
 
+# 视频本体在 R2（见 config/media_cdn.ts），这里只有首帧缩略图；mp4 一换名字就换 URL，可以长期缓存
+/videos/poster/*
+  Cache-Control: public, max-age=31536000, immutable
+
 /llms.txt
   Cache-Control: public, max-age=3600, must-revalidate
 

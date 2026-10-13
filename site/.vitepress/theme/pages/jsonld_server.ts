@@ -18,6 +18,7 @@ import { consoleFaqs } from '../../../config/console'
 import { guidePage } from '../../../config/guide'
 import { knowledge, knowledgeCategories } from '../../../config/knowledge'
 import { videos } from '../../../config/video_meta'
+import { posterUrl, videoUrl } from '../../../config/media_cdn'
 import { trustPages, operator } from '../../../config/trust'
 import type { Product } from '../../../config/site'
 
@@ -219,8 +220,8 @@ function videoObjectsFor(page: string) {
       '@type': 'VideoObject',
       name: v.description.split('：')[0],
       description: v.description,
-      contentUrl: `${BASE}/videos/${v.src}`,
-      thumbnailUrl: `${BASE}/videos/poster/${v.src.replace(/\.mp4$/, '.jpg')}`,
+      contentUrl: videoUrl(v.src),
+      thumbnailUrl: `${BASE}${posterUrl(v.src)}`,
       uploadDate: v.uploadDate,
       duration: v.duration,
       inLanguage: 'zh-CN',
