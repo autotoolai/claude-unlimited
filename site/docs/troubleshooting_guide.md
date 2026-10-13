@@ -142,6 +142,38 @@ dist 产物里那条规则文本也对，CSSOM 里 `document.styleSheets` 读出
 
 ## 五、SEO 与收录
 
+### 收录推送链路：脚本写好了但没接线，就是「没收录」的原因
+
+`scripts/seo_notify.ps1` 读 `dist/sitemap.xml` 的 URL 清单，一次跑完四条通道：IndexNow（一次 POST 全部 URL）、
+Bing（`SubmitFeed` 交 sitemap + `SubmitUrlBatch`，后者只推前 `MaxBingUrls = 10` 条，其余靠 sitemap）、
+百度（逐条 POST，按 `remain` 递减，遇超额 break）、GSC（交 sitemap）。
+
+- **自动触发点只有一处**：`scripts/deploy_claude_unlimited_site.ps1` 不带 `-SkipNotify` 时调用它。
+  `npm run build` 里**没有**推送（本地构建常常没开代理，挂了会误导人）。2026-10-13 之前这个脚本
+  从没被任何流程调用过，所以全站零收录——不是站点有问题。
+- **密钥在文件里不在环境变量**：`config/local/seo_secrets.env`（gitignore）。脚本先读
+  `config/seo_secrets.example.env` 再读 local，local 覆盖 example。查「配了没」要看这个文件，
+  `echo $BING_API_KEY` 是空的属正常。
+- **GSC 需要代理**：见下面下一条。
+- **百度配额**：接口逐条消耗，实测日配额很小（2026-10-13 当天推 9 条就耗尽），超额后次日再跑即可，
+  脚本会打印 `daily quota exhausted` 后 break，这是正常流程不是故障。
+- **百度 token 是账号级不是站点级**：实测同一账号下多个已加站的子域可共用一个 token，配额也是账号总配额，
+  拿 A 站的 token 推 B 站会成功、但会扣同一个池子。本站当前用的是 `aiautotools` 账号下 Product 项目的
+  同一个 token；想给本站独立配额，去 ziyuan 后台「链接提交」页取本站 token 换进 `config/local/seo_secrets.env` 即可，
+  键名不变。
+- **`/console` 故意不收录**：`public/robots.txt` 里 `Disallow: /console/`（入口壳，正文全靠客户端渲染），
+  `scripts/gen_sitemap.ts` 同步把它排除，两个信号必须一致——sitemap 是「主动请引擎收录」，与 Disallow 矛盾。
+  `check_dist.mjs` 的 sitemap 双向断言会自动跳过 robots 里声明禁抓的 URL，改 robots 时不必手改它。
+
+### 收录复核
+
+推送只是「请引擎来抓」，不是即时收录。百度、Bing 抓取境外小站普遍慢，1 到 3 天后再看：
+
+- 百度：`site:claude-unlimited.aiautotools.com`，或 ziyuan 后台「索引量」。后台还需要**手工提交一次 sitemap URL**，
+  这一步没有 API，只能手动点。
+- Bing：用**国际版**查 `site:`。cn.bing.com 的 `site:` 会退化成普通词搜索，命中 0 条是假象，别照它下结论。
+- Google：GSC 后台覆盖率。
+
 ### GSC / 百度接口本机直连不通
 
 GSC 走 Google API，本机直连不通。密钥文件里的 `HTTPS_PROXY` 默认注释着，开 Clash Verge 后按实际端口打开。
