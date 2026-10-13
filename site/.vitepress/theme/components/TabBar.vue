@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * 主导航链接组：首页 + 已启用的导航项 + 右侧「进入后台」。
+ * 主导航链接组：首页 + 已启用的导航项 + 右侧「控制台」。
  * 它不再自带外壳容器，而是被 PageShell / KnowledgeDoc 放进品牌行（.cu-tabs）里，
  * 与 logo、声明、主题切换、购买 CTA 共同构成单行吸顶导航。
  * slug 由外壳传入（guide_index、knowledge_xxx 等），用于当前项高亮；不传时退回按路径前缀判断。

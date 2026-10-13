@@ -111,7 +111,7 @@ export const siteConfig: SiteConfig = {
   ],
 
   // 主导航只放「内容页」：模型广场 / 套餐定价 / 使用教程 / 知识库。
-  // 无限额度已并入套餐定价；管理后台是外部站点，页头「进入后台」按钮与页脚「服务」列已有入口。
+  // 无限额度已并入套餐定价；管理后台是外部站点，页头「控制台」按钮与页脚「服务」列已有入口。
   nav: [
     { text: '模型广场', link: '/models', enabled: true },
     { text: '套餐定价', link: '/pricing', enabled: true },

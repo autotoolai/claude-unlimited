@@ -1,9 +1,9 @@
 {
-  "fetched_at": "2026-10-10T19:19:29+08:00",
+  "fetched_at": "2026-10-13T16:27:40+08:00",
   "source": "https://rsxermu666.cn/v1/models",
-  "total": 31,
+  "total": 33,
   "brands": {
-    "anthropic": 19,
+    "anthropic": 21,
     "openai": 11,
     "xai": 1
   },
@@ -28,6 +28,15 @@
     },
     {
       "id": "claude-fable-5-1",
+      "brand": "anthropic",
+      "context_window": 1000000,
+      "context_display": "1M",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "claude-haiku-5-5",
       "brand": "anthropic",
       "context_window": 1000000,
       "context_display": "1M",
@@ -100,6 +109,15 @@
     },
     {
       "id": "claude-sonnet-4-6 (1M)",
+      "brand": "anthropic",
+      "context_window": 1000000,
+      "context_display": "1M",
+      "source": "builtin",
+      "is_thinking": false,
+      "is_long_context": true
+    },
+    {
+      "id": "claude-sonnet-5-5",
       "brand": "anthropic",
       "context_window": 1000000,
       "context_display": "1M",

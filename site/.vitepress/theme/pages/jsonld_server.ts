@@ -108,7 +108,7 @@ const jsonLdModels = {
 }
 
 /**
- * /guide：小白教程与高手教程各输出一个 HowTo（与客户端 pages/data.ts 的 jsonLdGuide 同构，
+ * /guide：小白教程与高级配置各输出一个 HowTo（与客户端 pages/data.ts 的 jsonLdGuide 同构，
  * 改一边要改另一边；结构化数据里 HowToStep 用小节标题 + lead，正文步骤在 step 里逐条编号）。
  */
 function jsonLdGuide() {
@@ -121,8 +121,8 @@ function jsonLdGuide() {
     },
     {
       tab: 'pro',
-      name: '高手教程',
-      desc: '已经有 API Key 或不想装 CC Switch：参数速查 → 手动配置供应商 → 环境变量 → 编辑器接入 → 自检与排错。',
+      name: '高级配置',
+      desc: '已经有卡密或 API Key：提取 API Key → 手动配置（接口地址 / API Key / 模型名）。',
     },
   ]
   const graph = rails.map((r, i) => ({

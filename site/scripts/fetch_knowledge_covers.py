@@ -113,6 +113,12 @@ def main():
 
     slugs = slug_block_urls(open(SOURCES_TS, encoding='utf8').read())
     have = covers_in_ts()
+    # cover 的素材来源要能追溯：/blog/ 源页直抓的记 URL，其余记 cover map 的素材名
+    src_log_path = os.path.join(ROOT, 'config', 'knowledge_cover_sources.json')
+    src_log = {}
+    if os.path.exists(src_log_path):
+        with open(src_log_path, encoding='utf8') as f:
+            src_log = json.load(f).get('covers', {})
     cover_map = {}
     if os.path.exists(COVER_MAP_PATH):
         with open(COVER_MAP_PATH, encoding='utf8') as f:
@@ -127,6 +133,10 @@ def main():
         dest = os.path.join(OUT_DIR, slug + '.jpg')
         if os.path.exists(dest) and have.get(slug) == '/knowledge/%s.jpg' % slug:
             skipped.append(slug)
+            if cover_map.get(slug) and not urls:
+                src_log[slug] = 'cover_map:' + cover_map[slug]
+            elif urls:
+                src_log[slug] = 'blog:' + urls[0].rsplit('/', 1)[-1]
             continue
         if cover_map.get(slug) and not urls:
             src = os.path.join(LOCAL_COVERS_DIR, cover_map[slug] + '.jpg')
@@ -152,12 +162,21 @@ def main():
                 with open(dest, 'wb') as f:
                     f.write(body)
             saved.append(slug)
+            src_log[slug] = 'blog:' + u.rstrip('/').rsplit('/', 1)[-1]
             print('  [ok] %s <- %s (%dKB)' % (slug, img, len(body) // 1024))
             break
         else:
             missing.append(slug)
 
     if not check_only:
+        with open(src_log_path, 'w', encoding='utf8', newline='') as f:
+            json.dump({
+                '_说明': '每个 slug 的封面素材来源，由 scripts/fetch_knowledge_covers.py 自动维护。'
+                         'blog:<末段> = 从源站 /blog/<末段>/ 的 hero 图直抓；'
+                         'cover_map:<素材名> = 从本地 temp/aiprimetech_covers/<素材名>.jpg 取（见 config/knowledge_cover_map.json）。',
+                'covers': dict(sorted(src_log.items())),
+            }, f, ensure_ascii=False, indent=2)
+            f.write(chr(10))
         text = open(KNOWLEDGE_TS, encoding='utf8').read()
         n = 0
         for slug in saved:

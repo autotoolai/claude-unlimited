@@ -1,0 +1,115 @@
+{
+  "_说明": "每篇文章的封面三色组（bg 主色 / a 撞色即图标色 / b 点缀色），由 `node scripts/generate_knowledge_covers.mjs --sync-colors` 按 PALETTE 顺序分配，并自动把撞色明度调到与主色对比度 ≥ 3.2:1。想调某篇的颜色直接改这里的值；想整体换配色，改 generate_knowledge_covers.mjs 里的 PALETTE 后重跑 --sync-colors。",
+  "colors": {
+    "claude-code-tutorial": {
+      "bg": "#6f7a86",
+      "a": "#f2e8d4",
+      "b": "#e8b64a"
+    },
+    "claude-code-mcp-config": {
+      "bg": "#4e8f8a",
+      "a": "#fdf9f2",
+      "b": "#e07a3c"
+    },
+    "claude-code-make-video": {
+      "bg": "#a8604e",
+      "a": "#f8e8d0",
+      "b": "#f0c04a"
+    },
+    "claude-code-plan-mode": {
+      "bg": "#5a6f9e",
+      "a": "#f4ead6",
+      "b": "#e8a03c"
+    },
+    "claude-code-permission-modes": {
+      "bg": "#a8783e",
+      "a": "#fdf9f2",
+      "b": "#d9603e"
+    },
+    "claude-md-guide": {
+      "bg": "#6a8a4a",
+      "a": "#f6ecd8",
+      "b": "#e8843c"
+    },
+    "claude-code-cli-cheatsheet": {
+      "bg": "#7e5a9e",
+      "a": "#f2e6d8",
+      "b": "#e8a84a"
+    },
+    "claude-code-subagents": {
+      "bg": "#4a7a9e",
+      "a": "#f5ead4",
+      "b": "#f0b040"
+    },
+    "claude-code-skills": {
+      "bg": "#b0685e",
+      "a": "#f8e4cc",
+      "b": "#5e8a86"
+    },
+    "why-agents-cost-more-tokens": {
+      "bg": "#8a6a4a",
+      "a": "#f4e8d2",
+      "b": "#4e7a9e"
+    },
+    "claude-code-startup-tokens": {
+      "bg": "#5e7a6a",
+      "a": "#f6ecd6",
+      "b": "#e08a3c"
+    },
+    "prompt-caching-explained": {
+      "bg": "#9e5a5a",
+      "a": "#f8e8d4",
+      "b": "#e8b850"
+    },
+    "claude-api-pricing-explained": {
+      "bg": "#3e6e8e",
+      "a": "#f4ead8",
+      "b": "#e8903c"
+    },
+    "reduce-token-usage-tips": {
+      "bg": "#7e8a3e",
+      "a": "#f7eed6",
+      "b": "#d9703e"
+    },
+    "choose-claude-model": {
+      "bg": "#6e4e8e",
+      "a": "#f2e8dc",
+      "b": "#e8a84a"
+    },
+    "claude-code-vs-codex": {
+      "bg": "#4e8e6a",
+      "a": "#f6eed8",
+      "b": "#e8a040"
+    },
+    "claude-code-prompt-too-long-fix": {
+      "bg": "#a85a3e",
+      "a": "#f8e6cc",
+      "b": "#4a7a9e"
+    },
+    "claude-code-429-rate-limit": {
+      "bg": "#5e5e86",
+      "a": "#f4eade",
+      "b": "#e8b050"
+    },
+    "claude-code-529-overloaded": {
+      "bg": "#8e8a4e",
+      "a": "#fcf9f2",
+      "b": "#5a8a8e"
+    },
+    "claude-code-401-403": {
+      "bg": "#9e4e6a",
+      "a": "#f8e8dc",
+      "b": "#e8b450"
+    },
+    "claude-code-connection-lost": {
+      "bg": "#3e7e8e",
+      "a": "#f5ecda",
+      "b": "#e8943c"
+    },
+    "claude-code-usage-limit-reached": {
+      "bg": "#8a4e4e",
+      "a": "#f7ead6",
+      "b": "#e0a040"
+    }
+  }
+}

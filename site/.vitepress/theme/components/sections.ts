@@ -15,7 +15,7 @@ export interface SectionLink {
   label: string
   /** 1 = h2 章，2 = h3 节 */
   level?: number
-  /** 分组名（教程页的「小白教程」/「高手教程」）：同一 group 的节点放在一起，页面按 group 过滤后再传进来 */
+  /** 分组名（教程页的「小白教程」/「高级配置」）：同一 group 的节点放在一起，页面按 group 过滤后再传进来 */
   group?: string
 }
 

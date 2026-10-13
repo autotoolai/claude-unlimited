@@ -71,7 +71,7 @@ function onKeydown(e: KeyboardEvent) {
         <span v-else-if="g.status === 'coming-soon'" class="cu-seg__badge cu-seg__badge--soon">即将上线</span>
       </button>
     </div>
-    <p class="cu-seg__desc">{{ groups.find((g) => g.id === activeId)?.desc }}</p>
+    <p v-if="groups.find((g) => g.id === activeId)?.desc" class="cu-seg__desc">{{ groups.find((g) => g.id === activeId)?.desc }}</p>
 
     <slot :active-id="activeId" />
   </div>

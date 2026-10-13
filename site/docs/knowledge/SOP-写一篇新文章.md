@@ -135,6 +135,29 @@ npm run gen:sources         # 仅当 files 非空
 
 **做对了的标志**：`npm run check:seo` 通过。
 
+### 配封面
+
+封面不要复用别的文章已经占用的那一张图。素材库是 `temp/aiprimetech_covers/`，挑**还没被使用**的素材，按文章主题做语义匹配，不按文件名机械对应。
+
+先看哪些还空着：
+
+```bash
+# 在 site/ 下跑：先把站点已用的封面 md5 收成 /tmp/used.txt，再列出还没被用的素材名
+md5sum public/knowledge/*.jpg | awk '{print $1}' | cut -c1-8 | sort -u > /tmp/used.txt
+for f in temp/aiprimetech_covers/*.jpg; do d=$(md5sum $f | cut -c1-8); grep -q "^$d" /tmp/used.txt || basename $f .jpg; done
+```
+
+选好素材名后：
+
+1. 在 `config/knowledge_cover_map.json` 的 `covers` 里加一条 `"<slug>": "<素材名>"`（无源页的文章必需；有 `/blog/` 源页的脚本会优先直抓源站 hero 图，登记只作备份）。
+2. 删掉 `public/knowledge/<slug>.jpg`，否则脚本会跳过。
+3. 跑 `python scripts/fetch_knowledge_covers.py`。它会复制素材、回写 `knowledge.ts` 的 `cover` 字段，并自动维护 `config/knowledge_cover_sources.json` 来源台账（`blog:<末段>` 是源站直抓，`cover_map:<素材名>` 是本地素材）。
+4. `python scripts/fetch_knowledge_covers.py --check` 确认无缺失。
+
+素材名对应的源文标题在 `temp/aiprimetech_site/pages/blog__<素材名>.md` 第一行 `h1|`，挑之前先读一眼确认没挑错。
+
+素材库会枯竭。剩余素材里别家模型（GPT、Grok、The 等）的发布图与本站调性不符，优先挑 Claude Code / 成本 / 协议类主题。真挑不到合适的不填 `cover`，卡片会退化成纯文字卡，比配一张跑题的图好。
+
 ## 第 5 步 校验
 
 **结论**：顺序固定，每步只看它该看的东西。
@@ -142,7 +165,7 @@ npm run gen:sources         # 仅当 files 非空
 ```bash
 python scripts/check_seo_meta.py     # title ≤32 / desc ≤110 / tags ≥3
 npm run check:sources                 # 素材登记与 archive 一致；原创文章打 WARN 属正常
-npm run build                         # 产物（exit 1 是既有问题，见下）
+npm run build                         # 产物
 npm run check:links                   # 站内死链
 node scripts/check_dist.mjs           # 结构、卡片、分类 tab
 npm run check:toc -- --slug=<新 slug> # 目录锚点、FAQPage 条数、点击定位
@@ -151,7 +174,8 @@ python scripts/verify_build.py 4200   # 浏览器实测，本文项全 [ok]
 
 两个已知陷阱：
 
-- `npm run build` 的 exit 1 是既有问题（`check_dist.mjs` 有约 67 项与知识库无关的失败）。判断新文章是否通过，要看 `check_dist.mjs` 输出里该 slug 有没有出现在失败项里，不能只看 exit code。
+- `npm run build` 现在应当通过（exit 0）。它曾在任何代码状态下都 exit 1，因为 `check_dist.mjs` 断言「产物里不能有 Vue SSR 标记」，
+  与 `copy_public.mjs`「必须保留 SSR 标记否则 hydration 错位」直接矛盾；该断言已移除。若 build 又恒定失败，先读 [`../troubleshooting_guide.md`](../troubleshooting_guide.md) 再判断是不是回归。
 - `npm run check:toc` 默认只抽每类一篇。传 `--slug=<新 slug>` 会把 start 分类的样本换成新文章（该 slug 应属于 start 分类），其余分类不变。传完记得看输出首行的确认。
 
 **做对了的标志**：上面七条命令全部执行完，新 slug 没有出现在任何失败项里。
@@ -163,6 +187,7 @@ python scripts/verify_build.py 4200   # 浏览器实测，本文项全 [ok]
 - [ ] 正文里没有 `## 常见问题`、`## 相关阅读` 小节（`grep -n '^## 常见问题\|^## 相关阅读' docs/knowledge/<slug>.md` 无输出）
 - [ ] `faq` 3–5 条，答案写的是原文而不是压缩版
 - [ ] `related` 里的 3 篇都已存在
+- [ ] 封面图没有和其他文章重复，且语义对得上本文主题（没复用已用素材）
 - [ ] `git diff scripts/` 为空，除非本次有意改了脚本
 - [ ] 新建 md 后立即确认它能被读到（`ls` 与 `python -c "import os; os.path.exists(...)"`），不要只在写文件的那一步自认成功
 - [ ] `check:toc -- --slug=` 跑过

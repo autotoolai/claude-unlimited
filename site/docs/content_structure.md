@@ -14,15 +14,15 @@
 | 首页 | `/` | 落地页 | 这是什么、值不值、多少钱、怎么买 | 首屏 → 为什么值得 → 多少钱 → 四步怎么走 → 买之前可以先确认 → 继续了解 |
 | 套餐定价 | `/pricing` | 决策页 | 多少钱、买到什么、边界在哪、能不能退 | 选择套餐 → 购买后怎么用 → 包含什么 → 不包含什么 → 公平使用 → 退款规则 → 关于价格 → 购买与限速 FAQ |
 | 模型广场 | `/models` | 目录页 | 有哪些模型、model ID 是什么、怎么切 | 模型一览 → CTA |
-| 使用教程 | `/guide` | 操作页 | 怎么配起来 | 小白八步 / 高手五节（分段切换）→ 排错速查 |
-| 知识库 | `/knowledge` | 目录页 | 有哪些文章 | 分类胶囊 + 精选 + 四个分类小节 |
+| 使用教程 | `/guide` | 操作页 | 怎么配起来 | 小白六步 / 高级配置两节（分段切换）→ 排错交给知识库 |
+| 知识库 | `/knowledge` | 目录页 | 有哪些文章 | 分类胶囊 + 精选 + 分类小节（分类数以 `config/knowledge.ts` 的 `knowledgeCategories` 为准） |
 | 管理后台 | `/console` | 说明页 | 后台是什么（外部产品） | 后台能做什么 → 关键功能细说 → 备用域名 → 后台 FAQ |
 | 常见问题 | `/faq` | 答疑页 | 我遇到的问题 | 买之前 5 条 + 7 个分类 + 还没解决 |
 
 `/unlimited`（无限额度页）已于 2026-10-10 并入 `/pricing` 并 301，不要再新建同类页面。
 
 主导航只放内容页：模型广场 / 套餐定价 / 使用教程 / 知识库。管理后台是外部站点，
-入口在页头「进入后台」按钮与页脚「服务」列。
+入口在页头「控制台」按钮与页脚「服务」列。
 
 ## 内容模块词汇表
 
@@ -84,7 +84,7 @@
 
 ```bash
 npm run build        # 内含 check_dist.mjs：页面外壳、H1 唯一、板块 id、卡片数量
-npm run verify       # 470 项 SEO / 组件 / 链接验收
+npm run verify       # 48 项 SEO / 组件 / 链接验收
 npm run check:links  # 死链
 ```
 
@@ -92,4 +92,4 @@ npm run check:links  # 死链
 都有断言。增删首页板块时要同步改那里的断言。
 
 已知既有问题（改动前后都一样，不算回归）：`check:dist` 对 SSR 注释标记、教程页目录、知识库 related[] 的断言恒失败；
-`npx tsc --noEmit` 报 44 条全部来自 `node_modules/vitepress` 内部的 `.vue`。
+`npm run typecheck`（`vue-tsc --noEmit`）报 26 条：24 条来自 node_modules 里的 `.vue` 导入（可忽略），另有 2 条是 `analytics_snippets.ts` 的真错。详见 [`troubleshooting_guide.md`](troubleshooting_guide.md) 第二节。

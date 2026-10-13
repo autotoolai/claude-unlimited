@@ -3,6 +3,7 @@ import type { HeadConfig } from 'vitepress'
 import { siteConfig } from '../config/site'
 import { knowledge } from '../config/knowledge'
 import { publicDirPlugin } from './theme/middleware'
+import { baiduHead, umamiHead } from './analytics_snippets'
 
 /**
  * 站点形态：营销页（首页 / 套餐定价 / 无限额度 / 常见问题）+ 教程页（使用教程总览 / 模型与切换 / 接入与模型 / CC Switch），
@@ -74,7 +75,7 @@ export default defineConfig({
   lastUpdated: false,
   // 内部文档不进产物：README 与知识库写作规范不该出现在 sitemap 与线上
   // 内部文档：不进产物，因此也不进 sitemap（gen_sitemap 扫 dist）
-  srcExclude: ['README.md', 'knowledge_writing_guide.md', 'knowledge/SOP-写一篇新文章.md', 'content_structure.md', 'plans_sync.md'],
+  srcExclude: ['README.md', 'knowledge_writing_guide.md', 'knowledge/SOP-写一篇新文章.md', 'content_structure.md', 'plans_sync.md', 'guide_design_spec.md'],
   ignoreDeadLinks: true,
   head: [
     ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],
@@ -104,6 +105,9 @@ export default defineConfig({
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:title', content: siteConfig.name }],
     ['meta', { name: 'twitter:description', content: siteConfig.description }],
+    // 流量统计：Umami 出行为与转化事件，百度统计是国内口径参照（详见 .vitepress/analytics_snippets.ts）
+    ...umamiHead(),
+    ...baiduHead(),
   ],
   themeConfig: {
     // 页面外壳自带 logo、站名、导航、页内目录与声明，这里全部关掉默认外壳
@@ -143,10 +147,12 @@ export default defineConfig({
      * 首帧不一致」之外还叠加一类噪音：Vue devtools / VitePress 插件读这些全局。模板里不允许写 script，
      * 所以这里只在 dev 下通过 transformIndexHtml 注入一个清除脚本，正常构建不做任何事。
      */
-    // dev 用 5199：5173/5174/5175 常被其它项目占用；host: true 让局域网可访问
+    // dev 用 41800，preview(serve_dist) 用 41777：两者必须分开，否则浏览器标签还挂在旧 dev/preview 进程上时
+    // 你以为在预览新产物、其实看的是旧的。host: true 让局域网与 Tailscale 可访问。
+    // 改端口要同步 package.json 的 dev:site（本行对应）+ serve_dist.mjs 的 PORT。
     server: {
       host: true,
-      port: 5199,
+      port: 41800,
       strictPort: true,
       // 允许用局域网 IP / Tailscale IP / MagicDNS 名字打开；不加会看到 Vite 的 "This host is not allowed" 白屏。
       // IP 形式 Vite 默认放行（IP 直连不做 host 校验），域名形式必须显式列出。
@@ -156,6 +162,9 @@ export default defineConfig({
       // 禁止把 WebP/SVG 内联成 data:（易导致裂图 / 超长属性）
       assetsInlineLimit: 0,
     },
+    // dev 角标不在这里注入：vitepress dev 会用自己的 vite config 覆盖 transformIndexHtml，
+    // 实测 hook 一次都不被调用（2026-10-13）。改由 theme/Layout.vue 按 import.meta.env.DEV 渲染，
+    // 产物侧角标由 scripts/serve_dist.mjs 注入。
     // 诊断开关：CUP_HYDRATION_PROBE=1 npm run build 时打开 Vue 生产构建的 hydration 差异详情（打印不一致的元素与 vnode），
     // 排查内容时用，平时留空。它会一并关掉 devtools，避免干扰控制台输出。
     define: process.env.CUP_HYDRATION_PROBE

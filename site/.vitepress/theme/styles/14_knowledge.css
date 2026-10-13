@@ -404,6 +404,13 @@
    DOM 顺序是「目录 → 正文」，网格第一列是目录（01_shell_toc.css 里 224px），第二列是正文。
    1080px 以下切单列的规则在 01_shell_toc.css 的媒体查询里。 */
 .cu-shell__body--reading {
+  /* 正文列限宽只给带目录的长文页（教程 / 后台 / 知识库文章）。
+     2026-10-13 从 :root 撤下挪到这里：原先它是全局变量，营销页（模型广场 / 套餐定价 / FAQ /
+     知识库列表）的段落和引导语也各被限到 44rem，在 --cu-wrap 的 1140px 列里只占中间一小条，
+     一句话被迫折成两行。营销页没有可读性压力，让它们吃满整列。
+     变量是自定义属性，不给值时 max-width: var(--cu-content-w) 整条声明失效（不是回退到 0），
+     消费点在 01_shell.css 的 .cu-page p / ul / ol、10_faq.css、14_knowledge 的 .cu-page--doc 内。 */
+  --cu-content-w: 44rem;
   grid-template-columns: 224px minmax(0, 1fr);
   gap: 3.5rem;
   /* 不居中：正文靠左，与吸顶导航的左边缘对齐；居中会整块浮在半空、右侧多出大片空白 */
@@ -428,6 +435,46 @@
   max-width: 54rem;
 }
 
+
+/* 教程页整体再放宽到 52rem（约 832px）：行宽仍由文字层自己管住——
+   引导语 / 段落 / 动作 / 提示全部限宽 --cu-guide-text（46rem ≈ 736px，约 33 个汉字一行），
+   多出来的 96px 只给截图与表格（截图上限 700px，两者都受益于更高的像素高度）。
+   cu-guide-wrap 由 PageShell.vue 加在 .cu-shell__body 上（是 .cu-shell__inner 的祖先）。
+   目录仍限宽 46rem，所以视觉上正文列比目录列宽一档是刻意的。 */
+/* ⚠ PageShell 的 slug 传的是 "/guide"（带前导斜杠），所以判断要先去斜杠。
+   之前这里写的是 slug === 'guide'，永远不成立，这条 52rem 一直没生效：
+   教程页实际命中的是 01_shell.css 里 --reading 的 42rem，两图右列只剩 250px。 */
+.cu-shell__body--reading.cu-guide-wrap .cu-shell__inner {
+  /* 56rem（896px）：并排两图那一列是 340px + 1fr，两图等高后各自要占掉 340~400px 的图宽，
+     52rem 下右列只剩 250px，第二张图被压成一条。文字层仍限宽 46rem，不受影响。 */
+  max-width: 56rem;
+}
+
+/* 教程页页头（PageShell 的 .cu-page__head）改为顶格，不再居中。
+   2026-10-13 修：页头里的「已经买好了，这里只讲一件事……」是 .cu-page__lead，落在 .cu-page 内，
+   被营销页外壳留下的两条居中规则压住了——.cu-page__head 的 text-align: center 继承下来，
+   .cu-page__lead 自己的 margin: 1rem auto 又把它居中到 44rem。结果首屏出现两套左边线：
+   H1「使用教程」在 832px 列的正中，那段话却在 704px 盒子里居中，两者左边缘差 64px，
+   与下方 H2「1. 安装 CC Switch」的左边线也对不齐。
+   eyebrow 也要一起顶格：它是 inline-flex，text-align: center 会把它推到正中（实测 left 966 vs 列左 655）。
+   优先级：.cu-page__head 是 (0,1,0)、.cu-page__lead 是 (0,1,0)，.cu-page p 是 (0,1,1)，
+   所以 .cu-guide-wrap 这条 (0,2,0) 稳赢，不需要 !important。
+   只写 .cu-guide-wrap 前缀：这是 PageShell 加在 .cu-shell__body 上的类，只有教程页有，
+   其它长文页（知识库文章页 / 控制台页）的居中页头保持原样。
+   行宽交给 .cu-guide-lead 那套 --cu-guide-text 限宽思路，这里跟教程正文列同宽 52rem 里再限 46rem：
+   与下方步骤块的行宽一致，两侧留白也对得上。 */
+.cu-guide-wrap .cu-page__head {
+  text-align: left;
+}
+
+.cu-guide-wrap .cu-page__lead {
+  margin: 1rem 0 0;
+  /* 固定 46rem，不走 var(--cu-guide-text)：那个变量在 shell_extra.css 里是 52rem（与正文列同宽），
+     兜底值 46rem 永远不生效，这里一旦改变量，教程页引导语会跟着变宽到 52rem。
+     教程正文列 52rem 的余量是留给截图与表格的，纯文字引导语保持 46rem（≈33 字一行）。 */
+  max-width: 46rem;
+}
+
 .cu-shell__body--reading .cu-page {
   padding-bottom: 1rem;
 }
@@ -441,6 +488,16 @@
 @media (max-width: 1080px) {
   .cu-shell__body--reading {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* 单列下解除正文限宽：本文件在上面把 --reading .cu-shell__inner 定成 46rem、
+     教程页 .cu-guide-wrap .cu-shell__inner 定成 52rem，后者是 (0,3,0)，会压过
+     01_shell_toc.css 里那条 (0,2,0) 的解除规则（那个文件先加载），所以这里必须再写一遍。
+     900px 视口下不解除的话，正文只占 832px，两侧各空约 30px。 */
+  .cu-shell__body--reading .cu-shell__inner,
+  .cu-shell__body--reading .cu-shell__inner--reading,
+  .cu-shell__body--reading.cu-guide-wrap .cu-shell__inner {
+    max-width: none;
   }
 }
 

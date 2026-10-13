@@ -4,6 +4,7 @@
 依赖：Pillow。字体用系统自带的 Segoe UI Bold / Consolas；中文回退到 msyh.ttc（微软雅黑）。
 """
 import io
+import json
 import os
 import re
 import sys
@@ -12,6 +13,9 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 OUT = os.path.join(ROOT, 'public', 'og')
+
+with io.open(os.path.join(ROOT, 'config', 'logo.json'), encoding='utf-8') as f:
+    LOGO = json.load(f)
 
 W, H = 1200, 630
 PAPER = '#F5F1E8'
@@ -51,11 +55,26 @@ def font(kind, size):
 
 
 def logo(d, x, y, s):
-    d.rounded_rectangle([x, y, x + s, y + s], radius=int(s * 0.22), fill=ACCENT)
-    d.line([(x + s * 0.18, y + s * 0.38), (x + s * 0.36, y + s * 0.38)], fill='#FFF6EC', width=max(2, int(s * 0.08)))
-    d.arc([x + s * 0.22, y + s * 0.3, x + s * 0.56, y + s * 0.66], start=90, end=270, fill='#FFF6EC', width=max(2, int(s * 0.08)))
-    d.line([(x + s * 0.82, y + s * 0.62), (x + s * 0.64, y + s * 0.62)], fill='#FFF6EC', width=max(2, int(s * 0.08)))
-    d.arc([x + s * 0.44, y + s * 0.34, x + s * 0.78, y + s * 0.7], start=270, end=90, fill='#FFF6EC', width=max(2, int(s * 0.08)))
+    """品牌标记：几何与配色读 config/logo.json（由 config/logo.ts 生成），与 favicon 同源。
+
+    画法为归一化描述，不解析 SVG path 字符串。
+    """
+    sh = LOGO['shape']
+    d.rounded_rectangle(
+        [x, y, x + s, y + s],
+        radius=int(LOGO['radius'] / LOGO['size'] * s),
+        fill=LOGO['bg'],
+    )
+    w = max(2, int(round(sh['stroke'] * s)))
+    fg = LOGO['fg']
+    for ln in sh['lines']:
+        d.line(
+            [(x + ln['x1'] * s, y + ln['y1'] * s), (x + ln['x2'] * s, y + ln['y2'] * s)],
+            fill=fg, width=w,
+        )
+    for arc in sh['arcs']:
+        cx, cy, r = x + arc['cx'] * s, y + arc['cy'] * s, arc['r'] * s
+        d.arc([cx - r, cy - r, cx + r, cy + r], start=arc['from'], end=arc['to'], fill=fg, width=w)
 
 
 def text_w(d, s, f):

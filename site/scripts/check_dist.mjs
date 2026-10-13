@@ -12,7 +12,7 @@ const DIST = path.resolve(process.cwd(), '.vitepress', 'dist')
 const unregisterTsx = register()
 const knowledgeMod = await tsImport('../config/knowledge.ts', import.meta.url)
 const { faqItems, faqCategories } = await tsImport('../config/faq.ts', import.meta.url)
-const { guideShots } = await tsImport('../config/guide.ts', import.meta.url)
+const { guideShots, guideTabs } = await tsImport('../config/guide.ts', import.meta.url)
 const { siteConfig } = await tsImport('../config/site.ts', import.meta.url)
 unregisterTsx()
 function knowledgePages() {
@@ -31,6 +31,54 @@ Object.assign(PAGES, Object.fromEntries(knowledgePages()))
 
 const fails = []
 const ok = (cond, msg) => { if (!cond) fails.push(msg) }
+
+// —— 2026-10-13 样式链路断言 ——
+// 症状：整站页面看着像「没有样式」，居中 / 限宽 / 配色全部不生效。
+// 根因：产物 HTML 里样式表只有 rel="preload stylesheet"，缺 rel="stylesheet"，
+// 浏览器只预加载不应用，CSS 整份被丢弃。全站视觉回归，检查不出来，只能靠人眼发现。
+const distHtmlFiles = []
+;(function walk(dir) {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, e.name)
+    if (e.isDirectory()) walk(full)
+    else if (e.name.endsWith('.html')) distHtmlFiles.push(full)
+  }
+})(DIST)
+const preloadOnly = distHtmlFiles.filter((f) => {
+  const html = fs.readFileSync(f, 'utf8')
+  // 只统计本地样式表（/assets/*.css、/vp-icons.css 等），外链字体不算
+  const localCssLinks = [...html.matchAll(/<link[^>]*href="(\/[^"]+\.css)"[^>]*>/g)].map((m) => m[0])
+  return localCssLinks.some((tag) => /rel="[^"]*stylesheet/.test(tag) === false)
+})
+ok(
+  preloadOnly.length === 0,
+  `产物里有的 HTML 只 preload 没应用样式表（CSS 会被浏览器丢弃）：${preloadOnly.map((f) => path.relative(DIST, f)).join(', ') || '—'}`
+)
+
+
+// —— 2026-10-13 样式作用域断言 ——
+// 模型广场的引导语此前被两处规则误伤，都是「全局状态类 / 页面标记用错层级」的通病，这里钉死。
+const modelsHtml = fs.readFileSync(path.join(DIST, 'models.html'), 'utf8')
+// cu-guide-wrap 是教程页排版的标记（PageShell 只在 slug==='guide' 时加）。
+// 无目录的营销页带上它会继承教程页的页头左对齐与 lead 限宽，窄屏下 lead 被压到两行。
+ok(!/class="[^"]*cu-guide-wrap/.test(modelsHtml), 'models.html 不该带 cu-guide-wrap（这是教程页排版标记）')
+
+// 折叠态类 html.cu-toc-collapsed 挂在 <html> 上，状态存 localStorage 全站共享，
+// 解除段落限宽的规则必须挂 .cu-shell__body--reading 前缀，否则教程页一折叠，
+// 模型广场 / 套餐定价等营销页的 lead 与段落也跟着变成不限宽。
+const distCss = fs
+  .readdirSync(path.join(DIST, 'assets'))
+  .filter((f) => f.endsWith('.css'))
+  .map((f) => fs.readFileSync(path.join(DIST, 'assets', f), 'utf8'))
+  .join('\n')
+const leakRules = [...distCss.matchAll(/html\.cu-toc-collapsed[^{]*/g)]
+  .map((m) => m[0].trim())
+  .filter((sel) => /\.cu-page\s+(p|ul|ol)\b/.test(sel) && !sel.includes('cu-shell__body--reading'))
+ok(
+  leakRules.length === 0,
+  `cu-toc-collapsed 的段落限宽解除规则必须限定在带目录的页面内，发现泄漏：${leakRules.join(' | ') || '—'}`
+)
+
 
 for (const [route, file] of Object.entries(PAGES)) {
   const html = fs.readFileSync(path.join(DIST, `${file}.html`), 'utf8')
@@ -140,25 +188,41 @@ for (const [route, file] of Object.entries(PAGES)) {
   const nav = html.match(/<nav class="cu-tabs"[\s\S]*?<\/nav>/) || ['']
   ok(!/cu-navcta/.test(html), `${route}: 页头仍有旧的 cu-navcta 购买按钮（应换成 cu-brandbar__note 声明）`)
 }
-// 教程是一页两条轨（2026-10 重构：删购买章节、页首客服条、小白八步 + 高手五节）：
-// 客服条在正文第一屏，两条轨各有 kicker 计数，共用块（常见问题排查）不带 kicker。
+// 教程是一页两条轨（2026-10 重构：删购买章节、页首客服条、小白六步 + 高级配置两节）：
+// 小白轨 6 步，每步内部再分子步骤；高级轨只用表格与网址行，没有步骤块。
 const guideHtml = fs.readFileSync(path.join(DIST, 'guide/index.html'), 'utf8')
 const guideSteps = count(guideHtml, /cu-step-block__no/g)
-ok(guideSteps >= 8, `/guide: 步骤块数 ${guideSteps}，应 >= 8（小白轨 6 步 + 高手轨手填字段步骤）`)
-// kicker 数 = 小白 6 + 高手 5；改教程加节时要同步这里
-const GUIDE_KICKERS = 11
-ok(count(guideHtml, /cu-step-kicker/g) === GUIDE_KICKERS, `/guide: 步骤标签（小白 ${6} + 高手 ${5}）应恰好 ${GUIDE_KICKERS} 个，实际 ${count(guideHtml, /cu-step-kicker/g)}`)
-ok(count(guideHtml, /cu-seg__btn/g) === 2, `/guide: 分段切换应有两个胶囊（小白 / 高手），实际 ${count(guideHtml, /cu-seg__btn/g)}`)
+ok(guideSteps >= 8, `/guide: 子步骤块数 ${guideSteps}，应 >= 8（小白轨第 6 步含「下载 VS Code」子步骤）`)
+// kicker 全页为 0：H2 已带序号，再画胶囊会重复（docs/guide_design_spec.md「坑位：kicker」）
+const GUIDE_KICKERS = 0
+ok(count(guideHtml, /cu-step-kicker/g) === GUIDE_KICKERS, `/guide: 步骤标签应为 ${GUIDE_KICKERS} 个，实际 ${count(guideHtml, /cu-step-kicker/g)}`)
+ok(count(guideHtml, /cu-seg__btn/g) === 2, `/guide: 分段切换应有两个胶囊，实际 ${count(guideHtml, /cu-seg__btn/g)}`)
+// 胶囊按钮里还包着说明文案（`>轨名 <!----></button>`），所以只匹配「>轨名 」这一段
+for (const segName of guideTabs.map((t) => t.name)) ok(guideHtml.includes(`>${segName} <!----></button>`), `/guide: 分段切换里没有「${segName}」胶囊（轨名是文案契约：轨改名时这里要同步）`)
 // 教程页首客服条（KefuBar）已删除：客服只走右下角在线助手浮标，这里断言它没被挂回来
 ok(!guideHtml.includes('cu-kefubar'), '/guide: 页首客服条（KefuBar）已下线，产物里不该再出现 cu-kefubar')
-// 小白轨 6 步 + 高手轨 5 节 + 共用块；锚点 id 是 /guide#锚点 深链契约（config/faq.ts、kefu_bot.ts 引用）
-for (const anchor of ['install-ccswitch', 'get-key', 'import', 'models', 'enable', 'vscode', 'params', 'manual', 'env', 'editors', 'selfcheck', 'errors'])
+// 小白轨 6 步 + 高级轨 2 节；锚点 id 是 /guide#锚点 深链契约（config/faq.ts、kefu_bot.ts 引用）
+// 2026-10：高级轨精简为 pro-key / params；manual、env、editors、selfcheck 与 errors 旧锚点已删除
+// （common 排查块按要求整段删除，报错统一走 /faq#cat-setup 与知识库）
+const GUIDE_ANCHORS = ['install-ccswitch', 'get-key', 'import', 'models', 'enable', 'vscode', 'pro-key', 'params']
+for (const anchor of GUIDE_ANCHORS)
   ok(guideHtml.includes(`id="${anchor}"`), `/guide: 缺少小节锚点 id="${anchor}"（两条轨的小节）`)
+// 双向：产物里出现白名单之外的 <h2 id>（误恢复带回的旧块就是这样混进来的），也要在这里拦住
+{
+  const distAnchors = [...guideHtml.matchAll(/<h2 id="([a-z0-9-]+)"/g)].map((m) => m[1])
+  const extra = [...new Set(distAnchors)].filter((a) => !GUIDE_ANCHORS.includes(a))
+  ok(extra.length === 0, `/guide: 产物里多出未登记的小节锚点：${extra.join('、')}（config/guide.ts 多了一块，或该块已删除但没删干净）`)
+}
 // 截图文件名不会原样出现在 HTML 里（静态 import 带了 hash），按 <img class="cu-shot"> 数量断言；
-// 两条轨都渲染在 SSR 产物里（切轨靠 hidden），所以总数 = config/guide.ts 里 shot.src 的去重列表长度
+// 两条轨都渲染在 SSR 产物里（切轨靠 hidden），所以总数 = config/guide.ts 里 shot.src 按出现次数的列表长度
+// 图注编号必须与正文出现顺序连续（docs/guide_design_spec.md 第三章之二）。补子步骤时最容易漏改。
+const figureLabels = [...guideHtml.matchAll(/cu-shot__label[^>]*>图 (\d+)</g)].map((m) => Number(m[1]))
+ok(figureLabels.length > 0, '/guide: 产物里没有图注编号')
+for (let i = 1; i < figureLabels.length; i++)
+  ok(figureLabels[i] === figureLabels[i - 1] + 1, `/guide: 图注编号不连续：第 ${i + 1} 张是「图 ${figureLabels[i]}」，上一张是「图 ${figureLabels[i - 1]}」（config/guide.ts 里 shot.label）`)
 const GUIDE_SHOTS = guideShots.length
 const shotCount = count(guideHtml, /class="cu-shot[ "]/g)
-ok(shotCount === GUIDE_SHOTS, `/guide: 教程截图应渲染 ${GUIDE_SHOTS} 张（config/guide.ts 里 shot.src 的去重列表），实际 ${shotCount}`)
+ok(shotCount === GUIDE_SHOTS, `/guide: 教程截图应渲染 ${GUIDE_SHOTS} 张（config/guide.ts 里 shot.src 按出现次数的列表），实际 ${shotCount}`)
 // 抽每张图的产物路径，确认 hash 后的文件真的在 dist 里（换图后忘了更新 GuideShot.vue 的导入表会在这里暴露）
 const shotSrcs = [...guideHtml.matchAll(/src="(\/assets\/guide_[^"]+\.(?:png|jpg|jpeg|webp))"/g)].map((m) => m[1])
 ok(shotSrcs.length === GUIDE_SHOTS, `/guide: 教程截图 <img src> 数 ${shotSrcs.length}，应 ${GUIDE_SHOTS}`)

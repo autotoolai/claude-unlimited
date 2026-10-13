@@ -1,8 +1,10 @@
 /**
  * 模型与 ID 配置 —— 模型广场、使用教程与 FAQ 共用的唯一数据源。
  *
- * 权威来源：2026-10-10 对 https://rsxermu666.cn/v1/messages 的逐模型实测
- * （temp/probe_stage1.py），实测结论见下方 verifiedModels 注释。
+ * 权威来源：2026-10-13 对 https://rsxermu666.cn/v1/models 的实测快照
+ * （scripts/fetch_upstream_models.py，存于 config/models_upstream.json），
+ * 并对 claude-sonnet-5-5、claude-haiku-5-5 补了 /v1/messages 逐模型调用实测。
+ * 实测结论见下方注释。
  *
  * 实测确认的三件事，官网表述都以此为准：
  *
@@ -42,7 +44,7 @@ export interface ModelRow {
 }
 
 /** 实测验证时间，用于在页脚标注 */
-export const verifiedAt = '2026-10-10'
+export const verifiedAt = '2026-10-13'
 
 
 export const modelIds: ModelRow[] = [
@@ -77,14 +79,14 @@ export const modelIds: ModelRow[] = [
       'Fable-5 极限推理档位，拉满思考预算，支持多路径并行推演与交叉复盘，推理准确率拉满，耗时更高。可用模型里响应最快的一档，轻量任务上比 Fable 5.1 更省时间；思考强度固定不可调，需按预算调节思考量时改用 Opus 4.7 或 4.8。',
   },
   {
-    id: 'claude-sonnet-5',
-    tier: 'Sonnet 5',
+    id: 'claude-sonnet-5-5',
+    tier: 'Sonnet 5.5',
     scene: '质量与速度的中间档',
     pick: 'backup',
     brand: 'Claude',
-    tags: ['自适应思考', '全栈编码能力', '专业多模态解析'],
+    tags: ['自适应思考', '全栈编码能力', '专业多模态解析', '百万上下文'],
     summary:
-      'Anthropic 当前最强 Sonnet，Adaptive Thinking 默认启用、无需配置，由模型自动判断何时深入推理。编程、工具使用与代理规划全面升级，比 Opus 轻、比上一代 Sonnet 新的中间档，适合批量改文件、写样板代码这类量大但不复杂的活。',
+      'Sonnet 5.5 是 2026 年 9 月 28 日发布的当前最强 Sonnet，1M 上下文、128K 最大输出，支持图文输入与工具调用，Adaptive Thinking 默认启用、无需配置。相比上一代 Sonnet 5 输出生成快 30% 以上，多步工具调用与终端任务基准提升明显，是编码和大多数生产任务的默认档：量大但不复杂的批量改动、样板代码、整仓上下文分析都适合它。',
   },
   {
     id: 'claude-opus-4-8',

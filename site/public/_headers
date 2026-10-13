@@ -7,9 +7,6 @@
 /favicon.svg
   Cache-Control: public, max-age=86400
 
-/brand-logo.svg
-  Cache-Control: public, max-age=86400
-
 # 以下资源由 copy_public.mjs 直接落到 dist 根目录，不走 /assets/* 的 immutable 规则，
 # 且文件名不含 hash（改了图 URL 不变），必须显式给短缓存，否则 CDN 与浏览器会长期拿旧图
 /og/*

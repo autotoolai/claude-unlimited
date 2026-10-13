@@ -4,7 +4,7 @@
 
 | 项目 | 位置 | 文档 |
 |---|---|---|
-| Claude 无限卡官网（静态展示站） | `site/` | [`site/README.md`](../site/README.md) |
+| Claude 无限卡官网（静态展示站） | `site/` | [`site/README.md`](../site/README.md)（现状与命令）· [`site/docs/README.md`](../site/docs/README.md)（文档地图）· [`site/docs/troubleshooting_guide.md`](../site/docs/troubleshooting_guide.md)（故障排除）· [`site/docs/changelog.md`](../site/docs/changelog.md)（变更历史） |
 | vpns.beer 代理平台登录自动化 | `vpns_beer_agent/` | [`vpns_beer_agent/README.md`](../vpns_beer_agent/README.md) |
 
 `docs/` 下另有 `aiprimetech_全站页面分析.md` 与 `claude_code_页面精选清单.html`：竞品站分析与选题清单，由 `scripts/build_selection_html.py` 生成，只作参考。

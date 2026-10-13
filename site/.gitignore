@@ -14,3 +14,12 @@ Thumbs.db
 
 # Claude Code 本地会话状态目录（不入库）
 .claude-local/
+
+# ===== 流量看板：原始数据与生成物不入库，脚本在 scripts/analytics/ =====
+scripts/analytics/data/
+scripts/analytics/dashboard.html
+
+# 误嵌套的构建产物
+.vitepress/.vitepress/
+
+__pycache__/

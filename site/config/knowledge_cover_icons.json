@@ -1,0 +1,184 @@
+{
+  "_说明": "知识库封面配图的图标映射：slug -> {query, candidates}。图标取自 Iconify 的 lucide / tabler / ph 图标集（MIT / ISC 许可，可商用）。生成器 scripts/generate_knowledge_covers.mjs 按 candidates 顺序取第一个可用图标，全部取不到时再用 query 走 Iconify 搜索接口兜底，所以 query 一律写英文英文关键词。",
+  "covers": {
+    "claude-code-tutorial": {
+      "query": "terminal",
+      "candidates": [
+        "lucide:terminal",
+        "tabler:terminal-2"
+      ]
+    },
+    "claude-code-mcp-config": {
+      "query": "server",
+      "candidates": [
+        "tabler:server-cog",
+        "ph:plugs-connected",
+        "lucide:plug",
+        "tabler:settings-server"
+      ]
+    },
+    "claude-code-make-video": {
+      "query": "video",
+      "candidates": [
+        "ph:video-camera",
+        "tabler:video",
+        "lucide:clapperboard"
+      ]
+    },
+    "claude-code-plan-mode": {
+      "query": "checklist",
+      "candidates": [
+        "lucide:list-checks",
+        "tabler:list-check",
+        "lucide:clipboard-list"
+      ]
+    },
+    "claude-code-permission-modes": {
+      "query": "shield",
+      "candidates": [
+        "lucide:shield-check",
+        "tabler:shield-lock",
+        "lucide:lock-keyhole"
+      ]
+    },
+    "claude-md-guide": {
+      "query": "document",
+      "candidates": [
+        "lucide:file-text",
+        "tabler:file-description",
+        "lucide:files"
+      ]
+    },
+    "claude-code-cli-cheatsheet": {
+      "query": "keyboard",
+      "candidates": [
+        "tabler:keyboard",
+        "lucide:command",
+        "tabler:code"
+      ]
+    },
+    "claude-code-subagents": {
+      "query": "branch",
+      "candidates": [
+        "ph:git-branch",
+        "tabler:git-branch",
+        "lucide:network"
+      ]
+    },
+    "claude-code-skills": {
+      "query": "package",
+      "candidates": [
+        "tabler:package",
+        "lucide:package-open",
+        "lucide:sparkles"
+      ]
+    },
+    "why-agents-cost-more-tokens": {
+      "query": "gauge",
+      "candidates": [
+        "lucide:gauge",
+        "ph:gauge",
+        "tabler:bolt"
+      ]
+    },
+    "claude-code-startup-tokens": {
+      "query": "bolt",
+      "candidates": [
+        "ph:lightning",
+        "tabler:cpu-2",
+        "lucide:zap"
+      ]
+    },
+    "prompt-caching-explained": {
+      "query": "database",
+      "candidates": [
+        "tabler:database-cog",
+        "lucide:database",
+        "ph:database"
+      ]
+    },
+    "claude-api-pricing-explained": {
+      "query": "invoice",
+      "candidates": [
+        "tabler:report-money",
+        "lucide:receipt",
+        "tabler:calculator"
+      ]
+    },
+    "reduce-token-usage-tips": {
+      "query": "optimize",
+      "candidates": [
+        "tabler:arrow-down-right",
+        "lucide:scissors",
+        "ph:chart-line-down"
+      ]
+    },
+    "choose-claude-model": {
+      "query": "layers",
+      "candidates": [
+        "tabler:stack-2",
+        "lucide:layers",
+        "tabler:layers-difference"
+      ]
+    },
+    "claude-code-vs-codex": {
+      "query": "compare",
+      "candidates": [
+        "tabler:scale",
+        "ph:scales",
+        "lucide:git-compare"
+      ]
+    },
+    "claude-code-prompt-too-long-fix": {
+      "query": "text",
+      "candidates": [
+        "lucide:text-cursor-input",
+        "tabler:file-alert",
+        "lucide:wrap-text"
+      ]
+    },
+    "claude-code-429-rate-limit": {
+      "query": "timer",
+      "candidates": [
+        "ph:timer",
+        "lucide:timer",
+        "tabler:traffic-cone"
+      ]
+    },
+    "claude-code-529-overloaded": {
+      "query": "cloud",
+      "candidates": [
+        "ph:cloud-warning",
+        "lucide:cloud-alert",
+        "ph:cloud-arrow-up"
+      ]
+    },
+    "claude-code-401-403": {
+      "query": "key",
+      "candidates": [
+        "ph:key",
+        "tabler:key",
+        "lucide:key-round",
+        "tabler:key-off"
+      ]
+    },
+    "claude-code-connection-lost": {
+      "query": "unplug",
+      "candidates": [
+        "ph:plugs",
+        "tabler:plug-connected-x",
+        "lucide:unplug",
+        "tabler:plug-x"
+      ]
+    },
+    "claude-code-usage-limit-reached": {
+      "query": "gauge",
+      "candidates": [
+        "ph:gauge-full",
+        "tabler:gauge-filled",
+        "lucide:gauge",
+        "ph:gauge"
+      ]
+    }
+  }
+}

@@ -654,7 +654,6 @@
     opacity: 0.6;
   }
 }
-/* 教程分段切换（两条轨）的面板：切换后第一块是 h2，去掉额外的上边距 */
-.cu-guide-rail > div > h2:first-of-type {
-  margin-top: 0.5rem;
-}
+/* 教程轨内小节之间的上边距统一放在 shell_extra.css：轨内第一块 .5rem、其余 --cu-section-y-lg。
+   这里原来那条 .cu-guide-rail > div > h2:first-of-type 优先级 (0,2,2) 高于 shell_extra 的 (0,2,1)，
+   会把每一节的 h2 上边距都压成 0.5rem，导致六步挤在一起。 */

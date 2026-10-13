@@ -1,0 +1,27 @@
+{
+  "_说明": "每个 slug 的封面素材来源，由 scripts/fetch_knowledge_covers.py 自动维护。blog:<末段> = 从源站 /blog/<末段>/ 的 hero 图直抓；cover_map:<素材名> = 从本地 temp/aiprimetech_covers/<素材名>.jpg 取（见 config/knowledge_cover_map.json）。",
+  "covers": {
+    "choose-claude-model": "cover_map:choosing-the-right-model-cost",
+    "claude-api-pricing-explained": "cover_map:getting-started",
+    "claude-code-401-403": "cover_map:openrouter-vs-direct-api",
+    "claude-code-429-rate-limit": "blog:",
+    "claude-code-529-overloaded": "cover_map:claude-pro-max-limits-25-percent-increase",
+    "claude-code-cli-cheatsheet": "cover_map:claude-code-cli-guide",
+    "claude-code-connection-lost": "cover_map:claude-code-router",
+    "claude-code-make-video": "cover_map:anthropic-cowork-claude-desktop-agent",
+    "claude-code-mcp-config": "cover_map:claude-code-mcp-servers-setup-guide",
+    "claude-code-permission-modes": "blog:",
+    "claude-code-plan-mode": "blog:",
+    "claude-code-prompt-too-long-fix": "cover_map:claude-code-max-output-tokens",
+    "claude-code-skills": "cover_map:claude-code-features-october-2026",
+    "claude-code-startup-tokens": "blog:",
+    "claude-code-subagents": "cover_map:claude-code-projects-agent-teams",
+    "claude-code-tutorial": "cover_map:claude-code-cli-guide",
+    "claude-code-usage-limit-reached": "cover_map:claude-code-sessions-self-hosted-environments",
+    "claude-code-vs-codex": "cover_map:claude-code-vs-goose",
+    "claude-md-guide": "blog:",
+    "prompt-caching-explained": "blog:",
+    "reduce-token-usage-tips": "blog:",
+    "why-agents-cost-more-tokens": "cover_map:agent-cost-control"
+  }
+}

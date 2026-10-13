@@ -251,12 +251,19 @@ html:not(.dark) .cu-navtoggle .cu-icon-moon {
 }
 
 .cu-page__lead {
+  /* 营销页不吃满整列，但也不能压到 44rem：那句话在 1140px 的列里会被迫折成两行。
+     这里不写 max-width，留给 .cu-page p 的 var(--cu-content-w)——那变量只在带目录的长文页上有值，
+     营销页上整条声明失效，引导语自然吃满列宽（见 14_knowledge.css 里 .cu-shell__body--reading 的定义）。 */
   margin: 1rem auto 0;
-  max-width: 44rem;
   font-size: 1.08rem;
   line-height: 1.75;
   color: var(--cu-ink-2);
   text-wrap: pretty;
+  /* 页头是居中排版（.cu-page__head 的 text-align: center），lead 必须跟着居中。
+     但它同时是 <p>，落在 .cu-page 里，.cu-page p 那条 (0,1,1) 的 text-align: left 会压过
+     本条 (0,1,0)，所以这里必须 !important——这是全文件唯一一处非黑名单用法，
+     原因是「继承居中」要输给「直接选中」的更高优先级，不是优先级写错。 */
+  text-align: center !important;
 }
 
 /* —— 正文排版 —— */

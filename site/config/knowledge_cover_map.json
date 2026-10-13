@@ -1,9 +1,28 @@
 {
-  "_说明": "缺图文章的配图来源：从源站 69 张封面（temp/aiprimetech_covers/）里按语义挑选。语义相近的源文章可能与我们的主题不完全一致，这是有意为之——配图只作氛围。source 文章有 /blog/ 源页的由 fetch_knowledge_covers.py 直接抓取，这里只登记没有源页的。",
+  "_说明": "缺图文章的配图来源：从源站 69 张封面（temp/aiprimetech_covers/）里按语义挑选。语义相近的源文章可能与我们的主题不完全一致，这是有意为之——配图只作氛围。source 文章有 /blog/ 源页的由 fetch_knowledge_covers.py 直接抓取，这里只登记没有源页的。每条都用 /blog/ 源页的原素材直接抓取（fetch_knowledge_covers.py 对有源页的 slug 优先直抓），此表只作为素材名备份；换素材时同时更新 config/knowledge_cover_sources.json。",
   "covers": {
-    "claude-code-prompt-too-long-fix": "claude-code-max-output-tokens",
-    "claude-code-startup-tokens": "claude-code-token-overhead-startup",
+    "claude-code-tutorial": "claude-code-cli-guide",
     "claude-code-mcp-config": "claude-code-mcp-servers-setup-guide",
-    "claude-code-make-video": "anthropic-cowork-claude-desktop-agent"
+    "claude-code-make-video": "anthropic-cowork-claude-desktop-agent",
+    "claude-code-plan-mode": "claude-code-plan-mode",
+    "claude-code-permission-modes": "claude-code-auto-mode-vs-dangerously-skip-permissions",
+    "claude-md-guide": "claude-code-agents-md-support",
+    "claude-code-cli-cheatsheet": "claude-code-cli-guide",
+    "claude-code-subagents": "claude-code-projects-agent-teams",
+    "claude-code-skills": "claude-code-features-october-2026",
+    "why-agents-cost-more-tokens": "agent-cost-control",
+    "claude-code-startup-tokens": "claude-code-token-overhead-startup",
+    "prompt-caching-explained": "prompt-caching-explained",
+    "claude-api-pricing-explained": "getting-started",
+    "reduce-token-usage-tips": "reduce-llm-token-usage",
+    "choose-claude-model": "choosing-the-right-model-cost",
+    "claude-code-vs-codex": "claude-code-vs-goose",
+    "claude-code-prompt-too-long-fix": "claude-code-max-output-tokens",
+    "claude-code-429-rate-limit": "rate-limits-and-retries",
+    "claude-code-529-overloaded": "claude-pro-max-limits-25-percent-increase",
+    "claude-code-401-403": "openrouter-vs-direct-api",
+    "claude-code-connection-lost": "claude-code-router",
+    "claude-code-usage-limit-reached": "claude-code-sessions-self-hosted-environments",
+    "code-video-skills-guide": "show-hn-ideogram-4-0-open-weight-9-3b-text-to-image-model"
   }
 }

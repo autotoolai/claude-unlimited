@@ -46,7 +46,7 @@ async function copyWechat() {
 
     <h2 id="more">还没解决？</h2>
     <ul>
-      <li>卡密兑换、CC Switch 一键导入、模型列表为空——看<a href="/guide">使用教程</a>的「第二步 密钥配置」与<a href="/guide#errors">排错速查</a>；</li>
+      <li>卡密兑换、CC Switch 一键导入、模型列表为空——看<a href="/guide">使用教程</a>的「2. 换取 API Key」「3. 一键导入配置」与<a href="/faq#cat-setup">常见问题 · 使用与配置</a>；</li>
       <li>先看本页「限速与封号」与「数据与安全」两节——大多数争议都能在这里定位；</li>
       <li>点右下角<strong>在线助手</strong>，输入关键词（如「429」「Base URL」「一键导入」）会直接给出对应答案；</li>
     </ul>

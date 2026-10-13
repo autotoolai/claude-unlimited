@@ -73,6 +73,7 @@ const themePages = {
   console: PageConsole,
 }
 import PageModels from './models.vue'
+import VideoPlayer from './components/VideoPlayer.vue'
 import PageConsole from './console.vue'
 import NotFoundPage from './components/NotFoundPage.vue'
 
@@ -108,6 +109,7 @@ const theme: Theme = {
     app.component('SegmentedTabs', SegmentedTabs)
     app.component('SiteFooter', SiteFooter)
     app.component('KnowledgeIndex', KnowledgeIndex)
+    app.component('VideoPlayer', VideoPlayer)
     app.component('KnowledgeCard', KnowledgeCard)
     app.component('KnowledgeFooter', KnowledgeFooter)
     app.component('NotFoundPage', NotFoundPage)

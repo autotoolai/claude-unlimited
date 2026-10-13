@@ -113,7 +113,10 @@ useReveal()
       </div>
     </header>
 
-    <div class="cu-shell__body" :class="{ 'cu-shell__body--reading': !!toc }">
+    <div
+      class="cu-shell__body"
+      :class="{ 'cu-shell__body--reading': !!toc, 'cu-guide-wrap': slug.replace(/^\//, '') === 'guide', 'cu-shell__body--no-toc': !sections.length }"
+    >
       <!-- 目录在正文之前：宽屏是左侧一列，≤1280px 塌成正文上方的横排条（靠 DOM 顺序，不靠 order） -->
       <SectionNav :sections="sections" />
       <div class="cu-shell__inner" :class="toc ? `cu-shell__inner--reading${toc === 'wide' ? ' cu-shell__inner--wide' : ''}` : ''">

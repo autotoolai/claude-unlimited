@@ -128,10 +128,12 @@
     max-width: none;
   }
 
-  /* 折叠后正文吃满整列，段落也跟着吃满（否则 44rem 的居中段落会在宽列里左右各空一大片） */
-  html.cu-toc-collapsed .cu-page p,
-  html.cu-toc-collapsed .cu-page ul,
-  html.cu-toc-collapsed .cu-page ol {
+  /* 折叠后正文吃满整列，段落也跟着吃满（否则 44rem 的居中段落会在宽列里左右各空一大片）。
+     必须挂 .cu-shell__body--reading 前缀：html.cu-toc-collapsed 是全局类且状态存 localStorage 全站共享，
+     少了这个前缀，教程页一折叠，无目录的营销页（模型广场 / 套餐定价等）的 lead 与段落也会跟着变成不限宽。 */
+  html.cu-toc-collapsed .cu-shell__body--reading .cu-page p,
+  html.cu-toc-collapsed .cu-shell__body--reading .cu-page ul,
+  html.cu-toc-collapsed .cu-shell__body--reading .cu-page ol {
     max-width: none;
   }
 
@@ -237,8 +239,10 @@
     justify-content: start;
   }
 
-  /* 单列里 .cu-shell__inner 若还挂着 max-width 会吃掉整列宽度把正文挤扁，这里解除 */
-  .cu-shell__body--reading .cu-shell__inner--reading {
+  /* 单列里 .cu-shell__inner 若还挂着 max-width 会吃掉整列宽度把正文挤扁，这里解除。
+     2026-10-13 修：原先写成 .cu-shell__inner--reading（带中缀），但 14_knowledge.css:422
+     给 .cu-shell__inner 限宽时并不带这个中缀，两者对不上，窄屏下限宽一直解不掉。 */
+  .cu-shell__body--reading .cu-shell__inner {
     max-width: none;
   }
 
@@ -322,4 +326,14 @@
   .cu-tabs__console {
     display: none;
   }
+}
+
+/* 目录为空时（SectionNav 的 <aside v-if="sections.length"> 不渲染）父级网格仍是
+   `224px minmax(0, 1fr)` 两列，正文就成了网格第一个子元素、落进 224px 的目录列，
+   整页挤成一条窄柱。触发路径真实存在：教程页目录按轨名过滤（toc-group 与 guideTabs[].name 必须一致），
+   轨名对不上就整轨为空；知识库文章页的目录项也要等客户端挂载后才从正文 h2 读出来，SSR 阶段同样为空。
+   这里把「没有目录节点」显式表达成一个类，让两列退回单列。不改 <aside> 的静态 class：
+   SectionNav.vue 顶部注明 check_dist.mjs:48 精确匹配 `cu-sectionnav cu-sidenav`。 */
+.cu-shell__body--no-toc {
+  grid-template-columns: minmax(0, 1fr);
 }

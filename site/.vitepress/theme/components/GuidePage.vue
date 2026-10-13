@@ -3,7 +3,7 @@
  * 教程页渲染器：把 config/guide.ts 的一页数据渲染成 PageShell 内的正文。
  * 教程只有 /guide 一页，页面组件（theme/guide_index.vue）直接用它，不再传 slug。
  *
- * 结构：分段切换（小白 / 高手两条轨）→ 两条轨共用的「常见问题排查」→ 接着看 → 页尾 CTA。
+ * 结构：分段切换（小白 / 高级配置两条轨）→ 两条轨共用的「常见问题排查」→ 接着看 → 页尾 CTA。
  * 两条轨用 SegmentedTabs（role="tablist"，方向键可切换），面板由 v-show 控制，切回来时不重挂载。
  */
 import { ref } from 'vue'
@@ -24,33 +24,41 @@ import { renderInline } from '../utils/inline'
 const page = guidePage()
 const guideJsonLd = jsonLdGuide(page)
 
-/** 当前轨；不带 tab 的块（常见问题排查）在两条轨下面都显示 */
+/** 当前轨 */
 const activeTab = ref<GuideTabId>('novice')
 
-/** 某块在当前轨下是否渲染：不带 tab 的是共用块 */
+/** 某块在当前轨下是否渲染 */
 function visible(b: GuideBlock, tab: string): boolean {
   return !b.tab || b.tab === tab
 }
 
+/** 只渲染带 tab 的块（切轨靠 hidden）；共用块在 SegmentedTabs 之后单独渲染一份 */
 const railBlocks = page.blocks.filter((b) => b.tab)
-const sharedBlocks = page.blocks.filter((b) => !b.tab && b.id !== 'contact')
+const sharedBlocks = page.blocks.filter((b) => !b.tab)
 </script>
 
 <template>
   <JsonLd id="cu-jsonld-guide" :json="guideJsonLd" />
 
-  <PageShell slug="/guide" toc="side" :toc-group="activeTab === 'novice' ? '小白教程' : '高手教程'" :title="page.title" :lead="page.lead" :eyebrow="page.eyebrow">
+  <PageShell
+    slug="/guide"
+    toc="side"
+    :toc-group="activeTab === 'novice' ? '小白教程' : '高级配置'"
+    :title="page.title"
+    :lead="page.lead"
+    :eyebrow="page.eyebrow"
+  >
     <SegmentedTabs :groups="guideTabs" :active-id="activeTab" @update:active-id="activeTab = $event as GuideTabId">
       <template #default="{ activeId }">
         <!-- 两条轨都渲染，只切 hidden：只渲染当前轨的话，SSR 产物里没有另一轨的锚点与表格，
-             页内目录锚点校验、爬虫抓取和「/guide#params 直达高手教程」都会失效。 -->
+             页内目录锚点校验、爬虫抓取和「/guide#params 直达高级配置」都会失效。 -->
         <section v-for="tab in guideTabs" :key="tab.id" class="cu-guide-rail" :hidden="tab.id !== activeId">
           <template v-for="b in railBlocks" :key="b.id">
-            <div v-if="visible(b, tab.id)">
-              <h2 :id="b.id">{{ b.h2 }}</h2>
+            <div v-if="visible(b, tab.id)" class="cu-guide-block">
               <p v-if="b.kicker" class="cu-step-kicker">{{ b.kicker }}</p>
-              <p v-if="b.lead" v-html="renderInline(b.lead)" />
-              <p v-for="(t, i) in b.paras || []" :key="i" v-html="renderInline(t)" />
+              <h2 :id="b.id">{{ b.h2 }}</h2>
+              <p v-if="b.lead" class="cu-guide-lead" v-html="renderInline(b.lead ?? '')" />
+              <p v-for="(t, i) in b.paras || []" :key="i" class="cu-guide-para" v-html="renderInline(t)" />
               <ul v-if="b.list?.length">
                 <li v-for="(t, i) in b.list" :key="i" v-html="renderInline(t)" />
               </ul>
@@ -58,15 +66,15 @@ const sharedBlocks = page.blocks.filter((b) => !b.tab && b.id !== 'contact')
                 <p v-for="(t, i) in b.notes" :key="i" v-html="renderInline(t)" />
               </div>
               <GuideTerm v-for="(c, i) in b.cmd || []" :key="i" :title="c.title" :lines="c.lines" />
-              <CompareTable v-if="b.table" :columns="b.table.columns" :rows="b.table.rows" :caption="b.table.caption" />
-              <!-- 参数速查表之后的模型 ID 对照表（数据来自 config/models.ts，以「获取模型列表」实际返回为准） -->
+              <CompareTable v-if="b.table" :columns="b.table.columns" :rows="b.table.rows" :caption="b.table.caption" :label-col="b.table.labelCol" />
+              <!-- 填值表之后的模型 ID 对照表（数据来自 config/models.ts，以「获取模型列表」实际返回为准） -->
               <CompareTable
                 v-if="b.id === 'params'"
-                :columns="['层级', '适合场景', '建议']"
+                :columns="['适合场景', '建议']"
                 :rows="modelIdRows"
-                caption="以 CC Switch「获取模型列表」的实际返回为准"
+                caption="以工具「获取模型列表」的实际返回为准"
               />
-              <GuideSteps v-if="b.steps" :steps="b.steps" />
+              <GuideSteps v-if="b.steps" :steps="b.steps" :block-id="b.id" />
               <GuideUrl v-if="b.url" :url="b.url.href" :path="b.url.path" :label="b.url.label" />
               <GuideShot v-if="b.shot" :src="b.shot.src" :label="b.shot.label" :caption="b.shot.caption" />
               <div v-if="b.cta?.length" class="cu-cta-row">
@@ -80,7 +88,7 @@ const sharedBlocks = page.blocks.filter((b) => !b.tab && b.id !== 'contact')
                   >{{ l.text }}</a
                 >
               </div>
-              <ul v-if="b.links?.length">
+              <ul v-if="b.links?.length" class="cu-guide-links">
                 <li v-for="(l, i) in b.links" :key="i">
                   <a :href="l.url" :target="l.external ? '_blank' : undefined" :rel="l.external ? 'noopener sponsored nofollow' : undefined">{{ l.text }}</a>
                 </li>
@@ -91,27 +99,42 @@ const sharedBlocks = page.blocks.filter((b) => !b.tab && b.id !== 'contact')
       </template>
     </SegmentedTabs>
 
+    <!-- 共用块（tab 不设的块）：不属于任何一条轨，页级只渲染一份。当前教程页没有共用块，保留此分支 -->
     <template v-for="b in sharedBlocks" :key="b.id">
-      <h2 :id="b.id">{{ b.h2 }}</h2>
-      <p v-if="b.lead" v-html="renderInline(b.lead)" />
-      <p v-for="(t, i) in b.paras || []" :key="i" v-html="renderInline(t)" />
-      <ul v-if="b.list?.length">
-        <li v-for="(t, i) in b.list" :key="i" v-html="renderInline(t)" />
-      </ul>
-      <div v-if="b.notes?.length" class="cu-notes">
-        <p v-for="(t, i) in b.notes" :key="i" v-html="renderInline(t)" />
+      <div class="cu-guide-block">
+        <h2 :id="b.id">{{ b.h2 }}</h2>
+        <p v-if="b.lead" class="cu-guide-lead" v-html="renderInline(b.lead)" />
+        <p v-for="(t, i) in b.paras || []" :key="i" class="cu-guide-para" v-html="renderInline(t)" />
+        <ul v-if="b.list?.length">
+          <li v-for="(t, i) in b.list" :key="i" v-html="renderInline(t)" />
+        </ul>
+        <div v-if="b.notes?.length" class="cu-notes">
+          <p v-for="(t, i) in b.notes" :key="i" v-html="renderInline(t)" />
+        </div>
+        <GuideTerm v-for="(c, i) in b.cmd || []" :key="i" :title="c.title" :lines="c.lines" />
+        <CompareTable v-if="b.table" :columns="b.table.columns" :rows="b.table.rows" :caption="b.table.caption" :label-col="b.table.labelCol" />
+        <GuideSteps v-if="b.steps" :steps="b.steps" :block-id="b.id" />
+        <GuideUrl v-if="b.url" :url="b.url.href" :path="b.url.path" :label="b.url.label" />
+        <GuideShot v-if="b.shot" :src="b.shot.src" :label="b.shot.label" :caption="b.shot.caption" />
+        <div v-if="b.cta?.length" class="cu-cta-row">
+          <a
+            v-for="(l, i) in b.cta"
+            :key="i"
+            class="cu-btn cu-btn--ghost cu-btn--sm"
+            :href="l.url"
+            :target="l.external ? '_blank' : undefined"
+            :rel="l.external ? 'noopener sponsored nofollow' : undefined"
+            >{{ l.text }}</a
+          >
+        </div>
+        <ul v-if="b.links?.length" class="cu-guide-links">
+          <li v-for="(l, i) in b.links" :key="i">
+            <a :href="l.url" :target="l.external ? '_blank' : undefined" :rel="l.external ? 'noopener sponsored nofollow' : undefined">{{ l.text }}</a>
+          </li>
+        </ul>
       </div>
-      <GuideTerm v-for="(c, i) in b.cmd || []" :key="i" :title="c.title" :lines="c.lines" />
-      <CompareTable v-if="b.table" :columns="b.table.columns" :rows="b.table.rows" :caption="b.table.caption" />
-      <GuideSteps v-if="b.steps" :steps="b.steps" />
-      <GuideUrl v-if="b.url" :url="b.url.href" :path="b.url.path" :label="b.url.label" />
-              <GuideShot v-if="b.shot" :src="b.shot.src" :label="b.shot.label" :caption="b.shot.caption" />
-      <ul v-if="b.links?.length">
-        <li v-for="(l, i) in b.links" :key="i">
-          <a :href="l.url" :target="l.external ? '_blank' : undefined" :rel="l.external ? 'noopener sponsored nofollow' : undefined">{{ l.text }}</a>
-        </li>
-      </ul>
     </template>
+
 
     <nav class="cu-next" aria-label="接着看">
       <a v-for="n in page.next" :key="n.url" :href="n.url">

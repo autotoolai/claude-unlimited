@@ -1,5 +1,22 @@
 # docs
 
+## 文档地图
+
+先按「我要改什么」找一份读，不要通读：
+
+| 我要改 | 读哪份 |
+|---|---|
+| 新增或重排页面、决定某段内容放哪个页面 | [`content_structure.md`](content_structure.md) |
+| 写一篇知识库文章 | [`knowledge/SOP-写一篇新文章.md`](knowledge/SOP-写一篇新文章.md)，七步流程 |
+| 知识库写作风格与收录 | [`knowledge_writing_guide.md`](knowledge_writing_guide.md) |
+| 改教程页 | [`guide_design_spec.md`](guide_design_spec.md) |
+| 套餐价格 | [`plans_sync.md`](plans_sync.md)，价格由发卡站商品详情决定，不要手改 |
+| 改配色、圆角、字体、动效 | `.vitepress/theme/styles/00_base.css` 头部注释即规范原文，只改那里的 token |
+| 出故障了、行为不对 | [`troubleshooting_guide.md`](troubleshooting_guide.md) |
+| 想知道这个文件为什么长这样 | 上面各文档的「为什么」段；历史变更看 [`changelog.md`](changelog.md) |
+
+---
+
 内容根目录（VitePress `srcDir: 'docs'`）。每个 `.md` 只放 frontmatter 路由壳，正文在 `.vitepress/theme/pages/*.vue`。
 `layout` 字段选页面组件，VitePress 直接把它当 Vue 组件渲染，所以 md 里不用再写组件标签：
 
@@ -25,7 +42,7 @@
 - **正文在 `docs/knowledge/<slug>.md`**（原生 markdown），不是 `config/*.ts`。
 - 文章页写 `layout: page` + frontmatter `knowledge: true`，由 `theme/components/KnowledgeDoc.vue` 渲染 VPDoc 的 page 分支输出；H1 来自 markdown 自己的 `# 标题`。
 - 列表页 `docs/knowledge/index.md` 仍是路由壳（`layout: knowledge_index`），页面组件是 `theme/knowledge_index.vue`；结构为分类胶囊条 + 精选大卡 + 四个分类小节。
-- 元数据（列表卡片、Article + FAQPage JSON-LD、OG、页脚）在 `config/knowledge.ts`（四个分类按用户旅程：start / how / cost / troubleshoot）；页内目录复用 `components/SectionNav.vue`，目录项在客户端挂载后从正文的 `h2[id]` 读取（SSR 为空，由 `npm run check:toc` 在浏览器里核对），不走 `sections.ts`。
+- 元数据（列表卡片、Article + FAQPage JSON-LD、OG、页脚）在 `config/knowledge.ts`（四个分类按用户旅程：start / how / cost / troubleshoot；`knowledge.ts` 的 `knowledgeCategories` 是唯一真源，文档别手写分类数）；页内目录复用 `components/SectionNav.vue`，目录项在客户端挂载后从正文的 `h2[id]` 读取（SSR 为空，由 `npm run check:toc` 在浏览器里核对），不走 `sections.ts`。
 - 源站原文与抓取信息在 `config/knowledge_sources.ts`，由 `scripts/gen_sources.py` 复制到 `archive/knowledge_source_20261009/<slug>/`；`npm run check:sources` 校验逐字一致。PAGES（check_dist.mjs / verify_build.py）从 `config/knowledge.ts` 动态读取。
 - 新增文章的完整流程与写作规范见 `docs/knowledge_writing_guide.md`。
 
@@ -42,16 +59,20 @@
 全部问答在 `config/faq.ts`，页面顺序由 `.vitepress/theme/pages/data.ts` 的 `faqGroupOrder`
 （购买 → 商品 → 限速 → 配置 → 接入 → 安全 → 我们）决定，`components/sections.ts` 的 `SECTION_NAV.faq` 要与之一致
 （`check_dist.mjs` 会逐页断言）。`/faq` 顶部「买之前」区块取 `buyingQuestions` 里列出的条目 id，
-这些条目不会再在下面的分类里重复出现。改 FAQ 条数要同步 `check_dist.mjs` 的 `CU_FAQ_COUNT`（默认 33）。
+这些条目不会再在下面的分类里重复出现。改 FAQ 条数要同步 `check_dist.mjs` 的 `CU_FAQ_COUNT`（当前 28，与 `config/faq.ts` 的 `q:` 条数一致）。
 「限速与封号」里的具体速率数字由 `config/rules.ts` 的 `limitBullets()` 插值生成，不要在答案里另写一份。
 
 ## 教程页怎么写
 
-教程正文**不在 md 里，也不在页面组件里**，而在 `config/guide.ts`：一个 `GuidePage` 数据对象（`/guide`）。2026-10 重构后购买章节整段删除，客服入口已下线正文里的客服条，统一走右下角在线助手浮标，正文分两条轨——`tab: 'novice'` 的八步小白教程（默认）与 `tab: 'pro'` 的五节高手教程，由 `guideTabs` 驱动页内分段切换；不带 `tab` 的块（`contact` 除外）在两条轨下面都显示。
-`guide_index.vue` 直接渲染 `GuidePage.vue`，后者按 `config/guide.ts` 的 `blocks[]` 渲染：段落、列表、要点框、命令块、表格、步骤块（序号 + 段落 + 提示 + 截图）、按钮行（`cta`）。
-页内目录（`components/sections.ts` 按 tab 分组）、页脚「教程」列（`pages/data.ts` 的 `guideNavItems`）全部从同一份数据生成，改一处两处同步（首页的教程入口已于 2026-10-10 改为「继续了解」链接条）。
+**先读 [`guide_design_spec.md`](guide_design_spec.md)**（信息结构与视觉规范的权威源，2026-10-12 起）。下面只讲数据放在哪。
 
-改教程的入口只有一个：`config/guide.ts`。
+教程正文**不在 md 里，也不在页面组件里**，而在 `config/guide.ts`：一个 `GuidePage` 数据对象（`/guide`）。购买章节已整段删除，
+客服入口已下线正文里的客服条，统一走右下角在线助手浮标。正文分两条轨——`tab: 'novice'` 的小白教程（默认）与 `tab: 'pro'` 的高级配置，
+由 `guideTabs` 驱动**页级**分段切换；轨内不再重新分流。不带 `tab` 的块在两条轨下面都显示。
+`guide_index.vue` 直接渲染 `GuidePage.vue`，后者按 `config/guide.ts` 的 `blocks[]` 渲染：段落、列表、要点框、命令块、表格、步骤块（序号 + 段落 + 提示 + 截图）、按钮行（`cta`）。
+页内目录与页脚「教程」列（`pages/data.ts` 的 `guideNavItems`）全部从同一份数据生成，改一处两处同步。
+
+改教程的数据入口只有一个：`config/guide.ts`；改教程的规范入口是 `guide_design_spec.md`。
 
 ## 教程截图
 

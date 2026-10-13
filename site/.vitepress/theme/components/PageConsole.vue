@@ -75,7 +75,7 @@ const detail = [
     </section>
     <p class="cu-more">
       后台的完整图文教程在它自己的「使用教程」页；官网这边对应的是<a href="/guide">使用教程</a>，
-      按「取 Key → 一键导入 → 保存模型 → 检测链路」四步走，小白教程每步都有截图；已经有 Key 的看高手教程，那里有参数速查、手填字段和环境变量三条路径。
+      按「取 Key → 一键导入 → 保存模型 → 检测链路」四步走，小白教程每步都有截图；已经有 Key 的看高级配置，那里只讲 Base URL / API Key / 模型 ID 三个值怎么填。
     </p>
 
     <h2 id="domain">备用域名与连通性</h2>
@@ -84,7 +84,7 @@ const detail = [
       <strong>API Key 无需更换</strong>，已配置的编辑器也不用重新填。备用域名：
     </p>
     <div class="cu-domains">
-      <span v-for="d in consoleBackupDomains" :key="d" class="cu-domain">{{ d }} <CopyChip :text="'https://' + d" label="复制" /></span>
+      <span v-for="d in consoleBackupDomains" :key="d" class="cu-domain">{{ d }} <CopyChip :text="'https://' + d" label="复制网址" cta="copy_url" /></span>
     </div>
 
     <h2 id="faq">后台常见问题</h2>

@@ -177,7 +177,6 @@ model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与
     a: `「启用」把这份配置设为当前生效的供应商，终端里的 claude、VS Code 里的 Claude Code 插件都会指向它。
 
 「检测链路」发一次测试请求确认网关可达，显示正常就配置完成。检测失败先看第 4、5 步的截图与排错清单。`,
-    links: [{ text: '排错速查 · 教程', url: '/guide#errors' }],
   },
   {
     cat: 'setup',
@@ -185,7 +184,7 @@ model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与
     keywords: ['vscode', 'vs code', '插件', '扩展', '侧边栏', '编辑器插件'],
     q: 'VS Code 里怎么用 Claude Code？',
     a: `CC Switch 配好后，在 VS Code 扩展面板（Ctrl+Shift+X / Cmd+Shift+X）搜索 Claude Code，认准发布者为 Anthropic 的官方插件并安装。首次打开选择「使用已有的 API 配置 / API Key」登录，不需要登录 Anthropic 账号。`,
-    links: [{ text: '编辑器接入 · 高手教程', url: '/guide#editors' }],
+    links: [{ text: '教程 · 第 6 步 开始使用 Claude Code', url: '/guide#vscode' }],
   },
   {
     cat: 'setup',
@@ -206,7 +205,7 @@ model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与
     a: `先确认 CC Switch 里配置处于「已启用」状态，再重开一个终端窗口。
 
 如果仍然找不到命令，看「接入与模型」页的 VS Code / 终端部分，Windows 上可以在 PowerShell 里直接运行 claude。`,
-    links: [{ text: '编辑器接入 · 高手教程', url: '/guide#editors' }],
+    links: [{ text: '教程 · 第 5 步启用配置', url: '/guide#enable' }],
   },
 
   // ---------- 接入与使用 ----------

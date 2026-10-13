@@ -26,9 +26,9 @@ useHeroReveal()
         <span v-for="(w, i) in siteConfig.taglinePhrases" :key="i" class="cu-hero__w"><span class="cu-hero__i" :style="{ '--i': i }">{{ w }}</span></span>
       </h1>
       <p class="cu-lead">
-        {{ siteConfig.name }}：订阅期内调用 Claude 不按 token 计费，用多少都是同一份订阅价。无论你是在 Claude Code 里
-        重构整个项目、用 Cursor 读长代码库，还是让 agent 自动执行多步任务，都不必再盯着用量仪表盘。改一个 Base URL
-        加一个 Key 即可接入你现有的工具和 SDK。
+        <span class="cu-lead__line">订阅期内调用 Claude 不按 token 计费，用多少都是同一份订阅价。</span>
+        <span class="cu-lead__line">在 Claude Code 里重构项目、用 Cursor 读长代码库、让 agent 执行多步任务，都不必盯着用量仪表盘。</span>
+        <span class="cu-lead__line">改一个 Base URL 加一个 Key，即可接入你现有的工具和 SDK。</span>
       </p>
       <div class="cu-cta-row cu-cta-row--center">
         <ExternalCta label="立即购买" variant="primary" size="lg" cta="hero_primary" />

@@ -84,115 +84,294 @@
   }
 }
 
+/* 教程步骤块。
+   排版依据（对齐业界文档通用做法）：
+   - 两级编号：H2 上的「N.」是节号，组内徽标是子步骤号，每一组都画（单子步骤也画「1」）。
+     早期版本只在多子步骤组里画徽标，结果第 3 步整段左移、第 4 步右移一列，看着像漏了内容（2026-10-12 改）。
+     徽标用描边 + 空底的次级墨色，不反白：H2 旁边挂一个反白的「1」比 h3 还重。
+   - 序号列固定 3rem，序号与标题首行基线对齐，不再用 grid-row: span 99 拉成贯穿长竖线的漂浮大字。
+   - 上边框只在相邻两组之间出现（分隔线选择器 :not(:first-child)），消除
+     .cu-steps-block 的 border-bottom 与 li 的 border-top 紧挨出现的双线。 */
+/* padding: 0 是必须的：全局 .cu-page ol 和 VitePress 自带的 .vp-doc ol 都给了
+   padding-left: 1.25rem，两者优先级都是 (0,1,1)，比裸的 .cu-steps-block (0,1,0) 高，
+   不清零会让整块步骤相对标题右移 40px：h2 / 引导语 / 表格 / 截图都顶格，只有步骤块歪。
+   组内多子步骤时再多一层序号列，看着像「只有第 4 步那种步骤有问题」，其实每步都歪。
+   所以第一条选择器要叠 .cu-page .vp-doc 才压得过 VitePress 自带规则。 */
+.cu-page .vp-doc .cu-steps-block,
+.cu-page .cu-steps-block,
 .cu-steps-block {
-  margin: 2.5rem 0;
-  border-top: 1px solid var(--cu-line);
-  border-bottom: 1px solid var(--cu-line);
+  margin: 1.75rem 0;
+  padding: 0;
 }
 
 .cu-step-block {
   display: grid;
-  grid-template-columns: 3.25rem minmax(0, 1fr);
-  gap: 0 1.25rem;
-  padding: 1.5rem 0 1.75rem;
-  border-top: 1px solid var(--cu-line);
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: 0 1.1rem;
+  padding: 1.1rem 0;
   list-style: none;
   margin: 0;
 }
-.cu-steps-block > .cu-step-block:first-child {
-  border-top: none;
-  padding-top: 1.25rem;
+
+/* 组与组之间的分隔线：只画一道，不再叠上下两条 */
+.cu-step-block + .cu-step-block,
+.cu-steps-block + .cu-step-block {
+  border-top: 1px solid var(--cu-line);
 }
 
+/* 序号：小型圆角徽标，与标题首行对齐 */
 .cu-step-block__no {
-  grid-row: 1 / span 99;
-  font-family: var(--cu-serif);
-  font-size: 2.1rem;
+  align-self: start;
+  justify-self: start;
+  min-width: 1.7rem;
+  height: 1.7rem;
+  padding: 0 0.42rem;
+  border: 1px solid var(--cu-accent-line);
+  border-radius: var(--cu-r-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--cu-muted);
+  font-family: var(--cu-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
   line-height: 1;
-  font-weight: 700;
-  color: var(--cu-accent);
-  border-right: 1px solid var(--cu-line);
-  padding-top: 0.1rem;
 }
 
-.cu-step-block__body > h3 {
-  margin: 0 0 0.5rem;
-  font-size: 1.18rem;
-  line-height: 1.45;
+/* ol 的 padding-left 会被内部 li 继承（li 比 ol 更深，同样吃 1.25rem）。
+   归零写在 ol 上，li 才能拿到与 ol 同宽的盒子：正文列放宽到 52rem 后，
+   li 上残留的 1.25rem 会让步骤块凭空变成 704px，连截图的 700px 上限都放不下。 */
+.cu-page .vp-doc .cu-steps-block,
+.cu-page .cu-steps-block,
+.cu-steps-block {
+  padding: 0;
+}
+
+/* 轨内相邻两节（每个 .cu-guide-block 是一个块）的间距统一走这一条，不依赖各自的 last-child 兜底 */
+.cu-guide-rail .cu-guide-block + .cu-guide-block h2 {
+  margin-top: var(--cu-section-y-lg);
+}
+
+/* 教程页正文块（步骤块 / 提示块 / 表格 / 截图 / 终端）一律顶格，不再水平居中。
+   全局 .cu-page h2 是居中的分节头、.cu-page p 有 margin: auto，块级内容跟着居中，
+   于是标题在中间、内容在左边，同一页出现两套不同的左边线。
+   注意：教程的 h2 不在 .cu-page 里面（它在 .cu-guide-rail 里），选择器不能套 .cu-page。 */
+/* 引导语（b.lead）与后续正文段（b.paras）也是 .cu-page p（优先级 (0,1,1) 更高），
+   所以这里用类选择器把它们一起拉回左边线。全页 kicker 已归零，不能再靠「kicker 之后的 p」定位。
+   2026-10-13 修：这些选择器原先漏了 .cu-page 前缀，优先级同为 (0,1,0) 输给 .cu-page p，
+   margin-left/right: 0 根本没生效，引导语仍被 auto 居中到 44rem，在 52rem 的正文列里
+   左边凭空空出约 44px，与 H2「1. 安装 CC Switch」不在同一条左边线。补前缀后升到 (0,2,0)，压得过。
+   上面那条关于 h2 不能套 .cu-page 的提醒只针对 h2（教程的 h2 在 .cu-guide-rail 里，不在 .cu-page 内）。 */
+.cu-page .cu-guide-lead,
+.cu-page .cu-guide-para,
+.cu-page .cu-guide-links,
+.cu-page .cu-guide-rail .cu-step-kicker ~ p,
+.cu-page .cu-guide-rail .cu-steps-block,
+.cu-page .cu-guide-rail .cu-step-block__body,
+.cu-page .cu-guide-rail .cu-step-block__body p,
+.cu-page .cu-guide-rail .cu-step-block__body ul,
+.cu-page .cu-guide-rail .cu-step-block__action,
+.cu-page .cu-guide-rail .cu-step-block__notes,
+.cu-page .cu-guide-rail .cu-shot,
+.cu-page .cu-guide-rail .cu-term,
+.cu-page .cu-guide-rail .cu-notes,
+.cu-page .cu-guide-rail .cu-urlrow {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* 块级提示（高手轨的 notes：小节级说明、坑）。此前只有 markup 没有样式，
+   渲染出来就是一串裸段落，与正文没有层级区别。样式与步骤内的 cu-step-block__notes
+   同族（细线 + muted 小字），区别是块级不带左侧边线、按段落排。 */
+.cu-notes {
+  margin: 1.1rem 0 0;
+  padding: 0.85rem 1rem;
+  border-left: 2px solid var(--cu-line-strong);
+  background: var(--cu-bg-soft);
+  border-radius: 0 var(--cu-r-sm) var(--cu-r-sm) 0;
+}
+.cu-notes p {
+  margin: 0 0 0.45rem;
+  font-size: 0.92rem;
+  line-height: 1.85;
+  color: var(--cu-ink-2);
+}
+.cu-notes p:last-child {
+  margin-bottom: 0;
+}
+
+/* 教程页的 h2 是「第 N 步」的动作标题，不是营销页的分节头：
+   左对齐、衬线缩到与步骤标题同一档，kicker 胶囊在前、H2 在后，两者成组共用一条左边线。
+   （2026-10-12 修：全局 .cu-page h2 的居中会漏进教程页，必须在这里显式左对齐。） */
+.cu-guide-rail h2 {
+  text-align: left;
+  font-size: 1.32rem;
+  font-weight: 600;
+  line-height: 1.35;
   color: var(--cu-ink);
 }
 
+/* 轨内第一块不要额外的上边距（与 12_kefu.css 里那条同义，这里跟在上游文件之后，
+   优先级相同且位置更靠后，胜出）。其后各块按分节间距。 */
+.cu-guide-rail > div > h2:first-of-type {
+  margin-top: 0.5rem;
+}
+
+.cu-step-block__body > h3 {
+  margin: 0.1rem 0 0.5rem;
+  font-family: var(--cu-sans);
+  font-size: 1.06rem;
+  font-weight: 700;
+  line-height: 1.55;
+  letter-spacing: 0;
+  color: var(--cu-ink);
+}
+
+/* 标题与序号徽标顶对齐 */
+.cu-step-block__body > h3 {
+  margin-top: 0.12rem;
+}
+
 .cu-step-block__body p {
-  margin: 0 0 0.65rem;
+  /* 不显式写 margin-left / max-width：嵌套在多子步骤组里的 goal / notes 段落在序号列右侧，
+     一旦归零就会跑到左边线外面；这里只调上下间距，左右交给 .cu-guide-rail 那组规则。 */
+  margin-top: 0;
+  margin-bottom: 0.65rem;
   color: var(--cu-ink-2);
-  line-height: 1.9;
+  line-height: 1.85;
 }
 .cu-step-block__body p:last-child {
   margin-bottom: 0;
 }
 
-.cu-step-block__do {
-  margin: 0.85rem 0 0;
-  padding: 0.8rem 1rem;
-  border-left: 3px solid var(--cu-accent-line);
-  background: var(--cu-bg-soft);
-  border-radius: 0 var(--cu-r-sm) var(--cu-r-sm) 0;
-  font-size: 0.9rem;
-  line-height: 1.8;
+/* 目标句：这一个子动作为什么要做。比动作弱一级，所以用次级墨色、不加粗。 */
+.cu-step-block__goal {
   color: var(--cu-ink-2);
 }
-.cu-step-block__do-label {
-  display: inline-block;
-  margin-right: 0.5rem;
-  padding: 0.05rem 0.45rem;
-  border-radius: 5px;
+
+/* 动作：全页唯一的强调形式。左一个 6px 圆点 + 加粗墨色文字，不画框、不画底色。
+   原先的「要做的事」是 3px 左线 + 浅底 + 反白标签，是全页最重的一块，而内容往往只有
+   「下载 → 安装，全程保持默认」一行，视觉重量超过信息量，也让每一步像多了一层壳。 */
+.cu-step-block__action {
+  margin: 0.7rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cu-step-block__action li {
+  position: relative;
+  margin: 0.34rem 0;
+  padding-left: 1.05rem;
+  color: var(--cu-ink);
+  font-weight: 600;
+  line-height: 1.75;
+}
+.cu-step-block__action li::before {
+  content: "";
+  position: absolute;
+  left: 0.12rem;
+  top: 0.72em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
   background: var(--cu-contrast);
-  color: var(--cu-contrast-fg);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  vertical-align: 1px;
+}
+.cu-step-block__action a {
+  font-weight: inherit;
 }
 
-.cu-step-block__tips {
+/* 提示：坑、替代做法、失败征兆。最弱一级：muted 小字 + 一条左侧细线，与动作区分开。 */
+.cu-page .vp-doc .cu-step-block__notes,
+.cu-page .cu-step-block__notes,
+.cu-step-block__notes {
   margin: 0.9rem 0 0;
-  padding: 0 0 0 1.1rem;
-  font-size: 0.88rem;
+  padding: 0 0 0 0.95rem;
+  border-left: 1px solid var(--cu-line);
+  list-style: none;
+  font-size: 0.9rem;
   color: var(--cu-muted);
 }
-.cu-step-block__tips li {
+.cu-page .vp-doc .cu-step-block__notes li,
+.cu-step-block__notes li {
   margin: 0.25rem 0;
+  line-height: 1.8;
+  color: var(--cu-muted);
 }
 
+/* ==== 教程页插图规范（单图 / 并排两图）2026-10-13 ====
+   规范值与理由见 docs/guide_design_spec.md 的「插图规范」一节，这里只写实现。
+
+   .cu-shot { }            图片盒：细边框 + 圆角，两种布局共用
+   .cu-shot img { }        按比例缩放，单图按 --cu-shot-max-w 限宽
+   .cu-shot figcaption { } 页面名 + 编号徽标，整行居中
+   〔单图〕--cu-shot-max-w: 34rem (544px)，--cu-shot-max-h: 22rem (352px)
+   〔并排〕340px + 1fr，两图等高
+   加图或改图只动这三个自定义属性，不要在下面写死数值。 */
 .cu-step-block__shot {
   margin: 1rem 0 0;
-  max-width: 640px;
+  --cu-shot-max-w: 34rem;
+  --cu-shot-max-h: 22rem;
+  max-width: var(--cu-shot-max-w);
 }
 
+/* 合并小步时一步挂多张图：并排两列，窄屏回落成单列。
+   只在 .cu-step-block__shots（多图容器）里生效，单图走上面那对 --cu-shot-max-*。
+   这里的窄屏回落已移到文件末尾那条 560px 断点（见那里的说明）：
+   两条选择器优先级相同、媒体条件又更宽，留在这里会盖掉后面的宽屏两列。 */
+.cu-step-block__shots {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 1rem;
+  align-items: start;
+}
+.cu-step-block__shots .cu-step-block__shot {
+  max-width: none;
+}
+.cu-step-block__shots .cu-shot {
+  margin: 1rem 0 0;
+}
 .cu-shot {
   margin: 1.5rem 0;
 }
+/* 单图：宽高两个上限同时生效，图片按比例缩到不超任何一个（object-fit 在这里不参与）。
+   限高是为了竖图——guide_vscode_plugin 是 0.92 的近正方形，只限宽会撑到 590px 高，
+   比正文一屏还高。这里 max-height 与 width:100% 并存，浏览器按比例取小的那档。 */
 .cu-shot img {
   display: block;
   width: 100%;
+  max-height: var(--cu-shot-max-h, none);
   height: auto;
   border: 1px solid var(--cu-figure-frame);
   border-radius: var(--cu-r-sm);
   background: var(--cu-card-solid);
-  box-shadow: var(--cu-shadow-soft, 0 8px 24px rgba(0, 0, 0, 0.08));
 }
+/* 图注：整行居中，编号做成小墨色徽标跟在页面名前面。
+   用块级 + text-align:center 而不是 grid/flex 居中：grid 的两列会被内容撑满，
+   徽标和文字各自贴到左右边缘，中间空一大片；这里让徽标与文字作为同一行内联内容
+   参与居中，短图注自然收到图正中，长图注换行后也只是回到居中对齐，不会错位。 */
 .cu-shot figcaption {
-  margin-top: 0.45rem;
+  margin-top: 0.5rem;
   font-size: 0.8rem;
-  line-height: 1.7;
+  line-height: 1.6;
   color: var(--cu-muted);
-  display: flex;
-  gap: 0.5rem;
+  text-align: center;
+  text-wrap: balance;
 }
 .cu-shot figcaption b {
-  color: var(--cu-accent-deep);
+  color: var(--cu-contrast);
+  background: var(--cu-card-solid);
+  border: 1px solid var(--cu-line);
+  border-radius: 3px;
   font-family: var(--cu-mono);
-  font-weight: 700;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.35;
+  padding: 0.05rem 0.3rem;
+  margin-right: 0.4rem;
+  display: inline-block;
+  vertical-align: 0.06em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .cu-term {
@@ -287,19 +466,323 @@
 
 @media (max-width: 720px) {
   .cu-step-block {
-    grid-template-columns: 2.25rem minmax(0, 1fr);
-    gap: 0 0.85rem;
-  }
-  .cu-step-block__no {
-    font-size: 1.5rem;
+    grid-template-columns: 2.2rem minmax(0, 1fr);
+    gap: 0 0.8rem;
   }
 }
 
 /* 教程三大步的步骤标签：H2 下方的短行（如「第一步 · 购买激活码」） */
+/* 步骤标签（H2 上方那行小字，如「小白教程 · 第 4 步」）。
+   写成 .cu-page .cu-step-kicker：全局 .cu-page p 的优先级是 (0,1,1)，比这里的 (0,1,0) 高，
+   不加 .cu-page 前缀的话字号会被正文的 1.04rem 吃掉，标签既不显眼也不精致。 */
+.cu-page .cu-step-kicker,
 .cu-step-kicker {
-  margin: -0.5rem 0 0.9rem;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: var(--cu-accent);
+  margin: 0.65rem 0 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.16rem 0.6rem;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-pill);
+  background: var(--cu-bg-soft);
+  font-family: var(--cu-sans);
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  color: var(--cu-ink-2);
+}
+
+/* 块内裸段落与裸列表（b.paras、b.list、b.links）同样受全局 `.cu-page p` / `.cu-page ul` 约束，
+   少了 .cu-page 前缀就压不住 42rem 限宽与 auto 边距——高手轨「参数速查」「环境变量」等节的
+   正文段与列表就是因此整体右移 16~18px，与 H2 左边线对不上（2026-10-12 修）。
+
+   text-align 同样是这条规则要管的：全局 `.cu-page h2 + p`（(0,1,1)，压过 `.cu-page p` 的 left）
+   是给营销页居中分节头写的，而引导语正好是 H2 后第一个段落，整条命中，
+   表现为每节引导语文字居中、与左对齐的 H2 错开，句子越长偏得越远（2026-10-12 修）。
+   容器级 text-align 压不住直接指定 center 的段落，必须写到后代 p 上。
+
+   限定在教程页作用域内（.cu-guide-rail），不影响其他页面的居中段落。
+   验收用 scripts/audit_guide_align.mjs：量首字实际位置，不量元素盒子——
+   盒子顶格 ≠ 文字对齐，元素盒子量不出居中。 */
+.cu-page .cu-guide-rail p,
+.cu-page .cu-guide-rail > div > ul,
+.cu-page .cu-guide-rail > div > ul > li {
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+  text-align: left;
+}
+/* 裸列表用 VitePress 默认的项目符号，与步骤内的无符号列表区分开；只调间距，不动缩进量 */
+.cu-page .cu-guide-rail > div > ul {
+  padding-left: 1.25rem;
+  margin-top: 0.65rem;
+  margin-bottom: 0;
+}
+
+/* 引导语：紧跟 H2 的那一段，说「这一步为什么做」。视觉上是 H2 的续行，不是正文段落：
+   顶格、与 h2 同一条左边线，字号与正文一致但用次级墨色，与下方步骤块留出 --cu-section-y 的分节间距。 */
+/* 限宽与对齐由上面那条 `.cu-page .cu-guide-rail p` 统一管，这里只定间距与墨色。
+   margin 仍需 !important：`.cu-page h2 + p` 的 `0.9rem auto` 是 (0,1,1)，margin 覆盖不掉。 */
+.cu-page .cu-guide-lead,
+.cu-page .cu-guide-para {
+  margin: 0.85rem 0 0 !important;
+  color: var(--cu-ink-2);
+  line-height: 1.85;
+}
+/* 引导语与其后第一个块（步骤块 ol / 列表 ul / 表格 / 截图）之间原来留 1.7rem，
+   叠上块自身的边距后形成明显的大洞（约 40px），与「h2 → 引导语」的紧凑感对不上。
+   统一收到 0.9rem；这个值低于全局 .vp-doc 的 1.7em，所以选择器必须带上 .cu-guide-rail。 */
+.cu-guide-rail .cu-guide-lead + * {
+  margin-top: 0.9rem !important;
+}
+.cu-page .cu-guide-para {
+  margin-top: 0.65rem !important;
+}
+
+
+/* ---------- 教程页屏效与层级（2026-10-13 体验评估） ----------
+   评估结论：内容层（六槽位、lead 只说为什么、action 是全页唯一强调）不动，
+   改的是屏效与层级。四条数字：
+
+   1. 节间距 6.5rem → 3.25rem。教程每节只占 1~2 屏，6.5rem 的分节间距让节间空出近 3 屏高，
+      读者滚到第 4 步会怀疑漏了内容。不动全局 --cu-section-y-lg（知识库文章页与营销页也在用）。
+   2. 正文列 46rem → 52rem（14_knowledge.css 里 .cu-guide-wrap 一条），文字层仍限宽 46rem，
+      多出来的 96px 全给截图与表格：步骤块的序号列 3rem + 1.1rem 间隙把截图压到 638px，
+      截图上限 700px 从来没生效过，界面里的按钮字被缩得看不清。
+   3. 小字回血到 0.86rem：截图前缀（hint）与图注是「这张图对应第几步里哪一步」的唯一线索，
+      原来 0.78 / 0.8rem 低于 0.84rem 的舒适下限；notes 0.9 → 0.92rem。
+   4. 层级拉开：H3 1.06rem/700 → 0.98rem/600，与 H2 的 1.32rem/600 差一档，
+      H2 的节号成为本轨最重的元素。徽标保留（单子步骤也画），不再依赖徽标补救层级。
+   5. 顶部步骤进度条不加：左侧目录已有同一组节点，再加一条是重复表达（验收时否掉）。
+
+/* 节间距：3.25rem（原 6.5rem）。用选择器里直接写死数值，不用自定义变量——
+   后者在 .cu-guide-block 内部取不到（不在 .cu-guide-rail 祖先链上），会静默回退到旧值。
+   同样与 01_shell_toc.css / 12_kefu.css 等处的同名规则同权重，靠加载顺序取胜。 */
+.cu-guide-rail .cu-guide-block + .cu-guide-block h2 {
+  margin-top: 3.25rem;
+}
+
+/* 截图限宽 700px：图文左右并排，截图里的界面文字才有足够像素高度。
+   340px 下限是为了让左图不至于窄到读不清界面文字。视口窄于此但又宽于 760px 媒体查询时
+   （例如带侧栏的平板竖屏），两列仍然成立：minmax 下限吃不掉右列，右列是 minmax(0,1fr)，
+   会被压窄而不是把左图挤没。真正压到没内容的是手机宽度，由下面 760px 那条回落单列。 */
+.cu-step-block__shots {
+  grid-template-columns: minmax(320px, 340px) minmax(0, 1fr);
+}
+/* 吸顶落在 figure 外的容器上：figure 本身要 stretch 才能与右图等高，
+   一旦给 figure 加 align-self:start 或固定高度，stretch 就失效了。 */
+.cu-step-block__shots > .cu-step-block__shot:first-child {
+  position: sticky;
+  top: calc(var(--cu-nav-h) + 16px);
+}
+/* 窄屏回落单列的断点 ≤560px：步骤块本身 52rem，减去序号列后临界点已不足 520px。
+   ⚠ 上面第 334 行那条 720px 的回落对「宽屏两列」无效——两条选择器优先级相同，
+   560px 之前它总是先命中，所以它把后面的 340px 两列整个盖掉了，
+   结果 390px 下仍是 repeat(2, minmax(0,1fr)) 的两列，340px 那列把右列挤成 0px。
+   同类问题的排查法：在浏览器里遍历所有 stylesheet，打印命中 .cu-step-block__shots 的
+   grid-template-columns 并按媒体条件与出现顺序排开，就能看到「720px 那条其实一直在生效」。 */
+/* 760px 以下右列只剩 100 多像素、图整体塌掉，直接回落单列。
+   这条媒体查询必须与宽屏两列那条选择器完全相同（`.cu-step-block__shots`）且出现在它之后：
+   优先级相同时后写的赢，而媒体查询不提高优先级。原来的 @media 720px 那条虽然更宽，
+   却在文件更靠前的位置，560~720px 之间一直生效，把两列盖成 1fr —— 而 720px 断点下
+   右列只有 249px 图仍然完整看着正常，所以这个 bug 很难靠目视发现。
+   560px 那条只管吸顶还原。 */
+@media (max-width: 760px) {
+  .cu-step-block__shots {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* 单列下等高没有意义（本来就上下排列），但 flex 列 + cover 还在，
+     图片会被拉成整行高再裁掉两侧，窄屏上裁得很狠，这里还原成按宽度自适应。 */
+  .cu-step-block__shots .cu-shot img {
+    flex: 0 0 auto;
+    object-fit: contain;
+  }
+}
+@media (max-width: 560px) {
+  .cu-step-block__shots > .cu-step-block__shot:first-child {
+    position: static;
+  }
+}
+
+.cu-step-block__body > h3 {
+  scroll-margin-top: calc(var(--cu-nav-h) + 24px);
+}
+
+
+/* 行高分层：引导语是「H2 的续行」，给最松的 1.85 太散，压到 1.7；
+   步骤块里的 goal / 正文段保持 1.85（短句，宽松些好读）；提示块 1.85 → 1.75。 */
+.cu-guide-lead {
+  line-height: 1.7;
+}
+.cu-notes p {
+  line-height: 1.75;
+}
+
+/* 文字层限宽 46rem（736px，约 33 个汉字一行）：正文列放宽到 52rem 后，行宽仍由这一层管住，
+   否则每行 39 个汉字，超过中文长读 35-40 字的上限。命令块（代码不折行）与表格不在限宽之列。
+   --cu-guide-text 只在这条规则里出现一次，改文字宽度改这一个数。
+   列里的 ol.cu-steps-block 是最外层的元素：全局 .cu-page ul, .cu-page ol 给它上了
+   max-width: var(--cu-content-w)（44rem = 704px），它比正文层的任何一条都窄，会从外往里
+   把整列的步骤块掐到 704px——所以必须一并归零。 */
+.cu-guide-rail .cu-guide-block > p,
+.cu-guide-rail .cu-guide-block > ul,
+.cu-step-block__body > h3,
+.cu-step-block__body > p,
+.cu-step-block__body > ul {
+  max-width: var(--cu-guide-text, 46rem);
+}
+
+/* ol.cu-steps-block 是教程列里最外层的元素，全局 .cu-page ul, .cu-page ol 给了它
+   max-width: var(--cu-content-w)（44rem = 704px）。归零，否则整列步骤块从外往里被掐到 704px，
+   700px 的截图上限与正文层的 736px 文字限宽都失效。放在限宽规则之前，靠顺序取胜。 */
+.cu-guide-rail .cu-steps-block {
+  max-width: none;
+}
+
+/* 截图限宽 700px（原来 640px，且被步骤块序号列压到 638px，见上方第 2 条）。
+   正文列 52rem 减去序号列 3rem 与 1.1rem 间隙 = 762px，700px 正好放得下。 */
+/* 并排两图那一组不吃单图的宽度/高度上限：两列都在 minmax(0,1fr) 里，
+   上限只会把两列掐窄，右列只剩 ~300px，第二张图被压成一条。
+   归零上限（而不是写 none）是为了留个口子：并排时若某张图特别高，
+   可以在容器上重新给一个 --cu-shot-max-h 兜底。 */
+.cu-step-block__shots .cu-step-block__shot {
+  --cu-shot-max-w: none;
+  --cu-shot-max-h: none;
+}
+
+/* 图注：只限宽、居中（或随图左对齐）。全局 .cu-page p 给它上了
+   max-width: var(--cu-content-w) + margin auto，会把图注甩到离图一截的位置上。
+   截图前缀（hint）是加粗小字，必须留在左边线，所以单独排除。 */
+.cu-shot figcaption {
+  max-width: var(--cu-shot-max-w, none);
+  margin-left: 0;
+  margin-right: 0;
+}
+/* 并排两图那一组：图注跟着各自的列走，才能与图同宽居中，而不是被 700px 甩到左边。 */
+.cu-step-block__shots .cu-shot figcaption {
+  max-width: none;
+}
+
+/* 多图并排的两列：左图 340px 固定（可吸顶），右列吃掉剩余宽度。两图都拿到更高像素高度。 */
+/* 并排两图等高：grid 子项默认 stretch，所以两列 figure 高度自动取高的那个。
+   figure 改成 flex 列后，img 用 flex:1 + object-fit:contain 吃掉剩余高度，
+   两张图的实际显示高度就一致了（宽度仍按各自列宽，不会变形，只是留白边）。
+   图注 flex-shrink:0，两条图注永远落在同一条基线上。 */
+.cu-step-block__shots {
+  grid-template-columns: 340px minmax(0, 1fr);
+  align-items: stretch;
+}
+.cu-step-block__shots .cu-shot {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.cu-step-block__shots .cu-shot img {
+  /* 基础 min-height:auto = 图片按自身宽高比算出的固有高度，flex 只能放大不能压瘪；
+     如果这里写 min-height:0，在「figure 高度 = 内容高度」的自反馈里会被压到 0，
+     容器塌成只剩图注那几十像素。 */
+  flex: 1 1 auto;
+  /* 窄的那张（1.54）按 438px 宽要 284px 高，高的那张（1.46）只要 299px，都比 316px 矮。
+     object-fit:contain 会把两者的画面缩到等高居中，于是窄图左右各留出约 38px 白边、
+     高图上下留出约 8px——图注对得上基线，画面却大小不一，看着像没对齐。
+     改成 cover：宽的一侧正好吃满列宽，只在窄的那一侧（左右或上下）留一点边，
+     构图更接近原截图。教程截图本来就是要读界面文字的，裁掉几像素边框不影响。 */
+  object-fit: cover;
+  object-position: top center;
+}
+.cu-step-block__shots .cu-shot figcaption {
+  flex: 0 0 auto;
+}
+
+/* 小字回血 */
+.cu-shot figcaption {
+  font-size: 0.86rem;
+}
+.cu-step-block__notes {
+  font-size: 0.92rem;
+}
+
+/* H3 降一档，让 H2 的节号成为本轨最重的元素 */
+.cu-step-block__body > h3 {
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+/* 教程正文块间距统一收一档。
+   问题：figure.cu-shot 自带 1.5rem 上下边距，叠上 .cu-step-block 的 1.1rem 内边距后，
+   一张截图上方能空出 2.6rem（≈42px）；首尾那两张图因为父级没有相邻内容，看着像 3.7rem 的黑洞。
+   根因是「步骤块的内边距」和「块级元素自己的外边距」两套节奏叠在一起。
+   这里只在教程页（.cu-guide-rail）内把块间距收成 1rem，
+   步骤之间靠那条细分隔线分组，视觉节奏一致。页面级节奏（--cu-section-y-lg）不动。 */
+.cu-guide-rail .cu-shot {
+  margin: 1rem 0 0;
+}
+.cu-guide-rail .cu-term {
+  margin-top: 1rem;
+}
+.cu-step-block {
+  padding: 0.85rem 0;
+}
+.cu-step-block__body p {
+  margin-bottom: 0.5rem;
+  line-height: 1.75;
+}
+
+/* 真正的根因修在这里（上面那段只调了块间距，压不住）。
+   .cu-steps-block 此前只写了 margin: 1.75rem 0，但那条选择器是 (0,1,0)，
+   VitePress 自带的 .vp-doc ol { margin: 1.7em 0 } 是 (0,1,1)，
+   优先级更高，所以 ol 实际拿到 27.2px 的上下外边距（1.7em），再加 li 的 13.6px 内边距，
+   引导语到第一个步骤之间就成了 40.8px——正好是截图里那道大空档。
+   同样地，li 的内边距也被 .vp-doc li 之类压过，这里用 .cu-page .vp-doc 叠上去确保归一。 */
+.cu-page .vp-doc .cu-steps-block,
+.cu-page .cu-steps-block,
+.cu-steps-block {
+  margin: 1.1rem 0;
+}
+.cu-page .vp-doc .cu-step-block,
+.cu-page .cu-step-block,
+.cu-step-block {
+  padding: 0.75rem 0;
+  margin: 0;
+}
+/* 教程页里 ol / ul 列表的上下外边距统一收到 1rem，避免「段落 → 列表 → 段落」出现大洞 */
+.cu-guide-rail p + ol.cu-steps-block {
+  margin-top: 0.75rem;
+}
+
+/* 块末延伸阅读行（GuideBlock.links）：小一号的 muted 文字，每条前置一个「→」。
+   此前只有 markup 没有样式，落在 .cu-page a / ul 的默认规则里，渲染成 16px、近正文色、
+   带下划线的裸链接，还吃 max-width + auto 的居中，与本节正文不在同一条左边线。
+   结构与 .cu-cta-row 的 flex 换行一致（见 02_hero.css），但用文字链而不是按钮。 */
+.cu-page .cu-guide-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.6rem;
+  max-width: none;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.cu-page .cu-guide-links li {
+  margin: 0;
+}
+
+.cu-page .cu-guide-links a {
+  color: var(--cu-ink-2);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.cu-page .cu-guide-links a::before {
+  content: '→ ';
+  color: var(--cu-muted);
+}
+
+.cu-page .cu-guide-links a:hover {
+  color: var(--cu-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }

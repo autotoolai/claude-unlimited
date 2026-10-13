@@ -13,6 +13,7 @@ import { inBrowser, useRoute } from 'vitepress'
 import VPContent from 'vitepress/dist/client/theme-default/components/VPContent.vue'
 import KnowledgeDoc from './components/KnowledgeDoc.vue'
 import { useData } from 'vitepress'
+import { installClickTracking } from './analytics'
 
 const route = useRoute()
 const { frontmatter } = useData()
@@ -73,6 +74,7 @@ function scrollToHash() {
 }
 
 onMounted(() => {
+  installClickTracking()
   keepOnlyCurrentPage()
   syncInitialDark()
   renderJsonLd()
@@ -103,4 +105,28 @@ watch(
   -->
   <KnowledgeDoc v-if="isKnowledge()" />
   <VPContent v-else />
+
+  <!--
+    dev 角标：只在 vitepress dev 下渲染，生产构建整棵子树被摇掉，不影响产物。
+    作用是让 Tailscale 远程看页面的人一眼确认「连的是不是一个刚起的 dev 进程」。
+    本项目历史上「改了看不到最新」的根因是 dev 与产物预览共用 41777，
+    现在端口已拆开（dev 41800 / preview 41777），这个角标是第二重保险。
+    对面那枚 BUILD 角标由 scripts/serve_dist.mjs 注入。
+  -->
+  <div
+    v-if="isDev"
+    style="position:fixed;left:8px;bottom:8px;z-index:99999;padding:4px 8px;border-radius:6px;background:rgba(0,0,0,.72);color:#0f0;font:12px/1.4 ui-monospace,monospace;pointer-events:none"
+  >
+    DEV · {{ devStamp }}
+  </div>
 </template>
+
+<script lang="ts">
+// 模板里不能用 import.meta.env.DEV —— Vue 编译器按非 module 解析表达式会直接报错
+// "import.meta may appear only with sourceType: module"，整页 500。必须在这里算成常量再给模板用。
+const isDev = import.meta.env.DEV
+// 模块求值一次即 dev 进程的启动时刻。
+const devStamp = new Date().toISOString().slice(0, 19).replace('T', ' ')
+
+export default { data: () => ({ isDev, devStamp }) }
+</script>
