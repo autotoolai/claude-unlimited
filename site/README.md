@@ -74,9 +74,9 @@ npm ci
 # 注意：temp/ 下的历史调试脚本可能还写死 4173/5199/4199，跑它们要一并改端口。
 npm run build        # vitepress build + 自动生成 sitemap.xml
 npm run check:links  # dist 死链检查，有死链则退出码 1
-npx vue-tsc --noEmit # 类型检查（现状：24 条，全部来自 node_modules 里的 .vue 导入；本站源码 2 条，见下）
+npx vue-tsc --noEmit # 类型检查（现状：24 条，全部来自 node_modules 里的 .vue 导入；本站源码 0 条）
 npx tsx scripts/check_kefu.ts   # 助手关键词匹配自测（11 条用例）
-npm run verify       # 把 dist 抽到临时目录起服务，跑 48 项验收（SEO / 购买按钮 / 组件数量 / 助手语料 / OG 图）
+npm run verify       # 把 dist 抽到临时目录起服务，跑 55 处断言点（SEO / 购买按钮 / 组件数量 / 助手语料 / OG 图）
 npm run check:dist   # 只跑构建产物结构门禁（SSR 是否完整：外壳、H1、页内目录锚点、无未渲染模板）
 npm run gen:jsonld   # 单独重跑 JSON-LD 注入（改了 FAQ / 教程 / 模型表 / 知识库元数据后用）
 ```
@@ -120,9 +120,9 @@ markdown 编译成 `<template><div>…</div></template>` 并用 inline 渲染模
 | 正式域名 | https://claude-unlimited.aiautotools.com（自有域名 `aiautotools.com` 的子域；注册商阿里云，DNS 与 Pages 托管在 Cloudflare） |
 | 备用地址 | https://claude-unlimited-site.pages.dev（Pages 默认域，仍可访问，不做 SEO） |
 | 部署凭据 | 本机环境变量 `CLOUDFLARE_API_TOKEN`（与参考项目 Product 共用同一个 token；不要写进仓库） |
-| 源码备份 | https://github.com/futianren/claude-unlimited-site（公开仓库，`master` 分支；Pages 本身不依赖它，只作备份与协作）。**首次上线期间 `github.com:443` 从本机间歇性连不上（`api.github.com` 正常），若 `git push` 报连接失败，重试即可，Pages 不受影响** |
-| 部署前门禁 | `npm run build` 内含 `check_dist.mjs`（SSR 结构断言）+ `verify`（48 项 SEO / 组件 / 链接验收） |
-| 类型检查 | `npm run typecheck`（即 `vue-tsc --noEmit`）现状 26 条：24 条来自 node_modules 里的 `.vue` 导入，**另有 2 条是本站 `analytics_snippets.ts` 的 TS2322 真错**（`async: true` / `defer: true` 在 `HeadConfig` 里类型是 `string`）。前者可忽略，后者待修 |
+| 源码仓库 | https://github.com/autotoolai/claude-unlimited（公开仓库，MIT 许可，`master` 分支；Pages 本身不依赖它，只作备份与协作）。**本机到 `github.com:443` 需走代理（`HTTP(S)_PROXY=http://127.0.0.1:7897`），直连会超时** |
+| 部署前门禁 | `npm run build` 内含 `check_dist.mjs`（SSR 结构断言）+ `verify`（55 处断言点，逐页展开） |
+| 类型检查 | `npm run typecheck`（即 `vue-tsc --noEmit`）现状 24 条，**全部来自 node_modules 里的 `.vue` 导入**（VitePress 自带组件缺类型声明），本站源码 0 条 |
 
 因为是直接上传模式，Cloudflare 后台的「构建命令 / 输出目录 / Node 版本」对线上站点不生效，那些只在切到 Git 集成时才需要填。
 
@@ -213,10 +213,10 @@ pwsh -File scripts/deploy_claude_unlimited_site.ps1 -Branch preview -SkipNotify
 ## 本地 → 上线流程（改内容后照做）
 
 1. 改 `site/config/*.ts`（商品、联系方式、合作平台地址、FAQ、教程）或 `site/.vitepress/theme/*.vue`（版式）。
-2. `cd site && npm run build`：`check_dist.mjs` 结构门禁不过就不要继续；再 `npm run verify` 跑 48 项 SEO / 组件 / 链接验收。
+2. `cd site && npm run build`：`check_dist.mjs` 结构门禁不过就不要继续；再 `npm run verify` 跑 55 处断言点（SEO / 组件 / 链接）。
 3. `pwsh -File scripts/deploy_claude_unlimited_site.ps1 -SkipNotify`（需要 `CLOUDFLARE_API_TOKEN`）。
 4. 线上核对：`curl -sI https://claude-unlimited.aiautotools.com/guide | grep -i location` 看是否 308 到无后缀；首页看 `grep -o 'data-cta="[a-z_]*"'`；404 看 title / robots noindex。
-5. 提交并推送备份仓库（`git push`；本机到 `github.com:443` 曾出现间歇性连不上，失败时重试或改用 SSH 传输，`gh api repos/futianren/claude-unlimited-site/commits/master` 可查远端状态）。
+5. 提交并推送源码仓库（`git push`；本机到 `github.com:443` 需走代理，失败时换 SSH 传输，`gh api repos/autotoolai/claude-unlimited/commits/master` 可查远端状态）。
 
 ## 已知问题
 
