@@ -118,3 +118,10 @@
 - **原因**：`check_dist.mjs` 的域名检查只扫 `dist/assets/chunks/*.js`；VitePress 把 `changelog.md` 编译成 `dist/assets/changelog.md.<hash>.js`，在 chunks 目录之外，不在扫描范围内。chunks 目录里只有共享代码。
 - **改法**：域名检查改成递归扫全 dist 的文本文件（html/js/css/xml/txt/json），命中就报出具体是哪个文件。
 - **验证**：`grep -rl aiprimetech .vitepress/dist` 无输出；改动前 changelog.html 与 changelog.md.*.js 都能命中。
+
+### 问题 15：media_keys 门禁拿「回写后的新块」跟自己比，恒真
+
+- **现象**：`npm run gen:media_keys:check` 永远 exit 0。故意把 `config/media_cdn.ts` 里的哈希改成错值，门禁照样报「一致」；`build` 链条第一道（`gen:media_keys:check`）因此形同虚设。
+- **原因**：脚本先按磁盘上的视频算出 `wanted`，再用它生成 `next`（要回写的内容），然后拿 `parseKeys(next)` 去和 `wanted` 比——`next` 本来就是 `wanted` 生成的，比较的是同一个值的两份拷贝，永远相等。
+- **改法**：拿「文件里已登记的」`parseKeys(src)` 与「磁盘算出的」`wanted` 做集合比较，报多余/缺失。另加一条：本地 `public/videos` 没有 mp4 时（视频源文件在 R2 托管、不入库）直接跳过并 exit 0，且**不回写**——否则公开仓库里克隆下来跑一次 `gen:media_keys` 就会把已登记的映射清空，线上视频链接全失效。
+- **验证**：本机（7 支 mp4 在盘）报「一致（7 条）」exit 0；把某条哈希改成 DEADBEEF 后报「多余/缺失」并 exit 1；干净克隆（无 mp4）报「跳过」exit 0，且 `config/media_cdn.ts` 的 VIDEO_KEYS 仍是 7 条。

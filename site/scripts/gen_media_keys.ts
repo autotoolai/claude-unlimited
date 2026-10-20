@@ -16,26 +16,31 @@ const root = path.resolve(import.meta.dirname, '..')
 const vdir = path.join(root, 'public', 'videos')
 const cfg = path.join(root, 'config', 'media_cdn.ts')
 
+if (!existsSync(cfg)) throw new Error(`找不到 ${cfg}`)
+
 const h8 = (p: string) => createHash('sha256').update(readFileSync(p)).digest('hex').slice(0, 8)
 
 /** 磁盘上的视频 -> VIDEO_KEYS 里应有的 'src': 'key' 条目 */
-const wanted = readdirSync(vdir)
-  .filter((f) => f.endsWith('.mp4'))
-  .sort()
-  .map((f) => `'videos/${f}': 'videos/${path.basename(f, '.mp4')}.${h8(path.join(vdir, f))}.mp4',`)
+const wanted = existsSync(vdir)
+  ? readdirSync(vdir)
+      .filter((f) => f.endsWith('.mp4'))
+      .sort()
+      .map((f) => `'videos/${f}': 'videos/${path.basename(f, '.mp4')}.${h8(path.join(vdir, f))}.mp4',`)
+  : []
 
+const src = readFileSync(cfg, 'utf8')
 const block = `export const VIDEO_KEYS: Record<string, string> = {\n${wanted.join('\n')}\n}`
-const next = readFileSync(cfg, 'utf8').replace(
+const next = src.replace(
   /export const VIDEO_KEYS: Record<string, string> = \{[\s\S]*?\n\}/,
   block,
 )
 
 /** 从文件里逐行解析出实际的 'src': 'key'，不靠正则回溯 */
-function parseKeys(src: string): string[] {
-  const start = src.indexOf('export const VIDEO_KEYS')
+function parseKeys(text: string): string[] {
+  const start = text.indexOf('export const VIDEO_KEYS')
   if (start < 0) return []
-  const end = src.indexOf('\n}', start)
-  return src
+  const end = text.indexOf('\n}', start)
+  return text
     .slice(start, end < 0 ? undefined : end)
     .split('\n')
     .map((l) => l.trim())
@@ -43,17 +48,29 @@ function parseKeys(src: string): string[] {
 }
 
 const check = process.argv.includes('--check')
-if (!existsSync(cfg)) throw new Error(`找不到 ${cfg}`)
+
+/**
+ * 本地没有 mp4 就无法校验映射（视频源文件在 R2 托管、不入库），此时一律跳过：
+ * 既不报错，也不回写 —— 否则「克隆下来跑一次 gen:media_keys」会把已登记的映射清空，
+ * 线上所有视频链接随即失效。公开仓库（视频不入库）就是这种状态。
+ */
+if (wanted.length === 0) {
+  console.log('[media-keys] 跳过：本地 public/videos 没有 mp4（视频源文件在 R2 托管、不入库），无法校验映射')
+  process.exit(0)
+}
 
 if (check) {
-  const actual = parseKeys(next)
-  const ok = actual.length === wanted.length && actual.every((l, i) => l === wanted[i])
-  if (!ok) {
+  // 比对「已登记的」与「磁盘算出的」两份，不是拿回写后的新块跟自己比：
+  // 那样比恒等，映射漂移了也永远查不出来（这个门禁曾经就是这样形同虚设的）。
+  const committed = parseKeys(src)
+  const a = new Set(committed)
+  const w = new Set(wanted)
+  const extra = [...a].filter((l) => !w.has(l))
+  const missing = [...w].filter((l) => !a.has(l))
+  if (extra.length || missing.length) {
     console.error('[media-keys] 与 public/videos 不一致，先跑 npx tsx scripts/gen_media_keys.ts')
-    const a = new Set(actual)
-    const w = new Set(wanted)
-    for (const l of a) if (!w.has(l)) console.error('  多余: ' + l)
-    for (const l of w) if (!a.has(l)) console.error('  缺失: ' + l)
+    for (const l of extra) console.error('  多余: ' + l)
+    for (const l of missing) console.error('  缺失: ' + l)
     process.exit(1)
   }
   console.log(`[media-keys] 一致（${wanted.length} 条）`)
