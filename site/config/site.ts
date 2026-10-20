@@ -21,7 +21,7 @@ import { entryTier, entryTierDays, shopUrl as purchaseUrl } from './plans'
 
 export interface Partner {
   /** 稳定标识：组件里按 id 取，不写死 URL */
-  id: 'purchase' | 'console' | 'ccswitch'
+  id: 'purchase' | 'console' | 'ccswitch' | 'claude-desktop' | 'vscode'
   name: string
   /** 站点用途的一句话说明，教程页直接显示 */
   desc: string
@@ -78,6 +78,8 @@ export interface SiteConfig {
   legal: { icp?: string; company?: string }
   /** 全站提示语（Hero 按钮下方、公告位） */
   notice: string
+  /** 公开源码仓库。官网回链 GitHub、GitHub 回链官网，构成同一实体的双向指认 */
+  sourceRepo: { owner: string; repo: string; url: string }
 }
 
 export const siteConfig: SiteConfig = {
@@ -106,6 +108,20 @@ export const siteConfig: SiteConfig = {
       name: 'CC Switch 官方下载',
       desc: 'CC Switch 是一个约 8 MB 的 Windows/macOS 小工具，用它管理 Claude Code、Codex、Gemini 的 API 供应商配置，支持一键导入与链路检测。下载后全部保持默认安装即可。',
       url: 'https://ccswitch.io/',
+      kind: 'tool',
+    },
+    {
+      id: 'claude-desktop',
+      name: 'Claude 桌面版下载',
+      desc: 'Anthropic 官方桌面客户端，Windows 与 macOS 都有。装好后在 CC Switch 里新增桌面版供应商并开启路由即可使用本卡。',
+      url: 'https://claude.com/download',
+      kind: 'tool',
+    },
+    {
+      id: 'vscode',
+      name: 'VS Code 官方下载',
+      desc: '微软的免费代码编辑器，装好后再装 Claude Code 官方插件，是图形界面用 Claude 最顺手的路。',
+      url: 'https://code.visualstudio.com/',
       kind: 'tool',
     },
   ],
@@ -162,6 +178,12 @@ export const siteConfig: SiteConfig = {
   },
 
   notice: '支付后分钟级自动发货卡密，不排队、不人工审核。',
+
+  sourceRepo: {
+    owner: 'autotoolai',
+    repo: 'claude-unlimited',
+    url: 'https://github.com/autotoolai/claude-unlimited',
+  },
 }
 
 /** 取当前主推商品；组件用它渲染购买按钮 */

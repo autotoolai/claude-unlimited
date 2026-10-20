@@ -37,11 +37,9 @@ import PageShell from './components/PageShell.vue'
 import TabBar from './components/TabBar.vue'
 import SectionNav from './components/SectionNav.vue'
 import BrandLogo from './components/BrandLogo.vue'
-import GuidePage from './components/GuidePage.vue'
 import GuideSteps from './components/GuideSteps.vue'
 import GuideShot from './components/GuideShot.vue'
 import GuideTerm from './components/GuideTerm.vue'
-import SegmentedTabs from './components/SegmentedTabs.vue'
 import SiteFooter from './components/SiteFooter.vue'
 
 // frontmatter.layout 的解析发生在默认主题的 VPContent 里（<component :is="frontmatter.layout" />），
@@ -51,6 +49,7 @@ import PageIndex from './index.vue'
 import PagePricing from './pricing.vue'
 import PageFaq from './faq.vue'
 import PageGuideIndex from './guide_index.vue'
+import PageGuideScene from './guide_scene.vue'
 import PageKnowledgeIndex from './knowledge_index.vue'
 import CopyChip from './components/CopyChip.vue'
 import ConsoleEntry from './components/ConsoleEntry.vue'
@@ -68,6 +67,7 @@ const themePages = {
   pricing: PagePricing,
   faq: PageFaq,
   guide_index: PageGuideIndex,
+  guide_scene: PageGuideScene,
   knowledge_index: PageKnowledgeIndex,
   models: PageModels,
   console: PageConsole,
@@ -105,11 +105,9 @@ const theme: Theme = {
     app.component('TabBar', TabBar)
     app.component('SectionNav', SectionNav)
     app.component('BrandLogo', BrandLogo)
-    app.component('GuidePage', GuidePage)
     app.component('GuideSteps', GuideSteps)
     app.component('GuideShot', GuideShot)
     app.component('GuideTerm', GuideTerm)
-    app.component('SegmentedTabs', SegmentedTabs)
     app.component('SiteFooter', SiteFooter)
     app.component('KnowledgeIndex', KnowledgeIndex)
     app.component('VideoPlayer', VideoPlayer)

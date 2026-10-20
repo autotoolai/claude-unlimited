@@ -1,11 +1,11 @@
-import { guidePages, guideTabs } from '../../../config/guide'
+import { guidePages, guideBlocks } from '../../../config/guide'
 import { knowledgeCategories } from '../../../config/knowledge'
 
 /**
- * 页内目录配置：id 对应 markdown 里的二级标题（slug 化后），加标题时两处一起改。
+ * 页内目录配置：id 对应页面正文里的二级标题（slug 化后），加标题时两处一起改。
  *
  * 谁会显示目录由调用方决定，不是这里：
- * - 教程页 PageShell 传 toc="side" → 用 slug "/guide" 这组；
+ * - 教程页 PageShell 传 toc="side" → 索引页用 "/guide" 这组，5 个场景页各用自己的 slug（/guide/cc 等）；
  * - 后台页 PageShell 传 toc="wide" → 用 console 这组；
  * - 知识库文章页目录由 KnowledgeDoc 从正文 h2 客户端读取，不用这张表。
  * 下面 index / models / pricing / faq / knowledge_index 五组是营销页与列表页的，
@@ -15,8 +15,6 @@ export interface SectionLink {
   label: string
   /** 1 = h2 章，2 = h3 节 */
   level?: number
-  /** 分组名（教程页的「小白教程」/「高级配置」）：同一 group 的节点放在一起，页面按 group 过滤后再传进来 */
-  group?: string
 }
 
 export const SECTION_NAV: Record<string, SectionLink[]> = {
@@ -49,18 +47,25 @@ export const SECTION_NAV: Record<string, SectionLink[]> = {
       .sort((a, b) => a.order - b.order)
       .map((c) => ({ id: `cat-${c.cat}`, label: c.name })),
   ],
-  // 教程页：键就是 slug（/guide）。两条轨的小节都在目录里，但按轨分组（group），
-  // 页面只把当前轨 + 共用块传给 SectionNav（见 PageShell 的 tocGroup prop），避免锚点指向未渲染的段落。
+  // 教程场景页：每个客户端页一组，键就是该页的 slug（/guide/cc 等）。
+  // 目录项取自装配后的块（h2 带页内序号），与正文小节一字不差，锚点必然对得上。
+  // 页尾两节（常见问题 / 相关阅读）也必须在目录里：check_dist 断言正文每个 h2 都在目录中，
+  // 漏一项就是「目录能点但点过去没落点」的反向漂移。
   ...Object.fromEntries(
     guidePages.map((p) => [
       p.slug,
       [
-        ...guideTabs.flatMap((t) =>
-          p.blocks.filter((b) => b.tab === t.id).map((b) => ({ id: b.id, label: b.h2, level: 1 as const, group: t.name })),
-        ),
-        ...p.blocks.filter((b) => !b.tab && b.id !== 'contact').map((b) => ({ id: b.id, label: b.h2, level: 1 as const })),
+        ...guideBlocks(p).map((b) => ({ id: b.id, label: b.h2, level: 1 as const })),
+        { id: 'faq', label: '常见问题', level: 1 as const },
+        { id: 'related', label: '相关阅读', level: 1 as const },
       ],
     ]),
   ),
+  // 教程索引页（/guide）：三段，没有小节块
+  '/guide': [
+    { id: 'pick-client', label: '选一个你用的客户端' },
+    { id: 'first-step', label: '所有客户端都从这一步开始' },
+    { id: 'not-sure', label: '不确定用哪个' },
+  ],
 }
 

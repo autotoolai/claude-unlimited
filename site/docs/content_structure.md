@@ -14,7 +14,8 @@
 | 首页 | `/` | 落地页 | 这是什么、值不值、多少钱、怎么买 | 首屏 → 为什么值得 → 多少钱 → 四步怎么走 → 买之前可以先确认 → 继续了解 |
 | 套餐定价 | `/pricing` | 决策页 | 多少钱、买到什么、边界在哪、能不能退 | 选择套餐 → 购买后怎么用 → 包含什么 → 不包含什么 → 公平使用 → 退款规则 → 关于价格 → 购买与限速 FAQ |
 | 模型广场 | `/models` | 目录页 | 有哪些模型、model ID 是什么、怎么切 | 模型一览 → CTA |
-| 使用教程 | `/guide` | 操作页 | 怎么配起来 | 小白六步 / 高级配置两节（分段切换）→ 排错交给知识库 |
+| 使用教程（索引） | `/guide` | 分流页 | 我该看哪一篇 | 一句话答案 → 选一个你用的客户端（5 张场景卡）→ 所有客户端都从换取 API Key 开始 → 不确定用哪个 |
+| 使用教程（场景页 ×5） | `/guide/cc` `/guide/desktop` `/guide/codex` `/guide/workbuddy` `/guide/cursor` | 操作页 | 我在这个客户端里怎么配起来 | 一句话答案 → 小节流（编号在 H2）→ 常见问题 → 相关阅读 → 接着看 + CTA；排错交给知识库 |
 | 知识库 | `/knowledge` | 目录页 | 有哪些文章 | 分类胶囊 + 精选 + 分类小节（分类数以 `config/knowledge.ts` 的 `knowledgeCategories` 为准） |
 | 管理后台 | `/console` | 说明页 | 后台是什么（外部产品） | 后台能做什么 → 关键功能细说 → 备用域名 → 后台 FAQ |
 | 常见问题 | `/faq` | 答疑页 | 我遇到的问题 | 买之前 5 条 + 7 个分类 + 还没解决 |
@@ -37,7 +38,7 @@
 **说服类（首页、定价页）**
 - 卖点卡组 — `FeatureCards`，只讲「为什么值得」，不讲能力清单与流程
 - 计价对比 — 我们 / 按量 API / 官方订阅 三列对比
-- 档位网格 — `SegmentedTabs` + `PlanGrid` + `PlanCard`
+- 档位网格 — `PlanGrid` + `PlanCard`（分组切换器 `SegmentedTabs` 已于 2026-10-20 随教程两轨下线一并删除，定价页不再使用）
 
 **规格类（定价页）**
 - 规格表 — 包含什么（能力、客户端、SDK）
@@ -51,8 +52,8 @@
 - 模型一览 — `ModelCard` / `ModelBadges` / 层级分工表
 - 文章索引 — `KnowledgeCard` + 分类胶囊
 
-**流程类（首页、教程页）**
-- 四步流程 — `StepFlow` / `GuideSteps`
+**流程类（首页、教程场景页）**
+- 四步流程 — `StepFlow`（首页）/ `GuideSteps`（教程场景页的小节步骤）
 - 命令块 — `GuideTerm`
 
 **答疑类**
@@ -73,7 +74,7 @@
 | 价格、档位、退款条款 | `config/plans.ts` | 首页档位卡、定价页档位网格 |
 | 模型层级与 model ID | `config/models.ts` | 模型广场、教程 3.6、知识库文章 |
 | 全部问答 | `config/faq.ts` | FAQ 页、定价页、模型广场、在线助手、JSON-LD |
-| 教程正文 | `config/guide.ts` | 教程页、页脚 |
+| 教程正文 | `config/guide.ts` | 索引页与 5 个场景页、页脚、llms-full.txt、JSON-LD |
 | 商品、平台地址、联系方式、导航 | `config/site.ts` | 全站 |
 
 新增内容前先查这张表：已有数据源就派生，不要在页面组件里另写一份。
@@ -88,8 +89,10 @@ npm run verify       # 48 项 SEO / 组件 / 链接验收
 npm run check:links  # 死链
 ```
 
-`check_dist.mjs` 对首页 5 个板块、4 张卖点卡、5 张档位卡、3 张继续了解卡，以及「已删除的六个板块不许回来」
-都有断言。增删首页板块时要同步改那里的断言。
+```bash
+npm run check:align   # 教程页文字左边线，需先 npm run preview
+```
 
-已知既有问题（改动前后都一样，不算回归）：`check:dist` 对 SSR 注释标记、教程页目录、知识库 related[] 的断言恒失败；
-`npm run typecheck`（`vue-tsc --noEmit`）报 26 条：24 条来自 node_modules 里的 `.vue` 导入（可忽略），另有 2 条是 `analytics_snippets.ts` 的真错。详见 [`troubleshooting_guide.md`](troubleshooting_guide.md) 第二节。
+`check_dist.mjs` 对首页 5 个板块、4 张卖点卡、5 张档位卡、3 张继续了解卡，以及「已删除的六个板块不许回来」
+都有断言。增删首页板块时要同步改那里的断言。教程的断言是逐页的（5 个场景页各一套），改动教程结构时按
+`guide_design_spec.md` 第九节核对。

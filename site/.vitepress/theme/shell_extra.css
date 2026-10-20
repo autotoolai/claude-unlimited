@@ -822,3 +822,124 @@
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
+/* ---------------- 教程多场景：索引页与场景页的新增元素 ---------------- */
+
+/* 场景切换条：5 个客户端互跳。是链接不是 tab（5 个是 5 个独立页面，不是同页视图），
+   所以不用 tablist 语义，只用 aria-current 标当前。 */
+.cu-guide-scenes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1.6rem;
+}
+
+.cu-guide-scenes__item {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.42rem 0.9rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 999px;
+  background: var(--cu-card-solid);
+  color: var(--cu-ink-2);
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-decoration: none;
+  transition: background-color 0.25s var(--cu-ease), border-color 0.25s var(--cu-ease), color 0.25s var(--cu-ease);
+}
+
+.cu-guide-scenes__item:hover {
+  background: var(--cu-card);
+  border-color: var(--cu-line-strong);
+  color: var(--cu-ink);
+}
+
+.cu-guide-scenes__item.is-current {
+  background: var(--cu-accent-soft);
+  border-color: var(--cu-accent-line);
+  color: var(--cu-ink);
+  font-weight: 600;
+}
+
+/* 一句话答案：结论式独立成段，是被 AI 搜索直接引用的那一段。
+   用左侧墨色竖条 + 深墨色文字，与「提示」卡（.cu-notes）区分开——提示是补充，答案是结论。 */
+.cu-guide-answer {
+  margin: 0 0 2rem;
+  padding: 0 0 0 1rem;
+  border-left: 3px solid var(--cu-accent);
+  color: var(--cu-ink);
+  font-size: 1.02rem;
+  font-weight: 500;
+  line-height: 1.75;
+}
+
+/* 索引页的 h2：与场景页的小节 h2 区分开（索引页没有小节流，是三段式说明） */
+.cu-guide-h2 {
+  margin: 2.2rem 0 0.7rem;
+  font-size: 1.24rem;
+  font-weight: 700;
+  color: var(--cu-ink);
+  line-height: 1.5;
+}
+
+.cu-guide-list {
+  margin: 0.6rem 0 0;
+  padding-left: 1.2rem;
+  color: var(--cu-ink-2);
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+.cu-page .cu-guide-list li {
+  margin: 0.2rem 0;
+}
+
+.cu-guide-list code {
+  padding: 0.1rem 0.32rem;
+  border-radius: 4px;
+  background: var(--cu-accent-soft);
+  font-family: var(--cu-mono);
+  font-size: 0.88em;
+}
+
+/* 场景卡：整卡可点，指向各自的教程页 */
+.cu-guide-scene-cards {
+  margin: 1.2rem 0 1rem;
+}
+
+.cu-guide-scene-card h3 {
+  margin: 0 0 0.45rem;
+  font-size: 1.06rem;
+  font-weight: 700;
+  color: var(--cu-ink);
+}
+
+.cu-guide-scene-card p {
+  margin: 0 0 0.7rem;
+  color: var(--cu-ink-2);
+  font-size: 0.94rem;
+  line-height: 1.72;
+}
+
+.cu-guide-scene-card__meta {
+  display: inline-block;
+  margin-top: auto;
+  padding: 0.18rem 0.6rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 999px;
+  background: var(--cu-card-solid);
+  color: var(--cu-muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+/* 可放大的截图：密集界面图在 544px 版心里看不清，点开看原图 */
+.cu-shot a {
+  display: block;
+  cursor: zoom-in;
+}
+
+.cu-shot a:hover {
+  opacity: 0.92;
+}

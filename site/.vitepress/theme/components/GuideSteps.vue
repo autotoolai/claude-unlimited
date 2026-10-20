@@ -14,9 +14,11 @@ import { computed } from 'vue'
 import { renderInline } from '../utils/inline'
 import GuideShot from './GuideShot.vue'
 import GuideUrl from './GuideUrl.vue'
-import type { GuideStep } from '../../../config/guide'
+import type { GuideStepResolved } from '../../../config/guide'
 
-const props = defineProps<{ steps: GuideStep[]; /** 序号起始（默认 1） */ start?: number; /** 所属小节的 id；子步骤锚点写成 <blockId>-<序号>，供 FAQ / 客服机器人深链到具体子步骤 */ blockId?: string }>()
+// 收装配后的类型而不是 GuideStep：截图的 label（图 NN）由 guideBlocks() 生成，
+// 用 GuideStep 声明 props 的话 template 里读 sh.label 就是 TS2339（vue-tsc 会报）。
+const props = defineProps<{ steps: GuideStepResolved[]; /** 序号起始（默认 1） */ start?: number; /** 所属小节的 id；子步骤锚点写成 <blockId>-<序号>，供 FAQ / 客服机器人深链到具体子步骤 */ blockId?: string }>()
 
 /** 组内只有一个子步骤时 H2 上的「N.」已是唯一编号，不画徽标，也不画「子步骤 1」的前缀 */
 /** 徽标序号起始。H2 上的「3.」是节号，组内徽标是子步骤号，两级各司其职、每一组都画：
@@ -24,7 +26,7 @@ const props = defineProps<{ steps: GuideStep[]; /** 序号起始（默认 1） *
 const startNo = computed(() => props.start ?? 1)
 
 /** shot 可以是单张或数组（合并小步时一步挂多张图），统一摊平成数组 */
-function shots(s: GuideStep) {
+function shots(s: GuideStepResolved) {
   if (!s.shot) return []
   return Array.isArray(s.shot) ? s.shot : [s.shot]
 }

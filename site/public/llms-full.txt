@@ -12,6 +12,7 @@
 - 退款：激活 1 小时内不满意可全额退；周卡与月卡超 3 小时按 15 元/天折算退款；售后申请窗口 7 天
 - 购买：第三方发卡站 https://catfk.com/shop/2Z0CEP7C
 - 配置工具：CC Switch（https://ccswitch.io/），支持一键导入与链路检测
+- 源码与文档：https://github.com/autotoolai/claude-unlimited（本站 VitePress 源码公开，MIT 许可；官网是唯一官方入口）
 - 人工客服：微信 ren_mo_mo（点右下角在线助手 →「联系人工客服」，可一键复制微信号）
 - 管理后台：https://rsxermu666.cn/，独立站点；主域名不可达时切换备用域名，API Key 无需更换
 - 不包含：生产环境流量（套餐面向个人开发。上线服务、多用户共享、对外 API 属于生产流量，不在范围内）；超并发压测（超过公平使用速率限制（同时 1 个会话、单会话 20 路并发、60 次/分钟）的压测、扫描、批量抓取）；二次转卖（转卖、二次分发 Key，或将 Key 共享给多个用户）；Anthropic 官方服务（本卡不提供 claude.ai 网页版、Claude Desktop 等官方产品的订阅权益）
@@ -283,3 +284,88 @@ Claude 无限卡是独立的第三方 API 网关服务，与 Anthropic 官方无
   - 「余额不足」是什么？ —— 预付余额用完了。API 是预付制，余额为空就没有调用。`/compact`、重启、重装都没用，只能充值或改用订阅登录。
   - 「not your usage limit」是什么？ —— 服务端在高峰时限流，你的额度没动。等一分钟，用 `claude -c` 续跑；无人值守的运行设 `CLAUDE_CODE_RETRY_WATCHDOG=1`。
   - 怎么继续工作？ —— 把同样的 Claude Code 指向一个 API 端点：按 token 计费，没有会话窗口和周窗口；订阅重置后再取消环境变量切回来。
+
+## Claude Code 教程：VS Code 插件与终端配置
+
+- 页面：https://claude-unlimited.aiautotools.com/guide/cc
+- 一句话答案：Claude Code 是最主流的用法：先在管理后台把卡密换成 API Key，再用 CC Switch 一键导入配置、拉取模型、启用检测，最后在 VS Code 装官方 Claude Code 插件或在终端直接跑 claude。
+- 步骤：
+  - 1. 安装 CC Switch —— 装好 CC Switch 就算准备好了一半：它是个专门管 API 配置的小工具，全程默认安装，不用填任何东西。
+  - 2. 换取 API Key —— 卡密在发货信息里，换成一把 sk- 开头的 API Key 后面全程只用它——CC Switch、各个客户端、终端都是这一把。
+  - 3. 一键导入配置 —— 管理后台里有「一键导入配置」按钮，不用手填 Base URL 和 Key，两边自动对上。
+  - 4. 拉取并保存模型 —— 导入的配置要再拉一次模型列表，CC Switch 才知道网关这边有哪些模型可用。
+  - 5. 启用并检测链路 —— 前面配完配置已经在 CC Switch 里但还没生效，这一步启用并检测一下，显示运行正常就完成了。
+  - 6. 在 VS Code 里开始使用 —— 没用过 Claude Code 的，请按下方步骤通过 VS Code 官方插件使用：安装方便，图形界面比命令行更好上手。
+- 常见问题：
+  - Claude Code 怎么配置 Claude 无限卡？ —— 在管理后台换取 API Key，用 CC Switch 一键导入配置，拉一次模型列表并保存，启用后检测链路显示正常就算配好了。VS Code 里再装官方 Claude Code 插件即可。
+  - 一键导入后模型列表是空的？ —— 点「获取模型列表」再拉一次，加进模型配置后点保存。列表为空通常是配置刚导入还没刷新，或者 Key 没生效。
+  - 在 VS Code 里能用 Claude 无限卡吗？ —— 能。VS Code 装官方 Claude Code 插件后，选「使用已有的 API 配置 / API Key」，它会读 CC Switch 已经写好的配置，不用再填一遍 Key。
+  - 终端里怎么启动？ —— CC Switch 配置启用后，终端直接输入 claude 就能启动。想在会话里换模型用 /model 命令。
+
+## Claude 桌面版教程：新增供应商、开启路由与安装
+
+- 页面：https://claude-unlimited.aiautotools.com/guide/desktop
+- 一句话答案：Claude 桌面版要用 CC Switch 新增一个「桌面版」供应商，接入方式选直连，填上接口地址与 API Key，再打开路由开关并启用检测，最后安装桌面版客户端即可。
+- 步骤：
+  - 1. 安装 CC Switch —— 装好 CC Switch 就算准备好了一半：它是个专门管 API 配置的小工具，全程默认安装，不用填任何东西。
+  - 2. 换取 API Key —— 卡密在发货信息里，换成一把 sk- 开头的 API Key 后面全程只用它——CC Switch、各个客户端、终端都是这一把。
+  - 3. 新增桌面版供应商 —— 桌面版在 CC Switch 里是一个单独的供应商条目，要自己新建，不能用一键导入。
+  - 4. 填入接口地址与 API Key —— 地址填管理后台首页那一行，Key 填上一步换来的那把，接入方式选「直连」——桌面版和 Claude Code 的区别就在这里。
+  - 5. 打开路由开关 —— 桌面版必须走本地路由转发，请求才会被送到网关——这一步不做，前面配的全都白配。
+  - 6. 启用并检测链路 —— 配完最后启用一下，检测显示连通正常，桌面版就能用了。
+  - 7. 安装 Claude 桌面版 —— 配置好了，再装桌面版客户端本体，两个下载渠道都放这儿。
+  - 8. 在桌面版里开始用 —— 打开就能用，桌面版和终端里用的是同一把 Key、同一个模型。
+  - 9. 提示要虚拟机平台怎么办 —— 这是 Windows 缺可选功能，和你的 API 配置无关，按系统提示开一下就好。
+- 常见问题：
+  - Claude 桌面版怎么用 Claude 无限卡？ —— 在 CC Switch 里新增一个供应商，选择 Claude 桌面版并用自定义配置，接入方式选直连，填入接口地址与 API Key，打开路由里的 Claude Code 开关，启用并检测链路后安装桌面版即可。
+  - 桌面版和 Claude Code 用的地址一样吗？ —— 一样，都是管理后台首页那一行地址。区别在接入方式：桌面版选「直连」，Codex 要选 Anthropic Messages 上游格式。
+  - 桌面版提示要 Virtual Machine Platform 怎么办？ —— 这是 Windows 的可选功能没开。搜索「启用或关闭 Windows 功能」，勾选「虚拟机平台」和「适用于 Linux 的 Windows 子系统」，重启电脑即可。
+  - 桌面版打不开、显示不可用？ —— 通常是配置还没写进客户端。把 Claude 桌面版完全退出（不是最小化），回到 CC Switch 确认配置已启用、路由已打开，再重新打开。
+
+## Codex 教程：接入 Claude 无限卡并配置模型列表
+
+- 页面：https://claude-unlimited.aiautotools.com/guide/codex
+- 一句话答案：Codex 要在 CC Switch 里新增一个 Codex 供应商，上游格式必须选 Anthropic Messages 并开启路由，配置好模型列表后启用并检测链路，最后彻底重启 Codex 才会生效。
+- 步骤：
+  - 1. 安装 CC Switch —— 装好 CC Switch 就算准备好了一半：它是个专门管 API 配置的小工具，全程默认安装，不用填任何东西。
+  - 2. 换取 API Key —— 卡密在发货信息里，换成一把 sk- 开头的 API Key 后面全程只用它——CC Switch、各个客户端、终端都是这一把。
+  - 3. 新增 Codex 供应商 —— Codex 要在 CC Switch 里单独建一个供应商，不能用一键导入，也不能用桌面版那条配置。
+  - 4. 填入地址、Key 与默认模型 —— Codex 的请求地址要带 /v1，和 Claude Code 那边不一样；默认模型填一个网关确实返回的模型名。
+  - 5. 把上游格式设为 Anthropic Messages —— 这是 Codex 专有的一步，也是最关键的一步：本卡是 Anthropic 兼容端点，选错格式请求就发不出去。
+  - 6. 配置模型列表 —— 把网关有的模型加进列表，Codex 的 /model 命令才会列出这些模型名。
+  - 7. 开启路由 —— Codex 走本地路由转发，和桌面版一样：总开关与 Codex 应用开关都要开。
+  - 8. 启用并检测链路 —— 配置齐了启用一下，检测显示连通正常再往下走。
+  - 9. 彻底重启 Codex —— Codex 只在启动时读一次配置，这一步不做，前面所有配置都不会生效。
+- 常见问题：
+  - Codex 怎么配置 Claude 无限卡？ —— 在 CC Switch 新增 Codex 供应商，填接口地址（带 /v1）与 API Key，默认模型填 claude-opus-5-5，上游格式选 Anthropic Messages，开启路由里的 Codex 开关，启用检测后彻底重启 Codex。
+  - Codex 改了配置不生效？ —— Codex 只在启动时读一次配置，改完必须彻底退出（任务管理器里结束进程）再打开，单纯关窗口不算。
+  - 上游格式为什么必须选 Anthropic Messages？ —— 本卡是 Anthropic 兼容端点，Codex 选 Chat Completions 或 Responses 会按 OpenAI 协议发请求而连不上。选 Anthropic Messages 时必须同时开启路由。
+  - 检测链路显示正常但 Codex 里报错？ —— 先确认路由总开关和 Codex 那个应用开关都打开了；只有总开关开着、应用开关没开，请求不会被转发。
+
+## WorkBuddy 教程：添加自定义模型并切换使用
+
+- 页面：https://claude-unlimited.aiautotools.com/guide/workbuddy
+- 一句话答案：WorkBuddy 不用装 CC Switch——换取 API Key 后，在设置里添加自定义模型，接口地址填管理后台地址带 /v1、API Key 填 sk- 开头那把、模型名称填 claude-opus-5-5，保存后在模型列表里选中它就能用。
+- 步骤：
+  - 1. 换取 API Key —— 卡密在发货信息里，换成一把 sk- 开头的 API Key 后面全程只用它——CC Switch、各个客户端、终端都是这一把。
+  - 2. 添加自定义模型 —— WorkBuddy 的自定义模型只认 OpenAI 兼容协议，所以接口地址要带 /v1。
+  - 3. 切换到自定义模型开始用 —— 添加完要在模型列表里选中它才会生效，填完不选还是用的原来的模型。
+- 常见问题：
+  - WorkBuddy 怎么用 Claude 无限卡？ —— 换取 API Key 后，进 WorkBuddy 的设置添加自定义模型：接口地址填管理后台地址带 /v1、API Key 填 sk- 开头那把、模型名称填 claude-opus-5-5，保存后在模型列表里选中它即可。
+  - WorkBuddy 需要装 CC Switch 吗？ —— 不需要。WorkBuddy 支持 OpenAI 兼容协议，自定义模型里直接填三个值就能连；装 CC Switch 是 Claude Code、桌面版、Codex 这几条路才需要的。
+  - 接口地址后面要加 /v1 吗？ —— 要。WorkBuddy 的接口地址填管理后台地址加 /v1，界面上也有这句提示，不加会 404。
+  - 保存后模型列表里看不到？ —— 模型名称要和网关返回的 ID 完全一致（claude-opus-5-5），填错就不出现在列表里。填好后记得在模型列表里选中它。
+
+## 通用手动配置：Cursor 等客户端怎么填三个值
+
+- 页面：https://claude-unlimited.aiautotools.com/guide/cursor
+- 一句话答案：任何支持自定义 API 的客户端都只要填三个值——接口地址、sk- 开头的 API Key、模型名称；Cursor 这类 OpenAI 兼容端点的地址要带 /v1，各客户端的差异见页面末尾的速查表。
+- 步骤：
+  - 1. 换取 API Key —— 卡密在发货信息里，换成一把 sk- 开头的 API Key 后面全程只用它——CC Switch、各个客户端、终端都是这一把。
+  - 2. 手动配置三个值 —— 不用 CC Switch 的话，所有客户端都只要这三个值，区别只在地址写法与上游格式。
+  - 3. 各客户端填法差异速查 —— 同一个 Key 在不同客户端里，地址写法、上游格式和要不要开路由都不一样，对照这张表填。
+- 常见问题：
+  - 在 Cursor 里怎么用 Claude 无限卡？ —— 在 Cursor 的模型设置里添加自定义模型：接口地址填管理后台地址带 /v1、API Key 填 sk- 开头那把、模型名填 claude-opus-5-5 之类的真实 ID，保存后即可使用。
+  - 三个值到底填什么？ —— 接口地址是管理后台首页顶部那一行（OpenAI 兼容端点要带 /v1），API Key 是后台「提取 Key」页面那把 sk- 开头的密钥，模型名是网关真实返回的 model ID。
+  - 模型名称填什么？ —— 填网关真实返回的 ID，比如 claude-opus-5-5、claude-fable-5-1。填错客户端就选不到这个模型，完整清单见模型广场。
+  - 各家客户端的地址写法都一样吗？ —— 不一样。Claude Code 与桌面版用不带 /v1 的地址，Codex、WorkBuddy、Cursor 这类用带 /v1 的地址。页面末尾的速查表列了全部差异。

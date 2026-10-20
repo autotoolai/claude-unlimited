@@ -57,7 +57,7 @@ def knowledge_categories():
     return cats
 
 
-PAGES = ['/', '/models', '/console', '/pricing', '/faq', '/guide', '/knowledge'] + ['/knowledge/' + s for s in knowledge_slugs()]  # cleanUrls=false 时条目页是 /knowledge/x.html、总览是 /guide.html，Handler 两种路径都接受
+PAGES = ['/', '/models', '/console', '/pricing', '/faq', '/guide', '/knowledge'] + ['/knowledge/' + s for s in knowledge_slugs()] + ['/guide/cc', '/guide/desktop', '/guide/codex', '/guide/workbuddy', '/guide/cursor']  # cleanUrls=false 时条目页是 /knowledge/x.html、总览是 /guide.html，Handler 两种路径都接受
 def _read_config(name: str) -> str:
     with io.open(os.path.join(SITE, 'config', name), encoding='utf-8') as f:
         return f.read()
@@ -227,13 +227,24 @@ def main():
         shell_x = x[shell_xm.start():] if shell_xm else x
         check(f'{u:12} 唯一 h1', len(re.findall(H1_RE, shell_x)) == 1, f'外壳内 {len(re.findall(H1_RE, shell_x))} 个；title={title[0] if title else "?"}')
         check(f'{u:12} description', 'name="description"' in x)
+        # 教程场景页的 title 与 description 是 SEO 契约：title ≤ 32 字（SERP 中文约 30 字后截断），
+        # description ≤ 110 字（同 config/knowledge.ts 的 GEO 规范）。超了会在搜索结果里被截掉。
+        if u.startswith('/guide/'):
+            m_desc = re.search(r'name="description" content="([^"]*)"', x)
+            desc = m_desc.group(1) if m_desc else ''
+            m_title = re.search(r'<title>([^<]*)</title>', x)
+            t = m_title.group(1) if m_title else ''
+            check(f'{u:12} description ≤110 字', 0 < len(desc) <= 110, f'实际 {len(desc)} 字：{desc[:40]}')
+            check(f'{u:12} title ≤32 字', 0 < len(t.replace(" | Claude 无限卡", "")) <= 32, f'实际 {len(t)} 字：{t}')
+            check(f'{u:12} 场景切换条 5 个客户端', x.count('cu-guide-scenes__item') == 5, f"实际 {x.count('cu-guide-scenes__item')}")
+            check(f'{u:12} 有 HowTo 与 FAQPage', 'HowTo' in x and 'FAQPage' in x, '')
         check(f'{u:12} canonical', '<link rel="canonical"' in x)
         # 文章页：正文是 VPDoc 的 page 分支（layout: page），没有原生目录 aside，也没有 cu-page__head
         # 页内目录：只有长文页有（教程页 /guide、后台页 /console 由 PageShell 传 toc，知识库文章页自带），
         # 形态统一是右侧竖排 cu-sidenav；营销页与列表页（首页 / 模型 / 套餐 / 无限额度 / FAQ / 知识库列表）没有目录。
         # 文章页的目录项在客户端挂载后才从正文 h2 生成，SSR 里整块不渲染（见 KnowledgeDoc.vue 与 SectionNav.vue 的 v-if），
         # 所以文章页只校验两列骨架在，不校验目录节点；锚点一致性由 npm run check:toc 在浏览器里核对
-        has_toc = u in ('/guide', '/console')
+        has_toc = u.startswith('/guide') or u == '/console'
         shell_keys = ['cu-brandbar', 'cu-tabs', 'cu-shell__body'] + (['vp-doc', 'cu-shell__body--reading'] if is_knowledge_article else ([] if u == '/' else ['cu-page__head']))
         missing = [k for k in shell_keys if k not in x]
         check(f'{u:12} 页面外壳（品牌页头 + 导航条）', not missing, f'缺少 {missing}')

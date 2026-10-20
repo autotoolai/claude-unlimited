@@ -16,7 +16,8 @@ import { siteConfig } from '../../../config/site'
 import { modelIds } from '../../../config/models'
 import { faqItems } from '../../../config/faq'
 import { consoleFaqs } from '../../../config/console'
-import { guidePage } from '../../../config/guide'
+import { guidePageBySlug, guidePages } from '../../../config/guide'
+import { jsonLdGuideScene, jsonLdGuideIndex } from './guide_jsonld'
 import { knowledge, knowledgeCategories } from '../../../config/knowledge'
 import { videos } from '../../../config/video_meta'
 import { posterUrl, videoUrl } from '../../../config/media_cdn'
@@ -35,6 +36,9 @@ const org = {
   ...(siteConfig.legal.company ? { legalName: siteConfig.legal.company } : {}),
   url: BASE + '/',
   ...(operator.icp ? { taxID: operator.icp } : {}),
+  // sameAs 把官网与公开仓库指认为同一实体的两个入口。搜索引擎据此把两边的信号合并，
+  // 而不是当成两份互不相干的站点；反向链接（官网 → GitHub）在 SiteFooter 与 llms.txt。
+  sameAs: [siteConfig.sourceRepo.url],
 }
 
 const faqJsonLd = (items: { q: string; a: string }[]) => ({
@@ -120,33 +124,16 @@ const jsonLdModels = {
   })),
 }
 
-/**
- * /guide：小白教程与高级配置各输出一个 HowTo（与客户端 pages/data.ts 的 jsonLdGuide 同构，
- * 改一边要改另一边；结构化数据里 HowToStep 用小节标题 + lead，正文步骤在 step 里逐条编号）。
- */
-function jsonLdGuide() {
-  const page = guidePage()
-  const rails: { tab: 'novice' | 'pro'; name: string; desc: string }[] = [
-    {
-      tab: 'novice',
-      name: '小白教程',
-      desc: '按顺序照做：取 API Key → 装 CC Switch → 一键导入 → 获取并保存模型 → 启用并检测链路 → VS Code 插件 → /model 切换模型。',
-    },
-    {
-      tab: 'pro',
-      name: '高级配置',
-      desc: '已经有卡密或 API Key：提取 API Key → 手动配置（接口地址 / API Key / 模型名）。',
-    },
-  ]
-  const graph = rails.map((r, i) => ({
-    '@type': 'HowTo',
-    name: i === 0 ? page.title : r.name,
-    description: i === 0 ? page.desc : r.desc,
-    step: page.blocks
-      .filter((b) => b.tab === r.tab)
-      .map((b, j) => ({ '@type': 'HowToStep', position: j + 1, name: b.h2, text: b.lead ?? '' })),
-  }))
-  return { '@context': 'https://schema.org', '@graph': graph }
+/** /guide 索引页：CollectionPage + ItemList（5 个客户端） */
+function jsonLdGuideIndexPage() {
+  return jsonLdGuideIndex()['@graph'] as Record<string, unknown>[]
+}
+
+/** /guide/<scene>：一个 HowTo（这条路径怎么做）+ 一个 FAQPage（这个客户端的常见问题） */
+function jsonLdGuideScenePage(slug: string) {
+  const page = guidePageBySlug(slug)
+  if (!page) return undefined
+  return jsonLdGuideScene(page)['@graph'] as Record<string, unknown>[]
 }
 
 /** /knowledge 列表页：CollectionPage + ItemList */
@@ -206,6 +193,9 @@ function breadcrumbFor(route: string) {
     let name = s
     if (acc.length === 1 && s === 'knowledge') name = 'Claude 知识库'
     else if (acc.length === 1 && s === 'guide') name = '使用教程'
+    // 教程场景页（/guide/cc 等）：用场景短名（Claude Code、Codex…），不要把 slug 片段原文
+    // 当面包屑标题——爬虫按可见标题理解层级，'cc' 对人和 AI 都是噪声。
+    else if (acc.length === 2 && acc[0] === 'guide') name = guidePages.find((p) => p.slug.slice(1) === acc[1])?.nav ?? s
     else if (acc.length === 1 && s === 'pricing') name = '套餐定价'
     else if (acc.length === 1 && s === 'models') name = '模型广场'
     else if (acc.length === 1 && s === 'faq') name = '常见问题'
@@ -282,6 +272,16 @@ export function jsonLdForRoute(routePath: string): Record<string, unknown> | und
   // switch 而不是嵌套三元：knowledge 分支要剥掉外层 @graph（只留 CollectionPage），
   // 嵌套三元里塞这个操作类型收不拢，且读起来比 switch 难查。
   let flat: Record<string, unknown> | undefined
+  // 教程场景页：/guide/<scene>。必须放在 switch 之前——switch 是精确匹配，
+  // case 'guide' 命中不了 'guide/cc'，漏在这里的场景页会一路走到 default 拿到 undefined，
+  // 产物里既没有 HowTo 也没有 FAQPage（构建不报错，只是爬虫看不到结构化数据）。
+  if (routePath.startsWith('guide/')) {
+    const slug = '/guide/' + routePath.slice('guide/'.length)
+    const graph = jsonLdGuideScenePage(slug)
+    // 未知场景返回 undefined：宁可这一页没有结构化数据，也不要塞一个 '@graph': undefined 的空壳
+    if (!graph) return undefined
+    flat = { '@graph': graph }
+  }
   switch (routePath) {
     case 'pricing':
       flat = jsonLdPricing
@@ -296,7 +296,7 @@ export function jsonLdForRoute(routePath: string): Record<string, unknown> | und
       flat = faqJsonLd(consoleFaqs)
       break
     case 'guide':
-      flat = { '@graph': jsonLdGuide()['@graph'] }
+      flat = { '@graph': jsonLdGuideIndexPage() }
       break
     case 'knowledge':
       flat = { '@graph': (jsonLdKnowledgeIndex()['@graph'] as Record<string, unknown>[]).slice(0, 1) }

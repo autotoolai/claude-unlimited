@@ -90,7 +90,9 @@ if (anyChannel) {
 // 转化点：每个标记只需要「在站点某个页面存在」—— 首页没有套餐卡、没有复制按钮是正常的，
 // 所以扫全 dist。VitePress 产出的是 .html 目录（不是 _dir/index.html）；guide/console 各有 guide.html 与
 // guide/index.html 两份同源内容，算重复无害。缺一个就说明有人改组件时把埋点标记弄丢了。
-const REQUIRED_CTA = ['nav', 'hero_primary', 'plan_', 'kefu_open', 'copy_url']
+// guide_ 是教程页那两条 CTA（CC Switch 下载、管理后台）的前缀：教程页拆成 6 个页面后
+// 这两个转化点换了载体，必须重新列为必检，否则改页面组件时把埋点删了也没人拦。
+const REQUIRED_CTA = ['nav', 'hero_primary', 'plan_', 'kefu_open', 'copy_url', 'guide_']
 const htmlFiles = fs
   .readdirSync(DIST, { recursive: true, encoding: 'utf8' })
   .filter((f) => f.endsWith('.html'))

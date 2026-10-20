@@ -94,8 +94,8 @@ export const kefuBotEntries: KefuBotEntry[] = [
 
 售前售后任何问题都可以扫教程页最上面的客服二维码。`,
     links: [
-      { text: '看小白教程（带截图）', url: '/guide#install-ccswitch' },
-      { text: '直接一键导入配置', url: '/guide#import' },
+      { text: '按客户端看教程（带截图）', url: '/guide' },
+      { text: 'Claude Code 一键导入配置', url: '/guide/cc#cc-import' },
     ],
   },
   {

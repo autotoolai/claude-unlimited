@@ -8,7 +8,12 @@
 - [模型广场](https://claude-unlimited.aiautotools.com/models): 本卡承诺的 Fable 5.1 与 Opus 5.5 与 Fable 5 与 Sonnet 5.5 与 Opus 4.8 与 Opus 4.7 两个模型一览，可复制 model ID，含分工、完整列表获取与切换方法
 - [套餐定价](https://claude-unlimited.aiautotools.com/pricing): 无限卡在售 天卡 ¥13.5、周卡 ¥70、月卡 ¥125，周期卡与额度卡尚未定价；含退款规则与公平使用
 - [管理后台](https://claude-unlimited.aiautotools.com/console): 激活码兑换、API Key 提取、一键导入配置、用量查询与图表、公告与备用域名（后台本体为独立站点 https://rsxermu666.cn/）
-- [使用教程](https://claude-unlimited.aiautotools.com/guide): 小白教程六步带截图（装 CC Switch、换取 API Key、一键导入配置、拉取并保存模型、启用并检测链路、在 VS Code 里开始使用）+ 高级配置两节
+- [使用教程](https://claude-unlimited.aiautotools.com/guide): 先选你在用的客户端，再照着做：Claude Code / Claude 桌面版 / Codex / WorkBuddy / 其它客户端，每条路都带真实截图
+- [Claude Code 教程](https://claude-unlimited.aiautotools.com/guide/cc): 最主流的一条路。CC Switch 一键导入，VS Code 装官方插件就能写代码，终端里直接 claude 启动。（6 步 · 一键导入）
+- [Claude 桌面版 教程](https://claude-unlimited.aiautotools.com/guide/desktop): 桌面版要单独建一个供应商并开路由，比 Claude Code 多两步。装完桌面版客户端即可用，也不用翻墙。（9 步 · 新增供应商）
+- [Codex 教程](https://claude-unlimited.aiautotools.com/guide/codex): Codex 多两个关键动作：上游格式必须选 Anthropic Messages，配置完必须彻底重启 Codex 才会生效。（9 步 · 新增供应商）
+- [WorkBuddy 教程](https://claude-unlimited.aiautotools.com/guide/workbuddy): 最省事的一条路，不用装 CC Switch，也不用开路由。三个值填进 WorkBuddy 的自定义模型里就行。（3 步 · 自定义模型）
+- [其它客户端 教程](https://claude-unlimited.aiautotools.com/guide/cursor): 已经会自己填 API 的人看这一页：三个值怎么填、各客户端的差异，一次说清。（3 步 · 手动填值）
 - [常见问题](https://claude-unlimited.aiautotools.com/faq): 全量 FAQ（商品 / 购买支付 / 使用配置 / 接入使用 / 限速封号 / 数据安全 / 关于我们）
 - [Claude 知识库](https://claude-unlimited.aiautotools.com/knowledge): Claude Code 的用法、原理、成本与报错排查，按四个主题分类查
 - [故障排除](https://claude-unlimited.aiautotools.com/troubleshooting): 站点自身的部署与构建排错
@@ -24,6 +29,7 @@
 - 退款：激活 1 小时内不满意可全额退；周卡与月卡超 3 小时按 15 元/天折算退款；售后申请窗口 7 天
 - 购买：第三方发卡站 https://catfk.com/shop/2Z0CEP7C
 - 配置工具：CC Switch（https://ccswitch.io/），支持一键导入与链路检测
+- 源码与文档：https://github.com/autotoolai/claude-unlimited（本站 VitePress 源码公开，MIT 许可；官网是唯一官方入口）
 - 人工客服：微信 ren_mo_mo（点右下角在线助手 →「联系人工客服」，可一键复制微信号）
 - 管理后台：https://rsxermu666.cn/，独立站点；主域名不可达时切换备用域名，API Key 无需更换
 - 不包含：生产环境流量（套餐面向个人开发。上线服务、多用户共享、对外 API 属于生产流量，不在范围内）；超并发压测（超过公平使用速率限制（同时 1 个会话、单会话 20 路并发、60 次/分钟）的压测、扫描、批量抓取）；二次转卖（转卖、二次分发 Key，或将 Key 共享给多个用户）；Anthropic 官方服务（本卡不提供 claude.ai 网页版、Claude Desktop 等官方产品的订阅权益）

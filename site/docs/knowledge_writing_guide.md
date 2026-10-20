@@ -94,6 +94,7 @@ frontmatter 里不写 `date`：发布日期只存在于 `config/knowledge.ts`，
 10. 不出现工程口吻（「在 config 里改」）；不出现素材站品牌名、链接、折扣数字；正文不得出现素材站域名（`verify_build.py` 硬门禁）。
 11. 图片首批不用；需要时必须登记进 `theme/components/GuideShot.vue` 静态 import 表（图片不能放 `docs/`）。
 12. 源站原稿的正文以 `h2|`、`h3|` 前缀存行（不是 Markdown），翻译时按前缀还原成标题层级。
+13. **教程场景页（`/guide/<场景>`）的 GEO 结构与本文同一套规范**，不要另立一套：一句话答案（`config/guide.ts` 的 `page.answer`）、每节结论式 `lead`、`page.faq[]` 3–5 条、`page.tags[]` ≥ 3 个长尾词（per-page keywords 的唯一来源）、`page.related[]` ≥ 3 条站内互链。两处差别：教程页的这些字段在 `config/guide.ts` 而不是 `config/knowledge.ts`，且 H2 序号与图注编号由 `guideBlocks()` 在装配期生成、不手写。两套规范漂移的代价是 AI 爬虫在教程页读不到与文章页同等质量的结构。
 
 ## 收录基建
 

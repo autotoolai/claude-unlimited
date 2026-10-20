@@ -12,7 +12,7 @@ const DIST = path.resolve(process.cwd(), '.vitepress', 'dist')
 const unregisterTsx = register()
 const knowledgeMod = await tsImport('../config/knowledge.ts', import.meta.url)
 const { faqItems, faqCategories } = await tsImport('../config/faq.ts', import.meta.url)
-const { guideShots, guideTabs, guidePages } = await tsImport('../config/guide.ts', import.meta.url)
+const { guidePages, guideBlocks, guideShotsOf, guideAnchorsOf, guideLegacyAnchors, guideSceneCards, guideIndex } = await tsImport('../config/guide.ts', import.meta.url)
 const { siteConfig } = await tsImport('../config/site.ts', import.meta.url)
 unregisterTsx()
 /** 产物里允许存在的 mp4 总量上限（MB）。视频在 R2，public/ 只做上传源。 */
@@ -26,6 +26,7 @@ const PAGES = {
   '/pricing': 'pricing',
   '/faq': 'faq',
   '/guide': 'guide/index',
+  ...Object.fromEntries(guidePages.map((p) => [p.slug, p.slug.slice(1)])),
   '/knowledge': 'knowledge/index',
   '/models': 'models',
   '/console': 'console',
@@ -92,7 +93,7 @@ for (const [route, file] of Object.entries(PAGES)) {
   const isKnowledgeIndex = route === '/knowledge'
   // 长文页才有左侧目录（.cu-sidenav）：教程页、后台页由 PageShell 传 toc，知识库文章页自带。
   // 营销页与列表页（/ /models /pricing /faq /knowledge）不应该再出现任何页内目录。
-  const hasToc = route === '/guide' || route === '/console'
+  const hasToc = route.startsWith('/guide') || route === '/console'
   // 首页的 H1 在 Hero 里（HomeHero 组件），知识库文章页的 H1 在 markdown 里，都没有 cu-page__head
   const headKeys = route === '/' || isKnowledgeArticle ? [] : ['cu-page__head']
   const keys = ['cu-brandbar', 'cu-tabs__inner', 'cu-shell__body', 'cu-foot', ...headKeys, 'cu-kefu__fab']
@@ -150,10 +151,8 @@ for (const [route, file] of Object.entries(PAGES)) {
     if (hasToc) {
       ok(hrefs.length > 0, `${where}: 页内目录为空`)
       for (const h of hrefs) ok(ids.has(h), `${where}: 目录锚点 #${h} 在正文中不存在`)
-      // 反向（正文 → 目录）：教程页两条轨都渲染在 SSR 产物里（切轨靠 hidden），
-      // 但页内目录只列当前轨 + 共用块，所以另一轨的小节在目录里找不到是预期的，跳过。
-      const otherRail = where === '/guide'
-      for (const id of ids) if (!otherRail) ok(hrefs.includes(id), `${where}: 正文小节 #${id} 不在目录里`)
+      // 反向（正文 → 目录）：一轨一页后没有例外，每页的每个小节都必须在目录里
+      for (const id of ids) ok(hrefs.includes(id), `${where}: 正文小节 #${id} 不在目录里`)
     }
     // 2026-10-12：/pricing 底部横条已整条去掉（购买外链只留在套餐卡上），页面不再有 H2，按例外放行。
     if (where !== '/pricing') {
@@ -193,57 +192,87 @@ for (const [route, file] of Object.entries(PAGES)) {
   const nav = html.match(/<nav class="cu-tabs"[\s\S]*?<\/nav>/) || ['']
   ok(!/cu-navcta/.test(html), `${route}: 页头仍有旧的 cu-navcta 购买按钮（应换成 cu-brandbar__note 声明）`)
 }
-// 教程是一页两条轨（2026-10 重构：删购买章节、页首客服条、小白六步 + 高级配置两节）：
-// 小白轨 6 步，每步内部再分子步骤；高级轨只用表格与网址行，没有步骤块。
-const guideHtml = fs.readFileSync(path.join(DIST, 'guide/index.html'), 'utf8')
-// 样式表：轨选择器的选中态必须能从产物里查到（2026-10-13 的反白→竖条改动）。
-const styleDir = path.join(DIST, 'assets')
-const guideCss = fs.readdirSync(styleDir)
-  .filter((f) => f.startsWith('style.'))
-  .map((f) => fs.readFileSync(path.join(styleDir, f), 'utf8'))
-  .join('\n')
-const guideSteps = count(guideHtml, /cu-step-block__no/g)
-ok(guideSteps >= 8, `/guide: 子步骤块数 ${guideSteps}，应 >= 8（小白轨第 6 步含「下载 VS Code」子步骤）`)
-// 轨选择器（GuideRails，2026-10-13 取代 SegmentedTabs 的裸胶囊）：两列分栏，每列一个轨。
-// 断言轨数仍是 2 + 每个轨名都在产物里。轨名是文案契约，改轨名时这里要同步。
-ok(count(guideHtml, /cu-grails__item/g) === 2, `/guide: 轨选择器应有两个轨，实际 ${count(guideHtml, /cu-grails__item/g)}`)
-for (const segName of guideTabs.map((t) => t.name)) ok(guideHtml.includes(`>${segName}</strong>`), `/guide: 轨选择器里没有「${segName}」（轨名是文案契约：轨改名时这里要同步）`)
-// 选中态不能是反白填充：轨名是 <strong>，而 01_shell.css 的 `.cu-page strong` 给全页 strong 钉了
-// `color: var(--cu-ink)`，反白底 + 墨字会让轨名「看得见一条线、看不见字」。断言选中态用左侧竖条。
-ok(!new RegExp('\.cu-grails__item\.is-active\s*\{[^}]*--cu-contrast').test(guideCss), '/guide: 轨选择器选中态不该用 --cu-contrast 反白（轨名会被 .cu-page strong 钉成墨色而消失）')
-// kicker（h2 上方那行「小白教程 · 第 3 步」）全页为 0：序号已回到 h2，轨身份由页头的轨选择器表达。
-// 2026-10-13 定稿：h2 的序号管「轨内第几步」，再挂一层轨标签是同一句话说两遍。
-const GUIDE_KICKERS = 0
-ok(count(guideHtml, /cu-step-kicker/g) === GUIDE_KICKERS, `/guide: 步骤标签应为 ${GUIDE_KICKERS} 个，实际 ${count(guideHtml, /cu-step-kicker/g)}`)
-// 教程页首客服条（KefuBar）已删除：客服只走右下角在线助手浮标，这里断言它没被挂回来
-ok(!guideHtml.includes('cu-kefubar'), '/guide: 页首客服条（KefuBar）已下线，产物里不该再出现 cu-kefubar')
-// 小白轨 6 步 + 高级轨 2 节；锚点 id 是 /guide#锚点 深链契约（config/faq.ts、kefu_bot.ts 引用）
-// 2026-10：高级轨精简为 pro-key / params；manual、env、editors、selfcheck 与 errors 旧锚点已删除
-// （common 排查块按要求整段删除，报错统一走 /faq#cat-setup 与知识库）
-const GUIDE_ANCHORS = ['install-ccswitch', 'get-key', 'import', 'models', 'enable', 'vscode', 'pro-key', 'params']
-for (const anchor of GUIDE_ANCHORS)
-  ok(guideHtml.includes(`id="${anchor}"`), `/guide: 缺少小节锚点 id="${anchor}"（两条轨的小节）`)
-// 双向：产物里出现白名单之外的 <h2 id>（误恢复带回的旧块就是这样混进来的），也要在这里拦住
+const index_guideHtml = fs.readFileSync(path.join(DIST, 'guide/index.html'), 'utf8')
+// 教程：索引页 + 5 个客户端场景页（2026-10-20 重构：单页两轨 -> 按客户端分流）。
+// 每页一条完整路径，小节编号与图注编号都由 config/guide.ts 的 guideBlocks() 装配期生成，
+// 这里的断言改成逐页核对，不再有全站扁平的常量。
 {
-  const distAnchors = [...guideHtml.matchAll(/<h2 id="([a-z0-9-]+)"/g)].map((m) => m[1])
-  const extra = [...new Set(distAnchors)].filter((a) => !GUIDE_ANCHORS.includes(a))
-  ok(extra.length === 0, `/guide: 产物里多出未登记的小节锚点：${extra.join('、')}（config/guide.ts 多了一块，或该块已删除但没删干净）`)
+  const cards = guideSceneCards()
+  ok(cards.length === 5, `/guide: 场景卡应渲染 5 个客户端，实际 ${cards.length}`)
+  for (const c of cards) ok(index_guideHtml.includes(`href="${c.url}"`), `/guide: 场景卡里没有指向 ${c.url} 的链接`)
+
+  // 旧锚点兼容表：每项都必须在目标页真实存在，否则老链接（FAQ、在线助手、外部转载）会 404
+  const allAnchors = new Set(guidePages.flatMap((p) => guideAnchorsOf(p)))
+  for (const [old, target] of Object.entries(guideLegacyAnchors)) {
+    const [urlPart, anchor] = target.split('#')
+    ok(allAnchors.has(anchor), `/guide: 旧锚点 ${old} 指向 ${target}，但目标页没有这个锚点（config/guide.ts 的 guideLegacyAnchors 与页面数据不一致）`)
+    ok(fs.existsSync(path.join(DIST, urlPart.slice(1) + '.html')), `/guide: 旧锚点 ${old} 指向 ${target}，但目标页产物不存在`)
+  }
+
+  // 每个场景路由在 public/_redirects 里都要有「带尾斜杠 -> 不带」的 301。
+  // Pages 自己会把 .html 308 到无后缀，我们直接 301 少一跳；漏一条就是老链接多跳一次。
+  const redirects = fs.readFileSync(path.join(DIST, '_redirects'), 'utf8')
+  for (const page of guidePages) {
+    ok(
+      redirects.includes(`${page.slug}/ ${page.slug} 301`),
+      `/guide: public/_redirects 缺少 ${page.slug}/ -> ${page.slug} 的 301（带尾斜杠的旧链接会多跳一次）`,
+    )
+  }
+  // 索引页的一句话答案要渲染出来（它是索引页唯一的结论段，AI 引用直接引这一句）
+  ok(
+    index_guideHtml.includes(guideIndex.answer.slice(0, 30)),
+    '/guide: 索引页没有渲染一句话答案（config/guide.ts 的 guideIndex.answer）',
+  )
+
+  for (const page of guidePages) {
+    const html = fs.readFileSync(path.join(DIST, `${page.slug.slice(1)}.html`), 'utf8')
+    const where = page.slug
+
+    // 锚点：产物里该页的 <h2 id> 集合 == config 里该页的块 id 集合（双向，替代旧的全局白名单）
+    const expected = guideAnchorsOf(page)
+    for (const id of expected) ok(html.includes(`id="${id}"`), `${where}: 缺少小节锚点 id="${id}"`)
+    const distAnchors = [...new Set([...html.matchAll(/<h2 id="([a-z0-9-]+)"/g)].map((m) => m[1]))]
+    const extra = distAnchors.filter((a) => !expected.includes(a) && !['faq', 'related'].includes(a))
+    ok(extra.length === 0, `${where}: 产物里多出未登记的小节锚点：${extra.join('、')}`)
+
+    // 小节序号：从 1 连续（guideBlocks 装配期生成，这里守住它没被破坏）
+    const h2s = [...html.matchAll(/<h2[^>]*>(\d+)\. /g)].map((m) => Number(m[1]))
+    for (let i = 0; i < h2s.length; i++)
+      ok(h2s[i] === i + 1, `${where}: 小节序号不连续：第 ${i + 1} 节是「${h2s[i]}」`)
+
+    // 图注编号：每页从 01 起连续（同样由装配层生成）
+    const labels = [...html.matchAll(/cu-shot__label[^>]*>图 (\d+)</g)].map((m) => Number(m[1]))
+    ok(labels.length > 0, `${where}: 产物里没有图注编号`)
+    for (let i = 0; i < labels.length; i++)
+      ok(labels[i] === i + 1, `${where}: 图注编号不连续：第 ${i + 1} 张是「图 ${labels[i]}」`)
+
+    // 截图：数量 == config 里该页 shot.src 按出现次数的列表，且产物文件真实存在
+    const want = guideShotsOf(page)
+    const got = count(html, /class="cu-shot[ "]/g)
+    ok(got === want.length, `${where}: 截图应渲染 ${want.length} 张，实际 ${got}`)
+    const srcs = [...html.matchAll(/src="(\/assets\/guide_[^"]+\.(?:png|jpg|jpeg|webp))"/g)].map((m) => m[1])
+    ok(srcs.length === want.length, `${where}: 截图 <img src> 数 ${srcs.length}，应 ${want.length}`)
+    for (const src of srcs) ok(fs.existsSync(path.join(DIST, src)), `${where}: 截图文件 ${src} 不在产物里（GuideShot.vue 的静态导入表与 config/guide.ts 的文件名要一致）`)
+
+    // 页面级 SEO：per-page keywords 必须是该页自己的长尾词，不是全站那条
+    const kw = (html.match(/<meta name="keywords" content="([^"]*)"/) || [])[1] || ''
+    ok(kw.length > 0, `${where}: 没有 per-page keywords`)
+    ok(!kw.includes('claude api 中转'), `${where}: keywords 还是全站那条全局词（transformHead 没按 guide/<scene> 注入）`)
+    ok(page.tags.every((t) => kw.includes(t)), `${where}: keywords 与 config/guide.ts 的 tags 不一致`)
+
+    // GEO 结构：一句话答案 + 常见问题 + FAQPage
+    ok(html.includes(page.answer.slice(0, 30)), `${where}: 页面上没有一句话答案（config/guide.ts 的 answer 没渲染出来）`)
+    for (const f of page.faq) ok(html.includes(f.q), `${where}: 常见问题「${f.q}」没渲染出来`)
+    ok(html.includes('FAQPage'), `${where}: 产物里没有 FAQPage 结构化数据`)
+    ok(html.includes('HowTo'), `${where}: 产物里没有 HowTo 结构化数据`)
+    // 场景切换条：5 个客户端互跳
+    ok(count(html, /cu-guide-scenes__item/g) === 5, `${where}: 场景切换条应有 5 个客户端，实际 ${count(html, /cu-guide-scenes__item/g)}`)
+    // 页头客服条已下线
+    ok(!html.includes('cu-kefubar'), `${where}: 页首客服条（KefuBar）已下线，产物里不该再出现`)
+  }
+
+  ok(!index_guideHtml.includes('/guide/clients') && !index_guideHtml.includes('/guide/models'), '/guide: 仍有指向已删除的教程子页链接')
 }
-// 截图文件名不会原样出现在 HTML 里（静态 import 带了 hash），按 <img class="cu-shot"> 数量断言；
-// 两条轨都渲染在 SSR 产物里（切轨靠 hidden），所以总数 = config/guide.ts 里 shot.src 按出现次数的列表长度
-// 图注编号必须与正文出现顺序连续（docs/guide_design_spec.md 第三章之二）。补子步骤时最容易漏改。
-const figureLabels = [...guideHtml.matchAll(/cu-shot__label[^>]*>图 (\d+)</g)].map((m) => Number(m[1]))
-ok(figureLabels.length > 0, '/guide: 产物里没有图注编号')
-for (let i = 1; i < figureLabels.length; i++)
-  ok(figureLabels[i] === figureLabels[i - 1] + 1, `/guide: 图注编号不连续：第 ${i + 1} 张是「图 ${figureLabels[i]}」，上一张是「图 ${figureLabels[i - 1]}」（config/guide.ts 里 shot.label）`)
-const GUIDE_SHOTS = guideShots.length
-const shotCount = count(guideHtml, /class="cu-shot[ "]/g)
-ok(shotCount === GUIDE_SHOTS, `/guide: 教程截图应渲染 ${GUIDE_SHOTS} 张（config/guide.ts 里 shot.src 按出现次数的列表），实际 ${shotCount}`)
-// 抽每张图的产物路径，确认 hash 后的文件真的在 dist 里（换图后忘了更新 GuideShot.vue 的导入表会在这里暴露）
-const shotSrcs = [...guideHtml.matchAll(/src="(\/assets\/guide_[^"]+\.(?:png|jpg|jpeg|webp))"/g)].map((m) => m[1])
-ok(shotSrcs.length === GUIDE_SHOTS, `/guide: 教程截图 <img src> 数 ${shotSrcs.length}，应 ${GUIDE_SHOTS}`)
-for (const src of shotSrcs) ok(fs.existsSync(path.join(DIST, src)), `/guide: 截图文件 ${src} 不在产物里（GuideShot.vue 的静态导入表与 config/guide.ts 的文件名要一致）`)
-ok(!guideHtml.includes('/guide/clients') && !guideHtml.includes('/guide/models'), '/guide: 仍有指向已删除的教程子页链接')
 
 const faq = fs.readFileSync(path.join(DIST, 'faq.html'), 'utf8')
 // 条数与分类数直接从 config/faq.ts 取，不要在这里硬编码（改 FAQ 的人不知道要同步这里）

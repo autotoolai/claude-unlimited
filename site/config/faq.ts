@@ -9,7 +9,7 @@ import { limitBullets } from './rules'
  *   4. /faq 页的 FAQPage JSON-LD
  *
  * 2026-10-09 新增「使用与配置」分类（setup）：教程来源为卖家教程站 https://wx.bbyy.site/，
- * 问题按买家「买完之后做什么」重写，答案里给 /guide 与 /guide#锚点 的链接。
+ * 问题按买家「买完之后做什么」重写，答案里给 /guide 与各客户端场景页的链接。
  *
  * 改一处，四处同步，不会出现「页面写的和机器人答的不一样」。
  *
@@ -83,7 +83,7 @@ export const faqItems: FaqItem[] = [
 model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与 claude-opus-5-5（复杂推理、架构设计、深度代码分析），两个都建议加进 CC Switch。
 
 以 CC Switch「获取模型列表」实际返回的 ID 为准：若返回的 ID 与上面不同，说明网关侧命名有变，更新工具配置里的 model ID 即可，Key 不需要重新生成。`,
-    links: [{ text: '获取并保存模型 · 教程 4', url: '/guide#models' }],
+    links: [{ text: '获取并保存模型 · 教程 4', url: '/guide/cc#cc-models' }],
   },
   {
     cat: 'product',
@@ -111,7 +111,7 @@ model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与
 
 
 
-  // ---------- 使用与配置（教程来源：卖家教程站 https://wx.bbyy.site/，按问答重写；链接指向 /guide#锚点） ----------
+  // ---------- 使用与配置（教程来源：卖家教程站 https://wx.bbyy.site/，按问答重写；链接指向 /guide/cc 的小节锚点） ----------
   {
     cat: 'setup',
     id: 'cat-setup-ccswitch',
@@ -152,7 +152,7 @@ model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与
       '  }',
       '}',
     ],
-    links: [{ text: '教程 · 一键导入配置', url: '/guide#import' }],
+    links: [{ text: '教程 · 一键导入配置', url: '/guide/cc#cc-import' }],
   },
   {
     cat: 'setup',
@@ -165,8 +165,8 @@ model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与
 
 列表为空通常是 Base URL 或 Key 填错，回上一步核对。`,
     links: [
-      { text: 'CC Switch 一键导入 · 教程 3', url: '/guide#import' },
-      { text: '获取并保存模型 · 教程 4', url: '/guide#models' },
+      { text: 'CC Switch 一键导入 · 教程 3', url: '/guide/cc#cc-import' },
+      { text: '获取并保存模型 · 教程 4', url: '/guide/cc#cc-models' },
     ],
   },
   {
@@ -184,7 +184,7 @@ model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与
     keywords: ['vscode', 'vs code', '插件', '扩展', '侧边栏', '编辑器插件'],
     q: 'VS Code 里怎么用 Claude Code？',
     a: `CC Switch 配好后，在 VS Code 扩展面板（Ctrl+Shift+X / Cmd+Shift+X）搜索 Claude Code，认准发布者为 Anthropic 的官方插件并安装。首次打开选择「使用已有的 API 配置 / API Key」登录，不需要登录 Anthropic 账号。`,
-    links: [{ text: '教程 · 第 6 步 开始使用 Claude Code', url: '/guide#vscode' }],
+    links: [{ text: '教程 · 第 6 步 开始使用 Claude Code', url: '/guide/cc#cc-vscode' }],
   },
   {
     cat: 'setup',
@@ -195,7 +195,7 @@ model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与
 
 所有模型都在同一订阅价内，选 Opus 不会多花钱。Anthropic 上线新模型后网关会以新的 model ID 提供访问，Key 不需要换，只要在 CC Switch 里刷新模型列表再 /model 切过去。`,
     code: ['/model', '/model claude-fable-5-1'],
-    links: [{ text: '获取并保存模型 · 教程 4', url: '/guide#models' }],
+    links: [{ text: '获取并保存模型 · 教程 4', url: '/guide/cc#cc-models' }],
   },
   {
     cat: 'setup',
@@ -205,7 +205,7 @@ model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与
     a: `先确认 CC Switch 里配置处于「已启用」状态，再重开一个终端窗口。
 
 如果仍然找不到命令，看「接入与模型」页的 VS Code / 终端部分，Windows 上可以在 PowerShell 里直接运行 claude。`,
-    links: [{ text: '教程 · 第 5 步启用配置', url: '/guide#enable' }],
+    links: [{ text: '教程 · 第 5 步启用配置', url: '/guide/cc#cc-enable' }],
   },
 
   // ---------- 接入与使用 ----------

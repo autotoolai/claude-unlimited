@@ -1,6 +1,6 @@
 /**
  * 页面共享的静态数据（卖点、步骤、对比表、JSON-LD）。页面组件（index.vue / pricing.vue / faq.vue /
- * PageModels.vue / PageConsole.vue / GuidePage.vue / KnowledgeIndex.vue）从这里取数，
+ * PageModels.vue / PageConsole.vue / GuideIndexPage.vue / GuideScenePage.vue / KnowledgeIndex.vue）从这里取数，
  * config/ 里的站点配置、规则数字、FAQ、教程是唯一真源。
  */
 import { siteConfig } from '../../../config/site'
@@ -9,8 +9,7 @@ import { modelIds, recommendedIds, modelBrands } from '../../../config/models'
 import { planGroups, allTiers, tiersOf, featuredTierOf, entryTier, planPromos, refundNotes } from '../../../config/plans'
 import { consoleFeatures, consoleBackupDomains, consoleFaqs } from '../../../config/console'
 import type { FaqItem } from '../../../config/faq'
-import { guidePage, guideTabs } from '../../../config/guide'
-import type { GuidePage } from '../../../config/guide'
+import { jsonLdGuideScene, jsonLdGuideIndex, guideFooterItems } from './guide_jsonld'
 import { faqByCategory, faqItems, faqCategories, categoryLabels } from '../../../config/faq'
 import type { FaqCategory } from '../../../config/faq'
 /** 组件从 pages/data 统一引入这些 config 符号，改这里一处即可 */
@@ -20,32 +19,10 @@ export { siteConfig, modelIds, recommendedIds, faqCategories, categoryLabels, fa
 /** 常用 model ID 表 */
 export const modelIdRows = modelIds.map((m) => ({ label: m.id, values: [m.tier, m.scene, m.pick === 'primary' ? '推荐添加' : '备用'] }))
 
-/** 教程页 JSON-LD：小白教程与高级配置各输出一个 HowTo，每条轨里的步骤按出现顺序编号 */
-export function jsonLdGuide(page: GuidePage) {
-  const rails: { tab: 'novice' | 'pro'; name: string; desc: string }[] = [
-    { tab: 'novice', name: '小白教程', desc: '按顺序照做：装 CC Switch → 换取 API Key → 一键导入 → 拉取并保存模型 → 启用并检测链路 → 在 VS Code 里开始使用。需要切换模型时在会话里用 /model。' },
-    { tab: 'pro', name: '高级配置', desc: '已经有卡密或 API Key：提取 API Key → 手动配置（接口地址 / API Key / 模型名）。' },
-  ]
-  const graph = rails.map((r, i) => ({
-    '@type': 'HowTo',
-    // 第一条轨用页面标题与 description，后续轨用轨名与固定说明
-    name: i === 0 ? page.title : r.name,
-    description: i === 0 ? page.desc : r.desc,
-    step: page.blocks
-      .filter((b) => b.tab === r.tab)
-      .map((b, j) => ({ '@type': 'HowToStep', position: j + 1, name: b.h2, text: b.lead ?? '' })),
-  }))
-  return { '@context': 'https://schema.org', '@graph': graph }
-}
+export { jsonLdGuideScene, jsonLdGuideIndex }
 
-/** 页脚「教程」列的两条轨（页内分段切换的同名分组），锚点落在每轨第一节（小白轨的「先看一眼」小节已删，落到第 1 步） */
-export const guideNavItems = guideTabs.map((t) => ({
-  title: t.name,
-  nav: t.name,
-  url: '/guide#' + (t.id === 'novice' ? 'install-ccswitch' : 'params'),
-  desc: t.desc,
-  eyebrow: '教程',
-}))
+/** 页脚「教程」列：5 个客户端页 */
+export const guideNavItems = guideFooterItems()
 
 /** 购买前要问清的两件事（FAQ 页顶部「买之前」区块用），全部对应 config/faq.ts 里的条目 */
 export const buyingQuestions = faqItems.filter((x) => ['cat-limits-speed', 'cat-product-period'].includes(x.id))
@@ -73,7 +50,7 @@ export const knowledgeCount = knowledgeEntries.length
 /** 首页「继续了解」条：只做站内索引，不复制任何一页的正文 */
 export const homeContinueLinks = [
   { no: '01', title: '支持哪些模型', url: '/models', desc: 'model ID 一览、每张模型卡片能复制完整 model ID。' },
-  { no: '02', title: '怎么配置起来', url: '/guide', desc: '取 Key、一键导入、保存模型、检测链路，小白六步带真实截图；高级配置给接口地址 / API Key / 模型名的填法。' },
+  { no: '02', title: '怎么配置起来', url: '/guide', desc: '先选你在用的客户端：Claude Code、桌面版、Codex、WorkBuddy、Cursor 各一条完整路径，每一步都有真实截图。' },
   { no: '03', title: '知识库', url: '/knowledge', desc: 'Claude Code 用法、原理、成本控制与报错排查，${knowledgeCount} 篇按主题分类。' },
 ]
 
@@ -147,6 +124,8 @@ export const jsonLdHome = {
       name: siteConfig.name,
       url: base,
       description: siteConfig.description,
+      // 与 jsonld_server.ts 的 org.sameAs 保持一致（两份 JSON-LD 必须同步）
+      sameAs: [siteConfig.sourceRepo.url],
     },
     { '@type': 'WebSite', '@id': base + '/#site', url: base, name: siteConfig.name, description: siteConfig.description, inLanguage: 'zh-CN', publisher: { '@id': base + '/#org' } },
     {

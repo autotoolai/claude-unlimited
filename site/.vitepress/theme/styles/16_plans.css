@@ -239,10 +239,6 @@
    定价页把三组套餐从平铺改为切换，首屏只看一组。
    选中态用 --cu-contrast 反白（墨色底 + 米白字），与全站无彩体系一致，
    不引入任何彩色。胶囊圆角必须用 --cu-r-pill。 */
-.cu-seg-wrap {
-  margin: 1.5rem 0 0;
-}
-
 .cu-seg.cu-scroll-none {
   display: inline-flex;
   max-width: 100%;

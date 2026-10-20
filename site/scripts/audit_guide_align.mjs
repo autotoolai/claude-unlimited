@@ -5,7 +5,7 @@
  * `text-align: center`，引导语正好是 H2 后第一个段落会命中，元素盒子量出来是顶格的，
  * 文字却居中飘在右边（2026-10-12 的 bug 就是这样漏掉两轮）。
  *
- * 覆盖范围：两条轨（.cu-guide-rail）逐节逐子步骤。断言两层左边线（规范「缩进层级」）：
+ * 覆盖范围：5 个客户端场景页（.cu-guide-rail）逐节逐子步骤。断言两层左边线（规范「缩进层级」）：
  * - L0 = 小节块左缘：h2 / 引导语 / 正文段（提示卡是独立容器，按它自己的内容列断言）
  * - L1 = 步骤正文列左（.cu-step-block__body，即 grid 第二列）+ ul 内缩 + --cu-step-indent：步骤内的动作与提示文字
  * ol.cu-steps-block 的 704px 限宽是可读宽度，不是错位，不参与断言。
@@ -33,11 +33,16 @@ function firstCharLeft(el) {
   return Math.round(Math.min(...tops.map((t) => Math.min(...rects.filter((r) => Math.round(r.top) === t).map((r) => r.left)))))
 }
 
+/** 5 个客户端场景页 + 索引页（索引页只有卡片，不参与左边线测量，但顺手确认卡能渲染） */
+const SCENES = ['cc', 'desktop', 'codex', 'workbuddy', 'cursor']
+
 const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
-await page.goto(`${BASE}/guide/`, { waitUntil: 'networkidle' })
 
-const rows = await page.evaluate((fnSrc) => {
+const rows = []
+for (const scene of SCENES) {
+  await page.goto(`${BASE}/guide/${scene}`, { waitUntil: 'networkidle' })
+  rows.push(...(await page.evaluate((fnSrc) => {
   const firstCharLeft = eval(`(${fnSrc})`)
   const out = []
   const measure = (el, ctx) => {
@@ -99,7 +104,9 @@ const rows = await page.evaluate((fnSrc) => {
   }
 
   return out
-}, firstCharLeft.toString())
+}, firstCharLeft.toString())))
+  for (const r of rows) r.sec = `${scene} / ${r.sec}`
+}
 
 // 提示段是全角中文，浏览器给它们约 2px 的左侧字形边距（悬挂标点/中文字身盒），
 // 其余段落测出来正好落在左边线上。提示卡差 1.6px 是这个值，不是错位。

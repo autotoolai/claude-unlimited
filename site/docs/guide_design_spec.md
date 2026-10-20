@@ -1,52 +1,172 @@
 # 使用教程页信息结构与视觉规范
 
-页面：`/guide`，数据源 `config/guide.ts`，渲染 `GuidePage.vue` → `GuideBlockBody.vue` → `GuideSteps.vue`。
-本文件是写步骤内容的唯一依据。要加一步或改一句文案，先对照这里的槽位定义，不要临时新造字段。
+页面：`/guide`（索引页）与 `/guide/<场景>`（5 个客户端页）。
+数据源 `config/guide.ts`，渲染链路 `GuideIndexPage.vue` / `GuideScenePage.vue` → `GuideBlockBody.vue` → `GuideSteps.vue`。
+本文件是写教程内容的唯一依据。要加一步、改一句文案或加一个客户端，先对照这里的槽位定义，不要临时新造字段。
 
-## 一、三层结构
+2026-10-20 重构：教程从「单页两条轨（小白教程 / 高级配置）」改成「索引页 + 每客户端一页」。
+改动原因：买家手上的真实问题是「我想在我用的那个工具里跑起来」，而不是「我是新手还是高手」。
+去掉「高级配置」轨后，教程只问一个问题——**你在哪个客户端里用 Claude**。2026-10-13 那版删除的
+「报错对照表」「环境变量」等入口仍然不恢复：排错由知识库文章与 `/faq#cat-setup` 承接。
+
+## 一、页面结构
 
 ```
-页面（GuidePage）
-├─ 页头：eyebrow + H1 + lead（一句，告诉读者整页回答什么问题）
-├─ 轨选择器：小白教程 / 高级配置（两列分栏，贴 H1 正下方）
-│   └─ 轨（GuideRails，2026-10-13 取代 SegmentedTabs）
-│       └─ 小节（GuideBlock）= 一个 H2 主题
-│           └─ 步骤（GuideStep）= 小节内的一个动作单元
-└─ 页尾：接着看 + CTA
+/guide                 索引页：选客户端
+├── /guide/cc          Claude Code（VS Code 插件 / 终端）     6 节
+├── /guide/desktop     Claude 桌面版                          8 节
+├── /guide/codex       Codex                                  9 节
+├── /guide/workbuddy   WorkBuddy                              3 节
+└── /guide/cursor      Cursor 等其它客户端（三个值 + 速查表）  3 节
 ```
 
-轨只有两条，读者在页头一次选择，轨内不再重新分流。
+索引页与场景页的页内形状（`PageShell` 传 `toc="side"`，窄列两列骨架）：
 
-高级轨（2026-10 起）固定两节，顺序是契约：**1. 提取 API Key → 2. 手动配置**。
-标题用「手动配置」而不是「三个值填进工具」：分轨胶囊已经说了做什么，节标题只说这一步是干什么的（手动配），具体填哪三个值交给 lead 和表格说。
-编号与小白轨同样写在 H2 里（见「编号规则」），渲染层不区分轨。
-它与卖家腾讯文档第 2 章同构，只回答「自己配工具时哪三个值填什么」，不教安装、不教软件内点击、不教排错。
-首节必须是取 Key：后面的表格出现时读者手上得已经有 Key。
-环境变量与自检排错不进这条轨，也不在这条轨末尾挂链接（2026-10-13 用户明确删除原来的
-「环境变量怎么设 / 接不通怎么查」两条入口）。这些内容由知识库 `claude-code-tutorial` 与
-`claude-code-401-403` / `claude-code-connection-lost` 承接，从知识库索引或页尾「接着看」进。
-模型 ID 对照表也已删除（2026-10-13）：填值表里「模型名」一行直接写四个主力模型 ID，
-完整档位交给 /models 模型广场，`modelIdRows`（pages/data.ts）随之无人引用。
+```
+页头：eyebrow + H1 + lead（页头副标题）
+   ↓
+场景切换条（5 个链接，aria-current 标当前；只在场景页）
+   ↓
+一句话答案（.cu-guide-answer，结论式独立成段）
+   ↓
+小节流（.cu-guide-rail）：1. … N.，编号在 H2 里
+   每节：结论式 lead → 段落 → 列表 → 提示 → 命令块 → 表格 → 步骤 → 网址行 → 插图 → 按钮 → 链接
+   ↓
+常见问题（#faq，3–5 条 details 折叠）
+   ↓
+相关阅读（#related，≥3 条站内链接，锚文本是真实关键词）
+   ↓
+页尾：接着看（.cu-next）+ CTA
+```
 
-**报错排查不放在教程页**（2026-10-13 用户明确删除）：原来的 `errors` 共用块（报错对照表）已整段移除，
-`#errors` 锚点不再是深链契约；小白轨第 5 步的排错提示改指 `/faq#cat-setup`，知识库报错文章是唯一主场。
-改「锚点」一节时不要把 `#errors` 加回去。
+**没有轨切换器。** 每页一条路径，读者不需要分流。场景切换条是链接不是 tab：这 5 个是 5 个独立页面
+（各自独立 URL 与 SEO meta），用 `<a>` 与 `aria-current`，不套 tablist 语义。
 
-## 二、小节（GuideBlock）的槽位
+**路由形态已生产验证。** `docs/guide/<scene>.md` → `dist/guide/<scene>.html` → `/guide/<scene>`，
+与 `docs/knowledge/<slug>.md` 同构，Cloudflare Pages 自动命中；`copy_dir_overviews.mjs` 只为
+`/guide` 与 `/knowledge` 两页复制目录总览，教程子页不需要改。
+
+## 二、md 壳与 config 的分工
+
+| 层 | 文件 | 放什么 |
+|---|---|---|
+| 页面级 SEO | `docs/guide/<scene>.md` frontmatter | `title` / `description` / `head`（og:title、og:description）/ `scene` |
+| 结构化内容 | `config/guide.ts` | 小节、步骤、截图、表格、FAQ[]、related[]、tags[] |
+
+**`title` 与 `description` 有两个副本**：`docs/guide/<scene>.md` 的 frontmatter（喂 `<title>`、
+`<meta description>`、OG）与 `config/guide.ts` 的 `page.title` / `page.desc`（喂 JSON-LD 的
+`HowTo.name` 与 llms-full.txt）。两份文字必须一致——不一致时搜索结果与 AI 引用会各说各话。
+改一处要同时改另一处。
+
+`page.desc` 目前**没有渲染用途**（meta description 由 frontmatter 提供），但它是 JSON-LD 与
+llms-full.txt 的一份冗余，改的时候以 frontmatter 为准。
+
+`description ≤ 110 字`、`title ≤ 32 字`（`verify_build.py` 硬门禁，中文 SERP 会截断）。
+
+## 三、小节（GuideBlock）的槽位
 
 | 槽位 | 是否必填 | 放什么 | 不放什么 |
 |---|---|---|---|
-| `h2` | 必填 | 这条轨里的第几步，或这节的主题名。**不要手写序号**：写 `'一键导入配置'`，由 `guideH2(title, i)` 按轨内出现顺序加上 `N. `（两条轨各自从 1 起）。左侧目录的 label 取自 h2，所以序号会一并进目录 | 不写「小白教程 ·」前缀（kicker 已全页归零）；不手写 `N. ` |
-| `lead` | 必填 | **为什么**要做这一步，一句，30 字内。多子步骤的节要交代「一节分几小步」 | 不写「打开 XX，然后点 YY」；有子步骤时不复述子步骤标题里的动作，也不复述子步骤 `goal` 里已讲过的机制 |
-| `steps` | 小白轨必填 | 这一步下面要做的子动作 | 高级轨用 `table` / `url`，不用 `steps`（2026-10 起该轨没有命令块，小节内容靠 `lead` + `table` + `links` 交付） |
-| `table` | 高级轨常用 | 字段对照、报错对照，列不超过 3 列 | 不放长段落 |
-| `cmd` | 暂不使用 | 可复制的命令或命令组 | 高级轨已不收命令块；知识库文章才是命令主场 |
-| `notes` | 可选 | 跨子步骤的、离开上下文就失效的补充（如备用域名） | 能归到某个具体子步骤的提示，移到该步骤的 `notes` |
+| `id` | 必填 | **全站唯一**，场景页用 `'<场景>-<语义>'`（如 `cc-models`、`codex-key`） | 不手写序号；不带场景前缀会导致同一共享块在 5 页撞锚点 |
+| `title` | 必填 | 小节主题名，**不含序号**。序号由 `guideBlocks()` 按页内位置生成 `h2 = 'N. title'` | 不写「小白教程 ·」前缀 |
+| `shared` | 可选 | 引公共块（`install-ccswitch` / `get-key`），正文从 `sharedBlocks` 取，本页只给 `id` 与 `title` | 不把公共正文抄一遍 |
+| `lead` | 必填 | **结论式首段**：做完这步你会得到什么 / 为什么必须这么做，2–3 句（知识库同款规范） | 不写「打开 XX，然后点 YY」 |
+| `paras` | 可选 | 补充段落 | |
+| `list` | 可选 | 无序列表 | |
+| `notes` | 可选 | 跨子步骤的补充（如备用域名） | 能归到某个具体子步骤的提示移到该步骤的 `notes` |
+| `cmd` | 暂不使用 | 可复制的命令块（知识库文章才是命令主场） | |
+| `table` | 可选 | 对照表（如 Cursor 页的「各客户端填法速查表」），列不超过 3 列 | 不放长段落 |
+| `steps` | 可选 | 编号步骤 | |
+| `shot` | 可选 | 块级插图（整节一张） | |
+| `url` | 可选 | 外链卡（整块可点） | |
 | `links` | 可选 | 站内延伸阅读，无序小链接 | 站外网址走 `url` |
+| `cta` | 可选 | 按钮行（`links` 是无序列表，`cta` 是按钮） | |
 
-### 对齐契约：全页只有一条左边线
-教程页所有文字层（H2 / 引导语 / 正文段 / H3 / 动作 / 提示 / 列表）一律**左对齐**，
-引导语与 H2 共用同一条左边线，读者往下一扫不会看到任何一行自己漂在中间。
+### 编号与图注：单一入口，装配期生成
+
+`guideBlocks(page)` 是全站唯一给教程内容编号的地方，做三件事：合并共享块正文、给 H2 加页内
+序号、给截图加图注编号。页面组件、`sections.ts`（左侧目录）、`guideShotsOf` / `guideAnchorsOf`
+（门禁断言）、`gen_llms.ts`（步骤清单）五处都调这一个函数。
+
+- **H2 序号** = 块在 `page.blocks` 里的位置（从 1 起）。插一节不用改后面所有序号。
+- **图注** = 该页内截图的出现顺序（块顺序 → 块内先步骤截图、后块级截图），每页从 `图 01` 起。
+  `GuideShot.label` 字段保留但由装配层覆盖，config 里不手写。
+- **共享块文案里不出现步号**（「回第 2 步核对」会随场景错位），改写成「上一步」「刚才那一步」。
+
+手写编号是最大的漂移源：插一节要手改后面所有序号，补一张图要手改后面全部图号。
+
+### 锚点契约
+
+`block.id` 是深链契约。`config/faq.ts` 与 `config/kefu_bot.ts` 里的站内链接都指向
+`/guide/<场景>#<block.id>`（如 `/guide/cc#cc-models`）。
+
+旧的 `/guide#<锚点>` 深链（`models` / `import` / `enable` / `vscode` / `install-ccswitch` /
+`get-key` / `pro-key` / `params`）**不能断**：映射写在 `config/guide.ts` 的 `guideLegacyAnchors`，
+`/guide` 索引页在 `onMounted` 读 `location.hash` 命中后 `location.replace()` 跳到新页（整页跳转，
+避免 SPA 内 hash 滚动与重定向打架；fragment 不上服务器，`_redirects` 匹配不到）。
+`check_dist.mjs` 会断言每一项在目标页真实存在。
+
+### 子步骤锚点
+
+`GuideSteps` 给每个子步骤生成 `<blockId>-<序号>` 的 id（如 `cc-models-2`）。目前没有页面引用子步骤
+锚点，功能保留备用。
+
+## 四、共享块：公共内容只写一份
+
+装 CC Switch、换取 API Key 这类每个客户端都要做的步骤放在 `sharedBlocks`（`config/guide.ts`），
+各场景页用 `shared` 字段引用。正文不抄两遍，改一处全站生效。
+
+| key | 被哪几页引用 |
+|---|---|
+| `install-ccswitch` | cc / desktop / codex |
+| `get-key` | 全部 5 页 |
+
+WorkBuddy 与 Cursor 不用 CC Switch，只引用 `get-key`。共享块里的图（CC Switch 官网、管理后台首页）
+在各页重复出现是预期行为。
+
+## 五、步骤（GuideStep）的槽位
+
+槽位固定六个，**渲染顺序恒定**：`title → goal → action → link → cta → shot → notes`。缺哪个就不渲染
+哪个，所以每一步的视觉节奏都一样。
+
+| 槽位 | 是否必填 | 放什么 | 视觉 |
+|---|---|---|---|
+| `title` | 必填 | 动作短语，动词开头，不带句号，不带「第 X 步」 | H3 |
+| `goal` | 必填 | 这一个子动作**为什么**要做，一句 | 正文，次级墨色，顶格 |
+| `action` | 必填 | 实际要敲的按钮／菜单路径，**数组每一项是一个动作** | 行内高亮：左一个 6px 圆点 + 加粗墨色文字，不画框、不画底色 |
+| `link` | 可填 | 这一步要去的一个地址。`copy: false` 是点开型地址（官网、后台），不给复制按钮 | 网址行：明文 URL + 复制 + 打开链接 |
+| `cta` | 可填 | 这一步的按钮（与 `link` 指向同一处时二选一，别重复） | 幽灵按钮，与块级 `cta` 同组件 |
+| `shot` | 可填 | 这一步的对照截图。**一张传一个对象，两张传数组**（`GuideSteps` 并排渲染，网格两列 + 左图吸顶） | 图，限宽 640px |
+| `notes` | 可填 | 坑、替代做法、失败征兆 | 小字 muted 列表，左侧 1px 细线 |
+
+**密集界面图加 `zoom: true`**（Codex 供应商表单、WorkBuddy 添加模型、模型映射等），渲染成可点的
+链接，点开在新标签看原图——544px 版心看不清表格与表单文字。站内没有灯箱组件，不为一个图注去造一个。
+
+## 六、GEO 结构（与知识库同一套规范）
+
+爬虫读的是渲染后的 HTML，源码是 md 还是 Vue 对爬虫完全等价。决定 GEO 的是**结构**，不是文件格式。
+教程场景页与知识库文章同款结构：
+
+| 层 | 来源 | 谁在用 |
+|---|---|---|
+| 一句话答案 | `page.answer` | 页面首段 `.cu-guide-answer`、JSON-LD 的 `HowTo.description`、llms-full.txt |
+| 结论式首段 | 每节的 `lead` | 页面正文、被 AI 直接引用的段落 |
+| FAQPage | `page.faq[]`（3–5 条） | 页面折叠问答 + `FAQPage` JSON-LD |
+| per-page keywords | `page.tags[]` | `config.mts` 的 `transformHead` 按路由注入 `meta keywords` |
+| 站内互链 | `page.related[]`（≥3 条） | 页尾「相关阅读」 |
+| HowTo | `guideBlocks(page)` 的 h2 | `HowTo` JSON-LD，`step.name` 取带序号的 h2，与页面小节一字不差 |
+| llms-full 收录 | `gen_llms.ts` 遍历 `guidePages` | 一句话答案 + 步骤清单 + 常见问题 |
+
+**结构化数据有两份产出路径，必须同时在**：客户端注入走 `pages/data.ts`（`<JsonLd>` → `Layout.vue`
+挂载后插 head，做降级）；构建期写进产物 HTML 走 `pages/jsonld_server.ts` + `scripts/gen_jsonld.ts`
+（爬虫不执行 JS，只能看到这份）。生成逻辑下沉到 `pages/guide_jsonld.ts` 单一来源，两边各自 import。
+`jsonLdForRoute()` 里 `guide/<scene>` 的分支必须放在 `switch` **之前**——`switch` 是精确匹配，
+`case 'guide'` 命中不了 `guide/cc`，漏了构建不报错，只是爬虫看不到结构化数据。
+`gen_jsonld.ts` 的路由推导要去尾斜杠（`guide/index.html` → `guide/`），否则索引页也拿不到。
+
+## 七、对齐契约：全页只有一条左边线
+
+教程页所有文字层（H2 / 引导语 / 正文段 / H3 / 动作 / 提示 / 列表）一律**左对齐**。
 
 **两个必须记住的坑**（都源于全局营销页样式，教程页要反向覆盖）：
 
@@ -56,216 +176,90 @@
 | `.cu-page h2 + p` | `text-align: center`（(0,1,1)，压过 `.cu-page p` 的 left） | 同上一条里带 `text-align: left` |
 | `.cu-page h2` | `text-align: center` | `.cu-guide-rail h2` 改回 left |
 
-覆盖时 **`.cu-page` 前缀不能省**：`(0,1,0)` 压不过 `(0,1,1)`；margin 还要 `!important`，
-因为 `0.9rem auto` 的 auto 覆盖不掉。容器上写 `text-align: left` 没用——段落被直接指定了 center。
+覆盖时 **`.cu-page` 前缀不能省**（(0,1,0) 压不过 (0,1,1)）；margin 还要 `!important`，因为
+`0.9rem auto` 的 auto 覆盖不掉。容器上写 `text-align: left` 没用——段落被直接指定了 center。
 
-**验收量首字，不量盒子**：`node scripts/audit_guide_align.mjs`（需先 `npm run preview`，
-或 `npm run build:ci` 一条命令跑完）。元素盒子顶格 ≠ 文字对齐，居中只在首字位置上体现出来，
-只量 `getBoundingClientRect().left` 会一路放行（2026-10-12 就是这样漏了两轮）。
-`scripts/check_dist.mjs` 另有一条静态兜底断言，但不替代实测。
+**缩进层级：文字只有两层左边线，容器边框不算文字左边线。**
 
-
-引导语渲染成 `.cu-guide-lead`：顶格、与 H2 同一条左边线、次级墨色，视觉上是 H2 的续行而不是正文段落。
-全局 `.cu-page p` 带 `margin: auto` + 42rem 限宽（优先级 (0,1,1)），教程页所有段落（`lead` / `paras` /
-块内段落 / `links` 列表）都要顶格，否则会居中飘在右边、与 H2 左边线对不上。
-
-**覆盖这条全局规则时 `.cu-page` 前缀不能省**（2026-10-12 修）。`.cu-guide-lead { max-width: none }`
-只有 (0,1,0)，压不过 `.cu-page p`；margin 也会被 `margin: 0.9rem auto` 的 auto 覆盖回去。
-所以覆盖要么写成 `.cu-page .cu-guide-rail p`，要么给 margin 加 `!important`。当前生效的两组：
-
-| 选择器 | 管什么 |
-|---|---|
-| `.cu-page .cu-guide-lead` / `.cu-page .cu-guide-para` | 引导语与正文段的顶格 + 解除限宽 |
-| `.cu-page .cu-guide-rail p` / `> div > ul` | 两条轨里全部裸段落、裸列表 |
-
-验收除目视外，用 `scripts/audit_guide_align.mjs` 跑一遍全页（两条轨逐块量左边线 + 检查有无 `margin: auto` 残留），
-并排除两类设计内的差异：步骤块内的序号列（`+66px`，设计如此）与 `.cu-notes` 里的段落（提示块自带内边距）。
-
-### 缩进层级：文字只有两层左边线
-
-顶格只是底线。顶格之后每一层容器（步骤正文列、提示块、网址框、列表）都留了 12–20px 不等的内缩，
-而这些值是在不同时期为不同组件单独定的，彼此不知道对方存在。2026-10-13 实测同一页同时存在
-20 / 16.8 / 15.2 / 13.6px 四种内缩，加上序号列的 65.6px，扫一眼下去「每一行留的空白都不一样」。
-
-**规范：教程页只有两层文字左边线，容器边框不算文字左边线。**
-
-| 层 | 位置（相对列左） | 谁属于这一层 | 怎么表达层级 |
-|---|---|---|---|
-| L0 正文列 | 0 | H2 / 引导语 / 正文段 / 块级裸列表的符号 / `.cu-notes` / 步骤块（`li` 本身）/ 网址框 | 徽标、边框、间距 |
-| L1 步骤正文列 | 65.6 | H3 / `goal` / `action` 圆点与文字 / `link` / `cta` / `shot` / `notes` | 只靠序号列表达 |
+| 层 | 位置（相对列左） | 谁属于这一层 |
+|---|---|---|
+| L0 正文列 | 0 | H2 / 引导语 / 正文段 / 块级裸列表的符号 / `.cu-notes` / 步骤块（`li` 本身）/ 网址框 |
+| L1 步骤正文列 | 65.6 | H3 / `goal` / `action` 圆点与文字 / `link` / `cta` / `shot` / `notes` |
 
 序号徽标（`--cu-step-num-w`）、L1 序号列间隙（`--cu-step-gap`）、`action` 与 `notes` 的左内缩
-（`--cu-step-indent`）都从 `00_base.css` 的 `:root` 取值，见文件头部注释。容器边框（`.cu-notes` 左边线、
-`.cu-step-block__notes` 左边线、网址框的框）画在 L0 / L1 上，属于容器而不是文字，不参与这套层级。
+（`--cu-step-indent`）都从 `00_base.css` 的 `:root` 取值。
 
 **硬规则**
 
-1. **列表容器一律 `padding-left: 0`，内缩加在 `li` 上。** 根因是全局 `.cu-page ul, ol` 给所有 `ul/ol` 上了
-   `padding-left: 1.25rem`（优先级 (0,1,1)），压过组件里 (0,1,0) 的 `.cu-step-block__action { padding: 0 }`，
-   于是动作那行容器 20px、`li` 又 16.8px，两次缩进叠在一个列表上。
-2. **不要用 `padding` 简写清内缩，要显式写 `padding-left: 0`。** `.cu-urlrow { padding: .45rem .5rem .45rem .85rem }`
-   是简写（(0,1,0)），被 (0,1,1) 压过后只有 `margin` 归零生效，内缩 13.6px 一直留着。
-3. **`.cu-notes` 的内缩由卡片自身的 padding 表达，不再靠 `ul` 的继承 padding。** 早前它是一个
-   `padding: 0` 的裸盒子，层级靠上下细线；2026-10-13 改成提示卡（左上角「提示」胶囊标签 +
-   段落改圆点项 + 圆角容器），内缩改为卡片自身的 1.05rem 逐侧 padding，段落再挂 0.85rem
-   悬挂缩进。审计脚本因此不再拿卡片段落与 H2 左边线比，而是算卡片内容列（卡片左缘 + padding + 悬挂缩进）。
-4. **`.cu-urlrow` 左右对称**（`padding: .45rem .85rem`），明文网址不再比框左缘内缩 13.6px。
-5. **跨组件的间距、字号、圆角走 `00_base.css` 的 token**，教程页不在组件里写死 rem 值；
-   组件级只写结构（grid 列、边框、字号层级）。
+1. **列表容器一律 `padding-left: 0`，内缩加在 `li` 上。** 根因是全局 `.cu-page ul, ol` 给所有
+   `ul/ol` 上了 `padding-left: 1.25rem`（优先级 (0,1,1)），压过组件里 (0,1,0) 的 `padding: 0`。
+2. **不要用 `padding` 简写清内缩，要显式写 `padding-left: 0`。** 简写被 (0,1,1) 压过后只有
+   `margin` 归零生效。
+3. **`.cu-notes` 的内缩由卡片自身的 padding 表达**，不再靠 `ul` 的继承 padding。审计脚本算卡片
+   内容列（卡片左缘 + padding + 悬挂缩进），不与 H2 左边线比。
+4. **`.cu-urlrow` 左右对称**（`padding: .45rem .85rem`）。
+5. **跨组件的间距、字号、圆角走 `00_base.css` 的 token**。
 
-**验收**：`scripts/audit_guide_align.mjs` 把缩进纳入断言，测 L1 内所有文字的左边线必须落在
-`body 列 + --cu-step-indent`（±1px），L0 内所有文字必须落在列左（±1px）。该脚本读的是
-`--cu-step-indent` 的定义，改 token 不用改脚本。
+**清内缩只写单侧声明**（`padding-top/right/bottom/left`），写成 `padding: 0; padding-left: 0`
+（简写 + 单侧）会让 esbuild 展开出重复属性，浏览器最终拿到低优先级的值，页面看着跟没改一样。
+改完跑 `npm run check:css`。
 
-**踩过的坑**：上面第 1、2 条要写 `padding-left: 0` 时曾经写成 `padding: 0; padding-left: 0`（简写 + 单侧），
-esbuild 展开后产物里出现重复属性，浏览器最终拿到低优先级的 1.25rem，页面看着跟没改一样。
-**清内缩只写单侧声明**（`padding-top/right/bottom/left`），见 `npm run check:css` 与
-`docs/troubleshooting_guide.md` 的「源码里优先级更高的一条规则，浏览器却拿到低优先级那条的值」。
+**验收**：`node scripts/audit_guide_align.mjs`（需先 `npm run preview`，或 `npm run build:ci`）。
+量的是**首字实际位置**（`getClientRects`），不是元素盒子——盒子顶格 ≠ 文字对齐，2026-10-12 就是
+只看盒子量而漏了两轮。脚本遍历 5 个场景页，测 L0 / L1 两条左边线内的所有文字。
 
-### 坑位：kicker
-h2 上方那行「小白教程 · 第 3 步」是 `kicker`，**全页为 0，不要用**。序号已经回到 h2
-（`guideH2` 按轨内出现顺序生成），轨的身份由页头的轨选择器表达；再挂一层轨标签是同一句话说两遍。
-`scripts/check_dist.mjs` 的 `GUIDE_KICKERS = 0` 守住这点，`GuideBlock` 上也没有 `kicker` 字段。
+## 八、屏效与层级（保留 2026-10-13 的结论）
 
-### 坑位：轨选择器的选中态不能用反白
-轨名渲染成 `<strong>`，而 `01_shell.css` 的 `.cu-page strong` 给全页 strong 钉了 `color: var(--cu-ink)`。
-选中态若用 `--cu-contrast` 反白填充（墨底米白字），那个米白字会被这条规则改回墨色，深色模式下就变成
-浅底深字——轨名「看得见一条条线、看不见字」。所以选中态用**左侧 2px 墨色竖条 + 浅底 + 墨字**，
-与左侧目录当前项同一套语言，不依赖任何反白对比。`check_dist.mjs` 有一条断言守住这点：
-产物样式表里 `.cu-grails__item.is-active` 不许出现 `--cu-contrast`。
-
-## 三、步骤（GuideStep）的六个槽位
-
-槽位固定六个，**渲染顺序恒定**：title → goal → action → link → cta → shot → notes。缺哪个就不渲染哪个，所以每一步的视觉节奏都一样。
-
-> 旧写法 `body` / `do` / `tips` 已于 2026-10-13 全页删除：它们在组件里早已不渲染，写进数据等于内容隐形（当时有 9 个子步骤的文字因此不显示）。新内容一律用 `goal`（为什么做）+ `action`（做什么）+ `notes`（坑）。
-
-| 槽位 | 是否必填 | 放什么 | 视觉 |
-|---|---|---|---|
-| `title` | 必填 | 动作短语，动词开头，不带句号，不带「第 X 步」 | H3，组内子步骤才画序号徽标 |
-| `goal` | 必填 | 这一个子动作**为什么**要做，一句 | 正文，次级墨色，顶格 |
-| `action` | 必填 | 实际要敲的按钮／菜单路径，**数组每一项是一个动作** | 行内高亮：左一个 6px 圆点 + 加粗墨色文字，不画框、不画底色 |
-| `link` | 可填 | 这一步要去的一个地址。`copy: false` 是点开型地址（官网、后台），不给复制按钮；复制只留给高手轨手填 Base URL | 网址行：明文 URL + 复制 + 打开链接 |
-| `cta` | 可填 | 这一步的按钮（与 `link` 指向同一处时二选一，别重复） | 幽灵按钮，与块级 `cta` 同组件 |
-| `shot` | 可填 | 这一步的对照截图，最多一张 | 图，限宽 640px |
-| `notes` | 可填 | 坑、替代做法、失败征兆 | 小字 muted 列表，左侧 1px 细线 |
-
-### 为什么 `action` 不画框
-原先的「要做的事」是 3px 左线 + 浅底 + 反白标签，是全页最重的一块，而内容往往只有一行
-「下载 → 安装，全程保持默认」。视觉重量超过信息量，也让每一步看起来都像有额外一层壳。
-改成行内加粗 + 圆点后，全页只有一种强调，简单步骤真的就只是一句话。
-
-### 为什么 URL 和按钮合并成 `link`
-原先 `url`（明文网址 + 复制）和 `cta`（按钮）在同一步里指向同一个地址，出现两次。
-合并成 `link` 一个字段：明文网址 + 一键复制 + 一个跳转链接，够用且不重复。
-
-## 三之二、两级编号：节号与子步骤号
-H2 上的「N.」是**节号**，组内徽标是**子步骤号**，两级都画，组内只有一个子步骤时也画「1」。
-早期版本只在多子步骤组里画徽标，结果第 3 步整段左移、第 4 步右移一列，读者以为漏了内容（2026-10-12 改）。
-
-- 徽标用描边 + 空底的次级墨色（muted 文字），**不要反白**——反白是全站最重的一档，H2 旁边挂一个反白的「1」比 h3 还重。
-- 子步骤前缀（「子步骤 N · 在哪点」）**已于 2026-10-13 全页下线**：全页没有一条 hint，且子步骤标题本身已说清是哪一步，多一行只是重复。相关字段与样式已从 `GuideSteps.vue`、`shell_extra.css` 删除，不要再加回来。
-- 切分子步骤的判断：图没有单独讲某一步就不单独拆；「进 A → 进 B → 点 C」是一条动作链、一个图能说清的，合成一步。
-- 图注编号（「图 01」起）必须与正文出现顺序连续。`scripts/check_dist.mjs` 会断言这条（2026-10-13 补上；此前规范这么写但脚本没检查，第 6 步补子步骤时真的出现过两个「图 07」）。
-
-## 四、锚点与外部引用
-
-`block.id` 是深链契约，`config/faq.ts` 与 `config/kefu_bot.ts` 里有 `/guide#models`、`/guide#ccswitch`、
-`/guide#install-ccswitch`、`/guide#import` 等外链。**重排小节顺序可以，改 id 不行。**
-
-当前契约清单（`check_dist.mjs` 按这份断言，改轨时两边一起改）：
-小白轨 `install-ccswitch` / `get-key` / `import` / `models` / `enable` / `vscode`，高级轨 `pro-key` / `params`。
-已删除、不再是契约的旧锚点：`manual`、`env`、`editors`、`selfcheck`、`errors`。
-
-## 五、验收
-
-- `npm run build`：含 `scripts/check_dist.mjs` 的结构断言（步骤标签数、截图数、锚点存在、两轨都渲染在 SSR 产物里）。
-- 目视：任意一步的强调只有一种；简单步骤（下载、安装）不出现截图与框；轨内任意两节的 h2 上边距一致。
-- 文案自检目前**没有自动化**：`config/guide.ts` 里没有 DEV 断言。lead 是否混进操作指令、子步骤标题是否重复，只能目视或人工核对；图注连续性已由 `scripts/check_dist.mjs` 断言（见第五章）。
-
-## 六、教程页体验评估（2026-10-13）
-
-内容规范（第二、三节）不动，评估认为它是这个页面最好的部分。这轮改的是屏效与层级，
-对应 `shell_extra.css` 末尾「教程页屏效与层级」一组注释，以及 `14_knowledge.css` 里
-`.cu-guide-wrap` 的 52rem 一条（`PageShell.vue` 给 `.cu-shell__body` 加了 `cu-guide-wrap` 类，
-选择器带上它是为了只命中教程页，不误伤知识库文章页与后台页）。
-
-### 步骤进度：不做顶部进度条
-
-2026-10-13 加过一条吸顶的六步进度条（StepRail），验收时被否掉：**左侧目录已经有同一组节点**，
-再加一条是重复表达。位置留给左侧目录。宽屏不要任何顶部进度元素。
-
-窄屏（≤1080px）目录收进抽屉后目录不在视野里，用户靠什么知道进度？靠两样：
-① H2 自身的「N.」节号；② 步骤块左侧的子步骤徽标。两级编号都保留，别为了省事去掉。
-
-### 子步骤锚点
-
-`GuideSteps` 给每个子步骤生成 `<blockId>-<序号>` 的 id（如 `models-2`）。
-**目前没有任何页面引用子步骤锚点**（FAQ 与客服语料只深链到节级 id），功能保留备用：将来要深链到具体子步骤时，锚点已经在，但要在 `config/faq.ts` / `config/kefu_bot.ts` 里实际写出来才会生效。节级 id 是深链契约，不改。
+- **不做顶部进度条**：左侧目录已有同一组节点，再加一条是重复表达。窄屏靠 H2 的「N.」与步骤
+  徽标两级编号表达进度。
+- **kicker 全页为 0，不要用**：H2 上方那行「小白教程 · 第 3 步」是轨时代的产物，轨没了标签也不留。
+- **轨选择器已删除**：`.cu-grails` 一组样式与 `GuideRails.vue` 在 2026-10-20 一并删除。
+- **H3 降一档**（0.98rem / 600），让 H2 的节号成为本页最重的元素。
+- **徽标不反白**：描边 + 空底次级墨色。反白是全站最重的一档，H2 旁边挂一个反白的「1」比 h3 还重。
 
 ### 数字约定
 
 | 位置 | 值 | 为什么 |
 |---|---|---|
-| 节间距（`.cu-guide-rail h2`） | 3.25rem（直接写死，不用变量） | 每节只占 1~2 屏，6.5rem 会让节间空出近 3 屏高。用变量会在 `.cu-guide-block` 内部取不到、静默回退 |
-| 正文列 `.cu-shell__body--reading.cu-guide-wrap .cu-shell__inner` | 52rem（`14_knowledge.css`） | 步骤块序号列 3rem + 1.1rem 间隙把截图压到 638px，`max-width: 700px` 从来没生效过 |
-| 文字层限宽 `--cu-guide-text` | 46rem（`shell_extra.css` 一处） | 列宽放宽后行宽仍由文字层管住，否则每行 39 字，超过中文长读 35-40 字上限。命令块与表格不限宽 |
-| 步骤块 `ol.cu-steps-block` | `padding-left: 0`、`max-width: none` | 两层：li 继承 ol 的 1.25rem 内边距；全局 `.cu-page ul, .cu-page ol` 还给了 `max-width: var(--cu-content-w)`（44rem = 704px）。ol 是教程列最外层元素，不归零就从外往里把整列掐到 704px |
-| 截图 `.cu-step-block__shot` | `--cu-shot-max-w: 34rem`（544px）+ `--cu-shot-max-h: 22rem`（352px），见下方「插图规范」 | 52rem 列减去序号列与间隙约 762px，700px 正好 |
-| 图注 `.cu-shot figcaption` | `max-width: 700px` + 左边对齐 | 全局 `.cu-page p` 给了 `max-width: var(--cu-content-w)` + `margin: auto`，图注会被甩到离图一截的位置 |
+| 正文列 `.cu-shell__body--reading.cu-guide-wrap .cu-shell__inner` | 52rem（`14_knowledge.css`） | 步骤块序号列 + 间隙把截图压到 638px，`max-width: 700px` 从来没生效过 |
+| 文字层限宽 `--cu-guide-text` | 46rem（`shell_extra.css` 一处） | 行宽由文字层管住，否则每行 39 字，超过中文长读上限 |
+| 步骤块 `ol.cu-steps-block` | `padding-left: 0`、`max-width: none` | `li` 继承 `ol` 的 1.25rem 内边距；全局 `.cu-page ol` 还给了 `max-width: var(--cu-content-w)`（44rem） |
+| 截图 `.cu-step-block__shot` | `--cu-shot-max-w: 34rem`（544px）+ `--cu-shot-max-h: 22rem`（352px） | 宽高两个上限同时生效，按比例取先到的那档 |
 | 多图并排 `.cu-step-block__shots` | 340px + 剩余列，左图吸顶，两图等高 | 两图并排时右边那张被挤到 282px，界面文字缩得看不清 |
-| 图注 | 0.86rem | 页面名 + 编号徽标 |
-| 步骤 notes | 0.92rem | 同上 |
 | 引导语 line-height | 1.7 | 它是 H2 的续行，1.85 太散；步骤块里的短句保持 1.85 |
-| H3 | 0.98rem / 600 | 与 H2（1.32rem / 600）差一档，H2 的节号成为本轨最重的元素 |
 
-单子步骤也画徽标这条不变（2026-10-12 定），层级靠字号档差而不是靠徽标补救。
-
-### 网址行
-
-`link.copy === false` 只给明文 URL 与跳转链接，不显示复制按钮。用于「点开型」地址
-（CC Switch 官网、管理后台、VS Code 官网）：小白去那儿是点按钮操作，复制网址对他没有用。
-复制只留给高级轨手填 Base URL 的场景。
-
-### 多图并排
-
-一步挂两张截图时（只有第 4 步「获取模型列表 → 保存」），网格改成图文两列：
-左图 340px 并吸顶在导航之下，右列放第二张图与图注。断点两条：**≤760px** 回落单列
-（560px 时右列只剩 109px、图整体塌掉），**≤560px** 额外把吸顶还原成 static。
-
-原有的 720px 单列回落要删掉：它与宽屏两列选择器优先级相同、媒体条件又更宽，
-在 560~760px 之间会盖掉两列，390px 下更把右列挤成 0px。
-
-### 排错表多行
-
-`CompareTable` 的单元格支持 `\n`，渲染成 `<br>`。一格里塞几个动作时拆成多行，
-比用分号连排更好读——读者能逐条看清做哪个、按什么顺序。
+多图并排的断点两条：**≤760px** 回落单列，**≤560px** 额外把吸顶还原成 static。720px 那条单列
+回落已在 2026-10-13 删除（与宽屏两列选择器优先级相同、媒体条件又更宽，560~760px 之间一直生效）。
 
 ### 插图规范
 
-只看**展示尺寸**（页面上渲染出来的宽高），不看原图像素。原图在本机
-`.vitepress/theme/assets/guide/` 里，供 GuideShot.vue 静态导入。
+只看**展示尺寸**，不看原图像素。实现集中在 `shell_extra.css` 的 `.cu-step-block__shot` 一条，只通过
+两个自定义属性出数，并排组用 `.cu-step-block__shots .cu-step-block__shot` 把两个上限归零。
 
-实现集中在 `shell_extra.css` 的 `.cu-step-block__shot` 一条，只通过两个自定义属性出数：
-
-| 布局 | 宽度上限 | 高度上限 | 说明 |
-|---|---|---|---|
-| 单图 | `--cu-shot-max-w: 34rem`（544px） | `--cu-shot-max-h: 22rem`（352px） | 宽高两个上限同时生效，按比例取先到的那档 |
-| 并排两图 | 340px + `minmax(0,1fr)` 两列 | 两图等高（取高的那张） | 组内把两个上限都归零，图按列宽自适应 |
-| 并排 ≤760px | 单列 | 不限 | 回落单列后按宽度自适应，不裁 |
-
-**为什么是 544×352**：正文列 56rem（896px），单图占到 60% 左右，右侧留出一块空白，
-视线不必横跨整列去找图注；352px 略小于一屏（900px 视口下正文区约 700px）的三分之二，
-一张图不用滚动就能看完。竖图（`guide_vscode_plugin.png`，0.92 宽高比）只限宽会撑到
-590px 高，必须靠高度上限兜住。
-
-**块级截图也要挂 `cu-step-block__shot`**（2026-10-13 修）：`GuidePage.vue` 里 `block.shot`
-渲染的 `<GuideShot>` 原先没带这个类，`--cu-shot-max-w/-h` 是定义在这个类上的自定义属性，
-没有类就双双回退到 `none`，图片按整列 52rem 铺开，高度也不设防——这就是高级配置第 1 节
-那张「图 10 管理后台」在页面上明显偏大的原因。步骤内截图（`GuideSteps.vue`）一直是带类的。
-
-**规则**
-- 宽高上限只写在 `.cu-step-block__shot` 上，并排组用 `.cu-step-block__shots .cu-step-block__shot` 归零，不要在下面写死数值。
-- 缩放只能靠 `width:100%` + `max-height`，不写 `transform: scale()`：缩放会让文字发虚，且图注对不齐。
-- 单图不用 `object-fit`（图片按比例缩放，不裁），只有并排等高时用 `cover` + `object-position: top center`。
+- 缩放只能靠 `width:100%` + `max-height`，不写 `transform: scale()`（缩放让文字发虚、图注对不齐）。
+- 单图不用 `object-fit`（按比例缩放不裁），只有并排等高时用 `cover` + `object-position: top center`。
 - 新增插图先量原图宽高比：≤1.2 的竖图只受高度上限约束，>1.8 的宽图只受宽度上限约束。
+- **块级截图也要挂 `cu-step-block__shot`**：`GuideBlockBody.vue` 里 `block.shot` 渲染的
+  `<GuideShot>` 必须带这个类，否则两个自定义属性双双回退到 `none`，图片按整列铺开、高度不设防。
+
+## 九、验收
+
+```bash
+npm run build        # 含 check_dist.mjs 的逐页结构断言
+npm run verify       # SEO / 组件 / 链接验收
+npm run check:links  # 死链
+npm run check:css    # 改了 .vitepress/theme/**/*.css 必跑
+npm run check:align  # 教程页文字左边线（遍历 5 个场景页，需先 npm run preview）
+```
+
+`check_dist.mjs` 对教程的断言（逐页，替换掉旧的「全站扁平常量」）：
+
+- 小节锚点双向一致：产物里该页 `<h2 id>` 集合 == `guideAnchorsOf(page)`（`faq` / `related` 两个
+  页尾小节除外）。左侧目录（`sections.ts`）也含这两项，所以「正文小节 ↔ 目录」双向断言才过。
+- 小节序号从 1 连续；图注编号每页从 01 连续。
+- 截图：`guideShotsOf(page)` 的条数 == 产物里 `class="cu-shot "` 与 `<img src="/assets/guide_...">`
+  的条数，且每个文件真实存在（`GuideShot.vue` 的静态导入表与 `config/guide.ts` 的文件名要一致）。
+- per-page keywords 非空、不是全站那条全局词、且与 `page.tags` 一致。
+- 一句话答案、每条 FAQ、场景切换条 5 个、FAQPage 与 HowTo 结构化数据都在产物里。
+- `guideLegacyAnchors` 每一项在目标页存在且目标页产物存在。
+- 索引页 5 张场景卡全部渲染且 href 指向真实路由。

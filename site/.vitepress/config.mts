@@ -2,8 +2,34 @@ import { defineConfig } from 'vitepress'
 import type { HeadConfig } from 'vitepress'
 import { siteConfig } from '../config/site'
 import { knowledge, knowledgeCategories } from '../config/knowledge'
+import { guidePageBySlug, guideTagsOf, guideIndexTags } from '../config/guide'
 import { publicDirPlugin } from './theme/middleware'
 import { baiduHead, umamiHead } from './analytics_snippets'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+
+/**
+ * 允许用 Tailscale 域名形式打开 dev server（IP 形式本来就不做 host 校验）。
+ *
+ * 为什么读本地文件：具体主机名只在本机 config/local/dev_endpoints.json 里维护（已 gitignore），
+ * 公开仓库里不写死它。取不到就回落到 '.ts.net' —— Tailscale 的公开域名后缀，匹配任何
+ * *.ts.net 主机名，不泄露具体机器名，域名形式照常可用。
+ */
+function localTailscaleHost(): string {
+  const candidates = [
+    resolve(process.cwd(), '../config/local/dev_endpoints.json'),
+    resolve(process.cwd(), 'config/local/dev_endpoints.json'),
+  ]
+  for (const p of candidates) {
+    try {
+      const j = JSON.parse(readFileSync(p, 'utf-8')) as { tailscaleHost?: string }
+      if (j.tailscaleHost) return j.tailscaleHost
+    } catch {
+      /* 本地没这个文件就试下一个 */
+    }
+  }
+  return '.ts.net'
+}
 
 /**
  * 站点形态：营销页（首页 / 套餐定价 / 无限额度 / 常见问题）+ 教程页（使用教程总览 / 模型与切换 / 接入与模型 / CC Switch），
@@ -41,12 +67,20 @@ export default defineConfig({
     // 覆盖掉全局那条。tags 是人工维护的真实搜索词，不是堆砌。
     // 长文页的目录折叠态：首帧就把 <html> 的类补上，避免 SSR 先铺开目录、挂载后再收起的跳动。
     // 同步内联脚本，VitePress 渲染在 <head> 里，样式生效前执行；try/catch 兜住隐私模式下 localStorage 抛异常。
-    if (path === 'guide' || path === 'console' || path.startsWith('knowledge/')) {
+    if (path.startsWith('guide') || path === 'console' || path.startsWith('knowledge/')) {
       head.push([
         'script',
         {},
         'try{if(localStorage.getItem("cu-toc-collapsed")==="1"&&window.matchMedia("(min-width:1281px)").matches)document.documentElement.classList.add("cu-toc-collapsed")}catch(e){}',
       ])
+    }
+    // 教程场景页的 per-page keywords：全站只有一条全局 keywords 的话，5 个客户端页共用同一串词，
+    // 对中文长尾搜索没有区分度。这里按路由从 config/guide.ts 反查该页的 tags 注入（同知识库做法）。
+    if (path === 'guide' || path.startsWith('guide/')) {
+      const tags = path === 'guide' ? guideIndexTags() : guideTagsOf(guidePageBySlug('/' + path)?.scene ?? 'cc')
+      if (tags.length) {
+        head.push(['meta', { name: 'keywords', content: tags.join(',') }])
+      }
     }
     if (path.startsWith('knowledge/')) {
       const slug = path.slice('knowledge/'.length)
@@ -187,7 +221,7 @@ export default defineConfig({
       strictPort: true,
       // 允许用局域网 IP / Tailscale IP / MagicDNS 名字打开；不加会看到 Vite 的 "This host is not allowed" 白屏。
       // IP 形式 Vite 默认放行（IP 直连不做 host 校验），域名形式必须显式列出。
-      allowedHosts: ['.ts.net'],
+      allowedHosts: [localTailscaleHost()],
     },
     build: {
       // 禁止把 WebP/SVG 内联成 data:（易导致裂图 / 超长属性）

@@ -38,14 +38,10 @@ const props = defineProps<{
    * 目录数据仍来自 sections.ts 的 SECTION_NAV[slug]。
    */
   toc?: 'side' | 'wide'
-  /** 只显示该 group 的目录项（教程页按轨切换时传轨名；不传 = 全部）。不带 group 的共用项始终显示 */
-  tocGroup?: string
 }>()
 
 const sections = computed(() => {
-  const all = props.toc ? SECTION_NAV[props.slug] || [] : []
-  // 教程页两条轨：只列当前轨 + 共用块（group 为空的项）
-  return props.tocGroup ? all.filter((s) => !s.group || s.group === props.tocGroup) : all
+  return props.toc ? SECTION_NAV[props.slug] || [] : []
 })
 const eyebrow = computed(() => props.eyebrow || siteConfig.name)
 const shopUrl = computed(() => featuredProduct().shopUrl)
@@ -115,7 +111,7 @@ useReveal()
 
     <div
       class="cu-shell__body"
-      :class="{ 'cu-shell__body--reading': !!toc, 'cu-guide-wrap': slug.replace(/^\//, '') === 'guide', 'cu-shell__body--no-toc': !sections.length }"
+      :class="{ 'cu-shell__body--reading': !!toc, 'cu-guide-wrap': slug.replace(/^\//, '').startsWith('guide'), 'cu-shell__body--no-toc': !sections.length }"
     >
       <!-- 目录在正文之前：宽屏是左侧一列，窄屏塌成抽屉（靠 DOM 顺序，不靠 order）。
            variant="guide"：教程页目录形态（压顶部留白、去进度条），与知识库文章页分开。 -->

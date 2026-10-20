@@ -9,7 +9,7 @@
 | 新增或重排页面、决定某段内容放哪个页面 | [`content_structure.md`](content_structure.md) |
 | 写一篇知识库文章 | [`../content/knowledge/guide.md`](../content/knowledge/guide.md) 七步流程；正文先写 `content/knowledge/drafts/`，预览端口 41802 |
 | 知识库写作风格与收录 | [`knowledge_writing_guide.md`](knowledge_writing_guide.md) |
-| 改教程页 | [`guide_design_spec.md`](guide_design_spec.md) |
+| 改教程页（内容、小节、截图、目录） | [`guide_design_spec.md`](guide_design_spec.md) |
 | 套餐价格 | [`plans_sync.md`](plans_sync.md)，价格由发卡站商品详情决定，不要手改 |
 | 改配色、圆角、字体、动效 | `.vitepress/theme/styles/00_base.css` 头部注释即规范原文，只改那里的 token |
 | 出故障了、行为不对 | [`troubleshooting_guide.md`](troubleshooting_guide.md) |
@@ -17,69 +17,58 @@
 
 ---
 
-内容根目录（VitePress `srcDir: 'docs'`）。每个 `.md` 只放 frontmatter 路由壳，正文在 `.vitepress/theme/pages/*.vue`。
-`layout` 字段选页面组件，VitePress 直接把它当 Vue 组件渲染，所以 md 里不用再写组件标签：
+内容根目录（VitePress `srcDir: 'docs'`）。每个 `.md` 只放 frontmatter 路由壳，正文在 `.vitepress/theme/pages/*.vue` 或
+`config/guide.ts`。`layout` 字段选页面组件，VitePress 直接把它当 Vue 组件渲染，所以 md 里不用再写组件标签：
 
 | 文件 | layout | 页面组件 |
 |---|---|---|
 | `index.md` | `index` | `.vitepress/theme/index.vue` |
-| `pricing.md` | `pricing` | `.vitepress/theme/pricing.vue`（含原 `/unlimited` 的内容） |
+| `pricing.md` | `pricing` | `.vitepress/theme/pricing.vue` |
 | `faq.md` | `faq` | `.vitepress/theme/faq.vue` |
 | `models.md` | `models` | `.vitepress/theme/models.vue` → `components/PageModels.vue` |
 | `console.md` | `console` | `.vitepress/theme/console.vue` → `components/PageConsole.vue` |
-| `guide/index.md` | `guide_index` | `.vitepress/theme/guide_index.vue`（教程只有这一页） |
+| `guide/index.md` | `guide_index` | `.vitepress/theme/guide_index.vue` → `components/GuideIndexPage.vue` |
+| `guide/<scene>.md` | `guide_scene` | `.vitepress/theme/guide_scene.vue` → `components/GuideScenePage.vue` |
 
 **页面组件必须在 `.vitepress/theme/index.ts` 的 `themePages` 里注册。** `frontmatter.layout` 的解析发生在默认主题的
 `VPContent.vue`（`<component :is="frontmatter.layout" />`），它只认 `enhanceApp` 里 `app.component()` 注册过的名字。
-只在 `theme/` 下建文件、不 import 进 `theme/index.ts`，构建不会报错，但产物会 SSR 成空的 `<div>`（HTML 里只有
-`<guide_index></guide_index>`），而且会被 `check_dist.mjs` 的「外壳内 H1 数量」断言拦下。
-页面组件里的文件名、layout 的对应关系：`docs/guide/index.md` → `layout: guide_index` → `theme/guide_index.vue` → 渲染 `config/guide.ts` 的单页 `/guide`。
+只在 `theme/` 下建文件、不 import 进 `theme/index.ts`，构建不会报错，但产物会 SSR 成空的 `<div>`，而且会被
+`check_dist.mjs` 的「外壳内 H1 数量」断言拦下。
 
-## 知识库怎么写
+教程子页（2026-10-20 重构）：`docs/guide/<scene>.md` 的 frontmatter 只有 `layout: guide_scene` + `scene: <id>`
++ SEO 三件套（title / description / head），**正文全在 `config/guide.ts`**。`scene` 是路由后缀的来源，
+`guide_scene.vue` 从 frontmatter 读它再反查场景数据。5 个场景页就是 `docs/guide/{cc,desktop,codex,workbuddy,cursor}.md`。
+规范见 `guide_design_spec.md`。
 
-知识库（`/knowledge`）是文章模块，与教程页不同：
+## 教程怎么写
 
-- **正文在 `docs/knowledge/<slug>.md`**（原生 markdown），不是 `config/*.ts`。
-- 文章页写 `layout: page` + frontmatter `knowledge: true`，由 `theme/components/KnowledgeDoc.vue` 渲染 VPDoc 的 page 分支输出；H1 来自 markdown 自己的 `# 标题`。
-- 列表页 `docs/knowledge/index.md` 仍是路由壳（`layout: knowledge_index`），页面组件是 `theme/knowledge_index.vue`；结构为分类胶囊条 + 精选大卡 + 四个分类小节。
-- 元数据（列表卡片、Article + FAQPage JSON-LD、OG、页脚）在 `config/knowledge.ts`（四个分类按用户旅程：start / how / cost / troubleshoot；`knowledge.ts` 的 `knowledgeCategories` 是唯一真源，文档别手写分类数）；页内目录复用 `components/SectionNav.vue`，目录项在客户端挂载后从正文的 `h2[id]` 读取（SSR 为空，由 `npm run check:toc` 在浏览器里核对），不走 `sections.ts`。
-- 源站原文与抓取信息在 `config/knowledge_sources.ts`，由 `scripts/gen_sources.py` 复制到 `archive/knowledge_source_20261009/<slug>/`；`npm run check:sources` 校验逐字一致。PAGES（check_dist.mjs / verify_build.py）从 `config/knowledge.ts` 动态读取。
-- 新增文章的完整流程与写作规范见 `docs/knowledge_writing_guide.md`。
+数据入口只有一个：`config/guide.ts`。它里有三类东西：
 
-## 内容结构约定（2026-10-10）
+1. **`sharedBlocks`** — 装 CC Switch、换取 API Key 这类每个客户端都要做的公共正文，写一份，5 个场景页用 `shared` 字段引用。
+2. **5 个场景页数据**（`ccPage` / `desktopPage` / …）— 每个客户端一条完整路径：小节、步骤、截图、FAQ、相关阅读、长尾词。
+3. **装配层** — `guideBlocks(page)` 合并共享块、给 H2 加页内序号、给截图加图注编号。**全站唯一给教程内容编号的地方**，数据里不许手写 `N. ` 或 `图 NN`。
 
-全站页面各只回答一个问题，模块分工、页面职责与「同一段内容只存在于一个页面」的硬规则见
-[`content_structure.md`](content_structure.md)。新增模块或页面时先读它，确认它属于哪个页面，
-避免再次出现同一段内容在两页各写一遍的情况。
+`GuideIndexPage.vue` 渲染索引页（5 张场景卡 + 旧锚点兼容跳转），`GuideScenePage.vue` 渲染场景页
+（一句话答案 → `GuideBlockBody` 逐块 → FAQ → 相关阅读 → 接着看 + CTA）。左侧目录（`sections.ts` 的
+`SECTION_NAV`）与页脚「教程」列（`guideNavItems`）全部从同一份数据派生，改一处两处同步。
 
-限流数字、套餐边界、退款窗口只在 `config/rules.ts` 出现；页面表格、FAQ 答案、首页卖点都从它派生，改数字只改那一处。
+**`title` / `description` 有两个副本**：`docs/guide/<scene>.md` 的 frontmatter 与 `config/guide.ts` 的
+`page.title` / `page.desc`，改一处必须同时改另一处（否则搜索结果与 AI 引用各说各话）。没有任何门禁
+自动核对这两份，这是要人工守的约定。
 
-## FAQ 怎么写
-
-全部问答在 `config/faq.ts`，页面顺序由 `.vitepress/theme/pages/data.ts` 的 `faqGroupOrder`
-（购买 → 商品 → 限速 → 配置 → 接入 → 安全 → 我们）决定，`components/sections.ts` 的 `SECTION_NAV.faq` 要与之一致
-（`check_dist.mjs` 会逐页断言）。`/faq` 顶部「买之前」区块取 `buyingQuestions` 里列出的条目 id，
-这些条目不会再在下面的分类里重复出现。改 FAQ 条数要同步 `check_dist.mjs` 的 `CU_FAQ_COUNT`（当前 28，与 `config/faq.ts` 的 `q:` 条数一致）。
-「限速与封号」里的具体速率数字由 `config/rules.ts` 的 `limitBullets()` 插值生成，不要在答案里另写一份。
-
-## 教程页怎么写
-
-**先读 [`guide_design_spec.md`](guide_design_spec.md)**（信息结构与视觉规范的权威源，2026-10-12 起）。下面只讲数据放在哪。
-
-教程正文**不在 md 里，也不在页面组件里**，而在 `config/guide.ts`：一个 `GuidePage` 数据对象（`/guide`）。购买章节已整段删除，
-客服入口已下线正文里的客服条，统一走右下角在线助手浮标。正文分两条轨——`tab: 'novice'` 的小白教程（默认）与 `tab: 'pro'` 的高级配置，
-由 `guideTabs` 驱动**页级**分段切换；轨内不再重新分流。不带 `tab` 的块在两条轨下面都显示。
-`guide_index.vue` 直接渲染 `GuidePage.vue`，后者按 `config/guide.ts` 的 `blocks[]` 渲染：段落、列表、要点框、命令块、表格、步骤块（序号 + 段落 + 提示 + 截图）、按钮行（`cta`）。
-页内目录与页脚「教程」列（`pages/data.ts` 的 `guideNavItems`）全部从同一份数据生成，改一处两处同步。
-
-改教程的数据入口只有一个：`config/guide.ts`；改教程的规范入口是 `guide_design_spec.md`。
+教程页 CTA 按钮必须带 `data-cta`（`guide_ccswitch` / `guide_console`），否则转化事件丢失；
+`check_analytics.mjs` 的 `REQUIRED_CTA` 里有 `guide_` 前缀守着这条。
 
 ## 教程截图
 
 - 放在 `.vitepress/theme/assets/guide/`，在 `theme/components/GuideShot.vue` 里登记成静态 import，
   `config/guide.ts` 的每个截图只写文件名（如 `src: 'guide_onekey_import.png'`）。**图片不能放在 `docs/` 下**：
   那里的非 .md 文件不会被 Vite 打包，也不会复制进 dist。
-- 来源是发给买家的腾讯文档《AI工具使用教程》里的 9 张真实截图（2026-10 替换原先卖家教程站的示意图），每张都是买家实际操作后拍的界面，用户按官网图文做能在卖家文档里找到同一步。
+- **漏登记不会让构建失败**，只会让产物里那张图 404（`GuideShot.vue` 拿不到映射时 `url()` 原样返回文件名）。
+  `check_dist.mjs` 的「截图文件不在产物里」断言会拦，但只在跑完整 build 时才拦——改完图片先跑 build。
+- 来源是发给买家的腾讯文档《AI工具使用教程》里的真实截图（2026-10-20 起四份文档、33 张图）。
+  用户按官网图文做能在卖家文档里找到同一步。权威源与抓取方法见记忆文件 `guide-source-is-qq-doc`。
+- 新增的密集界面图（表单、面板）加 `zoom: true`，渲染成可点开原图的链接。
 
 ## 历史
 

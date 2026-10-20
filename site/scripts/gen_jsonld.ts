@@ -37,7 +37,10 @@ let skipped = 0
 for (const file of walk(dist)) {
   const rel = relative(dist, file).split(sep).join('/')
   // 产物文件名 -> 路由：index.html -> 首页，<dir>/index.html -> <dir>，其余去 .html
-  const route = rel.replace(/(^|\/)index\.html$/, '$1').replace(/\.html$/, '')
+  // rel 形如 'guide/index.html' -> 'guide/'：目录总览替换后带一个尾斜杠。
+  // 直接拿去查表会全部落空（switch 里是 'guide' 不是 'guide/'），结构化数据静默不注入，
+  // 所以这里统一去掉尾斜杠。
+  const route = rel.replace(/(^|\/)index\.html$/, '$1').replace(/\.html$/, '').replace(/\/$/, '')
   const jsonLd = jsonLdForRoute(route)
   if (!jsonLd) continue
   const html = readFileSync(file, 'utf8')

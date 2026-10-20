@@ -19,6 +19,7 @@ import { knowledge, knowledgeCategories } from '../config/knowledge'
 import { limits, limitRows, excludes, refundSummary, refundWindowDays, purchaseConditions } from '../config/rules'
 import { unlimitedTiers, shopUrl as purchaseUrl } from '../config/plans'
 import { modelIds } from '../config/models'
+import { guideSceneCards, guidePages, guideBlocks } from '../config/guide'
 
 const BASE = siteConfig.url.replace(/\/+$/, '')
 const SITE = `${BASE}/`
@@ -30,7 +31,10 @@ const pageLines = [
   `- [模型广场](${BASE}/models): 本卡承诺的 ${modelIds.map((m) => m.tier).join(' 与 ')} 两个模型一览，可复制 model ID，含分工、完整列表获取与切换方法`,
   `- [套餐定价](${BASE}/pricing): 无限卡在售 ${unlimitedTiers.map((t) => `${t.displayName} ${t.price}`).join('、')}，周期卡与额度卡尚未定价；含退款规则与公平使用`,
   `- [管理后台](${BASE}/console): 激活码兑换、API Key 提取、一键导入配置、用量查询与图表、公告与备用域名（后台本体为独立站点 ${siteConfig.partners.find((p) => p.id === 'console')?.url ?? ''}）`,
-  `- [使用教程](${BASE}/guide): 小白教程六步带截图（装 CC Switch、换取 API Key、一键导入配置、拉取并保存模型、启用并检测链路、在 VS Code 里开始使用）+ 高级配置两节`,
+  `- [使用教程](${BASE}/guide): 先选你在用的客户端，再照着做：${guideSceneCards().map((c) => c.title).join(' / ')}，每条路都带真实截图`,
+  ...guideSceneCards().map(
+    (c) => `- [${c.title} 教程](${BASE}${c.url}): ${c.desc}（${c.meta}）`,
+  ),
   `- [常见问题](${BASE}/faq): 全量 FAQ（商品 / 购买支付 / 使用配置 / 接入使用 / 限速封号 / 数据安全 / 关于我们）`,
   `- [Claude 知识库](${BASE}/knowledge): Claude Code 的用法、原理、成本与报错排查，按四个主题分类查`,
   `- [故障排除](${BASE}/troubleshooting): 站点自身的部署与构建排错`,
@@ -46,6 +50,7 @@ const facts: string[] = [
   `- 退款：${refundSummary}；售后申请窗口 ${refundWindowDays} 天`,
   `- 购买：第三方发卡站 ${purchaseUrl}`,
   `- 配置工具：CC Switch（${siteConfig.partners.find((p) => p.id === 'ccswitch')?.url ?? ''}），支持一键导入与链路检测`,
+  `- 源码与文档：${siteConfig.sourceRepo.url}（本站 VitePress 源码公开，MIT 许可；官网是唯一官方入口）`,
   `- 人工客服：微信 ${siteConfig.contact.wechatId}（点右下角在线助手 →「联系人工客服」，可一键复制微信号）`,
   `- 管理后台：${siteConfig.partners.find((p) => p.id === 'console')?.url ?? ''}，独立站点；主域名不可达时切换备用域名，API Key 无需更换`,
   `- 不包含：${excludes.map((e) => `${e.label}（${e.value}）`).join('；')}`,
@@ -123,6 +128,23 @@ for (const e of knowledge) {
   if (e.faq?.length) {
     fullParts.push('- 常见问题：')
     for (const f of e.faq) fullParts.push(`  - ${f.q} —— ${f.a}`)
+  }
+  fullParts.push('')
+}
+
+// 教程场景页：一句话答案 + 步骤清单 + 常见问题。AI 检索时能直接抄走一段完整答案。
+for (const p of guidePages) {
+  fullParts.push(`## ${p.title}`)
+  fullParts.push('')
+  fullParts.push(`- 页面：${BASE}${p.slug}`)
+  fullParts.push(`- 一句话答案：${p.answer}`)
+  fullParts.push('- 步骤：')
+  for (const b of guideBlocks(p)) {
+    fullParts.push(`  - ${b.h2}${b.lead ? ' —— ' + b.lead.replace(/<[^>]+>/g, '') : ''}`)
+  }
+  if (p.faq.length) {
+    fullParts.push('- 常见问题：')
+    for (const f of p.faq) fullParts.push(`  - ${f.q} —— ${f.a}`)
   }
   fullParts.push('')
 }
