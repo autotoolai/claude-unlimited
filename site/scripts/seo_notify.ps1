@@ -120,6 +120,64 @@ function Submit-Bing {
   }
 }
 
+function Get-BaiduPushOrder {
+  <#
+    百度配额小（约 10 条/天），所以推送顺序必须按商业价值排，不能按 sitemap 原序。
+    规则：优先级列表里的路径在前；/knowledge/ 下的文章一律压到最后；其余按 sitemap 原序。
+    只重排本次还没推过的 URL（台账见 Get-BaiduPushedSet），让每天的名额都花在没推过的页上。
+    实现用 [Array]::Sort 而非 Sort-Object：后者经脚本作用域调用时会把结果退化成单个字符串。
+  #>
+  param([string[]]$AllUrls)
+
+  $priority = @('/models', '/pricing', '/', '/guide', '/about', '/faq', '/changelog', '/knowledge', '/terms', '/privacy')
+  $stateDir = Join-Path $RepoRoot 'temp\seo_push'
+  $recordFile = Join-Path $stateDir 'baidu_pushed.txt'
+  $pushed = Get-BaiduPushedSet $recordFile
+
+  $rows = New-Object 'System.Collections.Generic.List[object]'
+  for ($i = 0; $i -lt $AllUrls.Count; $i++) {
+    $u = [string]$AllUrls[$i]
+    if ($pushed.Contains($u)) { continue }
+    $path = ([uri]$u).AbsolutePath
+    $rank = [array]::IndexOf($priority, $path)
+    if ($rank -lt 0) { $rank = if ($path -like '*/knowledge/*') { 100 } else { 50 } }
+    $rows.Add([pscustomobject]@{ Url = $u; Rank = $rank; Seq = $i })
+  }
+  if ($rows.Count -le 1) { return @($rows | ForEach-Object { $_.Url }) }
+
+  $arr = $rows.ToArray()
+  [Array]::Sort($arr, [System.Comparison[object]] {
+    param($a, $b)
+    if ($a.Rank -ne $b.Rank) {
+      if ($a.Rank -lt $b.Rank) { return -1 }
+      return 1
+    }
+    if ($a.Seq -lt $b.Seq) { return -1 }
+    if ($a.Seq -gt $b.Seq) { return 1 }
+    return 0
+  })
+  return @($arr | ForEach-Object { $_.Url })
+}
+
+function Get-BaiduPushedSet {
+  param([string]$RecordFile)
+  $set = New-Object 'System.Collections.Generic.HashSet[string]'
+  if (Test-Path -LiteralPath $RecordFile) {
+    foreach ($line in (Get-Content -LiteralPath $RecordFile -Encoding UTF8)) {
+      $u = $line.Trim()
+      if ($u) { [void]$set.Add($u) }
+    }
+  }
+  return $set
+}
+
+function Add-BaiduPushed {
+  param([string]$RecordFile, [string]$Url)
+  $dir = Split-Path -Parent $RecordFile
+  if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+  Add-Content -LiteralPath $RecordFile -Value $Url -Encoding UTF8
+}
+
 function Submit-Baidu {
   $site = $env:BAIDU_SITE
   $token = $env:BAIDU_TOKEN
@@ -130,16 +188,28 @@ function Submit-Baidu {
   }
   # 百度 API 的 site 不能带协议，否则 site init fail
   $site = $site.Trim() -replace '^https?://', '' -replace '/$', ''
-  $endpoint = "http://data.zz.baidu.com/urls?site=$([uri]::EscapeDataString($site))&token=$([uri]::EscapeDataString($token))"
+  # 注意：PS 5.1 不允许 "$(...)" 后面紧跟 &，两段 query 必须分开拼
+  $endpoint = "http://data.zz.baidu.com/urls?site=$([uri]::EscapeDataString($site))"
+  $endpoint = $endpoint + '&token=' + [uri]::EscapeDataString($token)
+
+  # 重要页优先，文章页压后；已推过的跳过
+  $stateDir = Join-Path $RepoRoot 'temp\seo_push'
+  $recordFile = Join-Path $stateDir 'baidu_pushed.txt'
+  $ordered = @(Get-BaiduPushOrder -AllUrls $Urls)
+  $limit = if ($env:BAIDU_LIMIT) { [int]$env:BAIDU_LIMIT } else { 10 }   # 账号级日配额约 10 条
   Write-Host ''
-  Write-Host "Baidu: push up to $($Urls.Count) urls one-by-one (site=$site)"
-  if ($DryRun) { Write-Host "DryRun: site=$site"; return }
-  # 新站日配额很小；整批易 over quota，改为逐条直到超额
+  Write-Host "Baidu: 待推 $($ordered.Count) 条（总 $($Urls.Count)，今日上限 $limit，site=$site）"
+  $todo = @($ordered)[0..([Math]::Min($limit, $ordered.Count) - 1)]
+  foreach ($u in $todo) { Write-Host "  队列: $u" }
+  if ($DryRun) { return }
+
+  # 新站日配额很小；整批易 over quota，改为逐条直到超额。超过 limit 提前停，避免撞到 over quota 后才 break。
   $ok = 0
-  foreach ($u in $Urls) {
+  foreach ($u in $todo) {
     try {
       $resp = Invoke-WebRequest -Uri $endpoint -Method POST -Body $u -ContentType 'text/plain' -UseBasicParsing
       Write-Host "Baidu OK: $u -> $($resp.Content)"
+      Add-BaiduPushed -RecordFile $recordFile -Url $u
       $ok++
       $j = $null
       try { $j = $resp.Content | ConvertFrom-Json } catch { }
@@ -164,6 +234,7 @@ function Submit-Baidu {
       break
     }
   }
+  Write-Host "Baidu: 本次提交 $ok 条，台账 $recordFile（已累计 $((Get-BaiduPushedSet $recordFile).Count) 条）"
 }
 
 # 把 dotenv 里读到的代理变量显式传给 python 子进程。PowerShell 5.1 的子进程默认继承父进程环境变量，

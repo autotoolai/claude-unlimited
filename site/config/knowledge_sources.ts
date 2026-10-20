@@ -423,11 +423,4 @@ export const knowledgeSources: KnowledgeSourceEntry[] = [
       },
     ],
   },
-  {
-    slug: 'code-video-skills-guide',
-    fetchedAt: '2026-10-13',
-    index:
-      '本文素材全部来自本机实测（2026-10-13）：四个开源技能仓库的 README 与 SKILL.md，以及五支自己渲染出来的样片。技能分工与坑位均为实测结论，非二手转述。video-shotcraft 用其镜头配方卡方法论与 assets/audio 音效库，官方样片标注由 Claude Opus 5.5 五轮迭代产出；anything2explainer 用其六镜模板、配音时间轴与字幕 HUD 体系，官方明确写了配色与动效判据；video-talkcraft 用其 motion-systems 四系统、字幕组件与 timing.json 工作流，其默认配音走 Fish Audio 付费，本机改用 Kokoro 自造句级时间戳替代；claude-motion-design 用其 seek(t) 纯函数引擎与 Playwright 逐帧渲染管线，官方样片标注由 Opus 5.5 产出，本片删掉了引擎默认的品牌字体与 logo 预载。Remotion 侧实测记录四条坑：TypeScript 必须钉 5.9.3（装到 TS 7 时 esbuild loader 报 readFile 崩溃）、图片必须走 staticFile()、镜头组件必须 .tsx、首帧前 5 帧要放完成态构图（平台抓首帧当封面）。配音侧实测：edge-tts 直连握手 403（系统代理端口未运行），改用 Kokoro-82M-v1.1-zh 本地推理，四个中文音色 zf_xiaobei / zf_xiaoyi / zm_yunjian / zm_yunxi 均出声，any2explainer 的 tts_build.py 已原生支持 kokoro 中文（逐块合成，块起始帧精确）。混音规范取自 ffmpeg loudnorm，目标 -14 LUFS / TP -1.5。',
-    files: [],
-  },
 ]

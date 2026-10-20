@@ -201,3 +201,28 @@ Cloudflare Pages 对 `/*.html` 一律 308 到无列路径，百度验证机器�
   `docs/troubleshooting_guide.md` 第六节。
 - `npx tsc --noEmit` 会报 `.vue` 模块找不到（见第二节）。
 - 文档里手写的「N 项 / N 条」是快照，脚本一改就漂。以命令输出为准。
+
+### 草稿预览开着就 build，报「没有 config/knowledge.ts 条目」
+
+这是**预期保护**，不是回归。`open_draft.mjs --slug=<slug>` 会把 `content/knowledge/drafts/<slug>.md` 复制到
+`docs/knowledge/<slug>.md` 让 41800 按原生页面渲染，而草稿在 `config/knowledge.ts` 里没有条目；
+`check_dist.mjs` 断言「docs/knowledge/ 下每个 md 都要有条目」，所以 build 一定失败，不会误上线。
+处理：`npx tsx content/knowledge/scripts/open_draft.mjs --slug=<slug> --close`。`publish_article` 会自动关，正常发布不会遇到。日常预览用 41802（`npm run draft:preview`），不会产生副本。
+
+### 草稿在 41800 上打不开（404），或者打开的是另一篇文章
+
+草稿不能只放在 `content/knowledge/drafts/` 就指望 41800 的 vitepress 认出来：`srcDir` 是 `docs/`，目录外的 md 既不是页面、
+`rewrites` 也只在 srcDir 内重排已存在的页面键，匹配不到（原因见 `content/knowledge/log.md` 问题 1）。
+正解是 `npm run draft:preview`：独立端口 41802，root 是生成的 `content/knowledge/preview/`，草稿被同步进去后按原生组件渲染。
+
+### 智品专员站被百度收录、本站为零的差异（2026-10-15 实测）
+
+两边提交方法完全相同（同一套 `seo_notify.ps1`、同一百度 token、同一 IndexNow key），差别在**首页首屏 SSR 正文**：
+
+| 站 | 首页 SSR 可见字数 | h2 数 | 百度 `site:` 结果 |
+|---|---|---|---|
+| alibabadesignkit（Product 项目） | 约 720 | 4 | 1 条 |
+| claude-unlimited（本站） | 约 575 | 1 | 0 条 |
+
+原因是首页 hero 标题按字拆成 `span` 由客户端逐字动画渲染，爬虫拿到的 H1 里每个词都是空 `span`。
+**处理**：品牌名、产品词、卖点必须出现在非动画文本里（hero 副标题或首个 h2 段落），不能只靠动画 H1。

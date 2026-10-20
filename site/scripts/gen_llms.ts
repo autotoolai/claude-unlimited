@@ -19,10 +19,6 @@ import { knowledge, knowledgeCategories } from '../config/knowledge'
 import { limits, limitRows, excludes, refundSummary, refundWindowDays, purchaseConditions } from '../config/rules'
 import { unlimitedTiers, shopUrl as purchaseUrl } from '../config/plans'
 import { modelIds } from '../config/models'
-import { videos } from '../config/video_meta'
-
-/** 主题数 = 没有 label 的条目数（同一支片子的迭代版本都带 label，不重复计主题） */
-const topics = videos.filter((v) => !v.label).length
 
 const BASE = siteConfig.url.replace(/\/+$/, '')
 const SITE = `${BASE}/`
@@ -54,7 +50,6 @@ const facts: string[] = [
   `- 管理后台：${siteConfig.partners.find((p) => p.id === 'console')?.url ?? ''}，独立站点；主域名不可达时切换备用域名，API Key 无需更换`,
   `- 不包含：${excludes.map((e) => `${e.label}（${e.value}）`).join('；')}`,
   `- 下单须知：${purchaseConditions.join(' ')}`,
-  `- 视频教程：${topics} 支主题 / ${videos.length} 支样片（含同题迭代版本对比）见 ${BASE}/knowledge/code-video-skills-guide`,
 ]
 
 const articleLines = knowledge.map(

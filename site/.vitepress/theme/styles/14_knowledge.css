@@ -700,3 +700,81 @@
   font-size: 1.25rem;
   color: var(--cu-ink);
 }
+
+/* ---------- 草稿工作台（41802 预览端口专用；线上不会出现这些类名） ---------- */
+/* DRAFT 徽标：草稿页唯一的视觉差异。草稿态 = config/knowledge.ts 里没有该 slug，
+   KnowledgeDoc 走 isDraft 分支打上这个徽标，样式与分类徽标同源，只是换成暖色描边以便一眼认出。 */
+.cu-kdoc__badge--draft {
+  background: transparent;
+  color: var(--cu-accent-deep);
+  box-shadow: inset 0 0 0 1px var(--cu-accent);
+  letter-spacing: 0.04em;
+}
+
+/* 草稿卡片：复用 .cu-kcard 的形状，只加状态与文件标记 */
+.cu-dcard {
+  align-content: start;
+}
+
+.cu-dcard__flag {
+  margin-left: auto;
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--cu-r-pill);
+  background: var(--cu-bg-soft);
+  color: var(--cu-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.cu-dcard__flag.is-ok {
+  color: var(--cu-accent-deep);
+}
+
+.cu-dcard__files {
+  display: flex;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  color: var(--cu-muted);
+}
+
+.cu-dcard__files span::before {
+  content: '○ ';
+}
+
+.cu-dcard__files .is-on::before {
+  content: '● ';
+  color: var(--cu-accent);
+}
+
+.cu-dcard__warn {
+  color: var(--cu-accent-deep);
+  font-weight: 700;
+}
+
+.cu-dcard__issues {
+  margin: 0.25rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.75rem;
+  color: var(--cu-accent-deep);
+}
+
+.cu-drafts__count {
+  font-variant-numeric: tabular-nums;
+}
+
+.cu-drafts__empty,
+.cu-drafts__how {
+  color: var(--cu-muted);
+}
+
+.cu-drafts__how code {
+  font-family: var(--cu-mono);
+  font-size: 0.85em;
+}
+
+/* 草稿列表页的一段引言：说清「这里是草稿、线上看不到」，比端口号之类有用 */
+.cu-drafts__lede {
+  max-width: 42rem;
+  color: var(--cu-muted);
+  font-size: 0.95rem;
+}

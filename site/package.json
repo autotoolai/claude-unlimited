@@ -6,13 +6,16 @@
     "dev": "cross-env VITEPRESS_DEV=1 tsx scripts/gen_logo.ts && node scripts/copy_public.mjs --watch",
     "dev:site": "vitepress dev --host 0.0.0.0 --port 41800 --strictPort",
     "gen:logo": "tsx scripts/gen_logo.ts",
-    "build": "npm run check:kefu && npm run check:plans && npm run gen:logo && vitepress build && npm run gen:sitemap && node scripts/copy_dir_overviews.mjs && npm run gen:llms && npm run gen:jsonld && node scripts/copy_public.mjs && node scripts/fix_css_links.mjs && python scripts/check_seo_meta.py && python scripts/check_geo_lint.py && node scripts/check_dist.mjs && node scripts/check_analytics.mjs && npm run check:links && npm run check:css",
+    "build": "npm run gen:media_keys:check && npm run check:kefu && npm run check:plans && npm run gen:logo && vitepress build && npm run gen:sitemap && node scripts/copy_dir_overviews.mjs && npm run gen:llms && npm run gen:jsonld && node scripts/copy_public.mjs && node scripts/fix_css_links.mjs && python scripts/check_seo_meta.py && python scripts/check_geo_lint.py && node scripts/check_dist.mjs && node scripts/check_analytics.mjs && npm run check:links && npm run check:css",
     "preview": "node scripts/serve_dist.mjs",
     "serve:dist": "node scripts/serve_dist.mjs",
     "gen:sitemap": "tsx scripts/gen_sitemap.ts",
     "gen:jsonld": "tsx scripts/gen_jsonld.ts",
     "check:links": "tsx scripts/check_links.ts",
     "check:dist": "node scripts/check_dist.mjs",
+    "check:draft": "node content/knowledge/scripts/check_draft.mjs",
+    "draft:preview": "node content/knowledge/scripts/preview.mjs",
+    "publish:article": "tsx content/knowledge/scripts/publish_knowledge_article.ts",
     "check:kefu": "tsx scripts/check_kefu.ts",
     "check:plans": "tsx scripts/check_plans.ts",
     "sync:plans": "tsx scripts/sync_shop_plans.ts",
@@ -34,7 +37,10 @@
     "check:css": "node scripts/check_css_dup_props.mjs",
     "gen:llms": "tsx scripts/gen_llms.ts",
     "check:geo": "python scripts/check_geo_lint.py",
-    "gen:poster": "bash scripts/gen_video_poster.sh"
+    "gen:poster": "bash scripts/gen_video_poster.sh",
+    "gen:media_keys": "tsx scripts/gen_media_keys.ts",
+    "upload:media": "python scripts/upload_media.py",
+    "gen:media_keys:check": "tsx scripts/gen_media_keys.ts --check"
   },
   "engines": {
     "node": ">=20 <25"

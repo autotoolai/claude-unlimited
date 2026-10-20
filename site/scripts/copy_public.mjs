@@ -74,11 +74,14 @@ function checkSsrMarkers() {
 }
 
 function copyAll() {
-  if (!existsSync(src)) return
   mkdirSync(dist, { recursive: true })
-  for (const name of readdirSync(src)) {
+  for (const name of existsSync(src) ? readdirSync(src) : []) {
     const s = join(src, name)
-    statSync(s).isDirectory() ? cpSync(s, join(dist, name), { recursive: true }) : cpSync(s, join(dist, name))
+    const d = join(dist, name)
+    // 只补拷、绝不先删：public/knowledge/ 与 VitePress 自己生成的 dist/knowledge/ 同名，
+    // 先删会把刚构建出来的 23 篇文章产物整个删掉。
+    if (statSync(s).isDirectory()) cpSync(s, d, { recursive: true })
+    else cpSync(s, d)
   }
   console.log(`[public] 已同步 -> ${dist}`)
 }

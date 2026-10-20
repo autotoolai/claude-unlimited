@@ -16,7 +16,7 @@
  * 只传 src 时不渲染切换控件，行为与从前完全一致。
  */
 import {computed, ref} from 'vue'
-import {posterUrl, videoUrl} from '../../config/media_cdn'
+import {posterUrl, videoUrl} from '../../../config/media_cdn'
 
 interface Version {
   /** 版本标签，如「第一轮」 */

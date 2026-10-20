@@ -8,7 +8,7 @@ Claude 无限卡官网（VitePress）。数据源在 `config/`，正文在 `docs
 
 | 任务 | 必读 |
 |---|---|
-| 写或改知识库文章 | `docs/knowledge/SOP-写一篇新文章.md`，按七步流程走 |
+| 写或改知识库文章 | `content/knowledge/guide.md`，按草稿到上线七步走；新文章先写 `content/knowledge/drafts/` |
 | 加页面、重排内容、决定某段放哪 | `docs/content_structure.md` |
 | 改教程页 | `docs/guide_design_spec.md` |
 | 改套餐价格 | `docs/plans_sync.md`（价格以发卡站商品详情为准，不手改） |
@@ -25,6 +25,7 @@ Claude 无限卡官网（VitePress）。数据源在 `config/`，正文在 `docs
 
 **改完必须跑**
 ```bash
+npm run check:draft -- --slug=<slug> # 写了草稿才跑：体检 frontmatter / 一句话答案 / H2 / faq / related
 npm run build                        # 含 check_dist.mjs 结构门禁，不过不继续
 npm run verify                       # SEO / 组件 / 链接验收
 npm run check:links                  # 死链
@@ -32,11 +33,17 @@ npm run check:toc -- --slug=<新slug>  # 写了知识库文章才跑，不要漏
 npm run check:css                   # 改了 .vitepress/theme/**/*.css 必跑，拦「padding 简写 + 单侧」导致的样式失效
 ```
 
+**知识库草稿（2026-10-14 起）**
+- 新文章的权威位置是 `content/knowledge/drafts/<slug>.md`，不在 `docs/` 也不在线上。确认后才用 `npm run publish:article -- --slug=<slug>` 移进 `docs/knowledge/`。
+- 预览：独立端口 `npm run draft:preview` → http://<本机 Tailscale IP>:41802/drafts/。它是第二个 vitepress dev server（root=content/knowledge/preview/），站点 dev（41800）完全看不到草稿。
+- 41800 预览（可选）：`npx tsx content/knowledge/scripts/open_draft.mjs --slug=<slug>` 把草稿复制到 `docs/knowledge/` 按原生页面渲染，`--close` 关掉。副本没有 config 条目，**预览期间 build 必然在 check_dist 失败，这是保护不是故障**。日常用 41802 即可，41800 这条只用于确认「复制后的文件在站点 dev 里也没问题」。
+- 不用 vitepress 的 `rewrites` 预览草稿：它只在 srcDir（docs/）内重排已存在的页面键，草稿在 srcDir 之外，匹配不到（已实测）。
+
 **代码**
 - 页面组件必须在 `.vitepress/theme/index.ts` 的 `themePages` 里注册，否则 `frontmatter.layout` 解析不到，产物静默 SSR 成空 div。
 - 埋点脚本放 `head`（`.vitepress/analytics_snippets.ts`）而不是组件里。新按钮只要带 `data-cta` 就自动进统计，不必改组件。
 - `id` 类配置必须内联兜底。SSR 子进程读不到 shell 导出的 `process.env`，只用环境变量会出现「meta 偶尔凭空消失」。
-- 知识库封面不要复用别的文章已用的图。先从 `temp/aiprimetech_covers/` 里还没被使用的素材按语义挑，登记进 `config/knowledge_cover_map.json`，删掉 `public/knowledge/<slug>.jpg` 后跑 `python scripts/fetch_knowledge_covers.py` 重取。详见 SOP 第 4 步「配封面」。
+- 知识库封面不要复用别的文章已用的图。先从 `temp/aiprimetech_covers/` 里还没被使用的素材按语义挑，登记进 `config/knowledge_cover_map.json`，删掉 `public/knowledge/<slug>.jpg` 后跑 `python scripts/fetch_knowledge_covers.py` 重取。详见 `content/knowledge/guide.md` 第 4 步「配封面」。
 
 ## 日常开发流程（Tailscale 远程看站必读）
 
@@ -54,6 +61,7 @@ npm run dev           # public/ 静态文件同步 + 4198 静态服务
 | 用途 | 地址 | 角标 |
 |---|---|---|
 | **日常开发，看的就是这个** | `http://<本机 Tailscale IP>:41800/`（或 `http://<本机 MagicDNS 主机名>:41800/`） | 左下角黑色 `DEV · 2026-10-13 16:20:01` |
+| 看草稿（工作台） | `http://<本机 Tailscale IP>:41802/drafts/` | 同上 |
 | 局域网同 Wi-Fi | `http://<本机局域网 IP>:41800/` | 同上 |
 | 部署前看构建产物 | `http://<本机 Tailscale IP>:41777/` | 左下角黑色 `BUILD 2026-10-13 15:02:44` |
 

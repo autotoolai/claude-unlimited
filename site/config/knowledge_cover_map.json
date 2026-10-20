@@ -22,7 +22,6 @@
     "claude-code-529-overloaded": "claude-pro-max-limits-25-percent-increase",
     "claude-code-401-403": "openrouter-vs-direct-api",
     "claude-code-connection-lost": "claude-code-router",
-    "claude-code-usage-limit-reached": "claude-code-sessions-self-hosted-environments",
-    "code-video-skills-guide": "show-hn-ideogram-4-0-open-weight-9-3b-text-to-image-model"
+    "claude-code-usage-limit-reached": "claude-code-sessions-self-hosted-environments"
   }
 }

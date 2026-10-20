@@ -6,7 +6,7 @@
  * 页内目录复用 SectionNav；目录项在客户端挂载后从正文的 h2[id] 读取（SSR 阶段不可用，见 config.mts 的 themePackages 注释），样式与其它页面一致。
  */
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
-import { Content, useRoute } from 'vitepress'
+import { Content, useData, useRoute } from 'vitepress'
 // 正文用 VitePress 官方的 <Content />（插槽）渲染 markdown：知识库文章写 layout: page，走 VPDoc 的 page 分支，
 // 只有 .vp-doc 没有原生 aside，右侧目录由下面的 SectionNav 提供。
 import { siteConfig, featuredProduct } from '../../../config/site'
@@ -21,12 +21,33 @@ import SectionNav from './SectionNav.vue'
 import JsonLd from './JsonLd.vue'
 import KnowledgeFooter from './KnowledgeFooter.vue'
 import { jsonLdKnowledge, knowledgeBySlug, knowledgeCategoryShort } from '../pages/data'
+import type { KnowledgeCat } from '../../../config/knowledge'
 import { useThemeToggle, useNavScrollState, useReveal } from '../composables/use_shell'
 
 const route = useRoute()
-const slug = computed(() => route.path.replace(/^\/knowledge\/?/, '').replace(/\/index\.html$/, '').replace(/\.html$/, '').replace(/\/$/, ''))
+const { frontmatter } = useData()
+/** 同时兼容 /knowledge/<slug>（线上与 41800）与 /drafts/<slug>（41802 草稿预览，路由前缀不同） */
+const slug = computed(() =>
+  // 开头的 _draft- 是 open_draft.mjs 的预览副本前缀，剥掉后再按 config 里的 slug 查（副本不是已发布文章）
+  route.path.replace(/^\/(knowledge|drafts)\/?/, '').replace(/^_draft-/, '').replace(/\/index\.html$/, '').replace(/\.html$/, '').replace(/\/$/, ''),
+)
 const article = computed(() => knowledgeBySlug(slug.value))
 const jsonLd = computed(() => (article.value ? jsonLdKnowledge(article.value, article.value.faq) : null))
+
+/**
+ * 草稿态：config/knowledge.ts 里没有该 slug（草稿还没发布）时，元信息从 frontmatter 兜底，
+ * 并打一个 DRAFT 徽标。这样 41802 预览页与线上文章页的外壳一致，差别只在这个徽标上，一眼能认出是草稿。
+ * 草稿没有 faq/related/JSON-LD/canonical —— 那些要等发布后 build 才生成，不该在预览里伪造。
+ */
+const isDraft = computed(() => !article.value)
+const draftMeta = computed(() => {
+  const fm = frontmatter.value as Record<string, unknown>
+  return {
+    title: typeof fm.title === 'string' ? fm.title : slug.value,
+    cat: typeof fm.category === 'string' ? fm.category : '',
+    kicker: typeof fm.kicker === 'string' ? fm.kicker : '',
+  }
+})
 
 const kefu = { entries: kefuItems, contact: siteConfig.contact, position: 'right' as const }
 const shopUrl = computed(() => featuredProduct().shopUrl)
@@ -163,10 +184,12 @@ watch(() => route.path, () => nextTick(() => { mountFaq(); nextTick(readHeadings
         <article class="cu-page cu-page--doc">
           <!-- JsonLd 只往注册表写数据（由 Layout.vue 在客户端挂载后插入 head），它保留 slot 所以放在元信息行之前不影响正文 -->
           <JsonLd v-if="jsonLd" id="cu-jsonld-knowledge" :json="jsonLd" />
-          <div class="cu-kdoc__meta" v-if="article">
+          <div class="cu-kdoc__meta" v-if="article || isDraft">
             <a class="cu-kdoc__crumb" href="/knowledge">知识库</a>
-            <span class="cu-kdoc__badge">{{ knowledgeCategoryShort(article.cat) }}</span>
-            <span>约 {{ article.minutes }} 分钟</span>
+            <span class="cu-kdoc__badge" v-if="article">{{ knowledgeCategoryShort(article.cat) }}</span>
+            <span class="cu-kdoc__badge cu-kdoc__badge--draft" v-else>DRAFT · 未发布</span>
+            <span v-if="article">约 {{ article.minutes }} 分钟</span>
+            <span v-else>{{ draftMeta.cat ? knowledgeCategoryShort(draftMeta.cat as KnowledgeCat) : (draftMeta.kicker || '未分类') }}</span>
             <!-- 时效信号（2026-10-13 新增）：只在真改过（updated != date）时显示。
                  列表页卡片继续不显示日期（视觉噪音），但文章页给一个「更新于」——
                  GEO 场景下 AI 判断内容是否过期看的就是页面上可见的更新信号，

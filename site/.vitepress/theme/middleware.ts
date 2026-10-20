@@ -24,6 +24,9 @@ const MIME: Record<string, string> = {
   '.json': 'application/json',
   '.webp': 'image/webp',
   '.ico': 'image/x-icon',
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
+  '.mov': 'video/quicktime',
 }
 
 /** 用 Vite 插件形式挂中间件：vitepress 会把 config.vite.plugins 合并进最终配置，比 vite.server 更可靠 */
@@ -38,8 +41,32 @@ export function publicDirPlugin(): Plugin {
         if (!rel || rel.includes('..')) return next()
         const file = path.join(PUBLIC_DIR, rel)
         if (!file.startsWith(PUBLIC_DIR) || !fs.existsSync(file) || !fs.statSync(file).isFile()) return next()
-        res.setHeader('Content-Type', MIME[path.extname(file).toLowerCase()] || 'application/octet-stream')
+        const type = MIME[path.extname(file).toLowerCase()] || 'application/octet-stream'
+        res.setHeader('Content-Type', type)
         res.setHeader('Cache-Control', 'no-cache')
+        // 视频要支持 Range：浏览器靠它做拖动进度条与断点续播，只回 200 全量的话
+        // seek 会失效（跳不动），Safari 干脆不播。所以 mp4/webm/mov 按 Range 头回 206。
+        const range = req.headers.range
+        const size = fs.statSync(file).size
+        if (type.startsWith('video/') && range) {
+          const m = /bytes=(\d*)-(\d*)/.exec(range)
+          const start = m && m[1] ? Number(m[1]) : 0
+          const end = m && m[2] ? Math.min(Number(m[2]), size - 1) : size - 1
+          if (start >= size || start > end) {
+            res.statusCode = 416
+            res.setHeader('Content-Range', `bytes */${size}`)
+            res.end()
+            return
+          }
+          res.statusCode = 206
+          res.setHeader('Content-Range', `bytes ${start}-${end}/${size}`)
+          res.setHeader('Accept-Ranges', 'bytes')
+          res.setHeader('Content-Length', String(end - start + 1))
+          fs.createReadStream(file, { start, end }).pipe(res)
+          return
+        }
+        res.setHeader('Accept-Ranges', type.startsWith('video/') ? 'bytes' : 'none')
+        res.setHeader('Content-Length', String(size))
         fs.createReadStream(file).pipe(res)
       })
     },

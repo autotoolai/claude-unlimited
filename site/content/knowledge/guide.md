@@ -75,9 +75,9 @@ python "$S/web_search.py" "主题 缺点 翻车 争议"
 
 **做对了的标志**：正文里每一个具体数字，都能在 `index` 里找到对应的一句话。
 
-## 第 3 步 起草正文
+## 第 3 步 起草正文到草稿区
 
-**结论**：结构固定，每节先给结论再展开。
+**结论**：结构固定，每节先给结论再展开；写进 `content/knowledge/drafts/<slug>.md`，不要直接写 `docs/knowledge/`。
 
 结构：
 
@@ -104,11 +104,14 @@ python "$S/web_search.py" "主题 缺点 翻车 争议"
 - 每 3–4 节插一个表格或「结论」块，避免连续长段。
 - 正文**不写** `## 常见问题` 和 `## 相关阅读` 两个小节。这两块由组件渲染：`KnowledgeDoc.vue` 在正文的「常见问题」h2 后插入折叠卡片（数据来自 `knowledge.ts` 的 `faq[]`），`KnowledgeFooter.vue` 在正文之后渲染「相关阅读」卡片区（数据来自 `related[]`）。正文里再写一遍会出现两个「相关阅读」区域。
 
+frontmatter 与已发布文章完全相同（`layout: page`、`knowledge: true`、`title` / `description` / `category` / `kicker` / `head`），复制一篇现成文章的就行。草稿区的作用只是让 vitepress 扫不到它，内容格式没有任何特殊之处。
+
 **做对了的标志**：一篇没有连续超过 3 段的长文字；每个 H2 都能单独拎出来当一节摘要。
 
-## 第 4 步 注册与生成
+## 第 4 步 注册元数据
 
-**结论**：正文写完才注册。注册了才有一切校验。
+**结论**：草稿期就把 `config/knowledge.ts` 与 `config/knowledge_sources.ts` 的条目写好。md 在 `content/knowledge/drafts/` 时，条目不会让它上线，所以可以提前把 FAQ 答案写扎实，不用留到发布那一刻手抖。
+
 
 在 `config/knowledge.ts` 的 `knowledge` 数组加一条 `KnowledgeMeta`：
 
@@ -119,21 +122,11 @@ python "$S/web_search.py" "主题 缺点 翻车 争议"
 | `desc` | ≤ 110 字 |
 | `summary` | ≤ 60 字 |
 | `tags` | ≥ 3 个，是真实搜索词 |
-| `related` | 3 篇已存在 slug |
+| `related` | 3 篇**已发布** slug（草稿指向未发布文章，发布后链接会 404，`check:draft` 会提醒） |
 | `faq` | 3–5 条，`q` 一句问题、`a` 一两句答案（答案原文写在这里，别压缩），这是 FAQ 内容的唯一来源 |
 | `cover` | 可选，源页面有配图才填 |
 
 在 `config/knowledge_sources.ts` 加一条 `SourceEntry`（`slug` / `fetchedAt` / `index` / `files`）。原创文章没有源站页面就写 `files: []`，脚本会打 WARN 并跳过 archive 生成，这是允许的。
-
-然后依次生成：
-
-```bash
-npm run gen:og:knowledge    # OG 图
-npm run gen:routes          # 路由重定向
-npm run gen:sources         # 仅当 files 非空
-```
-
-**做对了的标志**：`npm run check:seo` 通过。
 
 ### 配封面
 
@@ -142,7 +135,7 @@ npm run gen:sources         # 仅当 files 非空
 先看哪些还空着：
 
 ```bash
-# 在 site/ 下跑：先把站点已用的封面 md5 收成 /tmp/used.txt，再列出还没被用的素材名
+# 在 site/ 下跑：先把站点已用的封面 md5 收成 /tmp/used.txt，再列出还没被使用的素材名
 md5sum public/knowledge/*.jpg | awk '{print $1}' | cut -c1-8 | sort -u > /tmp/used.txt
 for f in temp/aiprimetech_covers/*.jpg; do d=$(md5sum $f | cut -c1-8); grep -q "^$d" /tmp/used.txt || basename $f .jpg; done
 ```
@@ -158,40 +151,62 @@ for f in temp/aiprimetech_covers/*.jpg; do d=$(md5sum $f | cut -c1-8); grep -q "
 
 素材库会枯竭。剩余素材里别家模型（GPT、Grok、The 等）的发布图与本站调性不符，优先挑 Claude Code / 成本 / 协议类主题。真挑不到合适的不填 `cover`，卡片会退化成纯文字卡，比配一张跑题的图好。
 
-## 第 5 步 校验
+**做对了的标志**：`npm run check:draft` 通过。草稿期不跑 `gen:og:knowledge` / `gen:routes` / `gen:sources`，它们是发布后的动作。
 
-**结论**：顺序固定，每步只看它该看的东西。
+## 第 5 步 预览与审核
+
+**结论**：在 41800 上按官网的样子看一遍，自己决定发不发。
 
 ```bash
-python scripts/check_seo_meta.py     # title ≤32 / desc ≤110 / tags ≥3
-npm run check:sources                 # 素材登记与 archive 一致；原创文章打 WARN 属正常
-npm run build                         # 产物
-npm run check:links                   # 站内死链
-node scripts/check_dist.mjs           # 结构、卡片、分类 tab
-npm run check:toc -- --slug=<新 slug> # 目录锚点、FAQPage 条数、点击定位
-python scripts/verify_build.py 4200   # 浏览器实测，本文项全 [ok]
+npm run check:draft -- --slug=<slug>   # 体检：frontmatter / 一句话答案 / H2 数 / 禁用小节 / faq / related
+npm run draft:preview                  # 独立端口 41802，列表页 /drafts/，改完自动热更新
+```
+
+命令的完整说明与四态表见 [`README.md`](./README.md)。
+
+然后浏览器打开 `http://<本机 Tailscale IP>:41802/drafts/`，点进去看每一篇。预览端口 41802 是独立的 dev server，草稿页与已发布文章走同一个 `KnowledgeDoc.vue`：左侧目录、封面、主题切换、页尾一致，差异只有「`DRAFT · 未发布`」徽标与没有 FAQ 折叠卡（faq 在发布前就该从 `.review.md` 里定稿）。草稿没有 `canonical` / `og` / JSON-LD（那些只在 build 后生成），不必在意。列表页还会显示每篇的体检摘要与素材卡 / 预览记录是否齐备。
+
+审核清单：
+
+- [ ] 每条具体数字都能指回 `index` 里的素材卡
+- [ ] 正文没有第三方平台名、媒体名、博主名
+- [ ] 正文里没有 `## 常见问题`、`## 相关阅读` 小节
+- [ ] `faq` 3–5 条，答案写的是原文而不是压缩版
+- [ ] `related` 里的 3 篇都已发布
+- [ ] 封面图没有和其他文章重复，且语义对得上本文主题
+- [ ] 标题在 SERP 里不被截断（≤ 32 字）、描述 ≤ 110 字
+- [ ] 窄屏（480px）下目录与折叠卡不横向溢出
+
+确认不发：草稿留在 `content/knowledge/drafts/` 不动，`.review.md` 写明「建议不发布」与理由。
+确认发：进入第 6 步。
+
+
+## 第 6 步 发布与校验
+
+**结论**：发布只是把草稿移进 `docs/knowledge/`，剩下的全是既有脚本。
+
+```bash
+npm run publish:article -- --slug=<slug>
+```
+
+脚本会：删掉预览副本 → 跑 `check:draft` → 校验 `config/knowledge.ts` 条目（faq 3–5 条、related 3 篇都已发布）→ 把 md 从 `content/knowledge/drafts/` 移进 `docs/knowledge/` → 打印后续命令。按提示依次跑：
+
+```bash
+npm run gen:routes            # public/_redirects 尾斜杠 301
+npm run gen:llms              # public/llms.txt 与 llms-full.txt
+npm run gen:og:knowledge      # OG 图
+npm run gen:sources           # 仅当 files 非空
+npm run build                 # 含 check_dist / check:links / check:css
+npm run check:toc -- --slug=<slug>   # 目录锚点、FAQPage 条数、点击定位
+npm run verify                # 全站 48+ 项验收
 ```
 
 两个已知陷阱：
 
-- `npm run build` 现在应当通过（exit 0）。它曾在任何代码状态下都 exit 1，因为 `check_dist.mjs` 断言「产物里不能有 Vue SSR 标记」，
-  与 `copy_public.mjs`「必须保留 SSR 标记否则 hydration 错位」直接矛盾；该断言已移除。若 build 又恒定失败，先读 [`../troubleshooting_guide.md`](../troubleshooting_guide.md) 再判断是不是回归。
-- `npm run check:toc` 默认只抽每类一篇。传 `--slug=<新 slug>` 会把 start 分类的样本换成新文章（该 slug 应属于 start 分类），其余分类不变。传完记得看输出首行的确认。
+- `npm run check:toc` 默认只抽每类一篇。传 `--slug=` 会把 start 分类的样本换成新文章（该 slug 应属于 start 分类），其余分类不变。传完看输出首行的确认。
+- build 里若报「docs/knowledge/<slug>.md 没有 config/knowledge.ts 条目」，是 `open_draft.mjs` 的预览副本没关：`npx tsx content/knowledge/scripts/open_draft.mjs --slug=<slug> --close`。发布脚本会自动关，所以正常发布不会遇到。
 
-**做对了的标志**：上面七条命令全部执行完，新 slug 没有出现在任何失败项里。
-
-## 第 6 步 发布前自查
-
-- [ ] 每条具体数字都能指回 `index` 里的素材卡
-- [ ] 正文没有第三方平台名、媒体名、博主名
-- [ ] 正文里没有 `## 常见问题`、`## 相关阅读` 小节（`grep -n '^## 常见问题\|^## 相关阅读' docs/knowledge/<slug>.md` 无输出）
-- [ ] `faq` 3–5 条，答案写的是原文而不是压缩版
-- [ ] `related` 里的 3 篇都已存在
-- [ ] 封面图没有和其他文章重复，且语义对得上本文主题（没复用已用素材）
-- [ ] `git diff scripts/` 为空，除非本次有意改了脚本
-- [ ] 新建 md 后立即确认它能被读到（`ls` 与 `python -c "import os; os.path.exists(...)"`），不要只在写文件的那一步自认成功
-- [ ] `check:toc -- --slug=` 跑过
-- [ ] `verify_build.py` 本文项全绿
+**做对了的标志**：上面七条命令全部执行完，新 slug 没有出现在任何失败项里；`grep <slug> .vitepress/dist/sitemap.xml` 能命中，`grep <slug> public/llms.txt` 能命中。
 
 ## 相关阅读
 

@@ -1,7 +1,7 @@
 # 知识库写作规范（docs/knowledge/*.md）
 
-「Claude 知识库」的正文写在 `docs/knowledge/<slug>.md`（原生 markdown），元数据在 `config/knowledge.ts`，源站原文登记在 `config/knowledge_sources.ts`。
-本文件是新增文章的执行规范，改文章只改这几处 + 跑生成脚本。
+「Claude 知识库」的正文写在 `docs/knowledge/<slug>.md`（原生 markdown，未确认的草稿先放 `content/knowledge/drafts/<slug>.md`），元数据在 `config/knowledge.ts`，源站原文登记在 `config/knowledge_sources.ts`。
+本文件只管写作规范（分类、模板、措辞、素材边界），**流程见 [`content/knowledge/guide.md`](../../content/knowledge/guide.md)**。
 
 ## 四个分类（按用户旅程）
 
@@ -16,14 +16,13 @@
 
 边界：**配置完成之前**看[使用教程](/guide)（装工具、Base URL、Key、模型）；**知识库只服务配置完成以后**的人。知识库里提到配置一律链到 /guide，不写自己的接入步骤。一篇一个主分类，tags 做横切。
 
-## 加一篇文章的流程
+## 加一篇文章：只管内容
 
-1. 写 `docs/knowledge/<slug>.md`（frontmatter + 正文，模板见下）。
-2. 在 `config/knowledge.ts` 的 `knowledge` 数组里加一条元数据（slug 与文件名一致），含 `faq[]`（与 md 的 H3 逐字一致）与 `related[]`（必须与 md「## 相关阅读」里 `/knowledge/<slug>` 链接一一对应，`npm run build` 里的 `check_dist.mjs` 会校验）；数组内书写顺序 = 站内排序（所有文章 date 相同，排序是稳定的）。
-3. 在 `config/knowledge_sources.ts` 加一条 `slug` 相同的条目：抓取日期、源页面列表（`path` / `url` / `title` / `section` / `lang`）与中文摘要原文。
-4. `python scripts/gen_sources.py`：把源站原文逐字复制到 `archive/knowledge_source_20261009/<slug>/`。
-5. `npm run gen:og:knowledge` 生成分享卡片，`npm run gen:routes` 同步 `_redirects` 与 `llms.txt`。
-6. `npm run build && npm run verify && npm run check:links && npm run check:sources && npm run check:seo && npm run check:toc`（`check:toc` 用浏览器核对客户端才有的页内目录、FAQPage 注入与 480px 单列布局）。`check:seo` 校验 title ≤ 32 字、description ≤ 110 字、title 禁用词、md 与 `knowledge.ts` 的 title/H1 三处一致、tags ≥ 3。
+流程在 [`content/knowledge/guide.md`](../../content/knowledge/guide.md)（草稿 → 预览 → 发布七步）。这里只重复三条容易忘的：
+
+1. `faq[]` 是 FAQ 内容的**唯一来源**，正文不写 `## 常见问题`；`related[]` 是页尾「相关阅读」的唯一来源，正文不写 `## 相关阅读`。
+2. 数组内书写顺序 = 站内排序，不要按字母排。
+3. 第三方平台名只允许出现在 `config/knowledge_sources.ts` 与 `archive/`，本文件、`knowledge.ts` 与产物里不得出现。
 
 `scripts/check_dist.mjs` 与 `scripts/verify_build.py` 的 PAGES 从 `config/knowledge.ts` 动态读取，不用手动加路由。
 

@@ -21,9 +21,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import io
+import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -48,14 +51,37 @@ def expected_key(p: Path) -> str:
     return f'videos/{p.stem}.{sha8(p)}.mp4'
 
 
+def remote_matches(bucket: str, key: str, size: int) -> bool:
+    """拉远端对象下来比大小。返回码不可信，只能靠内容确认。"""
+    tmp = Path(tempfile.gettempdir()) / ('_r2chk_' + Path(key).name)
+    cmd = wrangler_cmd() + ['r2', 'object', 'get', f'{bucket}/{key}', '--file', str(tmp), '--remote']
+    r = subprocess.run(cmd, capture_output=True, text=True, shell=(os.name == 'nt'))
+    okk = r.returncode == 0 and tmp.exists() and tmp.stat().st_size == size
+    if tmp.exists():
+        tmp.unlink()
+    return okk
+
+
+def wrangler_cmd() -> list[str]:
+    """wrangler 不在 PATH 时走 npx。Windows 上 npx 是 .cmd，subprocess 找不到要显式 shell。"""
+    if shutil.which('wrangler'):
+        return ['wrangler']
+    return ['npx', '--yes', 'wrangler@4']
+
+
 def put(local: Path, key: str, content_type: str, cache: str) -> None:
-    r = subprocess.run(
-        ['npx', '--yes', 'wrangler@4', 'r2', 'object', 'put', f'{BUCKET}/{key}',
-         '--file', str(local), '--content-type', content_type, '--cache-control', cache],
-        capture_output=True, text=True)
-    if r.returncode != 0:
-        sys.stderr.write(r.stdout + r.stderr)
-        raise SystemExit(f'[media] 上传失败: {key}')
+    # --remote 不能少：wrangler r2 object put 默认写本地模拟目录，会打印
+    # 「Upload complete」而远端一个对象都没有。这个坑真实踩过一次（10 个对象全部静默丢失）。
+    cmd = wrangler_cmd() + ['r2', 'object', 'put', f'{BUCKET}/{key}',
+                            '--file', str(local), '--remote',
+                            '--content-type', content_type, '--cache-control', cache]
+    # Windows: npx -> npx.cmd，subprocess 找不到可执行文件时必须 shell=True
+    r = subprocess.run(cmd, capture_output=True, text=True, shell=(os.name == 'nt'))
+    # 实测：shell=True 时 npx 的退出码会丢（恒为 0），静默「上传成功」而远端没有对象。
+    # 所以不信任返回码，改成拿远端对象的大小来判定成败。
+    if not remote_matches(BUCKET, key, local.stat().st_size):
+        sys.stderr.write((r.stdout or '') + (r.stderr or ''))
+        raise SystemExit(f'[media] 上传后远端校验不通过: {key}')
 
 
 def main() -> None:

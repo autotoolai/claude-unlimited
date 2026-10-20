@@ -28,14 +28,12 @@
 - 管理后台：https://rsxermu666.cn/，独立站点；主域名不可达时切换备用域名，API Key 无需更换
 - 不包含：生产环境流量（套餐面向个人开发。上线服务、多用户共享、对外 API 属于生产流量，不在范围内）；超并发压测（超过公平使用速率限制（同时 1 个会话、单会话 20 路并发、60 次/分钟）的压测、扫描、批量抓取）；二次转卖（转卖、二次分发 Key，或将 Key 共享给多个用户）；Anthropic 官方服务（本卡不提供 claude.ai 网页版、Claude Desktop 等官方产品的订阅权益）
 - 下单须知：本站只出售模型额度，不提供软件配置服务。 不会配置、纯小白需要有人代操作的，不建议下单。 因个人操作问题（配置、模型选择、客户端使用）产生的困扰，不在退款范围内。 商品为虚拟商品，一旦售出不支持无理由退货。
-- 视频教程：5 支演示视频见 https://claude-unlimited.aiautotools.com/knowledge/code-video-skills-guide
 
 ## 知识库文章
 
 - [Claude Code 教程：第一次会话之后怎么用](https://claude-unlimited.aiautotools.com/knowledge/claude-code-tutorial): 配置完成后怎么把 Claude Code 用顺手：CLAUDE.md、工作流、常用命令。
 - [Claude Code MCP 怎么配：命令、scope 与避坑](https://claude-unlimited.aiautotools.com/knowledge/claude-code-mcp-config): claude mcp add 命令、三种 scope、Windows 坑、归档包避坑、连不上排查。
 - [Opus 5.5 做视频教程：Remotion 出第一条 MP4](https://claude-unlimited.aiautotools.com/knowledge/claude-code-make-video): 刷屏的「一句话出视频」背后是 Remotion：八步跑通第一条 MP4。
-- [代码做视频：四个技能实测与分场景选型](https://claude-unlimited.aiautotools.com/knowledge/code-video-skills-guide): 四个代码渲染技能实测，按场景选型，附素材清单与踩坑。
 - [Claude Code 计划模式怎么用：四种权限模式的区别](https://claude-unlimited.aiautotools.com/knowledge/claude-code-plan-mode): plan / manual / acceptEdits / auto 的差别，何时先要计划再动手。
 - [Claude Code 权限模式有哪些](https://claude-unlimited.aiautotools.com/knowledge/claude-code-permission-modes): 六种权限模式的差别与无人值守任务的配置边界。
 - [CLAUDE.md 怎么写：写什么、放哪](https://claude-unlimited.aiautotools.com/knowledge/claude-md-guide): CLAUDE.md 写什么放哪，AGENTS.md 何时被读，.claude 目录各文件用途。

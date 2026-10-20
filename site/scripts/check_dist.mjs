@@ -275,6 +275,21 @@ const kcardsWithHref = knowledgeIndexHtml.match(/<a [^>]*class="[^"]*\bcu-ktile\
 ok(kcards.length === knowledgeMod.knowledge.length, `/knowledge: 文章卡 ${kcards.length} 张，应为 ${knowledgeMod.knowledge.length}（每篇一张）`)
 ok(kcardsWithHref.length === kcards.length, '/knowledge: 有文章卡缺 href（列表页点不开）')
 
+/* ---------- 知识库：docs/knowledge/ 下每个 md 都必须已登记（草稿预览副本的兜底门禁） ---------- */
+// 为什么在这里断言：open_draft.mjs 预览草稿时会把它复制进 docs/knowledge/<slug>.md，dev 能按原生页面渲染它，
+// 但草稿没有 config 条目，产物里就是一个没有列表卡、没有 JSON-LD、没有 llms 条目的孤儿页面。
+// 这个断言保证「预览副本没关就 build」一定失败，而不是被部署脚本直接推上线。
+const knowledgeMdFiles = fs.existsSync(path.join(process.cwd(), 'docs', 'knowledge'))
+  ? fs.readdirSync(path.join(process.cwd(), 'docs', 'knowledge')).filter((f) => f.endsWith('.md'))
+  : []
+// 列表页 index.md 与内部 SOP（若存在）本来就没有 config 条目，它们不是文章，不参与本断言
+const isNonArticle = (f) => f === 'index.md' || f.startsWith('SOP-')
+for (const f of knowledgeMdFiles) {
+  if (isNonArticle(f)) continue
+  const slug = f.replace(/\.md$/, '')
+  ok(KNOWLEDGE_SLUGS.has(slug), `docs/knowledge/${f} 没有 config/knowledge.ts 条目——若是草稿预览副本，跑 node content/knowledge/scripts/open_draft.mjs --slug=${slug} --close`)
+}
+
 /* ---------- 知识库：FAQPage JSON-LD（客户端注入的注册表，数据来自 config/knowledge.ts 的 faq[]） ---------- */
 const chunksDir = path.join(DIST, 'assets', 'chunks')
 const bundleJs = fs.existsSync(chunksDir)

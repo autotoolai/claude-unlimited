@@ -23,3 +23,9 @@ scripts/analytics/dashboard.html
 .vitepress/.vitepress/
 
 __pycache__/
+
+# ===== 草稿工作台（content/knowledge/）：生成物与预览副本不入库 =====
+# preview/ 是 preview.mjs 生成的 vitepress root（含 theme junction），一律不入库
+content/knowledge/preview/
+# open_draft 的预览副本在 docs/knowledge/ 下（41800 原生渲染），按 _draft-<slug> 命名并忽略
+docs/knowledge/_draft-*.md

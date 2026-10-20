@@ -25,7 +25,8 @@ config/models.ts   模型层级与 model ID 表（/models、教程页、FAQ 共�
 config/guide.ts    使用教程四页的内容数据（唯一编辑入口；改教程只改这里）
 config/logo.ts     品牌标记「无限」符号的唯一数据源（几何 + 品牌橙 #C85A1E / 米白 #FFF6EC），派生 favicon.svg、BrandLogo.vue、OG 分享图；改 logo 只改这里再 `npm run gen:logo`
 docs/              内容根（srcDir=docs）：首页 / pricing / faq / guide（1 页）/ console / models / knowledge + guide/assets 截图
-scripts/           构建脚本（sitemap、死链检查、部署、analytics/ 看板抓取与渲染、check_analytics.mjs 埋点门禁）
+content/knowledge/  草稿工作台：drafts/ 正文与素材卡、scripts/（preview 预览端口 / check_draft 体检 / publish_article 发布）、guide.md 流程、log.md 改进日志
+scripts/           构建脚本（sitemap、死链检查、部署、analytics/ 看板抓取与渲染、check_analytics.mjs 埋点门禁）；草稿相关脚本在 content/knowledge/scripts/
 .vitepress/analytics_snippets.ts  统计埋点的 head 片段（Umami / 百度统计，两项留空则不注入）
 .vitepress/theme/  外壳与组件：Layout.vue、index.ts（页面注册 + 样式入口）、components/、styles/（CSS 区块）、assets/guide/（教程截图）
 public/            robots.txt、_headers、_redirects、llms.txt、favicon、og 图目录
@@ -63,8 +64,9 @@ npm ci
 # 本地固定端口（都开了 strictPort，占用就直接报错，不会自动漂移）：
 #   41800  dev 站点页面（热更新）        npm run dev:site
 #   41777  构建产物预览（静态）          npm run build && npm run serve:dist
+#   41802  草稿工作台（只读草稿与文章）    npm run draft:preview
 #   4198   public/ 静态文件（仅 dev）    npm run dev
-# dev 与 preview 必须分端口：曾共用 41777，导致浏览器标签还挂在旧进程上时「改了看不到最新」。
+# dev 与 preview 必须分端口：曾共用 41777，导致浏览器标签还挂在旧进程上时「改了看不到最新」。41802 是草稿预览的独立 dev server。
 # 改端口要同步三处：package.json 的 dev:site、config.mts 的 server.port、serve_dist.mjs 的 PORT。
 # 41800/41777 都是本项目专用段，不会和其他项目的 Vite 默认端口（5173 等）或历史端口撞上。
 # 预览走 scripts/serve_dist.mjs 而不是 vitepress preview：本项目的 404 路由壳由 docs/404.md

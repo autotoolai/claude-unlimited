@@ -7,7 +7,7 @@
 | 我要改 | 读哪份 |
 |---|---|
 | 新增或重排页面、决定某段内容放哪个页面 | [`content_structure.md`](content_structure.md) |
-| 写一篇知识库文章 | [`knowledge/SOP-写一篇新文章.md`](knowledge/SOP-写一篇新文章.md)，七步流程 |
+| 写一篇知识库文章 | [`../content/knowledge/guide.md`](../content/knowledge/guide.md) 七步流程；正文先写 `content/knowledge/drafts/`，预览端口 41802 |
 | 知识库写作风格与收录 | [`knowledge_writing_guide.md`](knowledge_writing_guide.md) |
 | 改教程页 | [`guide_design_spec.md`](guide_design_spec.md) |
 | 套餐价格 | [`plans_sync.md`](plans_sync.md)，价格由发卡站商品详情决定，不要手改 |

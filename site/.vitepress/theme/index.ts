@@ -78,6 +78,7 @@ import VideoPlayer from './components/VideoPlayer.vue'
 import PageConsole from './console.vue'
 import PageTrust from './trust.vue'
 import NotFoundPage from './components/NotFoundPage.vue'
+import DraftIndex from './components/DraftIndex.vue'
 
 /* ---------- 主题 ---------- */
 
@@ -115,6 +116,7 @@ const theme: Theme = {
     app.component('KnowledgeCard', KnowledgeCard)
     app.component('KnowledgeFooter', KnowledgeFooter)
     app.component('NotFoundPage', NotFoundPage)
+    app.component('DraftIndex', DraftIndex)
     app.component('CopyChip', CopyChip)
     app.component('ConsoleEntry', ConsoleEntry)
     app.component('ModelCard', ModelCard)

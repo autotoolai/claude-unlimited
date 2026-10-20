@@ -18,27 +18,46 @@ const cfg = path.join(root, 'config', 'media_cdn.ts')
 
 const h8 = (p: string) => createHash('sha256').update(readFileSync(p)).digest('hex').slice(0, 8)
 
-const entries = readdirSync(vdir)
+/** 磁盘上的视频 -> VIDEO_KEYS 里应有的 'src': 'key' 条目 */
+const wanted = readdirSync(vdir)
   .filter((f) => f.endsWith('.mp4'))
   .sort()
-  .map((f) => `  'videos/${f}': 'videos/${path.basename(f, '.mp4')}.${h8(path.join(vdir, f))}.mp4',`)
+  .map((f) => `'videos/${f}': 'videos/${path.basename(f, '.mp4')}.${h8(path.join(vdir, f))}.mp4',`)
 
-const src = readFileSync(cfg, 'utf8')
-const block = `export const VIDEO_KEYS: Record<string, string> = {\n${entries.join('\n')}\n}`
-const next = src.replace(/export const VIDEO_KEYS: Record<string, string> = \{[\s\S]*?\n\}/, block)
-if (next === src && process.argv.includes('--check')) {
-  // 内容一致也算通过；只有与磁盘不一致才走到这里
-  console.log('[media-keys] 一致')
+const block = `export const VIDEO_KEYS: Record<string, string> = {\n${wanted.join('\n')}\n}`
+const next = readFileSync(cfg, 'utf8').replace(
+  /export const VIDEO_KEYS: Record<string, string> = \{[\s\S]*?\n\}/,
+  block,
+)
+
+/** 从文件里逐行解析出实际的 'src': 'key'，不靠正则回溯 */
+function parseKeys(src: string): string[] {
+  const start = src.indexOf('export const VIDEO_KEYS')
+  if (start < 0) return []
+  const end = src.indexOf('\n}', start)
+  return src
+    .slice(start, end < 0 ? undefined : end)
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l.startsWith("'"))
 }
-if (!process.argv.includes('--check')) {
-  if (!existsSync(cfg)) throw new Error(`找不到 ${cfg}`)
-  writeFileSync(cfg, next, 'utf8')
-  console.log(`[media-keys] 已回写 ${entries.length} 条`)
-} else {
-  const want = new RegExp(block.replace(/[.*+?^${}()|[\]\]/g, '\$&'))
-  if (!want.test(next)) {
+
+const check = process.argv.includes('--check')
+if (!existsSync(cfg)) throw new Error(`找不到 ${cfg}`)
+
+if (check) {
+  const actual = parseKeys(next)
+  const ok = actual.length === wanted.length && actual.every((l, i) => l === wanted[i])
+  if (!ok) {
     console.error('[media-keys] 与 public/videos 不一致，先跑 npx tsx scripts/gen_media_keys.ts')
+    const a = new Set(actual)
+    const w = new Set(wanted)
+    for (const l of a) if (!w.has(l)) console.error('  多余: ' + l)
+    for (const l of w) if (!a.has(l)) console.error('  缺失: ' + l)
     process.exit(1)
   }
-  console.log('[media-keys] 一致')
+  console.log(`[media-keys] 一致（${wanted.length} 条）`)
+} else {
+  writeFileSync(cfg, next, 'utf8')
+  console.log(`[media-keys] 已回写 ${wanted.length} 条`)
 }
