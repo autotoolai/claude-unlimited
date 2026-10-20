@@ -32,7 +32,12 @@ const { chromium } = loadPlaywright()
 
 // 每篇注册了 faq 的文章，页面上会有组件渲染的「常见问题」折叠卡片（知识库 Article 壳）
 const ARTICLES_FAQ = (() => {
-  const src = fs.readFileSync(path.join(process.cwd(), 'config', 'knowledge.ts'), 'utf8')
+  const full = fs.readFileSync(path.join(process.cwd(), 'config', 'knowledge.ts'), 'utf8')
+  // 只取 knowledge[] 数组本体：后面的 retiredKnowledgePages 块也有 slug 字段，
+  // 跨块正则会让退役页蹭到别人的 faq（退役页没有 faq，它是下线不是待检文章）
+  const start = full.indexOf('export const knowledge: KnowledgeMeta[] = [')
+  const end = full.indexOf('\n]', start)
+  const src = full.slice(start, end)
   const map = {}
   for (const m of src.matchAll(/slug: '([^']+)'[\s\S]*?faq: \[\s*\{/g)) map[m[1]] = true
   return map

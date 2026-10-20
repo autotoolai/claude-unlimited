@@ -34,6 +34,11 @@ def parse_ts_meta() -> dict:
     """
     src = KNOWLEDGE_TS.read_text(encoding='utf-8')
     meta = {}
+    # 只切 knowledge[] 数组本体：后面还有 retiredKnowledgePages 块，它也有 slug 字段，
+    # 按全文切块会把退役页当成现役文章（它没有 md 与 title/desc）。
+    start = src.index('export const knowledge: KnowledgeMeta[] = [')
+    end = src.index('\n]', start)
+    src = src[start:end]
     # 从每个 slug 行开始，到下一个 slug 行之前，是一条完整条目
     chunks = re.split(r'\n(?=\s*slug: )', src)
     for chunk in chunks:

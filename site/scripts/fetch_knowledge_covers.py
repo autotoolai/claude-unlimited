@@ -95,7 +95,10 @@ def fetch_auto(url):
 def covers_in_ts():
     """slug -> cover 值；必须逐条目找，跨条目匹配会把 cover 贴到上一个 slug 上。"""
     text = open(KNOWLEDGE_TS, encoding='utf8').read()
-    body = text[text.index('export const knowledge: KnowledgeMeta[] = ['):]
+    # 只取 knowledge[] 数组本体，不截到文件尾（后面的 retiredKnowledgePages 块也有 slug 字段）
+    start = text.index('export const knowledge: KnowledgeMeta[] = [')
+    end = text.index('\n]', start)
+    body = text[start:end]
     out = {}
     for m in ENTRY_RE.finditer(body):
         cm = re.search(r"cover: '([^']+)'", m.group(0))

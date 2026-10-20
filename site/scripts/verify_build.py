@@ -30,7 +30,11 @@ def knowledge_entries():
     条目以「两空格缩进的 { 独占一行」开头，slug 是条目的第一个字段。
     """
     t = open(KNOWLEDGE_TS, encoding='utf-8').read()
-    body = t[t.index('export const knowledge: KnowledgeMeta[] = ['):]
+    # 只取 knowledge[] 数组本体，不截到文件尾：后面还有 retiredKnowledgePages 块，
+    # 它也有 slug 字段，截到文件尾会把退役页当成现役文章。
+    start = t.index('export const knowledge: KnowledgeMeta[] = [')
+    end = t.index('\n]', start)
+    body = t[start:end]
     out = []
     for e in re.split(r'(?m)^  ' + B + '{' + B + 's*$', body)[1:]:
         sm = re.search(B + "s*slug: '([^']+)'", e)
@@ -45,6 +49,15 @@ def knowledge_entries():
 
 def knowledge_slugs():
     return [e['slug'] for e in knowledge_entries()]
+
+
+def retired_knowledge_pages():
+    """从 config/knowledge.ts 的 retiredKnowledgePages 读出退役页：slug 与现在的落点 to。"""
+    t = open(KNOWLEDGE_TS, encoding='utf-8').read()
+    m = re.search(r"export const retiredKnowledgePages[^=]*=\s*\[(.*?)\n\]", t, re.S)
+    if not m:
+        return []
+    return [{'slug': a, 'to': b} for a, b in re.findall(r"slug: '([^']+)',\s*\n\s*to: '([^']+)'", m.group(1))]
 
 
 def knowledge_categories():
@@ -367,7 +380,22 @@ def main():
     redir_path = os.path.join(root, '_redirects')
     redir = open(redir_path, encoding='utf-8').read() if os.path.isfile(redir_path) else ''
     n_knowledge_rules = len(re.findall(r'(?m)^/knowledge/', redir))
-    check('_redirects 无重复知识库规则', n_knowledge_rules == len(knowledge_slugs()) + 1, f'{n_knowledge_rules} 条 vs {len(knowledge_slugs()) + 1} 条')
+    n_retired = len(retired_knowledge_pages())
+    check(
+        '_redirects 无重复知识库规则',
+        n_knowledge_rules == len(knowledge_slugs()) + 1 + n_retired,
+        f'{n_knowledge_rules} 条 vs {len(knowledge_slugs()) + 1} 条尾斜杠 + {n_retired} 条退役页',
+    )
+    # 退役页：301 必须在，目标页必须在，别忘了它已经不在 knowledge[] 里（否则是现役页被误标退役）
+    for r in retired_knowledge_pages():
+        check(
+            f'_redirects 退役页 {r["slug"]} -> {r["to"]} 的 301',
+            re.search(r'(?m)^/knowledge/' + re.escape(r['slug']) + r' ' + re.escape(r['to']) + r' 301$', redir) is not None,
+            '缺这条 301 的话，已收录的旧地址会直接 404（跑 node scripts/gen_knowledge_routes.mjs）',
+        )
+        if r['to'] != '/knowledge':
+            check(f'退役页 {r["slug"]} 的目标页 {r["to"]} 在现役文章里', r['to'].replace('/knowledge/', '') in knowledge_slugs(), '目标页不存在，重定向过去仍是 404')
+        check(f'{r["slug"]} 已不在现役文章里', r['slug'] not in knowledge_slugs(), '退役页不该同时在 knowledge[] 里')
     for e in knowledge_entries():
         slug = e['slug']
         qs = e['faq']

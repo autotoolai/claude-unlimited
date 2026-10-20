@@ -43,6 +43,11 @@ def parse_articles() -> list[dict]:
     """从 config/knowledge.ts 按 slug 切块，取出 faq 列表与 slug。"""
     src = KNOWLEDGE_TS.read_text(encoding='utf-8')
     out = []
+    # 只切 knowledge[] 数组本体：后面的 retiredKnowledgePages 块也有 slug 字段，
+    # 按全文切块会把退役页当成现役文章（它没有 md，也不该参与 GEO 门禁）
+    start = src.index('export const knowledge: KnowledgeMeta[] = [')
+    end = src.index('\n]', start)
+    src = src[start:end]
     chunks = re.split(r'\n(?=\s*slug: )', src)
     for chunk in chunks:
         m = re.search(r"slug: '([^']+)'", chunk)

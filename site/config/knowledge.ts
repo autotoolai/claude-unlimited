@@ -548,6 +548,42 @@ export function knowledgeSummary(k: KnowledgeMeta): string {
 export const knowledgeEntries: KnowledgeMeta[] = [...knowledge]
 
 
+/* ---------------- 退役页：下架文章的重定向表 ----------------
+ *
+ * 为什么需要这张表：退役页从 knowledge[] 移除后，sitemap、llms.txt、知识库列表页三处引用都会随之消失
+ * （这是对的，它确实不该再被推荐），但**外链与已收录的搜索结果不会跟着消失**——直接 404 会把
+ * 已经积累的收录与外链权重丢掉。2026-10-14 下架的 code-video-skills-guide 就是这种情况：
+ * 线上仍是 200、在 sitemap 的 33 条里、还被列表页链着 3 处。
+ *
+ * 这里只声明「旧地址 -> 现在的正式落点」，由 scripts/gen_knowledge_routes.mjs 写进 public/_redirects；
+ * check_dist.mjs 与 verify_build.py 各有一道门禁守着（规则在、目标页在）。
+ *
+ * 规则：
+ *   slug   退役的旧地址（/knowledge/<slug>），必须已经不在 knowledge[] 里
+ *   to     现在的正式落点。用 '/knowledge/<slug>' 指向一篇现役文章（读者还能拿到可用的答案），
+ *          用 '/knowledge' 指向列表页（没有合适的替代文章时）
+ *   reason 为什么退役，写在这里以便日后判断「能不能撤掉这条 301」
+ */
+export interface RetiredKnowledgePage {
+  slug: string
+  to: string
+  reason: string
+}
+
+export const retiredKnowledgePages: RetiredKnowledgePage[] = [
+  {
+    slug: 'code-video-skills-guide',
+    to: '/knowledge/claude-code-make-video',
+    reason:
+      '2026-10-14 下架：原文按功能给四个开源视频技能排名做选型表，读者照表选完仍踩坑，且正文嵌了四支本机渲染的样片（两支首轮即坏），「实测」成色不足。同类需求由 claude-code-make-video（Remotion 出第一条 MP4）承接。',
+  },
+]
+
+/** 退役页的 slug 集合 */
+export function retiredKnowledgeSlugs(): string[] {
+  return retiredKnowledgePages.map((r) => r.slug)
+}
+
 /** 分类内的文章按站内顺序 */
 export function knowledgeCategoryEntries(cat: KnowledgeCat): KnowledgeMeta[] {
   return knowledgeEntries.filter((k) => k.cat === cat)

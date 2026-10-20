@@ -21,7 +21,11 @@ SLUG_RE = re.compile(B + "s*slug: '([^']+)'")
 
 def load_articles():
     t = open(KNOWLEDGE_TS, encoding='utf-8').read()
-    body = t[t.index('export const knowledge: KnowledgeMeta[] = ['):]
+    # 只取 knowledge[] 数组本体，不截到文件尾：后面还有 retiredKnowledgePages 块，
+    # 它也有 slug 字段，截到文件尾会把退役页当成现役文章。
+    start = t.index('export const knowledge: KnowledgeMeta[] = [')
+    end = t.index('\n]', start)
+    body = t[start:end]
     out = []
     for part in ENTRY_SEP.split(body)[1:]:
         sm = SLUG_RE.match(part)

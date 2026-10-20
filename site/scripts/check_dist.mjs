@@ -11,6 +11,7 @@ const DIST = path.resolve(process.cwd(), '.vitepress', 'dist')
 /** 知识库条目页与 FAQ 清单：从 config/knowledge.ts 动态读取（加文章不用改这里）；其余页面手写 */
 const unregisterTsx = register()
 const knowledgeMod = await tsImport('../config/knowledge.ts', import.meta.url)
+const retiredPages = knowledgeMod.retiredKnowledgePages ?? []
 const { faqItems, faqCategories } = await tsImport('../config/faq.ts', import.meta.url)
 const { guidePages, guideBlocks, guideShotsOf, guideAnchorsOf, guideLegacyAnchors, guideSceneCards, guideIndex } = await tsImport('../config/guide.ts', import.meta.url)
 const { siteConfig } = await tsImport('../config/site.ts', import.meta.url)
@@ -218,6 +219,25 @@ const index_guideHtml = fs.readFileSync(path.join(DIST, 'guide/index.html'), 'ut
       `/guide: public/_redirects 缺少 ${page.slug}/ -> ${page.slug} 的 301（带尾斜杠的旧链接会多跳一次）`,
     )
   }
+  // 退役页的 301：规则必须在 _redirects 里，且目标页的产物真实存在。
+  // 漏一条的后果是「已收录的旧地址直接 404」——外链与收录权重一起丢，而且不报错。
+  for (const r of retiredPages) {
+    ok(
+      redirects.includes(`/knowledge/${r.slug} ${r.to} 301`),
+      `/knowledge: 退役页 ${r.slug} 的 301 不在 public/_redirects 里（跑 node scripts/gen_knowledge_routes.mjs）。${r.reason}`,
+    )
+    if (r.to !== '/knowledge') {
+      ok(
+        fs.existsSync(path.join(DIST, `${r.to}.html`)),
+        `/knowledge: 退役页 ${r.slug} 指向 ${r.to}，但目标页产物不存在（重定向过去还是 404）`,
+      )
+    }
+    ok(
+      !fs.existsSync(path.join(DIST, `knowledge/${r.slug}.html`)),
+      `/knowledge: ${r.slug} 已登记为退役页，产物里却还有它的 html（要从 knowledge[] 移除）`,
+    )
+  }
+
   // 索引页的一句话答案要渲染出来（它是索引页唯一的结论段，AI 引用直接引这一句）
   ok(
     index_guideHtml.includes(guideIndex.answer.slice(0, 30)),

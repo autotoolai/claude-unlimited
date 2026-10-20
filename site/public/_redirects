@@ -48,4 +48,6 @@
 /knowledge/claude-code-401-403/ /knowledge/claude-code-401-403 301
 /knowledge/claude-code-connection-lost/ /knowledge/claude-code-connection-lost 301
 /knowledge/claude-code-usage-limit-reached/ /knowledge/claude-code-usage-limit-reached 301
+# 退役文章 -> 现在的落点（auto-generated, do not edit）：保外链与已收录权重，读者不会撞 404
+/knowledge/code-video-skills-guide /knowledge/claude-code-make-video 301
 # <<< knowledge routes
