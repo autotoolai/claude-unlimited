@@ -296,7 +296,28 @@ const bundleJs = fs.existsSync(chunksDir)
   ? fs.readdirSync(chunksDir).filter((f) => f.endsWith('.js')).map((f) => fs.readFileSync(path.join(chunksDir, f), 'utf8')).join('')
   : ''
 ok(bundleJs.includes('FAQPage'), '知识库：bundle 里没有 FAQPage（Article + FAQPage JSON-LD 未生成）')
-ok(!bundleJs.includes('aiprimetech'), '知识库：bundle 里出现素材站域名')
+/* 素材站域名：第三方域名只允许出现在 config/knowledge_sources.ts 与 archive/，产物里一处都不能有。
+   这里扫全 dist，而不是只扫 dist/assets/chunks/*.js——按页拆出的 chunk（dist/assets/changelog.md.*.js）
+   在 chunks 目录外，只扫 chunks 会漏过去，域名就跟着进了 bundle 和 sitemap。
+   真实事故：docs/changelog.md 正文写了素材站域名，build 没拦住，npm run verify 才抓到。 */
+const DOMAIN_HINT = 'aiprimetech'
+const TEXT_EXT = new Set(['.html', '.js', '.css', '.xml', '.txt', '.json'])
+function scanDistForDomain() {
+  const hits = []
+  const walk = (dir) => {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const fp = path.join(dir, e.name)
+      if (e.isDirectory()) walk(fp)
+      else if (TEXT_EXT.has(path.extname(e.name))) {
+        if (readFileSafe(fp, 'utf8').includes(DOMAIN_HINT)) hits.push(path.relative(DIST, fp))
+      }
+    }
+  }
+  if (fs.existsSync(DIST)) walk(DIST)
+  return hits
+}
+const domainHits = scanDistForDomain()
+ok(domainHits.length === 0, `产物里出现素材站域名 ${DOMAIN_HINT}：${domainHits.join(', ')}`)
 for (const k of knowledgeMod.knowledge) {
   const w = `/knowledge/${k.slug}`
   const faq = k.faq ?? []

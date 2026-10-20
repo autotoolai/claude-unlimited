@@ -104,3 +104,17 @@
 - **改法（build 侧门禁）**：`package.json` 的 `build` 最前面加 `npm run gen:media_keys:check`。视频内容一换，哈希后缀就变，`VIDEO_KEYS` 不同步时 build 直接失败——映射与磁盘不一致时，后面所有步骤都是白跑。
 - **为什么两道都要**：发布门禁防"这篇没上传"，build 门禁防"视频换了但没重新上传"。前者只在 publish 时跑，后者每次 build 都跑。
 - **验证**：`npm run gen:media_keys:check` → `[media-keys] 一致（7 条）`，exit 0；`npm run build` exit 0。
+
+### 问题 13：结构化数据有两份实现，改一处漏一处
+
+- **现象**：定价页 2026-10-12 起页内不再挂 FAQ 组件，但 `pages/data.ts`（客户端注入）与 `pages/jsonld_server.ts`（构建期写进产物）两处都还输出 FAQPage。产物里声明了页面上看不见的 4 条限速问答。
+- **原因**：JSON-LD 在本项目有两个生成入口，各写一份，内容靠人工同步；验收脚本只查「产物里有没有 FAQPage」，没查「页内有没有对应内容」，两份实现漂移时没人发现。
+- **改法**：两处同时去掉定价页的 FAQPage 节点；验收脚本补两条断言——「定价页 JSON-LD 不含 FAQPage（页内没有 FAQ）」与「限速类条目在 /faq 齐活」，把「结构化数据必须与页内可见内容一致」变成门禁。
+- **验证**：`npm run verify` 输出「定价页 JSON-LD 不含 FAQPage」与「FAQ 页：限速类 4 条齐活」两项 [ok]。
+
+### 问题 14：门禁只扫 chunks，按页拆出的 chunk 从旁边漏过去
+
+- **现象**：`docs/changelog.md` 正文写了素材站域名，域名随页面进了 bundle 与 sitemap，但 `npm run build` 通过，只有 `npm run verify` 抓到。
+- **原因**：`check_dist.mjs` 的域名检查只扫 `dist/assets/chunks/*.js`；VitePress 把 `changelog.md` 编译成 `dist/assets/changelog.md.<hash>.js`，在 chunks 目录之外，不在扫描范围内。chunks 目录里只有共享代码。
+- **改法**：域名检查改成递归扫全 dist 的文本文件（html/js/css/xml/txt/json），命中就报出具体是哪个文件。
+- **验证**：`grep -rl aiprimetech .vitepress/dist` 无输出；改动前 changelog.html 与 changelog.md.*.js 都能命中。
