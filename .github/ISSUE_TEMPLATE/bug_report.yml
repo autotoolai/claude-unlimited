@@ -1,0 +1,38 @@
+name: 问题反馈
+description: 官网或本仓库的使用问题
+title: "[问题] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        购买、兑换与售后请走官网客服（微信 ren_mo_mo），不要在这里提单。
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 发生了什么
+      description: 期望结果与实际结果的差异
+      placeholder: 在 xxx 环境下操作 xxx，期望 xxx，实际 xxx
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: 相关页面或文件路径
+      placeholder: https://claude-unlimited.aiautotools.com/knowledge/xxx
+  - type: textarea
+    id: env
+    attributes:
+      label: 环境
+      value: |
+        - 操作系统：
+        - 浏览器 / Node 版本：
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 确认
+      options:
+        - label: 我确认本 issue 不含 API Key、密码或 token
+          required: true

@@ -16,6 +16,8 @@ head:
 
 # 为什么 Agent 比聊天更烧 token
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/why-agents-cost-more-tokens](https://claude-unlimited.aiautotools.com/knowledge/why-agents-cost-more-tokens) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：API 是无状态的，每一轮都要把整段对话重发一次。N 轮对话每轮约 T 个 token，累计输入 token 约为 N²T/2 而不是 NT——会话长度翻倍，输入账单约翻四倍。这就是「十分钟很便宜、一小时后吓人」的原因。
 
 如果你在用按 token 计费的方式，聊天时几乎感觉不到成本，Claude Code 跑半小时就心疼，问题通常不在模型单价，而在上下文是怎么长的。
@@ -81,3 +83,4 @@ head:
 **结论**：更大的窗口只是把天花板抬高。你付的是实际发送的 token，不是窗口大小。
 
 1M 窗口的价值在于「需要时可以真的塞进去」，而不是「每次都塞满」。每次把同一份大文档重发一遍，账单照常增长；对稳定前缀开提示缓存才是省这类重复的办法，见[提示缓存原理](/knowledge/prompt-caching-explained)。
+

@@ -16,6 +16,8 @@ head:
 
 # Claude Code 技能怎么写
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-skills](https://claude-unlimited.aiautotools.com/knowledge/claude-code-skills) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：技能是一种渐进式披露——模型起先只看到技能的 `name` 和 `description`，任务匹配上才去读完整的 `SKILL.md` 及其引用的文件。所以 `description` 要写「什么时候用我」。技能放在 `~/.claude/skills/<name>/SKILL.md`（个人）、`.claude/skills/<name>/SKILL.md`（随仓库提交）或插件内。
 
 它是四个扩展点里最轻的一个：不需要子代理、不需要事件、不需要外部服务，只是一个把流程写下来的目录。
@@ -89,3 +91,4 @@ description: Write release notes from the git log in this repo's house style. Us
 | 外部系统的工具和数据 | MCP |
 
 技能为三者打包流程，但它本身不做任何事。
+

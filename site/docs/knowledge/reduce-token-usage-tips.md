@@ -16,6 +16,8 @@ head:
 
 # 降低 Claude 用量的工程方法：先测量再优化
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/reduce-token-usage-tips](https://claude-unlimited.aiautotools.com/knowledge/reduce-token-usage-tips) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：token 成本通常不是模型定价问题，而是信息路由问题。先按「指令 / 上下文 / 任务 / 输出」四段记账，看清大头在哪；然后按顺序做：给每条路由设预算、检索前裁剪、结构化摘要替代整段历史、用 schema 约束输出、把简单子任务路由到便宜档位。衡量口径是「每个成功任务的 token 数」，不是单次调用。
 
 ## token 用量是架构问题
@@ -147,3 +149,4 @@ head:
 **结论**：1M 窗口这类能力适合离线分析、整库审查、几小时的转录；不适合在线服务里每次请求都重读一遍全量语料。
 
 好的模式是：用长上下文离线分析一次，产出结构化的策略图、摘要或测试用例；运行时的助手只读需要的那部分。
+

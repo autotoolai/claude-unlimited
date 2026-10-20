@@ -16,6 +16,8 @@ head:
 
 # Claude Code 权限模式有哪些
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-permission-modes](https://claude-unlimited.aiautotools.com/knowledge/claude-code-permission-modes) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：权限模式决定「哪些动作要问你」。default 和 acceptEdits 只影响文件修改；plan 只读；auto 由一个分类器判断动作是否安全并自动批准；bypassPermissions（`--dangerously-skip-permissions`）跳过常规审批但仍保留少量保护。无人值守的长时间任务用 auto 加 `--permission-prompts none` 最稳，跳过权限只在容器或沙箱里做。
 
 ## 六种权限模式
@@ -93,3 +95,4 @@ claude \
 **结论**：权限模式只是其中一层，容器与沙箱是另一层。跳过权限 + 一次性容器，是跑陌生代码或批量任务时唯一稳妥的组合。先在本地把动作验证过再放进这个组合，见[Claude Code 教程](/knowledge/claude-code-tutorial)。
 
 至少把工作目录放在容器里、网络出站限制到 API 端点、容器可随时销毁。
+

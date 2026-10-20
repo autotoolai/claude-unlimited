@@ -16,6 +16,8 @@ head:
 
 # Claude Code 命令与参数速查：会话内和命令行
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-cli-cheatsheet](https://claude-unlimited.aiautotools.com/knowledge/claude-code-cli-cheatsheet) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：日常用 `claude` 进交互，会话内靠 `/init`、`/compact`、`/model`、`/status`、`/context` 这几个斜杠命令；脚本和 CI 用 `claude -p` 配 `--allowedTools` 预授权、`--max-turns` 限轮次、`--output-format json` 取结构化输出。
 
 ## 启动方式
@@ -94,3 +96,4 @@ claude -p "按文件里的要求做" < prompt.txt
 - 脚本里加 `--max-turns`，避免死循环。
 
 原理和更多方法见[为什么 Agent 比聊天更烧 token](/knowledge/why-agents-cost-more-tokens)与[降低 Claude 用量的工程方法](/knowledge/reduce-token-usage-tips)。
+

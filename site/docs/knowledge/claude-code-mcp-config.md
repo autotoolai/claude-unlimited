@@ -16,6 +16,8 @@ head:
 
 # Claude Code MCP 怎么配：命令、scope 与避坑
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-mcp-config](https://claude-unlimited.aiautotools.com/knowledge/claude-code-mcp-config) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：MCP 是给 Claude Code 装外部工具的插头，用 `claude mcp add` 一条命令接上一个服务器。真正会卡住新手的是三件事：scope 选哪个、Windows 上要不要 `cmd /c` 包装、以及别装早已归档的官方参考包。下面按「先看清代价 → 装第一个 → 遇到问题再回来查」的顺序写。
 
 截至 2026-10-10，本文命令已在 Claude Code 官方文档和本机 `claude mcp --help` 上核对过，标注日期是因为这个命令的选项和状态显示会随版本变化。
@@ -166,3 +168,4 @@ claude mcp login <名字>    # 需要 OAuth 的远程服务器
 - **项目级服务器先当陌生人看。** 别人仓库里的 `.mcp.json` 让你装什么工具，你有权拒绝。批准前至少看一眼这个服务器要执行什么命令。
 - **文件和命令类 MCP 给最小路径。** Filesystem 类服务器只指向项目目录，不要指向家目录；能执行命令的服务器更要在意。
 - **第三方服务器就是一段任意代码。** 官方 README 自己也说参考实现只是教学示例，生产使用要自己评估安全风险。装之前至少确认包名正确（拼错的包名会被当成新包从 npm 拉，浪费钱还可能装到别人的包）。
+

@@ -8,15 +8,36 @@
  * 为什么不用 http-server：没装进依赖，每次都要 npx 现拉。
  *
  * 端口：41777，与 dev:site / preview 一致。绑 0.0.0.0，这样局域网和 Tailscale 都能直接打开
- * （Tailscale 地址 <本机 Tailscale IP>:41777）。改端口要同步改 package.json 的 dev:site、
+ * （Tailscale 地址见 config/local/dev_endpoints.json，不入库）。改端口要同步改 package.json 的 dev:site、
  * preview 和 .vitepress/config.mts 的 server.port 三处。
  *
  * 用法：npm run serve:dist
  */
 import { createServer } from 'node:http'
 import { createReadStream, existsSync, statSync, readFileSync } from 'node:fs'
-import { extname, join, normalize } from 'node:path'
+import { extname, join, normalize, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+/**
+ * 本机 Tailscale IP：只在本机 config/local/dev_endpoints.json 里维护（已 gitignore），
+ * 公开仓库里不写死。取不到就不打印这个提示。
+ */
+function localTailscaleIp() {
+  const here = resolve(fileURLToPath(import.meta.url), '..')
+  const candidates = [
+    resolve(here, '../../config/local/dev_endpoints.json'),
+    resolve(process.cwd(), '../config/local/dev_endpoints.json'),
+  ]
+  for (const p of candidates) {
+    try {
+      const j = JSON.parse(readFileSync(p, 'utf-8'))
+      if (j.tailscaleIp) return j.tailscaleIp
+    } catch {
+      /* 本地没这个文件就试下一个 */
+    }
+  }
+  return ''
+}
+
 
 const ROOT = join(fileURLToPath(new URL('../.vitepress/dist', import.meta.url)))
 const PORT = 41777
@@ -101,6 +122,9 @@ createServer((req, res) => {
   createReadStream(target).pipe(res)
 })
   .listen(PORT, HOST, () => {
-    console.log(`[serve:dist] http://${HOST}:${PORT}/  (Tailscale: http://<本机 Tailscale IP>:${PORT}/)`)
+    const tsIp = localTailscaleIp()
+    console.log(
+      `[serve:dist] http://${HOST}:${PORT}/` + (tsIp ? `  (Tailscale: http://${tsIp}:${PORT}/)` : ''),
+    )
     console.log(`[serve:dist] 产物构建时间 ${STAMP}。这是静态产物，改代码看不到变化；要热更新请另开 npm run dev:site（端口 41800）。`)
   })

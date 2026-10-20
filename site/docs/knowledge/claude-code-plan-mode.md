@@ -16,6 +16,8 @@ head:
 
 # Claude Code 计划模式怎么用：四种权限模式的区别
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-plan-mode](https://claude-unlimited.aiautotools.com/knowledge/claude-code-plan-mode) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：计划模式（Plan Mode）让 Claude 只读不写，先调查并给出方案，等你确认后才动手。它解决的是「我怎么知道它要干什么」，与「它能不能执行命令」（权限模式）是两件独立的事。三种进入方式：会话内按 Shift+Tab 循环、输入 /plan、启动时带 claude --permission-mode plan。
 
 很多新手把计划模式当成「更安全的自动模式」，其实不是。它把「提方案」和「实施」分开：Claude 先读代码、查文件、理解任务，给出一份方案，停在那里等你批准。
@@ -100,3 +102,4 @@ head:
 ## 计划模式与模型搭配
 
 `/model` 里「用 Opus 规划、其它工作用 Sonnet」这类模型搭配（以 `/model` 实际列表为准），与计划权限模式不是一回事。一个是「用哪个模型想」，一个是「要不要先想再做」，两者可以独立组合。
+

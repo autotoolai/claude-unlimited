@@ -16,6 +16,8 @@ head:
 
 # Claude Code 报 429 限流怎么办
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-429-rate-limit](https://claude-unlimited.aiautotools.com/knowledge/claude-code-429-rate-limit) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：429 表示你在某一项每分钟上限上超了：请求数、token 数、或者并发在途请求数。Claude Code 会按 retry-after 等待并重试，多数几秒内自愈；持续超限就按顺序处理：减少并行子代理、`/compact` 压缩上下文、`/model` 换档、把后台工作挪到便宜档，最后才是申请提额。
 
 ## 429 是什么意思
@@ -68,3 +70,4 @@ claude -p "..." --max-turns 20
 ## 和 529 的区别
 
 **结论**：429 是你超了自己的速率；529 是模型整体容量不足，所有人都受影响。见到 `overloaded` 字样就是 529，处理办法见 [529 怎么处理](/knowledge/claude-code-529-overloaded)。
+

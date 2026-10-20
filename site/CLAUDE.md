@@ -91,3 +91,4 @@ npm run dev           # public/ 静态文件同步 + 4198 静态服务
 - 本机 `pwsh` 是 PowerShell 5.1，`.ps1` 注释里只能有 ASCII，中文会触发 ParserError。
 - 测 node 的正则或解析逻辑要写成 `.mjs` 文件跑，不要用 `node -e`（shell 会吞反斜杠）。
 - 仓库 `config/` 下有明文密码与 token，不入库、不贴进对话。
+- 本机开发端点（Tailscale 主机名与 IP）只在仓库根 `config/local/dev_endpoints.json`，已 gitignore；代码与文档里用占位符。

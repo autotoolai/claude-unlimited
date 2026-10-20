@@ -16,6 +16,8 @@ head:
 
 # 提示缓存原理：什么时候省钱、什么时候白花
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/prompt-caching-explained](https://claude-unlimited.aiautotools.com/knowledge/prompt-caching-explained) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：提示缓存把你请求的一段前缀存下来，之后共享这段前缀的调用按更低的输入价计费。适合缓存系统提示、工具定义、被反复提问的文档、固定示例；不适合缓存用户最新消息、含时间戳的前缀、以及太短的提示。验证方法：看响应 usage 里有没有 cache_read 计数。
 
 ## 缓存的工作方式
@@ -95,3 +97,4 @@ head:
 **结论**：前缀每次都不同（多租户定制、请求 ID、时间戳混进系统提示）、提示太短、或者本来就不重复。缓存的经济学是「一次创建成本 + 多次低价读取」，没有复用就没有收益。
 
 把不确定的内容从系统提示里挪出去，见[降低 Claude 用量的工程方法](/knowledge/reduce-token-usage-tips)；按场景决定哪类请求值得缓存，见[按任务选模型](/knowledge/choose-claude-model)。
+

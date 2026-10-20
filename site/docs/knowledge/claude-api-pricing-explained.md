@@ -16,6 +16,8 @@ head:
 
 # Claude API 怎么计费：token 构成与估算
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-api-pricing-explained](https://claude-unlimited.aiautotools.com/knowledge/claude-api-pricing-explained) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：账单 = 输入 token × 输入价 + 输出 token × 输出价。输入 token 包含系统提示、历史对话、检索文档、文件内容、工具定义与工具结果；输出 token 是模型实际生成的文本。两者的单价不同，输出通常贵数倍。一次对话的账单往往远大于你看到的用户输入。
 
 ## 输入 token 包含什么
@@ -108,3 +110,4 @@ head:
 - 对长文档分块与向量检索，别整篇塞进去；
 - 给 agent 循环设步数上限；
 - 区分可重试与不可重试错误，避免无意义循环。
+

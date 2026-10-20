@@ -16,6 +16,8 @@ head:
 
 # Claude Code 报错 401 / 403 怎么解决
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-401-403](https://claude-unlimited.aiautotools.com/knowledge/claude-code-401-403) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：先在会话里输入 `/status` 看当前用的是哪个凭据。环境里的 `ANTHROPIC_API_KEY` 优先于登录态，一个几个月前导出的陈旧密钥就是「反复 /login 仍然 401」的典型原因。Key 只属于一个端点：Key 与 `ANTHROPIC_BASE_URL` 不匹配就是 401；403 则多半是代理或组织权限，不是 Key 本身的问题。
 
 ## 会看到哪些消息
@@ -86,3 +88,4 @@ claude
 ```
 
 用 Key 就没有 OAuth、没有 token 刷新、没有组织成员关系，这一族报错只剩下「Key 是否匹配这个地址」。
+

@@ -16,6 +16,8 @@ head:
 
 # Claude Code 教程：第一次会话之后怎么用
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-tutorial](https://claude-unlimited.aiautotools.com/knowledge/claude-code-tutorial) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：安装、配置 Base URL 与 Key、装模型这些步骤在[使用教程](/guide)里。本文只讲配置完成之后的事：进项目目录跑 `/init` 生成 CLAUDE.md 并改对，先用 Shift+Tab 切到计划模式让它给方案，批准后再动手，告诉它测试命令并要求自跑自修。
 
 配置完成后，`cd` 进项目目录，终端输入 `claude`，第一件事是 `/init`。
@@ -120,3 +122,4 @@ claude
 4. Windows 上「用户环境变量」和「系统环境变量」是两处，都要看。
 
 `/status` 会直接显示 Claude Code 当前用的是哪个端点、哪个密钥、哪个模型，比猜快。
+

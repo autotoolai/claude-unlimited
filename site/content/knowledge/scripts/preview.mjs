@@ -28,6 +28,44 @@
  */
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+/**
+ * 本机 Tailscale 主机名：只在本机 config/local/dev_endpoints.json 里维护（已 gitignore），
+ * 公开仓库里不写死。取不到就回落到 '.ts.net'（Tailscale 公开后缀，域名形式照常可用）。
+ */
+function localTailscaleHost() {
+  const candidates = [
+    path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../config/local/dev_endpoints.json'),
+    path.resolve(process.cwd(), '../config/local/dev_endpoints.json'),
+  ]
+  for (const p of candidates) {
+    try {
+      const j = JSON.parse(fs.readFileSync(p, 'utf-8'))
+      if (j.tailscaleHost) return j.tailscaleHost
+    } catch {
+      /* 本地没这个文件就试下一个 */
+    }
+  }
+  return '.ts.net'
+}
+
+/** 本机 Tailscale IP，同上，取不到就返回空串。 */
+function localTailscaleIp() {
+  const candidates = [
+    path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../config/local/dev_endpoints.json'),
+    path.resolve(process.cwd(), '../config/local/dev_endpoints.json'),
+  ]
+  for (const p of candidates) {
+    try {
+      const j = JSON.parse(fs.readFileSync(p, 'utf-8'))
+      if (j.tailscaleIp) return j.tailscaleIp
+    } catch {
+      /* 本地没这个文件就试下一个 */
+    }
+  }
+  return ''
+}
+
 import { execFileSync, spawn } from 'node:child_process'
 
 const here = path.resolve(import.meta.dirname)
@@ -131,7 +169,7 @@ export default defineConfig({
       host: true,
       port: ${port},
       strictPort: true,
-      allowedHosts: ['.ts.net'],
+      allowedHosts: [localTailscaleHost()],
     },
   },
 })
@@ -280,7 +318,11 @@ const { createServer } = await import('vitepress')
 const server = await createServer(PREVIEW, { port: Number(port), strictPort: true })
 await server.listen()
 console.log('')
-console.log(`[preview] 草稿工作台：http://localhost:${port}/drafts/   （同 Wi-Fi / Tailscale 把 localhost 换成 <本机 Tailscale IP>）`)
+const tsIp = localTailscaleIp()
+    console.log(
+      `[preview] 草稿工作台：http://localhost:${port}/drafts/` +
+        (tsIp ? `   （同 Wi-Fi / Tailscale 把 localhost 换成 ${tsIp}）` : ''),
+    )
 console.log(`[preview] 站点 dev 仍是 41800，草稿不出现在那里；本进程只读 docs/knowledge 与 content/knowledge/drafts`)
 console.log('[preview] Ctrl+C 退出')
 process.on('SIGINT', () => {

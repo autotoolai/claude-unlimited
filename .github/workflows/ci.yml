@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    # 站点构建链：20 步（含 check_dist 结构门禁、check:seo、check:geo、check:links、check:css）
+    # 加 verify（48 项 SEO / 组件 / 链接验收）。本地视频源文件走 R2 托管、不在仓库里，
+    # 所以 gen:media_keys 会自动跳过 —— 这条在本地有 mp4 时照常校验，不影响开发机。
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 安装依赖
+        working-directory: site
+        run: npm ci
+
+      - name: 构建（含结构门禁与死链检查）
+        working-directory: site
+        run: npm run build
+
+      - name: 验收（48 项）
+        working-directory: site
+        run: npm run verify

@@ -16,6 +16,8 @@ head:
 
 # Claude 报错 529 overloaded 怎么处理
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-529-overloaded](https://claude-unlimited.aiautotools.com/knowledge/claude-code-529-overloaded) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：529 是模型那一刻没有空闲容量，不是你的额度问题，影响所有用这个模型的人，会自己恢复。让 Claude Code 把内置重试跑完、用 `/model` 换一档、减少同时运行的子代理，大任务避开高峰；它和 500（服务端故障）、429（你自己的速率上限）不是一回事。
 
 ## 529 是什么意思
@@ -55,3 +57,4 @@ API Error (529 {"type":"error","error":{"type":"overloaded_error","message":"Ove
 | 429 | 你超了自己的速率上限 | 你，减少并发或压缩上下文 |
 
 具体的并发和 token 速率数字见[常见问题](/faq)。
+

@@ -16,6 +16,8 @@ head:
 
 # Claude Code 与 Codex CLI 怎么选
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-vs-codex](https://claude-unlimited.aiautotools.com/knowledge/claude-code-vs-codex) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：三者是同一种形状的终端 agent——读仓库、提计划、改文件、跑测试、迭代。真正的差别在底下：模型（Claude 独占 / OpenAI 独占 / 任意）、计费（订阅 / API / 按量）和扩展面（Claude Code 的子代理、hooks、技能、插件最全）。先按这三项筛，再在自己的仓库上各试一天。
 
 ## 先把话说在前面
@@ -66,3 +68,4 @@ head:
 - 很多人两个都留：Claude Code 作默认，另一个给难 bug 提供第二意见。
 
 建议在自己的仓库上各试一天。命令与参数见 [Claude Code 命令与参数速查](/knowledge/claude-code-cli-cheatsheet)。
+

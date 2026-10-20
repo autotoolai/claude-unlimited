@@ -16,6 +16,8 @@ head:
 
 # CLAUDE.md 怎么写：写什么、放哪
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-md-guide](https://claude-unlimited.aiautotools.com/knowledge/claude-md-guide) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：CLAUDE.md 是每次会话都读入上下文的纯文本说明书，放构建与测试命令、代码约定、架构边界、工作流规则。Claude Code 2.1.277 起，当项目里没有任何符合条件的 CLAUDE.md 时会回退读 AGENTS.md；想在 /config 里把「项目指引」改成两者都读，选 claude-md-and-agents-md。
 
 ## CLAUDE.md 是什么，写什么
@@ -88,3 +90,4 @@ head:
 | `~/.claude/auto-memory/` | Claude 自动保存的记忆 |
 
 版本库里建议提交 settings.json、commands、agents、skills；带个人密钥或机器路径的设置写进 `.claude/settings.local.json` 并加进 `.gitignore`。
+

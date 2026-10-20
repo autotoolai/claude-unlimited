@@ -16,6 +16,8 @@ head:
 
 # Claude Code 子代理怎么用
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-subagents](https://claude-unlimited.aiautotools.com/knowledge/claude-code-subagents) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：子代理是在自己上下文窗口里完成一块任务、只把一段结论交回主会话的执行者。在 `.claude/agents/<name>.md` 里用一个 Markdown 文件定义它，靠 `description` 决定什么时候自动委派，靠 `tools` 收紧它能做什么，靠 `model` 固定档位。它省的是主会话的上下文，不是钱；并行的每个子代理各占一个并发位。
 
 大代码库里最容易失控的不是模型能力，是主会话的上下文。一个读了四十个文件的任务，那些文件会在此后每一轮被重新发一次，账单和速度一起变差。把这类「读很多、说一句」的活交给子代理，主会话只留下它的结论。
@@ -81,3 +83,4 @@ flag untested paths, and stop. Do not edit files.
 ## agent teams 是什么
 
 **结论**：较新的 Claude Code 版本有 agent teams：不是一个父代理委派给短命的子代理，而是多个会话作为有名字的队友协作，共享任务列表、彼此发消息，lead 可以派活、查状态、停掉某个队友。它是实验能力，随版本变化，查 `claude --help` 和更新日志里的当前开关，不要照着博客设。心智模型和子代理一样（多了持久化和通信），成本模型也一样（按队友数倍增）。
+

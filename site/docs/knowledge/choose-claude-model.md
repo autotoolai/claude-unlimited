@@ -16,6 +16,8 @@ head:
 
 # 按任务选模型：Opus、Sonnet、Haiku 怎么选
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/choose-claude-model](https://claude-unlimited.aiautotools.com/knowledge/choose-claude-model) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：三个档位是同一家族在「能力 vs 成本」曲线上的三个点位。Haiku 用于高并发、简单判断、延迟敏感的工作；Sonnet 是编码和大多数生产任务的默认；Opus 用于困难推理、长时间运行的 agent、出错代价高的决策。一个习惯就能砍掉最多的花费：从比你直觉高一档的模型开始，只有质量真的不够才升级。
 
 ## 三个档位各做什么
@@ -83,3 +85,4 @@ head:
 ## 新档位要不要立刻上生产
 
 **结论**：不要因为它更新更快就换。放进你自己的评测集，用真实 prompt 和真实验收标准测一轮：稳定格式、可重复行为、工具调用可靠性、失败模式可控，往往比单次回答的惊艳程度更重要。
+

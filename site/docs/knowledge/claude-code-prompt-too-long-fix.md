@@ -16,6 +16,8 @@ head:
 
 # prompt too long 报错怎么处理
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-prompt-too-long-fix](https://claude-unlimited.aiautotools.com/knowledge/claude-code-prompt-too-long-fix) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：先 `/context` 看上下文窗口被什么填满，再 `/compact` 压缩；还是不行就 `/clear` 重开。这是 400 错误，不是网络问题，重试没用。
 
 「prompt is too long」「input is too long for requested model」「context limit reached」是同一类问题：一次请求的内容超过了模型的上下文窗口。
@@ -61,3 +63,4 @@ Claude Code 这类 agent 工具的官方标准窗口是 200k token，我们不�
 窗口是被什么填满的，直接决定该释放哪一块，见[启动时那 33k token 去了哪](/knowledge/claude-code-startup-tokens)；工具输出为什么是最大的一块，见[为什么 Agent 比聊天更烧 token](/knowledge/why-agents-cost-more-tokens)。
 
 每次压缩仍会重发全部内容，所以在服务端侧还有更省的办法，见[降低 Claude 用量的工程方法](/knowledge/reduce-token-usage-tips)。
+

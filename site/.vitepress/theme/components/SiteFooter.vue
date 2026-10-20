@@ -1,5 +1,11 @@
 <script setup lang="ts">
-/** 页脚：品牌行 + 两列导航 + 底部声明 / ICP / 主体。数据来自 config/site.ts 与 navItems。 */
+/**
+ * 页脚：品牌行 + 两列导航 + 底部声明 / ICP / 主体。数据来自 config/site.ts 与 navItems。
+ *
+ * 「源码（GitHub）」放在「关于」列而不是新开一列：栅格是 1.4fr repeat(4,1fr)，现有 6 个子元素
+ * 已经排到第二行，再加一列会让「关于」这一列再折一次、版面更散。加了它是为了让官网 → 仓库
+ * 这条外链出现在全站每页（配合 Organization.sameAs，搜索引擎据此把官网与仓库认作同一实体）。
+ */
 import { siteConfig, navItems } from '../../../config/site'
 import { guideNavItems, knowledgeFooterCats } from '../pages/data'
 import { partnerUrl } from '../../../config/site'
@@ -47,6 +53,7 @@ const year = new Date().getFullYear()
           <li><a href="/terms">服务条款</a></li>
           <li><a href="/privacy">隐私政策</a></li>
           <li><a href="/changelog">变更历史</a></li>
+          <li><a :href="siteConfig.sourceRepo.url" target="_blank" rel="noopener">源码（GitHub）↗</a></li>
         </ul>
       </nav>
       <nav aria-label="知识库目录">

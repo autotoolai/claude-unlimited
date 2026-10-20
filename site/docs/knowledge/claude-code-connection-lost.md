@@ -16,6 +16,8 @@ head:
 
 # Claude Code 连接中断、等待 API 响应怎么处理
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-connection-lost](https://claude-unlimited.aiautotools.com/knowledge/claude-code-connection-lost) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：用 curl 打端点做两分钟自查——一秒内返回 401 说明网络通路正常、问题在上游或客户端；超时或 SSL 错误说明问题在你这一侧。「Waiting for API response · check your network」经常冤枉自己的网络，真正难受的是指数退避的等待时间，调低首字节超时能明显改善体感。
 
 ## 会看到哪些消息
@@ -77,3 +79,4 @@ VPN 出口在会话中途切换会重置所有打开的流，重连一次就会�
 把 `ANTHROPIC_BASE_URL` 指向网关后，链路变成「客户端 → 网关 → 上游」。它不会让你本地的坏网络变好，但对「上游重置」这一类问题，它去掉了对单一上游账户的依赖：网关会在一个账户饱和时换另一个。
 
 切换前先对网关地址跑一遍上面的 curl 自查，确认链路通。还没配置过端点和 Key 的话，先看[使用教程](/guide)。
+

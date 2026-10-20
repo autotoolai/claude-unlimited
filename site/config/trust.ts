@@ -10,6 +10,7 @@
  * 远大于没有主体信息。
  */
 import { siteConfig, partnerUrl } from './site'
+import { knowledge } from './knowledge'
 import {
   limits,
   limitRows,
@@ -19,6 +20,12 @@ import {
   purchaseConditions,
 } from './rules'
 import { unlimitedTiers, shopUrl as purchaseUrl } from './plans'
+
+/** 公开仓库地址。本页与 /about 的「源码公开」段都指它，改仓库只改 siteConfig.sourceRepo 一处 */
+const repo = siteConfig.sourceRepo
+
+/** 知识库篇数从 config/knowledge.ts 派生（CLAUDE.md 规则：数字不许手写进文案） */
+const knowledgeCount = String(knowledge.length)
 
 export interface TrustSection {
   /** H2 标题 */
@@ -84,6 +91,14 @@ export const aboutSections: TrustSection[] = [
       ...purchaseConditions,
     ],
     bullets: true,
+  },
+  {
+    h2: '源码公开',
+    items: [
+      `本站的 VitePress 源码与 ${knowledgeCount} 篇知识库文章已在 GitHub 公开（${repo.url}，MIT 许可），可自行核对本站呈现的全部内容与数字。`,
+      '开源的只有前端展示层。调用通道、额度分发与服务由本站独立运营，仓库里没有后端代码、密钥或计费逻辑，也不能用于复刻或替代本站服务。',
+      '购买、兑换与售后一律以官网与管理后台为准，GitHub 上的 issue 与 discussion 不是购买或客服渠道。',
+    ],
   },
   {
     h2: '联系方式',

@@ -16,6 +16,8 @@ head:
 
 # Claude Code 启动时那 33k token 去了哪
 
+> 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-startup-tokens](https://claude-unlimited.aiautotools.com/knowledge/claude-code-startup-tokens) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
+
 > **一句话答案**：在你输入第一句话之前，Claude Code 已经发出约 33k token 的固定前缀：系统提示约 3k–5k、工具定义约 15k–20k（最大的一块）、环境上下文约 2k–4k、你的 CLAUDE.md 0–10k 不等。最大头是工具 schema，所以清理 MCP 服务器和精简 CLAUDE.md 是收益最高的两个动作。
 
 ## 33k 由什么构成
@@ -69,3 +71,4 @@ claude mcp remove <名字>
 **结论**：它是固定成本换来的能力，不是乱花的钱。衡量它的正确口径是「每个任务的总 token」，而不是「第一次请求有多大」。
 
 一次真正的重构任务里，几十轮对话的总量往往是几千到两万；启动的 33k 摊到整个任务上并不显眼。频繁开短会话、每次只问一句话的人，启动成本占比才会高。
+
