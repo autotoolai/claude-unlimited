@@ -241,6 +241,13 @@ WorkBuddy 与 Cursor 不用 CC Switch，只引用 `get-key`。共享块里的图
 - 新增插图先量原图宽高比：≤1.2 的竖图只受高度上限约束，>1.8 的宽图只受宽度上限约束。
 - **块级截图也要挂 `cu-step-block__shot`**：`GuideBlockBody.vue` 里 `block.shot` 渲染的
   `<GuideShot>` 必须带这个类，否则两个自定义属性双双回退到 `none`，图片按整列铺开、高度不设防。
+- **截图的框线颜色走 `--cu-figure-frame`**（浅色 `rgba(20,20,19,.18)` / 深色 `rgba(243,240,232,.2)`），
+  定义在 `00_base.css` 的三处（浅色 `:root`、深色块、`prefers-color-scheme` 块）。
+  这个 token 在 2026-10-20 之前是缺失的（token 化迁移时漏掉，`archive/custom.css` 里有原始值），
+  而 `shell_extra.css` 一直在引用它——变量缺失会让整条 `border` 声明失效，
+  于是**浅色和深色下截图都没有边框**，而构建、`check:css`、`typecheck` 全都查不出来。
+  现在 `check:css` 会拦「引用了但没定义、也没写兜底（`var(--x, 兜底)`）的变量」，
+  `check:theme` 守另一半：变量在，但深浅两套下解析出来的框线颜色或尺寸不对。
 
 ## 九、验收
 
@@ -250,6 +257,7 @@ npm run verify       # SEO / 组件 / 链接验收
 npm run check:links  # 死链
 npm run check:css    # 改了 .vitepress/theme/**/*.css 必跑
 npm run check:align  # 教程页文字左边线（遍历 5 个场景页，需先 npm run preview）
+npm run check:theme  # 教程页深浅两套模式（截图框有边且随模式换色，需先 npm run preview）
 ```
 
 `check_dist.mjs` 对教程的断言（逐页，替换掉旧的「全站扁平常量」）：

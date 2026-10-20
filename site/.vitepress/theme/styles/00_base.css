@@ -41,6 +41,11 @@
   --cu-line: rgba(20, 20, 19, 0.12);
   --cu-line-strong: rgba(20, 20, 19, 0.2);
 
+  /* —— 插图外框：截图与配图画一圈实线，比 --cu-line 略重，让图从纸面上「浮出来」。
+     这个变量在 token 化迁移时漏掉了（archive/custom.css 里有），而 shell_extra.css
+     仍在引用它，于是 border 整条声明失效，截图框在任何模式下都没有边框。 —— */
+  --cu-figure-frame: rgba(20, 20, 19, 0.18);
+
   --cu-code-bg: #ece7db;
   --cu-term-bg: #1f1e1d;
   --cu-grid-line: rgba(20, 20, 19, 0.04);
@@ -113,6 +118,7 @@ html:not(.light):has(.dark) {
 
   --cu-line: rgba(243, 240, 232, 0.12);
   --cu-line-strong: rgba(243, 240, 232, 0.24);
+  --cu-figure-frame: rgba(243, 240, 232, 0.2);
 
   --cu-code-bg: #282623;
   --cu-term-bg: #111110;
@@ -147,6 +153,7 @@ html:not(.light):has(.dark) {
 
     --cu-line: rgba(243, 240, 232, 0.12);
     --cu-line-strong: rgba(243, 240, 232, 0.24);
+    --cu-figure-frame: rgba(243, 240, 232, 0.2);
 
     --cu-code-bg: #282623;
     --cu-term-bg: #111110;

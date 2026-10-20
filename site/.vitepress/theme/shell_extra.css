@@ -401,7 +401,7 @@
   width: 100%;
   max-height: var(--cu-shot-max-h, none);
   height: auto;
-  border: 1px solid var(--cu-figure-frame);
+  border: 1px solid var(--cu-figure-frame, var(--cu-line-strong));
   border-radius: var(--cu-r-sm);
   background: var(--cu-card-solid);
 }

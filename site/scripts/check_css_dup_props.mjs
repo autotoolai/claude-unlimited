@@ -31,6 +31,21 @@ const files = [
   join(themeDir, 'shell_extra.css'),
 ]
 
+/** 变量定义的扫描范围要比「重复属性」那圈大：变量可以在任意一个样式文件里定义 */
+function allCssFiles() {
+  const out = []
+  const walk = (dir) => {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      const p = join(dir, e.name)
+      if (e.isDirectory()) walk(p)
+      else if (e.name.endsWith('.css')) out.push(p)
+    }
+  }
+  walk(join(themeDir, 'styles'))
+  out.push(join(themeDir, 'shell_extra.css'))
+  return out
+}
+
 /** 去掉注释 */
 function stripComments(css) {
   return css.replace(/\/\*[\s\S]*?\*\//g, '')
@@ -108,10 +123,71 @@ for (const file of files) {
   }
 }
 
+
+// 3. 引用了但既没定义、也没有兜底的 CSS 变量。
+//    真实故障（2026-10-20）：--cu-figure-frame 在 token 化迁移时从 00_base.css 漏掉了
+//    （archive/custom.css 里有原始值），而 shell_extra.css 仍写着
+//    `border: 1px solid var(--cu-figure-frame)` —— 变量缺失会让整条声明失效，
+//    于是截图框在浅色与深色下都没有边框，而构建、check:css、typecheck 全都察觉不到。
+//    `var(--x, 兜底)` 不算问题：变量缺失时用兜底值，行为是确定的。
+//    只查 --cu- 前缀：--vp-* 由 VitePress 自己定义，不归本项目管。
+{
+  const cssFiles = allCssFiles()
+  const defined = new Set()
+  for (const file of cssFiles) {
+    const css = stripComments(readFileSync(file, 'utf8'))
+    for (const m of css.matchAll(/(--cu-[a-z0-9-]+)\s*:/g)) defined.add(m[1])
+  }
+  for (const file of cssFiles) {
+    const css = stripComments(readFileSync(file, 'utf8'))
+    for (const m of css.matchAll(/var\(/g)) {
+      // 取出这一处 var() 的参数表：按顶层逗号切分（括号内的逗号不算）
+      const start = m.index + m[0].length
+      let depth = 1
+      let i = start
+      while (i < css.length && depth > 0) {
+        if (css[i] === '(') depth++
+        else if (css[i] === ')') depth--
+        i++
+      }
+      const inner = css.slice(start, i - 1)
+      const args = []
+      let d = 0
+      let last = 0
+      for (let k = 0; k < inner.length; k++) {
+        const ch = inner[k]
+        if (ch === '(') d++
+        else if (ch === ')') d--
+        else if (ch === ',' && d === 0) { args.push(inner.slice(last, k)); last = k + 1 }
+      }
+      args.push(inner.slice(last))
+      const line = css.slice(0, m.index).split('\n').length
+      const where = `${file.slice(themeDir.length + 1)} 第 ${line} 行`
+      // 第一个参数是变量名：后面带逗号说明写了兜底，变量缺失也是确定的
+      const nm = (args[0] || '').trim().match(/^(--cu-[a-z0-9-]+)$/)
+      if (nm && !defined.has(nm[1]) && args.length === 1) {
+        fails.push(
+          `${where} :: ${nm[1]} 引用了但没有任何地方定义它，也未写兜底（var(${nm[1]}, 兜底)）\n      变量缺失会让整条声明失效：这条属性静默不生效，构建与其它门禁都查不出来`,
+        )
+      }
+      // 兜底里再嵌 var() 的，那些变量必须自己被定义（或自己带兜底）
+      for (let k = 1; k < args.length; k++) {
+        for (const nested of args[k].matchAll(/var\((--cu-[a-z0-9-]+)([^)]*)\)/g)) {
+          if (defined.has(nested[1])) continue
+          if (nested[2].includes(',')) continue
+          fails.push(
+            `${where} :: ${nested[1]} 出现在兜底值里但没有定义（兜底值里的变量缺失同样会让声明失效）`,
+          )
+        }
+      }
+    }
+  }
+}
+
 console.log(`CSS 重复属性检查：扫了 ${files.length} 个文件 / ${checked} 条规则`)
 if (fails.length) {
-  console.error('\n[x] 发现重复属性（浏览器按最后一个生效，低优先级规则会赢，改用单侧声明）：')
+  console.error('\n[x] 发现重复属性或未定义变量（浏览器按最后一个生效；变量缺失则整条声明静默失效）：')
   for (const f of fails) console.error('    - ' + f)
   process.exit(1)
 }
-console.log('[x] CSS 重复属性检查通过（无「简写 + 单侧」混写，无同块重复声明）')
+console.log('[x] CSS 重复属性检查通过（无「简写 + 单侧」混写，无同块重复声明，无未定义且无兜底的变量）')
