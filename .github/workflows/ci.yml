@@ -10,8 +10,8 @@ permissions:
 
 jobs:
   build:
-    # 站点构建链：20 步（含 check_dist 结构门禁、check:seo、check:geo、check:links、check:css）
-    # 加 verify（48 项 SEO / 组件 / 链接验收）。本地视频源文件走 R2 托管、不在仓库里，
+    # 站点构建链：17 步（含 check_dist 结构门禁、check:seo、check:geo、check:links、check:css）
+    # 加 verify（55 处断言点，逐页展开：SEO / 组件 / 链接）。本地视频源文件走 R2 托管、不在仓库里，
     # 所以 gen:media_keys 会自动跳过 —— 这条在本地有 mp4 时照常校验，不影响开发机。
     runs-on: ubuntu-latest
     steps:
@@ -35,6 +35,6 @@ jobs:
         working-directory: site
         run: npm run build
 
-      - name: 验收（48 项）
+      - name: 验收（55 处断言点）
         working-directory: site
         run: npm run verify

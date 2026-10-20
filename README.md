@@ -22,7 +22,7 @@ Claude 无限卡是一个独立运营的第三方 API 网关服务，把 Claude 
 
 - 全部页面源码（首页、模型广场、套餐定价、常见问题、使用教程、知识库、信任页）
 - 22 篇原创知识库文章，覆盖用法、原理、成本与报错排查
-- 构建门禁：20 步构建链 + 48 项验收断言，改坏了本地就红
+- 构建门禁：17 步构建链 + 55 处验收断言（逐页展开），改坏了本地就红
 - SEO / GEO 基建：sitemap、IndexNow 主动推送、JSON-LD、llms.txt、结构化数据
 
 **开源的只有前端展示层。** 调用通道、额度分发与服务由运营方独立运营，仓库里没有后端代码、密钥或计费逻辑，也不能用于复刻或替代该服务。购买、兑换与售后一律以[官网](https://claude-unlimited.aiautotools.com)与管理后台为准。
@@ -95,8 +95,8 @@ npm run dev        # 静态文件同步 + 4198 静态服务
 改完必须跑这几道门禁，任意一道红就别发布：
 
 ```bash
-npm run build        # 20 步构建链：结构门禁 check_dist、SEO、地理门禁、死链、CSS
-npm run verify       # 48 项验收：SEO / 组件 / 链接
+npm run build        # 17 步构建链：结构门禁 check_dist、SEO、地理门禁、死链、CSS
+npm run verify       # 55 处断言点（逐页展开）：SEO / 组件 / 链接
 npm run check:links  # 死链
 npm run check:css    # 改了 .vitepress/theme/**/*.css 必跑
 ```
