@@ -9,11 +9,12 @@
  * config.mts 在 Node 侧加载会拖进 SFC 编译器。下面的构造函数只依赖 config/ 下的纯数据模块。
  *
  * 数据仍以 config/ 为唯一真源：这里不新增任何文案，只把页面组件里那份 JSON 换个地方生成。
- * 两处必须同步——改了 FAQ、教程步骤、模型表或知识库元数据后，跑 `npm run check:jsonld` 比对产物里的 JSON。
+ * 两处必须同步——改了 FAQ、教程步骤、模型表或知识库元数据后，跑 `npm run build`
+ * （内含 gen:jsonld 把结构化数据写进产物 + check_dist 断言产物里的 JSON-LD 类型）核对结果。
  */
 import { siteConfig } from '../../../config/site'
 import { modelIds } from '../../../config/models'
-import { faqItems, faqByCategory } from '../../../config/faq'
+import { faqItems } from '../../../config/faq'
 import { consoleFaqs } from '../../../config/console'
 import { guidePage } from '../../../config/guide'
 import { knowledge, knowledgeCategories } from '../../../config/knowledge'
@@ -79,8 +80,10 @@ const jsonLdHome = {
 }
 
 /**
- * /pricing：Product + FAQPage（原 /unlimited 的 FAQ 并入这里）。
- * 购买 + 限速两类 FAQ 必须带上，缺了定价页就拿不到富摘要。
+ * /pricing：只有 Product。
+ * 2026-10-12 起 /pricing 页内不再挂 FAQ 组件，限速与封号规则只在 /faq 维护一份。
+ * FAQPage 必须与页面可见内容一致（搜索引擎按「声明了但页面上看不见」判不合格），
+ * 所以定价页不输出 FAQPage；/faq 页的 FAQPage 由下面的 faqJsonLd(faqItems) 提供。
  */
 const jsonLdPricing = {
   '@context': 'https://schema.org',
@@ -101,7 +104,6 @@ const jsonLdPricing = {
         seller: { '@type': 'Organization', name: siteConfig.name },
       },
     },
-    faqJsonLd(faqByCategory('limits')),
   ],
 }
 

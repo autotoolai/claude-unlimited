@@ -80,6 +80,11 @@ if not _m:
 SITE_URL = _m.group(1)
 # shopUrl 在 config/plans.ts 里是模板字符串，这里取 shopToken 后按同一模板拼，避免抄第二份 URL
 SHOP_URL = _const(_plans, 'shopUrl').replace('${shopToken}', _const(_plans, 'shopToken'))
+# 档位专属商品页的前缀同样从 config/plans.ts 的 itemUrl 模板取，不在脚本里抄第二份域名
+_m2 = re.search(r"export const itemUrl\s*=\s*\([^)]*\)\s*=>\s*`([^`]+)`", _plans)
+if not _m2:
+    sys.exit('未能从 config/plans.ts 读到 itemUrl 模板，请检查配置')
+ITEM_URL_PREFIX = re.sub(r'\$\{[^}]*\}', '', _m2.group(1))  # 去掉模板占位符，只留前缀
 H1_RE = re.compile(r'<' + 'h1')
 
 
@@ -193,10 +198,17 @@ def main():
     check('og:title / og:description / og:image / og:url', all(f'property="og:{k}"' in h for k in ['title', 'description', 'image', 'url']), str(re.findall(r'property="og:(title|description|image|url)" content="([^"]*)"', h)))
     check('twitter:card', 'name="twitter:card"' in h)
     # 只统计 CTA 按钮（cu-btn 类），FAQ 正文里的「前往下单页」是正文链接，不要求埋点
+    # 商品入口现在分两处：页头（nav）与首屏（hero_primary）。套餐卡的购买按钮在 /pricing，底部 CTA 指向 /pricing。
+    # 不断言按钮数量（区块增减是产品决定），只断言「该有的入口在、且属性合规」。
     buttons = re.findall(r'<a class="[^"]*cu-btn[^"]*"[^>]*href="' + re.escape(SHOP_URL) + r'"[^>]*>', h)
-    check('CTA 按钮至少 3 处（Hero / 套餐卡 / 底部 CTA）', len(buttons) >= 3, f'实际 {len(buttons)}')
-    check('CTA 按钮均 target=_blank + rel=noopener sponsored nofollow', all('target="_blank"' in b and 'rel="noopener sponsored nofollow"' in b for b in buttons))
     ctas = [re.findall(r'data-cta="([^"]*)"', b) for b in buttons]
+    cta_names = {c[0] for c in ctas if len(c) == 1 and c[0]}
+    check(
+        '首页商品入口：页头(nav) + 首屏(hero_primary) 都在',
+        {'nav', 'hero_primary'} <= cta_names,
+        f'实际 {sorted(cta_names)}',
+    )
+    check('CTA 按钮均 target=_blank + rel=noopener sponsored nofollow', all('target="_blank"' in b and 'rel="noopener sponsored nofollow"' in b for b in buttons))
     check('CTA 按钮均带非空 data-cta', all(len(c) == 1 and c[0] for c in ctas), str(ctas))
     # 导航条右侧 CTA 走 ExternalCta（带 data-cta），页头不再有第二个购买按钮
     check('导航条购买 CTA 走 ExternalCta', 'data-cta="nav"' in h, '')
@@ -270,16 +282,38 @@ def main():
         f'tiers={len(re.findall("cu-tcard__name", h))} faq={len(re.findall("cu-faq__item", h))}',
     )
     pricing = pages['/pricing'].decode('utf-8')
-    # 定价页 2026-10-11 精简：只留无限卡档位网格 + 「限速与封号」FAQ。卡片数与 FAQ 条数从 config 现算，不写死。
+    # 2026-10-12 起 /pricing 页内不再挂 FAQ 组件：限速与封号规则只在 /faq 维护一份。
+    # 卡片数与限速条数从 config 现算，不写死；「页内 0 条 FAQ」与「限速类在 /faq 齐活」一起断言，
+    # 防止以后有人在定价页把 FAQ 加回来，或把限速条目从 /faq 漏掉。
     _tiers = len(re.findall(r'cu-tcard__name', pricing))
     _pricing_faq = len(re.findall('cu-faq__item', pricing))
     _limits_faq = len(re.findall(r"cat: 'limits'", faq_src))
     check(
-        f'定价页：{_tiers} 张档位卡 + 限速类 FAQ {_limits_faq} 条',
-        _tiers >= 1 and _pricing_faq == _limits_faq,
+        f'定价页：{_tiers} 张档位卡，页内不挂 FAQ（限速类 {_limits_faq} 条只在 /faq）',
+        _tiers >= 1 and _pricing_faq == 0,
         f'tiers={_tiers} faq={_pricing_faq} limits={_limits_faq}',
     )
+    # 结构化数据必须与页面可见内容一致：页内没有 FAQ 就不许声明 FAQPage
+    check('定价页 JSON-LD 不含 FAQPage（页内没有 FAQ）', 'FAQPage' not in pricing, f'命中 {pricing.count("FAQPage")} 处')
+    # 每张可购买档位卡一个商品 CTA，指向自己的档位商品页，target/rel/埋点齐活
+    _tier_cards = _tiers - len(re.findall('cu-btn--disabled', pricing))
+    _tier_ctas = re.findall(r'<a class="[^"]*cu-btn[^"]*"[^>]*href="' + re.escape(ITEM_URL_PREFIX) + r'[^"]*"[^>]*>', pricing)
+    _tier_cta_names = [re.findall(r'data-cta="([^"]*)"', b) for b in _tier_ctas]
+    check(
+        f'定价页：{_tier_cards} 个档位 CTA，target/rel/埋点齐活',
+        len(_tier_ctas) == _tier_cards
+        and all('target="_blank"' in b and 'rel="noopener sponsored nofollow"' in b for b in _tier_ctas)
+        and all(len(c) == 1 and c[0] for c in _tier_cta_names),
+        f'cards={_tier_cards} ctas={len(_tier_ctas)} names={_tier_cta_names}',
+    )
     faq = pages['/faq'].decode('utf-8')
+    # 限速类条目必须逐条出现在 /faq（定价页不再挂 FAQ，这里是唯一主场页）
+    _limits_on_page = len(re.findall(r'id="cat-limits-[a-z0-9]+"', faq))
+    check(
+        f'FAQ 页：限速类 {_limits_faq} 条齐活',
+        _limits_on_page == _limits_faq,
+        f'页内 {_limits_on_page} 条 / config {_limits_faq} 条',
+    )
     check(
         f'FAQ 页：{_faq_total} 条 + {_faq_cats + 1} 个分类锚点（buying + {_faq_cats} 类）+ summary role=button',
         len(re.findall('cu-faq__item', faq)) == _faq_total

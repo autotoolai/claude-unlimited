@@ -87,16 +87,26 @@ export default defineConfig({
   srcExclude: [
     // 内部文档不进产物，因此也不进 sitemap（gen_sitemap 扫 dist）。
     // 这份名单是黑名单，逐个列文件名，新增内部文档一定会漏。真正的兜底在 check_dist.mjs：
-    // 它断言「dist 里的每个 html 都必须在 sitemap.xml 里」且「sitemap 里每条都必须在 dist 里」，
+    // 它断言「dist 里的每个 html 都必须在 sitemap.xml 里」且「sitemap 里每条都都在 dist 里」，
     // 所以漏写 srcExclude 会直接让 build 失败，而不是静默产生一个可索引页面。
+    // content/knowledge/drafts/ 不列在这里：草稿权威位置在 docs/ 之外，build 的页面扫描只认 srcDir；
+    // open_draft 生成的 docs/knowledge/_draft-*.md 副本由 check_dist.mjs 的「每个 md 都要有 config 条目」断言挡住。
     'README.md',
     'knowledge_writing_guide.md',
-    'knowledge/SOP-写一篇新文章.md',
     'content_structure.md',
     'plans_sync.md',
     'guide_design_spec.md',
     'troubleshooting_guide.md',
+    // 提示词与成片质量闸是写作/出片的内部素材（提示词本身是某篇文章的片段，闸门文档是内部阈值），
+    // 未成稿前不进产物：它们会被 VitePress 当成普通页面渲染（无站点外壳）并进 sitemap。
+    'prompts/**',
   ],
+  // 草稿 → 发布的中间态：草稿放 content/knowledge/drafts/<slug>.md，不进 docs/。
+  // 预览用独立端口 41802（npm run draft:preview，第二个 vitepress dev server，root=content/knowledge/preview/），
+  // 它把已发布文章与草稿同步到自己的 root 后按原生页面渲染，本 dev server（41800）完全看不到草稿。
+  // 「忘了关草稿就 build」由 open_draft 生成的 docs/knowledge/<slug>.md 副本兜底：副本没有 config 条目，
+  // check_dist.mjs 的「docs/knowledge 下每个 md 都要有条目」断言会直接让 build 失败，不会被推上线。
+  // 草稿体检：npm run check:draft；发布：npm run publish:article
   ignoreDeadLinks: true,
   head: [
     ['link', { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' }],

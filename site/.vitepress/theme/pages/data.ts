@@ -108,7 +108,13 @@ export const jsonLdModels = {
   })),
 }
 
-/** /pricing 页 JSON-LD：Product（主）+ FAQPage（购买 + 限速两类）。原 /unlimited 的 FAQ 并入这里 */
+/**
+ * /pricing 页 JSON-LD：只有 Product。
+ * 2026-10-12 起 /pricing 页内不再挂 FAQ 组件（限速与封号只在 /faq 维护一份），
+ * 结构化数据必须与页面可见内容一致，所以这里不输出 FAQPage——
+ * 否则等于向搜索引擎声明「页面上有这 4 条问答」，而页面上根本没有。
+ * /faq 页自己的 FAQPage 由 jsonLdFaq 提供。
+ */
 export const jsonLdPricing = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -128,7 +134,6 @@ export const jsonLdPricing = {
         seller: { '@type': 'Organization', name: siteConfig.name },
       },
     },
-    faqJsonLd(faqByCategory('limits')),
   ],
 }
 
