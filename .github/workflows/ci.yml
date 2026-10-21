@@ -15,7 +15,7 @@ jobs:
     # 所以 gen:media_keys 会自动跳过 —— 这条在本地有 mp4 时照常校验，不影响开发机。
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v4
         with:
