@@ -10,8 +10,11 @@ permissions:
 
 jobs:
   build:
-    # 站点构建链：17 步（含 check_dist 结构门禁、check:seo、check:geo、check:links、check:css）
-    # 加 verify（55 处断言点，逐页展开：SEO / 组件 / 链接）。本地视频源文件走 R2 托管、不在仓库里，
+    # 站点构建链：结构门禁、SEO 与地理门禁、死链检查、CSS 检查。
+    # 链首是 README 索引校验 —— README 里的清单与数字由 site/scripts/gen_readme_index.ts
+    # 从 site/config/ 生成，改了 config 却没跑 npm run gen:readme 就会红。
+    # 这条只依赖 config/ 与 docs/，不依赖 dist，所以能在昂贵的构建之前就失败。
+    # 加 verify（逐页验收断言：SEO / 组件 / 链接）。本地视频源文件走 R2 托管、不在仓库里，
     # 所以 gen:media_keys 会自动跳过 —— 这条在本地有 mp4 时照常校验，不影响开发机。
     runs-on: ubuntu-latest
     steps:
@@ -31,10 +34,10 @@ jobs:
         working-directory: site
         run: npm ci
 
-      - name: 构建（含结构门禁与死链检查）
+      - name: 构建（含 README 索引校验、结构门禁与死链检查）
         working-directory: site
         run: npm run build
 
-      - name: 验收（55 处断言点）
+      - name: 验收（逐页断言）
         working-directory: site
         run: npm run verify

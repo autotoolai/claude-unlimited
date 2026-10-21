@@ -16,7 +16,6 @@
 - [其它客户端 教程](https://claude-unlimited.aiautotools.com/guide/cursor): 已经会自己填 API 的人看这一页：三个值怎么填、各客户端的差异，一次说清。（3 步 · 手动填值）
 - [常见问题](https://claude-unlimited.aiautotools.com/faq): 全量 FAQ（商品 / 购买支付 / 使用配置 / 接入使用 / 限速封号 / 数据安全 / 关于我们）
 - [Claude 知识库](https://claude-unlimited.aiautotools.com/knowledge): Claude Code 的用法、原理、成本与报错排查，按四个主题分类查
-- [故障排除](https://claude-unlimited.aiautotools.com/troubleshooting): 站点自身的部署与构建排错
 - [变更历史](https://claude-unlimited.aiautotools.com/changelog): 按日期倒序的站点变更记录
 
 ## 事实要点

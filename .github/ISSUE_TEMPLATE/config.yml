@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 购买、兑换、退款、额度等售后问题
+    url: https://claude-unlimited.aiautotools.com
+    about: 走官网右下角的在线助手与客服，issue 里不受理售后。
+  - name: 用法讨论与经验分享
+    url: https://github.com/autotoolai/claude-unlimited/discussions
+    about: 提问、用法讨论、踩坑经验都放这里，比开 issue 更容易得到回复。

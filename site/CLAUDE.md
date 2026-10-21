@@ -23,6 +23,13 @@ Claude 无限卡官网（VitePress）。数据源在 `config/`，正文在 `docs
 - 数字不许手写进文档。文档里出现「N 项 / N 条」就是漂移的起点，以命令实际输出为准。
 - 知识库文章页写 `layout: page` + frontmatter `knowledge: true`；元数据注册在 `config/knowledge.ts`（含 `faq[]`）；素材登记在 `config/knowledge_sources.ts`（第三方域名只允许出现在这里和 `archive/`）。
 
+**仓库根 README**
+- 仓库根 `README.md` 的清单区块（知识库、教程索引、套餐价格、精选 FAQ、站点页面）由 `scripts/gen_readme_index.ts` 从 `config/` 生成，哨兵是 `<!-- readme:xxx:start -->` / `<!-- readme:xxx:end -->`。**不要手改哨兵之间的内容**，改数据源后跑 `npm run gen:readme`。
+- README 手写区允许版本号（Node 20 / Python 3.12）与流程序数（第一步 / 三步），禁止「多少篇 / 多少条 / 多少步 / 多少处」。CI 跑 `npm run check:readme`，改了 `config/` 没重生成就红。
+
+**文件命名**
+- 仓库内新建文件一律 snake_case 全小写英文。**唯一例外**：GitHub 社区健康文件用其固定大小写名（`CONTRIBUTING.md`、`CODE_OF_CONDUCT.md`、`SECURITY.md`、`.github/SUPPORT.md`、`.github/ISSUE_TEMPLATE/config.yml`），按 GitHub 约定优先。
+
 **改完必须跑**
 ```bash
 npm run check:draft -- --slug=<slug> # 写了草稿才跑：体检 frontmatter / 一句话答案 / H2 / faq / related

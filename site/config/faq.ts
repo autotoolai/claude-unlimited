@@ -43,6 +43,9 @@ export interface FaqItem {
   /** /faq 页锚点 */
   id: string
   cat: FaqCategory
+  /** 仓库 README 要展示的精选问题。/faq 页展示全量，这里只挑买家最常问的几条。
+   *  标记后由 scripts/gen_readme_index.ts 写进 README，不手写进文档。 */
+  featured?: boolean
 }
 
 export const categoryLabels: Record<FaqCategory, string> = {
@@ -59,6 +62,7 @@ export const faqItems: FaqItem[] = [
   {
     cat: 'product',
     id: 'cat-product-official',
+    featured: true,
     keywords: ['官方', 'anthropic', '是不是官方', '正品', '真假', '和anthropic什么关系', '冒牌', '山寨', '授权'],
     q: '你们是 Anthropic 官方吗？',
     a: '不是：本站是独立的第三方 API 网关服务，仅通过兼容接口转发起调用。',
@@ -66,6 +70,7 @@ export const faqItems: FaqItem[] = [
   {
     cat: 'product',
     id: 'cat-product-unlimited',
+    featured: true,
     keywords: ['无限', '无限额度', '不限量', '到底无限', '什么意思', '是不是真无限', 'token限制', '额度上限'],
     q: '「无限额度」到底无限到什么程度？',
     a: `订阅期内不按 token 计费：你发起的每次调用，无论消耗 1 千还是 20 万 token，都包含在订阅价里。
@@ -76,6 +81,7 @@ export const faqItems: FaqItem[] = [
   {
     cat: 'product',
     id: 'cat-product-models',
+    featured: true,
     keywords: ['模型', '支持哪些模型', 'opus', 'fable', '5.5', '5.1', '版本', '新模型'],
     q: '支持哪些模型？新模型上线要换 Key 吗？',
     a: `本卡承诺 Fable 5.1 与 Opus 5.5 两个模型，均在同一订阅价内，不因选择 Opus 产生额外费用。
@@ -88,6 +94,7 @@ model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与
   {
     cat: 'product',
     id: 'cat-product-tools',
+    featured: true,
     keywords: ['工具', '支持什么工具', 'claude code', 'cursor', 'cline', 'roo code', 'aider', 'continue', '客户端', '编辑器'],
     q: '支持哪些客户端和工具？',
     a: `凡是能接 Anthropic 或 OpenAI 兼容接口的都能用，包括：Claude Code、Cursor、Cline、Roo Code、Aider、Continue、Zed、JetBrains、VS Code，以及官方 Python / TypeScript / Go SDK。
@@ -273,6 +280,7 @@ Key 不需要因为模型升级而更换——新模型上线只改 model ID。`
   {
     cat: 'limits',
     id: 'cat-limits-speed',
+    featured: true,
     keywords: ['限速', '速率', '并发', 'rps', 'tpm', 'rpm', '限制', '公平使用', 'fair use', '多少并发', '上限'],
     q: '限速和并发的具体数字是多少？',
     a: `为保证所有用户稳定访问，网关设有公平使用速率限制，具体数值会随上游容量调整：
@@ -314,6 +322,7 @@ Claude Code、Cursor、Cline、Roo Code、Aider 等主流工具都有内置重�
   {
     cat: 'limits',
     id: 'cat-limits-appeal',
+    featured: true,
     keywords: ['申诉', '被限制了', '恢复了', '复通', '怎么解除', '投诉限制', '误判'],
     q: '被限制了怎么申诉？',
     a: `先看返回的错误类型：429 是速率限制，等待 Retry-After 后自动恢复，不需要申诉。
@@ -325,6 +334,7 @@ Claude Code、Cursor、Cline、Roo Code、Aider 等主流工具都有内置重�
   {
     cat: 'security',
     id: 'cat-security-store',
+    featured: true,
     keywords: ['存储', '存不存', '日志', '记录', '保存多久', '数据留存', '隐私', '存', '留存'],
     q: '我的请求内容会被存储吗？',
     a: `我们以提供服务与排查故障所必需的限度记录用量元数据（调用时间、模型、状态、消耗、请求标识），不记录你的 prompt 正文与模型输出。
@@ -370,6 +380,7 @@ Claude Code、Cursor、Cline、Roo Code、Aider 等主流工具都有内置重�
   {
     cat: 'about',
     id: 'cat-about-sla',
+    featured: true,
     keywords: ['可用率', 'sla', '稳定性', '宕机', '故障', '挂了', '不能用了', '稳定性保证'],
     q: '稳定性有保障吗？',
     a: `网关通过多上游账号智能路由与自动故障转移来提升可用性，目标可用率 99.9%。但服务依赖上游模型供应商与公网，我们不对不中断作绝对保证。

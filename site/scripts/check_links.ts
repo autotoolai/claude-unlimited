@@ -4,6 +4,7 @@
  */
 import { readdirSync, statSync, readFileSync, existsSync } from 'node:fs'
 import { join, relative, sep } from 'node:path'
+import { siteConfig } from '../config/site'
 
 const dist = join(process.cwd(), '.vitepress', 'dist')
 const SRC_PREFIX = '' // 与 config.mts 的 srcDir='docs' 对应：条目页产物直接在 dist 根
@@ -75,5 +76,27 @@ for (const file of files) {
   }
 }
 
-console.log(`[links] 检查 ${files.length} 个页面，${checked} 条站内链接，死链 ${broken} 条`)
+/* llms.txt / llms-full.txt 是给 AI 读的索引，里面的站内绝对 URL 也必须是活页。
+   之前只扫 HTML 的 href/src，llms.txt 是纯文本，扫不到——于是 gen_llms.ts 里写了一条
+   不存在的 /troubleshooting 链接，AI 读到的就是 404。这里补上这道校验。 */
+const ORIGIN = siteConfig.url.replace(/\/+$/, '')
+let txtChecked = 0
+for (const name of ['llms.txt', 'llms-full.txt']) {
+  const abs = join(dist, name)
+  if (!existsSync(abs)) continue
+  const txt = readFileSync(abs, 'utf8')
+  const re = new RegExp(ORIGIN.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(/[^)\\s]*)?', 'g')
+  let m: RegExpExecArray | null
+  while ((m = re.exec(txt))) {
+    const route = (m[1] || '/').split('#')[0].split('?')[0]
+    if (!route || route === '/') continue
+    txtChecked++
+    if (!targetFor(route).some(existsSync)) {
+      console.error(`[links] 死链: ${name} -> ${route}`)
+      broken++
+    }
+  }
+}
+
+console.log(`[links] 检查 ${files.length} 个页面，${checked} 条站内链接，${txtChecked} 条 llms.txt 链接，死链 ${broken} 条`)
 process.exit(broken ? 1 : 0)

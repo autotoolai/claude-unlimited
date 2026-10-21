@@ -37,7 +37,6 @@ const pageLines = [
   ),
   `- [常见问题](${BASE}/faq): 全量 FAQ（商品 / 购买支付 / 使用配置 / 接入使用 / 限速封号 / 数据安全 / 关于我们）`,
   `- [Claude 知识库](${BASE}/knowledge): Claude Code 的用法、原理、成本与报错排查，按四个主题分类查`,
-  `- [故障排除](${BASE}/troubleshooting): 站点自身的部署与构建排错`,
   `- [变更历史](${BASE}/changelog): 按日期倒序的站点变更记录`,
 ]
 

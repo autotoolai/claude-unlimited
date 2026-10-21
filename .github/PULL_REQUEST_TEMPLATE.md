@@ -6,10 +6,12 @@
 
 <!-- 列出跑过的命令与结果。涉及站点改动的必须附上这些门禁的通过输出：
 
-- `cd site && npm run build`（含 20 步构建链与 check_dist 结构门禁）
-- `cd site && npm run verify`（SEO / 组件 / 链接验收）
+- `cd site && npm run build`（含结构门禁、SEO 与地理门禁、死链与 CSS 检查）
+- `cd site && npm run verify`（逐页验收断言：SEO / 组件 / 链接）
 - `cd site && npm run check:links`（死链）
 - `cd site && npm run check:css`（改了 .vitepress/theme/**/*.css 必跑）
+- `cd site && npm run check:readme`（改了 site/config/ 里的数据、想让 README 清单跟着变时必跑；
+  不过则跑 `npm run gen:readme` 生成后再提交）
 -->
 
 ## 注意

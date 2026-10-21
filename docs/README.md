@@ -6,6 +6,13 @@
 |---|---|---|
 | Claude 无限卡官网（静态展示站） | `site/` | [`site/README.md`](../site/README.md)（现状与命令）· [`site/docs/README.md`](../site/docs/README.md)（文档地图）· [`site/docs/troubleshooting_guide.md`](../site/docs/troubleshooting_guide.md)（故障排除）· [`site/docs/changelog.md`](../site/docs/changelog.md)（变更历史） |
 
+## 仓库级文档
+
+| 文档 | 讲什么 |
+|---|---|
+| [`seo_geo_infrastructure.md`](seo_geo_infrastructure.md) | 搜索引擎与 AI 检索基建：canonical、JSON-LD、sitemap、llms.txt、主动推送。改 URL 会连带改什么。 |
+| [`maintenance_notes.md`](maintenance_notes.md) | 维护者的操作笔记：凭据与 workflow scope、部署前的清盘动作、README 的生成机制。 |
+
 本机另有 `vpns_beer_agent/`（vpns.beer 代理平台登录自动化，与官网无关且明文存凭据，不随公开仓库发布）、
 `site/archive/knowledge_source_20261009/`（第三方站点原文副本，仅作事实核对）与竞品站分析文档，
 这三处都只在本机保留，不在 GitHub 上。
