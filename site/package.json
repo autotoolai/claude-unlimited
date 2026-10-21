@@ -51,7 +51,7 @@
     "cross-env": "^7.0.3",
     "playwright": "^1.61.1",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2",
+    "typescript": "^7.0.2",
     "vitepress": "^1.6.4",
     "vue-tsc": "^2.1.10"
   }
