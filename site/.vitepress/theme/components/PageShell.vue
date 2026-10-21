@@ -38,16 +38,23 @@ const props = defineProps<{
    * 目录数据仍来自 sections.ts 的 SECTION_NAV[slug]。
    */
   toc?: 'side' | 'wide'
-  /**
-   * 窄列正文但没有页内目录（教程索引页）。
-   * 与 toc 的区别：toc 会渲染左侧目录并把外壳撑成两列，narrow 只有窄列那一列。
-   * 两者互斥：toc 在场时 narrow 忽略。
-   */
-  narrow?: boolean
 }>()
 
 const sections = computed(() => {
   return props.toc ? SECTION_NAV[props.slug] || [] : []
+})
+
+/**
+ * 教程页分两种版式，各自一个标记类：
+ * - 'index'：/guide 索引页。跟套餐页、模型页同一套营销页版式：满宽 1140px、页头居中。
+ * - 'scene'：/guide/<客户端> 场景页。阅读列版式：56rem 正文 + 左侧目录、页头顶格左对齐。
+ * 两类之前共用一个 cu-guide-wrap，索引页因此继承了场景页的「顶格左对齐页头」，
+ * 首屏出现「左标题 + 居中副标题」两套轴。拆开后各自独立。
+ */
+const guideKind = computed(() => {
+  const s = props.slug.replace(/^\//, '')
+  if (s === 'guide') return 'index'
+  return s.startsWith('guide/') ? 'scene' : ''
 })
 const eyebrow = computed(() => props.eyebrow || siteConfig.name)
 const shopUrl = computed(() => featuredProduct().shopUrl)
@@ -117,7 +124,12 @@ useReveal()
 
     <div
       class="cu-shell__body"
-      :class="{ 'cu-shell__body--reading': !!toc, 'cu-shell__body--narrow': narrow && !toc, 'cu-guide-wrap': slug.replace(/^\//, '').startsWith('guide'), 'cu-shell__body--no-toc': !sections.length }"
+      :class="{
+        'cu-shell__body--reading': !!toc,
+        'cu-guide-wrap': guideKind === 'scene',
+        'cu-guide-index': guideKind === 'index',
+        'cu-shell__body--no-toc': !sections.length,
+      }"
     >
       <!-- 目录在正文之前：宽屏是左侧一列，窄屏塌成抽屉（靠 DOM 顺序，不靠 order）。
            variant="guide"：教程页目录形态（压顶部留白、去进度条），与知识库文章页分开。 -->

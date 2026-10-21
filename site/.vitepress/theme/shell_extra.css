@@ -883,35 +883,150 @@
   line-height: 1.5;
 }
 
-/* 场景卡：整卡可点，指向各自的教程页 */
-.cu-guide-scene-cards {
-  margin: 1.2rem 0 1rem;
+/* ---------- 教程索引页（/guide）：与套餐页 / 模型页同一套轴与卡片语言 ----------
+   索引页不是阅读页，是分流页：它跟 /pricing、/models 一样是营销页外壳
+   （满宽 1140px、页头居中），场景卡也用模型页 .cu-mcard 的度量。
+   这一段的类都带 .cu-guide-index 前缀，只作用于索引页——
+   5 个场景页（.cu-guide-rail）共用 .cu-guide-answer / .cu-guide-h2 等类，不受影响。 */
+
+/* 一句话答案：索引页版式是居中，答案条也得居中。
+   原来它被 .cu-page p 的 margin:auto + max-width 压成「缩在中间的引文」，
+   和上方左对齐的标题差 96px。底色用 --cu-bg-soft（比场景卡的 --cu-card 浅一档），
+   与下方 5 张客户端卡区分开。场景页的 .cu-guide-answer 仍是左侧墨条形态。 */
+.cu-guide-index .cu-guide-answer {
+  max-width: 46rem;
+  margin: 1.5rem auto 0;
+  padding: 1.15rem 1.5rem;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-md);
+  background: var(--cu-bg-soft);
+  color: var(--cu-ink);
+  font-size: 1.12rem;
+  font-weight: 600;
+  line-height: 1.75;
+  text-align: center;
 }
 
-.cu-guide-scene-card h3 {
-  margin: 0 0 0.45rem;
-  font-size: 1.06rem;
+/* 分组标签：抄套餐页 .cu-tgrid-head 的网格头（无衬线 1.25rem 左对齐），
+   只是本页用 h2 承担（check_dist 要求外壳内至少有一个 h2）。
+   索引页整页只有两段，上间距从营销页的 6.5rem 收到 3rem。 */
+.cu-guide-index .cu-guide-index__label {
+  margin: 3rem 0 0;
+  font-family: var(--cu-sans);
+  font-size: 1.25rem;
   font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-align: left;
   color: var(--cu-ink);
 }
 
-.cu-guide-scene-card p {
-  margin: 0 0 0.7rem;
-  color: var(--cu-ink-2);
-  font-size: 0.94rem;
-  line-height: 1.72;
+/* 场景卡网格：抄模型页 .cu-mcards 的 auto-fill minmax(300px,1fr) + gap 1rem。
+   满宽 1140px 下正好 3 列（每列 369px）；窄屏自动降 2 列 / 1 列。 */
+.cu-guide-index .cu-guide-scene-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 0;
 }
 
-.cu-guide-scene-card__meta {
-  display: inline-block;
-  margin-top: auto;
-  padding: 0.18rem 0.6rem;
+/* 卡片本体：抄模型页 .cu-mcard 的度量（--cu-card 底、--cu-line 边、--cu-r-md 12px、
+   padding 1.15/1.25/1.2、gap .7rem、hover 上浮 3px + --cu-shadow-lift）。 */
+.cu-guide-index .cu-guide-scene-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1.15rem 1.25rem 1.2rem;
+  background: var(--cu-card);
   border: 1px solid var(--cu-line);
-  border-radius: 999px;
-  background: var(--cu-card-solid);
-  color: var(--cu-muted);
-  font-size: 0.8rem;
+  border-radius: var(--cu-r-md);
+  color: var(--cu-ink);
+  text-decoration: none;
+  transition: transform var(--cu-dur) var(--cu-ease), box-shadow var(--cu-dur) var(--cu-ease),
+    border-color 0.3s var(--cu-ease);
+}
+
+.cu-guide-index .cu-guide-scene-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--cu-line-strong);
+  box-shadow: var(--cu-shadow-lift);
+  text-decoration: none;
+}
+
+/* 客户端名当「档位名」看：与套餐卡 .cu-tcard__name 同规格（1.2rem / 800）。 */
+.cu-guide-index .cu-guide-scene-card h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--cu-ink);
+}
+
+/* 描述与模型卡 .cu-mcard__summary 同规格。 */
+.cu-guide-index .cu-guide-scene-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--cu-ink);
+}
+
+/* 步数徽标与模型卡 .cu-mcard__tag 同规格；margin-top:auto 让它贴卡底，
+   同一行卡片的徽标落在同一水平线上。 */
+.cu-guide-index .cu-guide-scene-card__meta {
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-pill);
+  background: var(--cu-bg-soft);
+  color: var(--cu-ink-2);
+  font-size: 0.74rem;
+  font-weight: 600;
   line-height: 1.5;
+}
+
+/* 收尾卡：「其它客户端」是兜底项，横跨两列把最后一行补齐（不留空格），
+   内部改成横向排布，避免宽卡里竖着三行字显得空荡。
+   3 列时：第 1 行 3 张 + 第 2 行 1 张 + 这张跨 2 列（正好补满 3 列）；
+   2 列时：这张独占一行满宽；1 列时复位成普通卡
+   （否则 span 2 会撑出隐式列、横向溢出）。 */
+.cu-guide-index .cu-guide-scene-card--wide {
+  grid-column: span 2;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  column-gap: 1.25rem;
+}
+
+.cu-guide-index .cu-guide-scene-card--wide h3 {
+  flex: 0 0 auto;
+}
+
+.cu-guide-index .cu-guide-scene-card--wide p {
+  flex: 1 1 18rem;
+}
+
+.cu-guide-index .cu-guide-scene-card--wide .cu-guide-scene-card__meta {
+  margin-top: 0;
+}
+
+@media (max-width: 680px) {
+  .cu-guide-index .cu-guide-scene-card--wide {
+    grid-column: auto;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cu-guide-index .cu-guide-scene-card--wide .cu-guide-scene-card__meta {
+    margin-top: auto;
+  }
+}
+
+/* 「接着看」区块：标签已承担分隔，去掉旧的顶部细线，网格跟场景卡同一套间隙。 */
+.cu-guide-index .cu-next {
+  margin: 1.5rem 0 0;
+  padding-top: 0;
+  border-top: 0;
 }
 
 /* 可放大的截图：密集界面图在 544px 版心里看不清，点开看原图 */

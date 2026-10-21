@@ -5,8 +5,11 @@
  * 这一页只回答一个问题：你在哪个客户端里用 Claude。选完进对应场景页，
  * 那里有从换 Key 到检测链路的完整步骤。旧的 /guide#锚点 也在这一页做兼容跳转
  * （guideLegacyAnchors，见 config/guide.ts）——fragment 不上服务器，只能客户端处理。
+ *
+ * 版式：跟套餐页、模型页同一套营销页外壳（满宽 1140px、页头居中），
+ * 场景卡用模型页 .cu-mcard 的度量。具体见 docs/guide_design_spec.md。
  */
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import PageShell from './PageShell.vue'
 import JsonLd from './JsonLd.vue'
 import CtaBand from './CtaBand.vue'
@@ -15,6 +18,7 @@ import { partnerUrl } from '../../../config/site'
 import { jsonLdGuideIndex } from '../pages/data'
 
 const index = guideIndex
+const cards = computed(() => guideSceneCards())
 
 /** 旧锚点兼容：/guide#models 这类老链接跳到新场景页的同名小节 */
 onMounted(() => {
@@ -28,21 +32,20 @@ onMounted(() => {
 <template>
   <JsonLd id="cu-jsonld-guide-index" :json="jsonLdGuideIndex()" />
 
-  <PageShell slug="/guide" narrow :title="index.title" :lead="index.lead" :eyebrow="index.eyebrow">
+  <PageShell slug="/guide" :title="index.title" :lead="index.lead" :eyebrow="index.eyebrow">
     <!-- 一句话答案：与 5 个场景页同一个来源（config/guide.ts 的 guideIndex.answer），
-         这样索引页的答案、JSON-LD 里的 description、llms-full.txt 里的那句是同一句话，不会各说各的 -->
+         这样索引页的答案、JSON-LD 里的 description、llms-full.txt 里的那句是同一句话，不会各说各的。
+         样式见 shell_extra.css 的「教程索引页」段：居中的结论条（不是场景页那种左侧墨条）。 -->
     <p class="cu-guide-answer">{{ index.answer }}</p>
 
-    <h2 id="pick-client" class="cu-guide-h2">选一个你用的客户端</h2>
-    <p class="cu-guide-lead">
-      每条路都是从换取 API Key 开始，到检测链路结束。跟着做就行，不用先懂原理。
-    </p>
+    <h2 id="pick-client" class="cu-guide-index__label">{{ cards.length }} 个客户端</h2>
 
-    <div class="cu-cards cu-cards--two cu-guide-scene-cards">
+    <div class="cu-guide-scene-cards">
       <a
-        v-for="c in guideSceneCards()"
+        v-for="c in cards"
         :key="c.id"
-        class="cu-card cu-card--link cu-guide-scene-card"
+        class="cu-guide-scene-card"
+        :class="{ 'cu-guide-scene-card--wide': c.wide }"
         :href="c.url"
       >
         <h3>{{ c.title }}</h3>
@@ -51,9 +54,9 @@ onMounted(() => {
       </a>
     </div>
 
+    <h2 class="cu-guide-index__label">接着看</h2>
     <nav class="cu-next" aria-label="接着看">
       <a v-for="n in index.next" :key="n.url" :href="n.url">
-        <small>接着看</small>
         <strong>{{ n.text }}</strong>
       </a>
     </nav>

@@ -6,7 +6,7 @@ import { knowledgeCategories } from '../../../config/knowledge'
  *
  * 谁会显示目录由调用方决定，不是这里：
  * - 教程场景页 PageShell 传 toc="side" → 5 个场景页各用自己的 slug（/guide/cc 等）；
- * - 教程索引页（/guide）2026-10-20 起传 narrow，不显示目录；"/guide" 这组只留锚点 id 备查；
+ * - 教程索引页（/guide）不显示目录；"/guide" 这组只留锚点 id 备查；
  * - 后台页 PageShell 传 toc="wide" → 用 console 这组；
  * - 知识库文章页目录由 KnowledgeDoc 从正文 h2 客户端读取，不用这张表。
  * 下面 index / models / pricing / faq / knowledge_index 五组是营销页与列表页的，
@@ -62,8 +62,8 @@ export const SECTION_NAV: Record<string, SectionLink[]> = {
       ],
     ]),
   ),
-  // 教程索引页（/guide）：2026-10-20 起不显示页内目录（客户端场景页仍有）。
+  // 教程索引页（/guide）：不显示页内目录（客户端场景页仍有）。
   // 这里只留正文里的锚点 id，与页面结构一一对应，方便排查与老链接定位。
-  '/guide': [{ id: 'pick-client', label: '选一个你用的客户端' }],
+  '/guide': [{ id: 'pick-client', label: '5 个客户端' }],
 }
 

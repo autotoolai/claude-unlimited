@@ -135,7 +135,7 @@ export interface GuideIndex {
   title: string
   desc: string
   eyebrow: string
-  /** 页头下的一句话：先选客户端，再照着做 */
+  /** 页头下的一句话：从换取 API Key 到检测链路怎么走 */
   lead: string
   /** 一句话答案：喂 llms-full.txt */
   answer: string
@@ -154,6 +154,8 @@ export interface GuideSceneCard {
   /** 角标：几步 · 形态（步数由块数派生，不手写） */
   meta: string
   url: string
+  /** 收尾卡：横跨两列，把最后一行补齐（兜底项「其它客户端」用） */
+  wide?: boolean
 }
 
 /* ---------------- 公共块：正文只写一份，被多个场景页引用 ---------------- */
@@ -790,7 +792,7 @@ export const guideIndex: GuideIndex = {
   title: '使用教程',
   desc: 'Claude 无限卡使用教程：按客户端选一条路——Claude Code、Claude 桌面版、Codex、WorkBuddy、Cursor 等，每条路都有完整步骤与真实截图。',
   eyebrow: '已经买好了，从这里开始',
-  lead: '先选你用的客户端，再照着做。每条路都是从换取 API Key 开始，到检测链路结束，每一步都有真实截图。',
+  lead: '从换取 API Key 到检测链路，跟着做就行，不用先懂原理。',
   answer: '先选你用的客户端——Claude Code、Claude 桌面版、Codex、WorkBuddy、Cursor 各有一条完整路径，每一步都带真实截图，照着做就能跑起来。',
   tags: ['claude 无限卡 使用教程', 'claude 无限卡 教程', 'claude code 教程', 'claude 桌面版 教程', 'codex 教程', 'workbuddy 教程', 'cursor 配置 claude api'],
   next: [
@@ -820,6 +822,8 @@ export function guideSceneCards(): GuideSceneCard[] {
     desc: p.summary,
     meta: p.blocks.length + ' 步 · ' + tags[p.scene],
     url: p.slug,
+    // 「其它客户端」是兜底项，做横跨两列的收尾卡
+    wide: p.scene === 'cursor' ? true : undefined,
   }))
 }
 
