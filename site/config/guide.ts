@@ -935,4 +935,7 @@ export const guideLegacyAnchors: Record<string, string> = {
   'vscode': '/guide/cc#cc-vscode',
   'pro-key': '/guide/cursor#cursor-get-key',
   'params': '/guide/cursor#cursor-params',
+  // 2026-10-20 索引页瘦身时删掉的两段小节：老链接指到内容最接近的地方
+  'first-step': '/guide/cc#cc-get-key',   // 换取 API Key（每个客户端页的第一步）
+  'not-sure': '/guide/cursor#cursor-params', // 「不确定用哪个」原本指向的通用手动配置
 }

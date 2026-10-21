@@ -28,7 +28,7 @@ onMounted(() => {
 <template>
   <JsonLd id="cu-jsonld-guide-index" :json="jsonLdGuideIndex()" />
 
-  <PageShell slug="/guide" toc="side" :title="index.title" :lead="index.lead" :eyebrow="index.eyebrow">
+  <PageShell slug="/guide" narrow :title="index.title" :lead="index.lead" :eyebrow="index.eyebrow">
     <!-- 一句话答案：与 5 个场景页同一个来源（config/guide.ts 的 guideIndex.answer），
          这样索引页的答案、JSON-LD 里的 description、llms-full.txt 里的那句是同一句话，不会各说各的 -->
     <p class="cu-guide-answer">{{ index.answer }}</p>
@@ -50,25 +50,6 @@ onMounted(() => {
         <small class="cu-guide-scene-card__meta">{{ c.meta }}</small>
       </a>
     </div>
-
-    <h2 id="first-step" class="cu-guide-h2">所有客户端都从这一步开始</h2>
-    <p class="cu-guide-lead">
-      卡密在发货信息里，先在管理后台把它换成一把 <code>sk-</code> 开头的 API Key，
-      后面每个客户端都填这一把。换好之后，Key 会一直留在后台里，随时能回去看。
-    </p>
-    <ul class="cu-guide-list">
-      <li>主域名打不开时，用后台里的备用域名，Key 不用重换。</li>
-      <li>换好的 Key 以 <code>sk-</code> 开头，在 CC Switch、各个客户端、终端里通用。</li>
-      <li>还没配好就点上面的卡片，每一页的第一步都是「换取 API Key」。</li>
-    </ul>
-
-    <h2 id="not-sure" class="cu-guide-h2">不确定用哪个？</h2>
-    <p class="cu-guide-lead">
-      绝大多数人用 <strong>Claude Code</strong>：命令行或 VS Code 插件，CC Switch 一键导入最省事。
-      想在图形界面里用对话，选 <strong>Claude 桌面版</strong>。
-      已经会用命令行工具的，或者要用别的客户端，看
-      <a href="/guide/cursor">通用手动配置</a>——三个值填对就能用。
-    </p>
 
     <nav class="cu-next" aria-label="接着看">
       <a v-for="n in index.next" :key="n.url" :href="n.url">

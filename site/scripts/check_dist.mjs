@@ -92,9 +92,10 @@ for (const [route, file] of Object.entries(PAGES)) {
   const where = route
   const isKnowledgeArticle = route.startsWith('/knowledge/') && route !== '/knowledge'
   const isKnowledgeIndex = route === '/knowledge'
-  // 长文页才有左侧目录（.cu-sidenav）：教程页、后台页由 PageShell 传 toc，知识库文章页自带。
-  // 营销页与列表页（/ /models /pricing /faq /knowledge）不应该再出现任何页内目录。
-  const hasToc = route.startsWith('/guide') || route === '/console'
+  // 长文页才有左侧目录（.cu-sidenav）：教程场景页（/guide/<scene>）、后台页由 PageShell 传 toc，
+  // 知识库文章页自带。教程索引页（/guide）2026-10-20 起不再显示目录。
+  // 营销页与列表页（/ /models /pricing /faq /knowledge）同样不应该再出现任何页内目录。
+  const hasToc = route.startsWith('/guide/') || route === '/console'
   // 首页的 H1 在 Hero 里（HomeHero 组件），知识库文章页的 H1 在 markdown 里，都没有 cu-page__head
   const headKeys = route === '/' || isKnowledgeArticle ? [] : ['cu-page__head']
   const keys = ['cu-brandbar', 'cu-tabs__inner', 'cu-shell__body', 'cu-foot', ...headKeys, 'cu-kefu__fab']

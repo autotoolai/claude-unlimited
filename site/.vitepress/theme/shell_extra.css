@@ -883,26 +883,6 @@
   line-height: 1.5;
 }
 
-.cu-guide-list {
-  margin: 0.6rem 0 0;
-  padding-left: 1.2rem;
-  color: var(--cu-ink-2);
-  font-size: 0.95rem;
-  line-height: 1.8;
-}
-
-.cu-page .cu-guide-list li {
-  margin: 0.2rem 0;
-}
-
-.cu-guide-list code {
-  padding: 0.1rem 0.32rem;
-  border-radius: 4px;
-  background: var(--cu-accent-soft);
-  font-family: var(--cu-mono);
-  font-size: 0.88em;
-}
-
 /* 场景卡：整卡可点，指向各自的教程页 */
 .cu-guide-scene-cards {
   margin: 1.2rem 0 1rem;

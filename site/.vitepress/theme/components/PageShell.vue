@@ -34,10 +34,16 @@ const props = defineProps<{
   eyebrow?: string
   /**
    * 页内目录：不传（默认）= 不显示，只有长文页才开。
-   * 'side' 窄列长读（教程页），'wide' 宽列（后台页的 3 列卡网格）。
+   * 'side' 窄列长读（教程场景页），'wide' 宽列（后台页的 3 列卡网格）。
    * 目录数据仍来自 sections.ts 的 SECTION_NAV[slug]。
    */
   toc?: 'side' | 'wide'
+  /**
+   * 窄列正文但没有页内目录（教程索引页）。
+   * 与 toc 的区别：toc 会渲染左侧目录并把外壳撑成两列，narrow 只有窄列那一列。
+   * 两者互斥：toc 在场时 narrow 忽略。
+   */
+  narrow?: boolean
 }>()
 
 const sections = computed(() => {
@@ -111,7 +117,7 @@ useReveal()
 
     <div
       class="cu-shell__body"
-      :class="{ 'cu-shell__body--reading': !!toc, 'cu-guide-wrap': slug.replace(/^\//, '').startsWith('guide'), 'cu-shell__body--no-toc': !sections.length }"
+      :class="{ 'cu-shell__body--reading': !!toc, 'cu-shell__body--narrow': narrow && !toc, 'cu-guide-wrap': slug.replace(/^\//, '').startsWith('guide'), 'cu-shell__body--no-toc': !sections.length }"
     >
       <!-- 目录在正文之前：宽屏是左侧一列，窄屏塌成抽屉（靠 DOM 顺序，不靠 order）。
            variant="guide"：教程页目录形态（压顶部留白、去进度条），与知识库文章页分开。 -->

@@ -168,7 +168,9 @@ function Get-BaiduPushedSet {
       if ($u) { [void]$set.Add($u) }
     }
   }
-  return $set
+  # The comma keeps PowerShell from unrolling the HashSet into individual strings;
+  # an empty set would otherwise come back as $null and $pushed.Contains() would throw.
+  return ,$set
 }
 
 function Add-BaiduPushed {

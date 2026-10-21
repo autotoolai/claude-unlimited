@@ -435,6 +435,20 @@
   max-width: 54rem;
 }
 
+/* —— 窄列正文、没有左侧目录（教程索引页）——
+   不用 .cu-shell__body--reading：那个类同时绑着 224px 目录列与目录折叠态
+   （html.cu-toc-collapsed 是全站共享状态，存在 localStorage 里），
+   索引页没有目录，折叠态会把正文挤进 40px 的窄轨。
+   这里另起一个类：文字宽度与场景页一致（--cu-content-w 44rem），正文列 56rem 居中。 */
+.cu-shell__body--narrow {
+  --cu-content-w: 44rem;
+}
+
+.cu-shell__body--narrow .cu-shell__inner {
+  max-width: 56rem;
+  margin-inline: auto;
+}
+
 
 /* 教程页整体再放宽到 52rem（约 832px）：行宽仍由文字层自己管住——
    引导语 / 段落 / 动作 / 提示全部限宽 --cu-guide-text（46rem ≈ 736px，约 33 个汉字一行），

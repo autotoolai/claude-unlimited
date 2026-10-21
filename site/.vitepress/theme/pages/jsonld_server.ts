@@ -55,7 +55,17 @@ const faqJsonLd = (items: { q: string; a: string }[]) => ({
 const jsonLdHome = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Organization', '@id': BASE + '/#org', name: siteConfig.name, url: BASE, description: siteConfig.description },
+    {
+      '@type': 'Organization',
+      '@id': BASE + '/#org',
+      name: siteConfig.name,
+      url: BASE,
+      description: siteConfig.description,
+      // sameAs 把官网与公开仓库指认为同一实体的两个入口。首页的 Organization 是
+      // 这里手写的字面量，文件顶部的 org 常量并没有被 jsonLdHome 用上，所以这里
+      // 必须自己写一遍；与 pages/data.ts 的客户端版本保持同步（两份要一致）。
+      sameAs: [siteConfig.sourceRepo.url],
+    },
     {
       '@type': 'WebSite',
       '@id': BASE + '/#site',
