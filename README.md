@@ -149,6 +149,31 @@ pwsh -File scripts/deploy_claude_unlimited_site.ps1
 
 提交前跑完上面那四道门禁，并在 PR 里贴上输出。
 
+## 维护说明
+
+- **改 `.github/workflows/` 需要带 `workflow` scope 的凭据。** OAuth 令牌（`gho_`）默认只带
+  `gist` / `read:org` / `repo`，推 workflow 文件会被 GitHub 整次拒绝：
+
+  ```
+  ! [remote rejected] master -> master (refusing to allow an OAuth App to create
+    or update workflow `.github/workflows/ci.yml` without `workflow` scope)
+  ```
+
+  本机可用的凭据是 `futianren` 的 `ghp_` PAT。注意全局 git config 里挂着 `gh` 的凭据助手，
+  它**优先于** `GIT_ASKPASS` 回答凭据，所以必须 `git -c credential.helper= push` 清空 helper 链，
+  否则 askpass 不生效、仍然会用到没有 workflow scope 的令牌。
+
+- **本地验收**：`cd site && npm run build`，再跑 `npm run check:dist`（产物结构门禁）与
+  `npm run verify:build`（逐页断言 SEO / 组件 / 链接）。改完页面先跑这几条。
+
+- **部署**：`site/scripts/deploy_claude_unlimited_site.ps1`（先 `npm run build`，再
+  `wrangler pages deploy`）。站点域名 `claude-unlimited.aiautotools.com` 绑在
+  Cloudflare Pages 项目 `claude-unlimited-site` 上。
+
+- **搜索推送**：`site/scripts/seo_notify.ps1` 走 IndexNow + Bing + 百度 + GSC。
+  百度有每日配额（10 条），GSC 需要 `site/temp/seo_probe/.venv` 里的 `google-auth`，
+  且服务账号在 GSC 后台要有该属性的 Full 权限。
+
 ## License
 
 [MIT](LICENSE)。代码可自由取用；品牌、服务与商标不在授权范围内。
