@@ -22,9 +22,9 @@ config/rules.ts    限流数字 / 套餐边界 / 退款窗口的唯一数据源�
 config/site.ts     站点元信息 + 商品（价格 / 周期天数 days / 承诺 promise）+ 合作平台地址（purchase / activation / ccswitch）+ 客服联系方式（全站唯一数据源）
 config/faq.ts      FAQ 唯一数据源（页面 + 助手 + JSON-LD 共用；7 个分类，使用与配置分类来自卖家教程站）
 config/models.ts   模型层级与 model ID 表（/models、教程页、FAQ 共用）
-config/guide.ts    使用教程的内容数据（索引页 + 5 个客户端场景页；唯一编辑入口，改教程只改这里）
+config/guide.ts    使用教程的内容数据（索引页 + 6 个场景页；唯一编辑入口，改教程只改这里）
 config/logo.ts     品牌标记「无限」符号的唯一数据源（几何 + 品牌橙 #C85A1E / 米白 #FFF6EC），派生 favicon.svg、BrandLogo.vue、OG 分享图；改 logo 只改这里再 `npm run gen:logo`
-docs/              内容根（srcDir=docs）：首页 / pricing / faq / models / console / 信任页三页 / changelog + guide（索引页 + 5 个场景页）/ knowledge（索引页 + 文章）+ guide/assets 截图
+docs/              内容根（srcDir=docs）：首页 / pricing / faq / models / console / 信任页三页 / changelog + guide（索引页 + 6 个场景页）/ knowledge（索引页 + 文章）+ guide/assets 截图
 content/knowledge/  草稿工作台：drafts/ 正文与素材卡、scripts/（preview 预览端口 / check_draft 体检 / publish_article 发布）、guide.md 流程、log.md 改进日志
 scripts/           构建脚本（sitemap、死链检查、部署、analytics/ 看板抓取与渲染、check_analytics.mjs 埋点门禁）；草稿相关脚本在 content/knowledge/scripts/
 .vitepress/analytics_snippets.ts  统计埋点的 head 片段（Umami / 百度统计，两项留空则不注入）

@@ -71,8 +71,28 @@ const slugArg = flags.find((a) => a.startsWith('--slug='))?.slice(7)
   || process.env.CU_TOC_SAMPLE
 const ARTICLES = { ...DEFAULT_ARTICLES }
 if (slugArg) {
-  console.log(`[toc] 指定样本 slug=${slugArg}（替换 start 分类的样本，其余分类保持默认；该 slug 应属于 start 分类）`)
-  ARTICLES.start = slugArg
+  // 样本要替换的是该 slug 所属分类的那一篇：文章页在列表页要先切到所属分类的 tab 才可见，
+  // 拿别的分类的 tab 去点它的卡片会一直点不到（表现为 scrollIntoViewIfNeeded 超时）。
+  const cat = (() => {
+    const full = fs.readFileSync(path.join(process.cwd(), 'config', 'knowledge.ts'), 'utf8')
+    const start = full.indexOf('export const knowledge: KnowledgeMeta[] = [')
+    const end = full.indexOf('\n]', start)
+    const src = full.slice(start, end)
+    for (const m of src.matchAll(/slug: '([^']+)'[\s\S]*?cat: '([^']+)'/g)) {
+      if (m[1] === slugArg) return m[2]
+    }
+    return null
+  })()
+  if (!cat) {
+    console.error(`[toc] config/knowledge.ts 里没有 slug '${slugArg}'，无法确定它属于哪个分类`)
+    process.exit(2)
+  }
+  if (!ARTICLES[cat]) {
+    console.error(`[toc] 分类 '${cat}' 不在样本分类里（${Object.keys(ARTICLES).join('、')}）`)
+    process.exit(2)
+  }
+  console.log(`[toc] 指定样本 slug=${slugArg}（替换 ${cat} 分类的样本，其余分类保持默认）`)
+  ARTICLES[cat] = slugArg
 }
 
 const unknownFlags = flags.filter(f => !f.startsWith('--slug='))

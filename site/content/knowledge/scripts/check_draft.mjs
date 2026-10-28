@@ -83,7 +83,9 @@ if (slugArg) {
 } else {
   files = fs
     .readdirSync(DRAFTS)
-    .filter((f) => f.endsWith('.md') && f !== 'README.md')
+    // 素材卡（<slug>.source.md）与预览记录（<slug>.review.md）是每篇草稿的配套文件，不是文章本身，
+    // 体检只查正文。少了这个过滤，批量模式会把它们当文章报一堆「没有 frontmatter」的假 fail。
+    .filter((f) => f.endsWith('.md') && f !== 'README.md' && !/\.(source|review)\.md$/.test(f))
     .map((f) => ({ slug: f.replace(/\.md$/, ''), file: path.join(DRAFTS, f) }))
 }
 

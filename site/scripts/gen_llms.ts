@@ -31,7 +31,7 @@ const pageLines = [
   `- [模型广场](${BASE}/models): 本卡承诺的 ${modelIds.map((m) => m.tier).join(' 与 ')} 两个模型一览，可复制 model ID，含分工、完整列表获取与切换方法`,
   `- [套餐定价](${BASE}/pricing): 无限卡在售 ${unlimitedTiers.map((t) => `${t.displayName} ${t.price}`).join('、')}，周期卡与额度卡尚未定价；含退款规则与公平使用`,
   `- [管理后台](${BASE}/console): 激活码兑换、API Key 提取、一键导入配置、用量查询与图表、公告与备用域名（后台本体为独立站点 ${siteConfig.partners.find((p) => p.id === 'console')?.url ?? ''}）`,
-  `- [使用教程](${BASE}/guide): 先选你在用的客户端，再照着做：${guideSceneCards().map((c) => c.title).join(' / ')}，每条路都带真实截图`,
+  `- [使用教程](${BASE}/guide): 先选你用的那一种，再照着做：${guideSceneCards().map((c) => c.title).join(' / ')}，每条路都带真实截图`,
   ...guideSceneCards().map(
     (c) => `- [${c.title} 教程](${BASE}${c.url}): ${c.desc}（${c.meta}）`,
   ),

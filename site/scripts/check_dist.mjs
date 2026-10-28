@@ -200,7 +200,8 @@ const index_guideHtml = fs.readFileSync(path.join(DIST, 'guide/index.html'), 'ut
 // 这里的断言改成逐页核对，不再有全站扁平的常量。
 {
   const cards = guideSceneCards()
-  ok(cards.length === 5, `/guide: 场景卡应渲染 5 个客户端，实际 ${cards.length}`)
+  // 场景数从数据源取：加一条教程页只改 config/guide.ts，这里跟着变
+  ok(cards.length === guidePages.length, `/guide: 场景卡应渲染 ${guidePages.length} 条路径，实际 ${cards.length}`)
   for (const c of cards) ok(index_guideHtml.includes(`href="${c.url}"`), `/guide: 场景卡里没有指向 ${c.url} 的链接`)
 
   // 旧锚点兼容表：每项都必须在目标页真实存在，否则老链接（FAQ、在线助手、外部转载）会 404
@@ -286,10 +287,27 @@ const index_guideHtml = fs.readFileSync(path.join(DIST, 'guide/index.html'), 'ut
     for (const f of page.faq) ok(html.includes(f.q), `${where}: 常见问题「${f.q}」没渲染出来`)
     ok(html.includes('FAQPage'), `${where}: 产物里没有 FAQPage 结构化数据`)
     ok(html.includes('HowTo'), `${where}: 产物里没有 HowTo 结构化数据`)
-    // 场景切换条：5 个客户端互跳
-    ok(count(html, /cu-guide-scenes__item/g) === 5, `${where}: 场景切换条应有 5 个客户端，实际 ${count(html, /cu-guide-scenes__item/g)}`)
+    // 场景切换条：所有场景页互跳，数量与数据源一致
+    ok(
+      count(html, /cu-guide-scenes__item/g) === guidePages.length,
+      `${where}: 场景切换条应有 ${guidePages.length} 个入口，实际 ${count(html, /cu-guide-scenes__item/g)}`,
+    )
     // 页头客服条已下线
     ok(!html.includes('cu-kefubar'), `${where}: 页首客服条（KefuBar）已下线，产物里不该再出现`)
+
+    // title / description 的两个副本必须一致：
+    // docs/guide/<scene>.md 的 frontmatter 喂 <title> / meta description / OG，
+    // config/guide.ts 的 page.title / page.desc 喂 JSON-LD 与 llms-full.txt。
+    // 两份副本全靠人工同步，改一处忘另一处不会红——这里加断言把它守住。
+    const mdPath = path.resolve(process.cwd(), 'docs', 'guide', `${page.scene}.md`)
+    const md = readFileSafe(mdPath, 'utf8')
+    ok(md.length > 0, `${where}: 找不到 docs/guide/${page.scene}.md`)
+    if (md) {
+      const mdTitle = (md.match(/^title:\s*['\"]?(.+?)['\"]?\s*$/m) || [])[1] || ''
+      const mdDesc = (md.match(/^description:\s*['\"]?(.+?)['\"]?\s*$/m) || [])[1] || ''
+      ok(mdTitle === page.title, `${where}: title 两个副本不一致——md frontmatter「${mdTitle}」vs config/guide.ts「${page.title}」`)
+      ok(mdDesc === page.desc, `${where}: description 两个副本不一致——md frontmatter「${mdDesc}」vs config/guide.ts「${page.desc}」`)
+    }
   }
 
   ok(!index_guideHtml.includes('/guide/clients') && !index_guideHtml.includes('/guide/models'), '/guide: 仍有指向已删除的教程子页链接')

@@ -52,14 +52,10 @@ const blocks = computed(() => (page.value ? guideBlocks(page.value) : []))
         <li v-for="(r, i) in page.related" :key="i">
           <a :href="r.url">{{ r.text }}</a>
         </li>
+        <li class="cu-guide-links__next">
+          <a :href="page.next.url">{{ page.next.text }}</a>
+        </li>
       </ul>
-
-      <nav class="cu-next" aria-label="接着看">
-        <a v-for="n in page.next" :key="n.url" :href="n.url">
-          <small>接着看</small>
-          <strong>{{ n.text }}</strong>
-        </a>
-      </nav>
 
       <CtaBand title="还没上手？">
         <template #tools>

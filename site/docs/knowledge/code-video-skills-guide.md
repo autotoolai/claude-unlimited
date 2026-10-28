@@ -116,7 +116,7 @@ ffmpeg -af loudnorm=I=-14:TP=-1.5:LRA=11 -i in.mp4 out.mp4
 
 ### 4. 一条视频是怎么算出来的
 
-<VideoPlayer src="v6_seek_t.mp4" caption="41.0 秒 · 1920×1080 · 30fps" />
+<VideoPlayer src="v6_seek_t.mp4" caption="73.8 秒 · 1920×1080 · 30fps" />
 
 这条本身就是在讲这门技术。第一版用 claude-motion-design 的 `seek(t)` 引擎做，四支镜头全是并列的示意图，看不出因果关系，而且零解说零字幕，观众没有进入点。第三轮推倒重做，换成 Remotion，五镜改成一条完整因果链：写脚本 → 脚本切成时间轴 → 每一秒交给函数算一帧 → 一帧帧接成视频 → 改一句重渲。
 

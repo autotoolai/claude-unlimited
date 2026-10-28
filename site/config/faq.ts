@@ -89,7 +89,7 @@ export const faqItems: FaqItem[] = [
 model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与 claude-opus-5-5（复杂推理、架构设计、深度代码分析），两个都建议加进 CC Switch。
 
 以 CC Switch「获取模型列表」实际返回的 ID 为准：若返回的 ID 与上面不同，说明网关侧命名有变，更新工具配置里的 model ID 即可，Key 不需要重新生成。`,
-    links: [{ text: '获取并保存模型 · 教程 4', url: '/guide/cc#cc-models' }],
+    links: [{ text: '教程 · 拉取并保存模型', url: '/guide/cc#cc-models' }],
   },
   {
     cat: 'product',
@@ -172,8 +172,8 @@ model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与
 
 列表为空通常是 Base URL 或 Key 填错，回上一步核对。`,
     links: [
-      { text: 'CC Switch 一键导入 · 教程 3', url: '/guide/cc#cc-import' },
-      { text: '获取并保存模型 · 教程 4', url: '/guide/cc#cc-models' },
+      { text: '教程 · 一键导入配置', url: '/guide/cc#cc-import' },
+      { text: '教程 · 拉取并保存模型', url: '/guide/cc#cc-models' },
     ],
   },
   {
@@ -188,10 +188,10 @@ model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与
   {
     cat: 'setup',
     id: 'cat-setup-vscode',
-    keywords: ['vscode', 'vs code', '插件', '扩展', '侧边栏', '编辑器插件'],
-    q: 'VS Code 里怎么用 Claude Code？',
-    a: `CC Switch 配好后，在 VS Code 扩展面板（Ctrl+Shift+X / Cmd+Shift+X）搜索 Claude Code，认准发布者为 Anthropic 的官方插件并安装。首次打开选择「使用已有的 API 配置 / API Key」登录，不需要登录 Anthropic 账号。`,
-    links: [{ text: '教程 · 第 6 步 开始使用 Claude Code', url: '/guide/cc#cc-vscode' }],
+    keywords: ['vscode', 'vs code', '插件', '扩展', '侧边栏', '编辑器插件', 'cursor 插件', 'cursor 扩展'],
+    q: 'VS Code 和 Cursor 里怎么用 Claude Code 插件？',
+    a: `CC Switch 配好后，在编辑器的扩展面板（Ctrl+Shift+X / Cmd+Shift+X）搜索 Claude Code，认准发布者为 Anthropic 的官方插件并安装。VS Code 与 Cursor 用的是同一个扩展（ID 都是 anthropic.claude-code），读同一份配置。首次打开选择「使用已有的 API 配置 / API Key」，不需要登录 Anthropic 账号。`,
+    links: [{ text: '教程 · 在 VS Code 里装插件', url: '/guide/cc#cc-vscode' }],
   },
   {
     cat: 'setup',
@@ -202,7 +202,7 @@ model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与
 
 所有模型都在同一订阅价内，选 Opus 不会多花钱。Anthropic 上线新模型后网关会以新的 model ID 提供访问，Key 不需要换，只要在 CC Switch 里刷新模型列表再 /model 切过去。`,
     code: ['/model', '/model claude-fable-5-1'],
-    links: [{ text: '获取并保存模型 · 教程 4', url: '/guide/cc#cc-models' }],
+    links: [{ text: '教程 · 拉取并保存模型', url: '/guide/cc#cc-models' }],
   },
   {
     cat: 'setup',
@@ -212,7 +212,7 @@ model ID 为 claude-fable-5-1（速度与质量均衡，日常编码主力）与
     a: `先确认 CC Switch 里配置处于「已启用」状态，再重开一个终端窗口。
 
 如果仍然找不到命令，看「接入与模型」页的 VS Code / 终端部分，Windows 上可以在 PowerShell 里直接运行 claude。`,
-    links: [{ text: '教程 · 第 5 步启用配置', url: '/guide/cc#cc-enable' }],
+    links: [{ text: '教程 · 启用并检测链路', url: '/guide/cc#cc-enable' }],
   },
 
   // ---------- 接入与使用 ----------
@@ -239,13 +239,13 @@ OpenAI SDK、LangChain、LiteLLM、Cursor：填带 /v1 的地址，它会拼 /v1
   {
     cat: 'usage',
     id: 'cat-usage-claudecode',
-    keywords: ['claude code', 'cc怎么用', '命令行', 'cli', '终端', 'anthropic code', 'claude_code', 'claudecode', '怎么安装 claude code'],
-    q: '怎么接入 Claude Code？',
-    a: `四步：装 Claude Code → 设两个环境变量（Base URL + Key）→ 验证生效 → 正常用。
+    keywords: ['claude code', 'cc怎么用', '命令行', 'cli', '终端', 'anthropic code', 'claude_code', 'claudecode', '怎么安装 claude code', 'claude code cli'],
+    q: '怎么在终端里用 Claude Code（CLI）？',
+    a: `五步：换 API Key → 装 CLI → 设两个环境变量 → 验证链路 → 进项目跑第一次会话。
 
-设环境变量有三种方式（终端临时、写入 shell 配置、全局生效），Windows / macOS / Linux 命令不同，详见接入指南。`,
+装 CLI：Windows 在 PowerShell 里跑 irm https://claude.ai/install.ps1 | iex，macOS 与 Linux 跑 curl -fsSL https://claude.ai/install.sh | bash。环境变量是 ANTHROPIC_BASE_URL（网关根地址，不带 /v1）与 ANTHROPIC_API_KEY。`,
     code: ['export ANTHROPIC_BASE_URL=<网关根地址>', 'export ANTHROPIC_API_KEY=<你的 Key>'],
-    // 「接入指南」页二期上线后再加链接
+    links: [{ text: '教程 · Claude Code CLI', url: '/guide/cli' }],
   },
   {
     cat: 'usage',

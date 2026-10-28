@@ -126,7 +126,7 @@ console.log('')
  * 任何一步失败都在移动 md 之前退出——草稿还在，不会出现「发布到一半」。
  */
 const mdBody = readFileSync(target, 'utf8')
-const videoSrcs = [...mdBody.matchAll(/<VideoPlayer[^>]*src=["']([^"']+)["']/g)].map((m) => m[1])
+const videoSrcs = [...mdBody.matchAll(/<VideoPlayer[^>]*\ssrc=["']([^"']+)["']/g)].map((m) => m[1])
 const videosDir = join(root, 'public', 'videos')
 
 if (videoSrcs.length) {

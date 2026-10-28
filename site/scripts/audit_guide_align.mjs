@@ -5,7 +5,10 @@
  * `text-align: center`，引导语正好是 H2 后第一个段落会命中，元素盒子量出来是顶格的，
  * 文字却居中飘在右边（2026-10-12 的 bug 就是这样漏掉两轮）。
  *
- * 覆盖范围：5 个客户端场景页（.cu-guide-rail）逐节逐子步骤。断言两层左边线（规范「缩进层级」）：
+ * 覆盖范围：6 个客户端场景页（.cu-guide-rail）逐节逐子步骤，外加页头 / 页尾三处
+ * （.cu-page__lead、.cu-guide-answer、.cu-guide-h2）——这三处 2026-10-22 之前不在测量范围内，
+ * 于是「页头副标题居中」「一句话答案缩进 138px」「页尾 H2 又大又居中」三个错位长期没人发现。
+ * 断言两层左边线（规范「缩进层级」）：
  * - L0 = 小节块左缘：h2 / 引导语 / 正文段（提示卡是独立容器，按它自己的内容列断言）
  * - L1 = 步骤正文列左（.cu-step-block__body，即 grid 第二列）+ ul 内缩 + --cu-step-indent：步骤内的动作与提示文字
  * ol.cu-steps-block 的 704px 限宽是可读宽度，不是错位，不参与断言。
@@ -14,6 +17,7 @@
  * 环境变量 AUDIT_BASE 可覆盖预览地址。
  */
 import { chromium } from 'playwright'
+import { register, tsImport } from 'tsx/esm/api'
 
 const BASE = process.env.AUDIT_BASE || 'http://127.0.0.1:41777'
 const fails = []
@@ -33,8 +37,13 @@ function firstCharLeft(el) {
   return Math.round(Math.min(...tops.map((t) => Math.min(...rects.filter((r) => Math.round(r.top) === t).map((r) => r.left)))))
 }
 
-/** 5 个客户端场景页 + 索引页（索引页只有卡片，不参与左边线测量，但顺手确认卡能渲染） */
-const SCENES = ['cc', 'desktop', 'codex', 'workbuddy', 'cursor']
+/** 全部场景页（索引页只有卡片，不参与左边线测量，但顺手确认卡能渲染）。
+ *  场景表从 config/guide.ts 读，加一条教程页不用改这个脚本。
+ *  这个脚本用 node 直跑，导 .ts 得走 tsx 的 tsImport（与 check_dist.mjs 同法）。 */
+const unregisterTsx = register()
+const { guideScenes } = await tsImport('../config/guide.ts', import.meta.url)
+unregisterTsx()
+const SCENES = guideScenes()
 
 const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
@@ -52,6 +61,35 @@ for (const scene of SCENES) {
     out.push({ ...ctx, align: cs.textAlign, left })
   }
 
+  // 页头 / 页尾三处：基准是正文列左缘（.cu-page 的内容左），与小节 h2 同一条线。
+  // 这三处 2026-10-22 之前不在测量范围内，于是三处错位长期没人发现：
+  //   .cu-page__lead  页头副标题，被 01_shell.css 的 center !important 压成居中
+  //   .cu-guide-answer 一句话答案，被全局 .cu-page p 的 margin:auto 缩进 138px
+  //   .cu-guide-h2     页尾「常见问题 / 相关阅读」，被全局 .cu-page h2 压成又大又居中
+  {
+    const page = document.querySelector('.cu-page')
+    if (page) {
+      const base = Math.round(page.getBoundingClientRect().left)
+      const lead = page.querySelector('.cu-page__lead')
+      if (lead) measure(lead, { sec: '页头副标题', role: 'page-lead', base })
+      // 一句话答案是带竖线的提示卡：竖线落在 L0 左边线上，文字在框内缩进
+      // （3px 竖线 + 16px 内边距 = 19px，与 .cu-notes 的竖线+悬挂缩进同一模式）。
+      // 所以它的文字基准 = L0 + 竖线宽 + 内边距，而不是 L0 本身。
+      // 这样写仍然能抓住回归：整块被全局 `.cu-page p` 的 margin:auto 居中走时，
+      // 文字落点会整体右移 138px，与这个基准对不上。
+      const answer = page.querySelector('.cu-guide-answer')
+      if (answer) {
+        const acs = getComputedStyle(answer)
+        const bar = parseFloat(acs.borderLeftWidth) || 0
+        const pad = parseFloat(acs.paddingLeft) || 0
+        measure(answer, { sec: '一句话答案', role: 'answer', base: base + bar + pad })
+      }
+      for (const h of page.querySelectorAll(':scope > .cu-guide-h2')) {
+        measure(h, { sec: h.textContent.trim(), role: 'tail-h2', base })
+      }
+    }
+  }
+
   for (const rail of document.querySelectorAll('.cu-guide-rail')) {
     for (const blk of rail.querySelectorAll('.cu-guide-block')) {
       const base = Math.round(blk.getBoundingClientRect().left)
@@ -66,15 +104,14 @@ for (const scene of SCENES) {
       for (const ul of blk.querySelectorAll(':scope > ul')) {
         out.push({ sec, role: 'ul', alignOnly: true, align: getComputedStyle(ul).textAlign })
       }
-      // 提示块 .cu-notes：现在是有内边距的提示卡，段落不再顶格（H2 左边线），
-      // 而是对齐到卡片的内容列（卡片左缘 + 自身 padding-left + li 的悬挂缩进）。
-      // 卡外还有一个绝对定位的「提示」标签，它不参与断言（它本就该压在线上）。
+      // 提示块 .cu-notes：2026-10-22 起不再是「提示卡」，改成与步骤级提示同形
+      // （左细线 + 次级墨色小字），没有自身内边距，段落靠 margin-left 悬挂缩进。
+      // 所以基准 = 容器左缘 + 段落 margin-left（不再有 padding 一项）。
       const card = blk.querySelector('.cu-notes')
       if (card) {
         const cardBase = Math.round(card.getBoundingClientRect().left)
-        const pad = parseFloat(getComputedStyle(card).paddingLeft) || 0
-        const hang = parseFloat(getComputedStyle(card.querySelector('p')).paddingLeft) || 0
-        const cardText = cardBase + pad + hang + parseFloat(getComputedStyle(card.querySelector('p')).marginLeft)
+        const hang = parseFloat(getComputedStyle(card.querySelector('p')).marginLeft) || 0
+        const cardText = cardBase + hang
         for (const p of card.querySelectorAll(':scope > p')) measure(p, { sec, role: 'notes-block', base: cardText })
       }
 

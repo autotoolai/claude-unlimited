@@ -25,18 +25,7 @@ export interface VideoMeta {
 }
 
 export const videos: VideoMeta[] = [
-]
 
-/**
- * 已下架文章的视频元数据（2026-10-14 随 code-video-skills-guide 撤下）。
- *
- * 为什么不直接删：四支片子的 src / 时长 / 说明都还在，R2 上文件与 config/media_cdn.ts 的 VIDEO_KEYS 也都在，
- * 新文章（哪怕还是草稿）要用同一套素材时，直接把条目搬回 videos 即可，不必重测 ffprobe。
- *
- * 为什么留在 videos 里不行：videos 是 VideoObject JSON-LD 与 llms.txt 的唯一来源，文章没发布时挂上去，
- * 产物里就会出现指向 404 页面的 VideoObject 与 llms 链接。所以「未发布」必须表现为「不在 videos 里」。
- */
-export const unlistedVideos: VideoMeta[] = [
   {
     src: 'v1_round3.mp4',
     description: 'Claude 无限卡的产品宣传片：四个镜头讲清这张卡是什么、有什么、怎么用，结尾给出访问地址。',
@@ -65,4 +54,15 @@ export const unlistedVideos: VideoMeta[] = [
     uploadDate: '2026-10-14',
     page: 'code-video-skills-guide',
   },
+]
+
+/**
+ * 未出现在正文里的视频元数据。
+ *
+ * 为什么单独放一个数组：videos 是 VideoObject JSON-LD 与 llms.txt 的唯一来源，文章没发布时挂上去，
+ * 产物里就会出现指向 404 页面的 VideoObject 与 llms 链接。所以「未发布」必须表现为「不在 videos 里」。
+ *
+ * 2026-10-15 重写后的 code-video-skills-guide 重新发布，四支片子随之搬回 videos。
+ */
+export const unlistedVideos: VideoMeta[] = [
 ]

@@ -21,7 +21,7 @@ export const modelIdRows = modelIds.map((m) => ({ label: m.id, values: [m.tier, 
 
 export { jsonLdGuideScene, jsonLdGuideIndex }
 
-/** 页脚「教程」列：5 个客户端页 */
+/** 页脚「教程」列：全部场景页 */
 export const guideNavItems = guideFooterItems()
 
 /** 购买前要问清的两件事（FAQ 页顶部「买之前」区块用），全部对应 config/faq.ts 里的条目 */
@@ -50,7 +50,7 @@ export const knowledgeCount = knowledgeEntries.length
 /** 首页「继续了解」条：只做站内索引，不复制任何一页的正文 */
 export const homeContinueLinks = [
   { no: '01', title: '支持哪些模型', url: '/models', desc: 'model ID 一览、每张模型卡片能复制完整 model ID。' },
-  { no: '02', title: '怎么配置起来', url: '/guide', desc: '先选你在用的客户端：Claude Code、桌面版、Codex、WorkBuddy、Cursor 各一条完整路径，每一步都有真实截图。' },
+  { no: '02', title: '怎么配置起来', url: '/guide', desc: '先选你用的那一种：Claude Code 插件（VS Code / Cursor）、CLI（终端）、桌面版、Codex、WorkBuddy、Cursor 各一条完整路径，每一步都有真实截图。' },
   { no: '03', title: '知识库', url: '/knowledge', desc: 'Claude Code 用法、原理、成本控制与报错排查，${knowledgeCount} 篇按主题分类。' },
 ]
 

@@ -37,9 +37,15 @@ export const VIDEO_KEYS: Record<string, string> = {
 'videos/v6_seek_t.mp4': 'videos/v6_seek_t.d278851d.mp4',
 }
 
-/** map 里的 key 是 R2 上的带哈希文件名；本地 public/videos/ 存的是原名，所以本地回落一律用原名。 */
+/**
+ * map 里的 key 是 R2 上的带哈希文件名；本地 public/videos/ 存的是原名，所以本地回落一律用原名。
+ *
+ * 查表的键带 'videos/' 前缀（gen_media_keys.ts 按磁盘路径生成），而调用方给的是裸文件名，
+ * 所以查表要用 `videos/${src}`。用裸文件名查会落空、回落到无哈希的地址，而 R2 上只存带哈希的对象，
+ * 那样产物里的视频链接全是 404。
+ */
 export const videoUrl = (src: string): string => {
-  const key = VIDEO_KEYS[src]
+  const key = VIDEO_KEYS[`videos/${src}`]
   if (VIDEO_CDN) return key ? `${VIDEO_CDN}/${key}` : `${VIDEO_CDN}/videos/${src}`
   return `/videos/${src}`
 }

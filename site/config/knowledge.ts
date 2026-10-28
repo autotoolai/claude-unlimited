@@ -261,6 +261,67 @@ export const knowledge: KnowledgeMeta[] = [
     ],
   },
   {
+    slug: 'claude-desktop-china-usage',
+    cat: 'start',
+    title: 'Claude 桌面版在国内怎么用：注册、网络与登录',
+    desc: '官方支持地区清单 184 个国家和地区里没有中国大陆，客户端本身可装可用；配好 API Key 与本地路由就能不登录官方账号使用，国内的可行路径与失效情形。',
+    summary: '支持地区清单不含中国大陆，客户端可装可用，靠 API Key 与本地路由走通。',
+    date: '2026-10-26',
+    cover: '/knowledge/claude-desktop-china-usage.jpg',
+    kicker: 'Claude 桌面版',
+    tags: ['claude 桌面版 国内', 'claude 国内使用', 'claude 桌面版 注册', 'claude 桌面版 登录', 'claude 支持地区'],
+    minutes: 8,
+    related: ['claude-desktop-capabilities', 'claude-code-connection-lost', 'claude-code-401-403'],
+    faq: [
+      { q: 'Claude 桌面版在国内能注册账号吗？', a: '不能。官方支持地区清单列出 184 个国家和地区，不含中国大陆，清单外一律视为不支持地区，官方也明确未列出地区属于违规使用范围。' },
+      { q: '不注册官方账号，桌面版还能用吗？', a: '能。客户端是本地程序，模型请求发到哪里由本机配置决定。配好 API Key 与本地路由后，不登录官方账号也能正常对话和用 Claude Code。' },
+      { q: '香港、澳门能用吗？', a: '这两个地区不在官方支持地区清单里，情况和大陆一致。清单里包含的是台湾、新加坡、日本、韩国。' },
+      { q: '桌面版用第三方接口，会不会被判定违规？', a: '要分开看。走 API 通道调用模型和以官方订阅账号身份使用 Claude 服务是两回事，后者的受订阅条款与地区政策约束。两者不要混着用。' },
+      { q: '国内用桌面版要开虚拟机平台吗？', a: '要。Windows 上首次使用桌面版的文件与代码能力会提示启用虚拟机平台，这是系统可选功能，在系统设置里勾选后重启即可，与接口配置无关。' },
+    ],
+  },
+  {
+    slug: 'claude-desktop-capabilities',
+    cat: 'start',
+    title: 'Claude 桌面版能做什么：功能、免费额度与和终端版区别',
+    desc: '桌面版三块功能（对话、Claude Code、Cowork）与计划准入对比，文件执行、浏览器与连接器的边界，以及它和终端版 Claude Code 在交互与自动化上的分工。',
+    summary: '对话、Claude Code、Cowork 三块功能与计划准入，和终端版的分工。',
+    date: '2026-10-26',
+    cover: '/knowledge/claude-desktop-capabilities.jpg',
+    kicker: 'Claude 桌面版',
+    tags: ['claude 桌面版 功能', 'claude desktop 能做什么', 'claude 桌面版 免费', 'claude cowork', 'claude 桌面版 和 cli 区别'],
+    minutes: 8,
+    related: ['claude-desktop-china-usage', 'claude-code-vs-codex', 'claude-code-cli-cheatsheet'],
+    faq: [
+      { q: 'Claude 桌面版免费版能用 Claude Code 吗？', a: '不能。官方计划表里免费版只有对话，Claude Code 和 Cowork 都需要付费计划起步，桌面版只是把这两块功能按计划做了准入限制。' },
+      { q: '桌面版和终端版 Claude Code 有什么区别？', a: '同一个 agent 的两种外壳。桌面版补上图形界面、文件与 diff 预览、多会话并排；终端版在脚本、CI 和无人值守长任务上更强，关键能力是 `claude -p` 打印模式。' },
+      { q: 'Cowork 是干什么的？', a: '面向非开发者的桌面 agent，直接在你选定的文件夹和工具之间干活，能开浏览器、在必要时接管屏幕，适合整理文档、批量处理表格这类活。' },
+      { q: '桌面版会额外收费吗？', a: '不会单独收费，它消耗的是你账号或接口那边的额度。真正烧钱的是 agent 模式而不是聊天，桌面版跑 Claude Code、改本地文件时 token 消耗结构和纯对话不是一个量级。' },
+      { q: '换客户端要重新配 Key 吗？', a: '不用。桌面版和终端版读同一份环境配置，同一把 Key 和同一个地址在两边都生效，终端里用 `/status` 就能确认当前配置。' },
+    ],
+  },
+  {
+    slug: 'code-video-skills-guide',
+    cat: 'how',
+    title: '用代码做视频：四个开源技能怎么选',
+    desc: '实测四个代码渲染视频技能：宣传片、科普讲解、口播教程、纯动效分别该用哪个，开拍前要准备什么素材，中文配音两条路线怎么选，以及三轮迭代踩过的坑。',
+    summary: '四个代码渲染视频技能按场景选型，附素材清单、配音路线与三轮迭代的踩坑记录。',
+    date: '2026-10-15',
+    cover: '/knowledge/code-video-skills-guide.jpg',
+    kicker: '视频',
+    tags: ['代码做视频', 'remotion', '视频生成', 'claude code 技能', '文案配音'],
+    minutes: 12,
+    related: ['claude-code-make-video', 'claude-code-skills', 'prompt-caching-explained'],
+    sourceSlug: 'code-video-skills-guide',
+    faq: [
+      { q: '代码做视频和文生视频差在哪？', a: '文生视频是模型逐帧生成像素，适合实拍质感与人物表演；代码做视频是每一帧由程序算出来，适合字幕条、数据动画、代码演示、宣传片与科普讲解。核心差别是可复现：同一份代码渲染一百次结果完全一样。' },
+      { q: '四个技能怎么选？', a: '看画面是真实界面还是抽象示意：真实界面（你的产品、你的终端）用 video-shotcraft；抽象示意图配解说用 anything2explainer；要字级时间戳锁配音用 video-talkcraft；想避开 Remotion 授权用 claude-motion-design。' },
+      { q: '我该给技能多少信息？', a: '只给五样：主题或产品入口、时长、要不要解说、配音偏好、素材路径。不要自己写分镜、字幕位置、元素出现帧号——那是技能内部的实现，手填会和它的自动设计冲突。正确做法是让技能先出 30 秒样片，再提修改意见。' },
+      { q: '中文配音用什么？出片后怎么检查？', a: '配音用 Kokoro-82M-v1.1-zh 本地跑，免费可商用不联网，四个中文音色；edge-tts 音质自然且有词级边界，但需要能连 speech.platform.bing.com，连不上握手 403。检查用机器闸而非人眼：本文第一轮里人工审帧认为两支片子通过，实际那两支根本没挂载成片（上部像素标准差 0.00）。' },
+      { q: '为什么第一帧很重要？', a: '社交平台直接抓视频第一帧当缩略图。第一帧是空白底色或半截入场动画，热度和点击都会打折，所以前 5 帧要放完整画面。' },
+    ],
+  },
+  {
     slug: 'why-agents-cost-more-tokens',
     cat: 'how',
     title: '为什么 Agent 比聊天更烧 token',
@@ -571,12 +632,9 @@ export interface RetiredKnowledgePage {
 }
 
 export const retiredKnowledgePages: RetiredKnowledgePage[] = [
-  {
-    slug: 'code-video-skills-guide',
-    to: '/knowledge/claude-code-make-video',
-    reason:
-      '2026-10-14 下架：原文按功能给四个开源视频技能排名做选型表，读者照表选完仍踩坑，且正文嵌了四支本机渲染的样片（两支首轮即坏），「实测」成色不足。同类需求由 claude-code-make-video（Remotion 出第一条 MP4）承接。',
-  },
+  // 2026-10-14 下架的 code-video-skills-guide 已于 2026-10-15 重写后重新发布，不再是退役页。
+  // 保留这张表是为了以后再下架文章时有地方登记：规则由 scripts/gen_knowledge_routes.mjs 写进
+  // public/_redirects，check_dist.mjs 与 verify_build.py 各有一道门禁守着（规则在、目标页在、产物里没有它）。
 ]
 
 /** 退役页的 slug 集合 */

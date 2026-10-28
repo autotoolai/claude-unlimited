@@ -20,6 +20,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 SITE = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # 不受运行时 chdir 影响
 DIST = os.path.join(SITE, '.vitepress', 'dist')
 KNOWLEDGE_TS = os.path.join(SITE, 'config', 'knowledge.ts')
+GUIDE_TS = os.path.join(SITE, 'config', 'guide.ts')
 B = chr(92)  # 需要在 Python 字符串里写正则反斜杠时用它拼，避免编辑器/工具链层层转义
 
 
@@ -47,6 +48,12 @@ def knowledge_entries():
     return out
 
 
+def guide_slugs():
+    """从 config/guide.ts 读出教程场景页的路由：加一条教程页不用改这里。"""
+    t = io.open(GUIDE_TS, encoding='utf-8').read()
+    return re.findall(r"slug: '(/guide/[^']+)'", t)
+
+
 def knowledge_slugs():
     return [e['slug'] for e in knowledge_entries()]
 
@@ -70,7 +77,7 @@ def knowledge_categories():
     return cats
 
 
-PAGES = ['/', '/models', '/console', '/pricing', '/faq', '/guide', '/knowledge'] + ['/knowledge/' + s for s in knowledge_slugs()] + ['/guide/cc', '/guide/desktop', '/guide/codex', '/guide/workbuddy', '/guide/cursor']  # cleanUrls=false 时条目页是 /knowledge/x.html、总览是 /guide.html，Handler 两种路径都接受
+PAGES = ['/', '/models', '/console', '/pricing', '/faq', '/guide', '/knowledge'] + ['/knowledge/' + s for s in knowledge_slugs()] + guide_slugs()  # cleanUrls=false 时条目页是 /knowledge/x.html、总览是 /guide.html，Handler 两种路径都接受
 def _read_config(name: str) -> str:
     with io.open(os.path.join(SITE, 'config', name), encoding='utf-8') as f:
         return f.read()
@@ -249,7 +256,7 @@ def main():
             t = m_title.group(1) if m_title else ''
             check(f'{u:12} description ≤110 字', 0 < len(desc) <= 110, f'实际 {len(desc)} 字：{desc[:40]}')
             check(f'{u:12} title ≤32 字', 0 < len(t.replace(" | Claude 无限卡", "")) <= 32, f'实际 {len(t)} 字：{t}')
-            check(f'{u:12} 场景切换条 5 个客户端', x.count('cu-guide-scenes__item') == 5, f"实际 {x.count('cu-guide-scenes__item')}")
+            check(f'{u:12} 场景切换条 {len(guide_slugs())} 个入口', x.count('cu-guide-scenes__item') == len(guide_slugs()), f"实际 {x.count('cu-guide-scenes__item')}")
             check(f'{u:12} 有 HowTo 与 FAQPage', 'HowTo' in x and 'FAQPage' in x, '')
         check(f'{u:12} canonical', '<link rel="canonical"' in x)
         # 文章页：正文是 VPDoc 的 page 分支（layout: page），没有原生目录 aside，也没有 cu-page__head

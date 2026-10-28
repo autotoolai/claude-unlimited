@@ -94,8 +94,9 @@ export const kefuBotEntries: KefuBotEntry[] = [
 
 售前售后任何问题都可以扫教程页最上面的客服二维码。`,
     links: [
-      { text: '按客户端看教程（带截图）', url: '/guide' },
+      { text: '按用法看教程（带截图）', url: '/guide' },
       { text: 'Claude Code 一键导入配置', url: '/guide/cc#cc-import' },
+      { text: 'Claude Code CLI 教程', url: '/guide/cli' },
     ],
   },
   {
@@ -204,9 +205,9 @@ export const kefuBotEntries: KefuBotEntry[] = [
   {
     cat: 'usage',
     id: 'bot-usage-vscode',
-    keywords: ['vscode', 'vs code', 'vscode插件', 'vs code插件', 'claude code 插件', 'claude code 侧边栏', 'vscode侧边栏', 'vs code侧边栏', '侧边栏插件', 'vscode怎么用', 'vs code怎么用', '插件', '扩展', '装扩展', '扩展怎么装'],
+    keywords: ['vscode', 'vs code', 'vscode插件', 'vs code插件', 'claude code 插件', 'claude code 侧边栏', 'vscode侧边栏', 'vs code侧边栏', '侧边栏插件', 'vscode怎么用', 'vs code怎么用', '插件', '扩展', '装扩展', '扩展怎么装', 'cursor 插件', 'cursor扩展', 'cursor 装插件'],
     tag: '使用',
-    q: 'VS Code 里怎么用 Claude Code？',
+    q: 'VS Code 和 Cursor 里怎么用 Claude Code 插件？',
     faqId: 'cat-setup-vscode',
   },
   {

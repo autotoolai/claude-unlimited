@@ -134,7 +134,7 @@ const jsonLdModels = {
   })),
 }
 
-/** /guide 索引页：CollectionPage + ItemList（5 个客户端） */
+/** /guide 索引页：CollectionPage + ItemList（全部场景路径） */
 function jsonLdGuideIndexPage() {
   return jsonLdGuideIndex()['@graph'] as Record<string, unknown>[]
 }

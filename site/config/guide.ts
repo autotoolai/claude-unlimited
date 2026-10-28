@@ -1,5 +1,5 @@
 /**
- * 教程内容数据源 —— 「使用教程」索引页与 5 个场景页的唯一真源。
+ * 教程内容数据源 —— 「使用教程」索引页与 6 个场景页的唯一真源。
  *
  * 页面只回答一件事：买家已经在「我在哪个客户端里用 Claude」上做完选择，接下来照着做。
  * 因此内容按「场景」分文件组织：每个场景一页，一页一条完整路径，从换 Key 到检测链路。
@@ -29,7 +29,7 @@ import { partnerUrl } from './site'
 import { consoleBackupDomains } from './console'
 
 /** 场景 id：既是页面路由后缀，也是该页锚点 id 的前缀 */
-export type GuideSceneId = 'cc' | 'desktop' | 'codex' | 'workbuddy' | 'cursor'
+export type GuideSceneId = 'cc' | 'cli' | 'desktop' | 'codex' | 'workbuddy' | 'cursor'
 
 /** 公共块 key：同一份正文被多个场景页引用 */
 export type SharedBlockKey = 'install-ccswitch' | 'get-key'
@@ -60,8 +60,13 @@ export interface GuideStep {
   cta?: { text: string; url: string; external?: boolean }[]
   /** 只在这一子步骤成立的提示 */
   notes?: string[]
-  /** 这一步的对照截图；多图用数组，GuideSteps 会并排渲染 */
-  shot?: GuideShot | GuideShot[]
+  /**
+   * 这一步的对照截图；多图用数组，GuideSteps 会并排渲染。
+   * 显式写 false 表示「这一步确认不放图」（终端命令这类没有界面的步骤）——
+   * 不写与写 false 效果相同，但写出来是给门禁看的：门禁要求每个步骤都显式声明，
+   * 「漏写」和「确认不放」就不会混在一起。
+   */
+  shot?: GuideShot | GuideShot[] | false
   /** 站内延伸阅读，与块级 `links` 同组件 */
   links?: { text: string; url: string; external?: boolean }[]
 }
@@ -73,6 +78,16 @@ export interface GuideBlock {
   title: string
   /** 引用公共块：正文取 sharedBlocks[key]，本页只给 id 与标题 */
   shared?: SharedBlockKey
+  /**
+   * 共享块正文里的占位符替换表，如 {console} → 管理后台地址。
+   * 装配期（guideBlocks）做替换，让共享正文能按页面换掉个别名词。
+   */
+  sharedVars?: Record<string, string>
+  /**
+   * 只在本页追加的块级提示（不写进共享正文）。
+   * 装配期把共享块的 notes 与这里的 notes 拼在一起，共享块保持唯一真源。
+   */
+  sharedNotes?: string[]
   /** 小节首段：先给结论（知识库同一规范），再说为什么 */
   lead?: string
   /** 段落 */
@@ -126,8 +141,11 @@ export interface GuidePage {
   related: { text: string; url: string }[]
   /** 小节流 */
   blocks: GuideBlock[]
-  /** 页尾「接着看」 */
-  next: { text: string; url: string }[]
+  /**
+   * 页尾「接着看」：只给一个下一站，且不能和 related 重复。
+   * 渲染成相关阅读列表的最后一项（GuideScenePage.vue），不再单独画一排卡片。
+   */
+  next: { text: string; url: string }
 }
 
 /** 索引页（/guide）数据 */
@@ -135,9 +153,14 @@ export interface GuideIndex {
   title: string
   desc: string
   eyebrow: string
-  /** 页头下的一句话：从换取 API Key 到检测链路怎么走 */
-  lead: string
-  /** 一句话答案：喂 llms-full.txt */
+  /**
+   * 页头下的整段话：把「做什么」与「选哪条路」合成一段。
+   *
+   * 2026-10-21 起索引页不再单列一个居中的答案框（.cu-guide-answer）：原来 lead 与 answer
+   * 两段各说一半，框起来的那段还跟下面的卡片标题重复。合并后只有一段，直接当页头副标题，
+   * 版式跟套餐页一致（居中、限宽、无框）。所以只有这一个字段：它既是页面上的那段话，
+   * 也是 llms-full.txt 与 JSON-LD description 的来源，不再有第二处措辞可漂移。
+   */
   answer: string
   /** 索引页的长尾搜索词（per-page keywords 的来源） */
   tags: string[]
@@ -178,12 +201,12 @@ const desktopUrl = partnerUrl('claude-desktop')
  */
 export const sharedBlocks: Record<SharedBlockKey, Omit<GuideBlock, 'id' | 'title' | 'shared'>> = {
   'install-ccswitch': {
-    lead: '装好 CC Switch 就算准备好了一半：它是个专门管 API 配置的小工具，全程默认安装，不用填任何东西。',
+    lead: '装好 CC Switch 就算准备好了一半：它是个专门管 API 配置的小工具，全程默认安装。',
     steps: [
       {
-        title: '打开下载页，下载对应系统的安装包',
-        goal: '它是管配置的小工具，装好只是先把软件准备好，这一步不用填任何东西。',
-        action: ['打开下面的官网 → 挑自己系统的安装包（Windows / macOS 都有）→ 下载 → 安装，全程保持默认。'],
+        title: '挑对系统的安装包',
+        goal: '装完先别动配置，下一步才需要填值。',
+        action: ['打开下面的官网 → 下载 Windows 或 macOS 版 → 双击运行，一路默认。'],
         link: { href: ccswitchUrl, label: 'CC Switch 官网' },
         notes: ['软件很小，不需要注册账号，装完先不用配置，下一步直接换 Key。', '杀毒软件提示未知来源时选「仍要运行」，这是开源小工具。'],
         shot: { src: 'guide_ccswitch_site.png', caption: 'CC Switch 官网首页' },
@@ -191,50 +214,50 @@ export const sharedBlocks: Record<SharedBlockKey, Omit<GuideBlock, 'id' | 'title
     ],
   },
   'get-key': {
-    lead: '卡密在发货信息里，换成一把 sk- 开头的 API Key 后面全程只用它——CC Switch、各个客户端、终端都是这一把。',
+    lead: '卡密在发货信息里，在管理后台换成一把 sk- 开头的 API Key，后面全程只用它。',
     steps: [
       {
-        title: '在管理后台把卡密换成 API Key',
-        goal: '这把 sk- 开头的密钥就是后面全程要用的 API Key；激活码、Key 都会留在后台里，刷新页面随时能再看。',
-        action: ['打开下面的管理后台 → 在「我的面板」或「提取 Key」页面粘贴激活码 → 提交激活 → 在「提取 Key」页面拿到你的 Key。'],
+        title: '把卡密换成 API Key',
+        goal: '后面每一步都要填这把 Key，别提前改。',
+        action: ['打开下面的管理后台 → 在「我的面板」或「提取 Key」页面粘贴激活码 → 提交激活 → 复制拿到的 Key。'],
         link: { href: consoleUrl, label: '管理后台' },
-        notes: ['先复制保存一份到密码管理器；忘了也不要紧，回管理后台用同一把激活码随时能再看，刷新页面不会丢。'],
         shot: { src: 'guide_site.png', caption: '管理后台首页，粘贴卡密的输入框在这里' },
       },
     ],
+    // 块级提示只放对所有页面都成立的信息。「都在后台里」那条原来挂在步骤上，
+    // 但它讲的是「后台这个服务」而不是「这一步的动作」，放块级更准，也省步骤的左列高度。
     notes: [
-      '激活码、API Key、用量记录都存在管理后台里：同一把激活码随时回来查看，刷新、换浏览器、换设备都不影响。',
+      '激活码、API Key、用量记录都存在后台里：换设备、换浏览器都不影响，忘了就回后台用同一把激活码再看。',
       '主域名打不开时，用后台里的备用域名（' + consoleBackupDomains.join('、') + '），API Key 不用换。',
-      '兑换得到的 Key 以 sk- 开头；后面 CC Switch、VS Code、终端都用它，不用再换。',
     ],
   },
 }
 
 /* ---------------- 场景页数据 ---------------- */
 
-/** Claude Code（VS Code 插件 / 终端）：一键导入，6 步 */
+/** Claude Code 官方插件（VS Code / Cursor）：一键导入 + 装插件，7 步 */
 const ccPage: GuidePage = {
   slug: '/guide/cc',
   scene: 'cc',
-  nav: 'Claude Code',
+  nav: 'Claude Code 插件',
   order: 1,
-  title: 'Claude Code 教程：VS Code 插件与终端配置',
-  desc: 'Claude 无限卡接入 Claude Code 的完整步骤：装 CC Switch、换取 API Key、一键导入配置、拉取并保存模型、启用并检测链路、在 VS Code 官方插件里开始用。',
-  lead: '从装 CC Switch 到在 VS Code 里跑起来，这条路一共 6 步，照着做就行。',
-  eyebrow: '终端与编辑器',
-  summary: '最主流的一条路。CC Switch 一键导入，VS Code 装官方插件就能写代码，终端里直接 claude 启动。',
-  answer: 'Claude Code 是最主流的用法：先在管理后台把卡密换成 API Key，再用 CC Switch 一键导入配置、拉取模型、启用检测，最后在 VS Code 装官方 Claude Code 插件或在终端直接跑 claude。',
+  title: 'Claude Code 插件教程：VS Code、Cursor',
+  desc: '在 VS Code 与 Cursor 里装 Anthropic 官方 Claude Code 插件：装 CC Switch、换 API Key、一键导入配置、拉取模型、启用检测，再装插件开始用。',
+  lead: '装完官方插件就能在编辑器里用本卡的模型，这页把配置和安装一次做完。',
+  eyebrow: '编辑器插件',
+  summary: '同一款 Anthropic 官方插件，VS Code 和 Cursor 都能装。图形界面用，比命令行更好上手。',
+  answer: 'Claude Code 插件在 VS Code 与 Cursor 里是同一个 Anthropic 官方扩展：先用 CC Switch 一键导入配置并启用检测，再在编辑器的扩展面板里搜「Claude Code」、认准发布者 Anthropic 装上，用的就是前面配好的那把 Key。',
   faq: [
-    { q: 'Claude Code 怎么配置 Claude 无限卡？', a: '在管理后台换取 API Key，用 CC Switch 一键导入配置，拉一次模型列表并保存，启用后检测链路显示正常就算配好了。VS Code 里再装官方 Claude Code 插件即可。' },
+    { q: 'Claude Code 插件怎么配置 Claude 无限卡？', a: '在管理后台换取 API Key，用 CC Switch 一键导入配置，拉一次模型列表并保存，启用后检测链路显示正常就算配好了；再到 VS Code 或 Cursor 的扩展面板装官方插件即可。' },
+    { q: 'VS Code 和 Cursor 用的是同一个插件吗？', a: '是。扩展 ID 都是 anthropic.claude-code，Anthropic 官方文档同时给了 VS Code 与 Cursor 的安装入口，两个编辑器里读的是同一份配置。' },
     { q: '一键导入后模型列表是空的？', a: '点「获取模型列表」再拉一次，加进模型配置后点保存。列表为空通常是配置刚导入还没刷新，或者 Key 没生效。' },
-    { q: '在 VS Code 里能用 Claude 无限卡吗？', a: '能。VS Code 装官方 Claude Code 插件后，选「使用已有的 API 配置 / API Key」，它会读 CC Switch 已经写好的配置，不用再填一遍 Key。' },
-    { q: '终端里怎么启动？', a: 'CC Switch 配置启用后，终端直接输入 claude 就能启动。想在会话里换模型用 /model 命令。' },
+    { q: '插件里要填 API Key 吗？', a: '不用。CC Switch 启用后配置已经写进 Claude Code 的用户配置，插件直接读它，登录方式选「使用已有的 API 配置 / API Key」就行。' },
   ],
-  tags: ['claude code 教程', 'claude code 配置', 'cc switch 配置', 'vscode claude code 插件', 'claude code api'],
+  tags: ['claude code 插件', 'vscode claude code 插件', 'cursor claude code 插件', 'claude code 扩展', 'anthropic claude code'],
   related: [
+    { text: 'Claude Code CLI 教程：终端安装与配置', url: '/guide/cli' },
     { text: 'Claude Code 教程：第一次会话之后怎么用', url: '/knowledge/claude-code-tutorial' },
     { text: 'Claude Code 命令与参数速查：会话内和命令行', url: '/knowledge/claude-code-cli-cheatsheet' },
-    { text: 'Claude Code 与 Codex CLI 怎么选', url: '/knowledge/claude-code-vs-codex' },
   ],
   blocks: [
     { id: 'cc-install-ccswitch', title: '安装 CC Switch', shared: 'install-ccswitch' },
@@ -245,11 +268,11 @@ const ccPage: GuidePage = {
       lead: '管理后台里有「一键导入配置」按钮，不用手填 Base URL 和 Key，两边自动对上。',
       steps: [
         {
-          title: '在管理后台点「一键导入配置」',
-          goal: '这一步让管理后台和 CC Switch 对上号，不用你手抄地址和密钥。',
-          action: ['回到管理后台 → 点「一键导入配置」→ CC Switch 会自动弹出接收窗口 → 确认导入。'],
-          notes: ['点了没反应多半是 CC Switch 没启动，先打开它再点。', '导入窗口里直接确认导入，不要改里面的 Base URL。', '同名配置会覆盖，重复导入不会叠加。', '窗口里提示「需在客户端中点击启用后写入配置文件」，下一步就做这件事。'],
-          shot: { src: 'guide_onekey_import.png', caption: '管理后台里的「一键导入配置」按钮与导入确认窗口' },
+          title: '自动填好地址和 Key',
+          goal: '手抄最容易把地址抄错，导入能跳过这一步。',
+          action: ['回到管理后台 → 点「一键导入配置」→ CC Switch 弹出导入窗口 → 点「确认导入」。'],
+          notes: ['点了没反应多半是 CC Switch 没启动，先打开它再点。', '导入窗口里直接确认导入，不要改里面的 Base URL。', '同名配置会覆盖，重复导入不会叠加。', '窗口里提示要「启用」后才写入配置文件，后面「启用并检测链路」那节会做。'],
+          shot: { src: 'guide_onekey_import.png', caption: '管理后台里的「一键导入配置」按钮与导入确认窗口', zoom: true },
         },
       ],
     },
@@ -259,24 +282,24 @@ const ccPage: GuidePage = {
       lead: '导入的配置要再拉一次模型列表，CC Switch 才知道网关这边有哪些模型可用。',
       steps: [
         {
-          title: '打开 CC Switch 进去获取模型',
-          goal: '先确认配置确实进了 CC Switch。',
-          action: ['打开 CC Switch → 看左侧的 Claude 配置，标签显示「使用中」就说明已经导进来了。'],
-          shot: { src: 'guide_get_models.png', caption: '打开 CC Switch，导入的配置已显示「使用中」' },
+          title: '确认配置已导入',
+          goal: '没导进来的话，后面拉不到模型。',
+          action: ['打开 CC Switch → 左侧 Claude 那条配置标着「使用中」，就是导进来了。'],
+          shot: { src: 'guide_get_models.png', caption: '打开 CC Switch，导入的配置已显示「使用中」', zoom: true },
         },
         {
-          title: '点高级选项，获取模型列表',
-          goal: '让 CC Switch 知道网关这边有哪些模型可用。',
-          action: ['双击这条配置进入「编辑供应商」→ 点「获取模型列表」，下面就会列出可用模型。'],
+          title: '拉取可用模型',
+          goal: '模型名以网关返回的为准，手填容易填错。',
+          action: ['双击这条配置进入「编辑供应商」→ 点「获取模型列表」。'],
           notes: ['列表为空通常是 Base URL 或 Key 填错了，回上一步核对一遍。', '带 -5-5、-4-8 这样后缀的是不同版本，不确定就用列表里的最新几个。'],
-          shot: { src: 'guide_model_list.png', caption: '「获取模型列表」后显示的可用模型' },
+          shot: { src: 'guide_model_list.png', caption: '「获取模型列表」后显示的可用模型', zoom: true },
         },
         {
           title: '选择你需要的模型并保存',
           goal: '把要用的模型加进来，不保存下一步启用后模型列表会是空的。',
           action: ['把 claude-fable-5-1、claude-opus-5-5、claude-opus-4-8、claude-sonnet-5-5 都添加进去，然后点「保存」。'],
           notes: ['完整的模型介绍见<a href="/models">模型广场</a>。'],
-          shot: { src: 'guide_save_models.png', caption: '选择模型并点「保存」' },
+          shot: { src: 'guide_save_models.png', caption: '选择模型并点「保存」', zoom: true },
         },
       ],
     },
@@ -286,62 +309,221 @@ const ccPage: GuidePage = {
       lead: '前面配完配置已经在 CC Switch 里但还没生效，这一步启用并检测一下，显示运行正常就完成了。',
       steps: [
         {
-          title: '点「启用」，再点「检测链路」',
-          goal: '启用后配置才会写进 CC Switch，检测显示运行正常就算配完了。',
-          action: ['回到 CC Switch 主界面 → 点「启用」→ 再点「检测链路」，显示运行正常即可。'],
+          title: '让配置生效',
+          goal: '检测这一步能提前暴露地址填错的问题。',
+          action: ['回到 CC Switch 主界面 → 点「启用」→ 再点「检测链路」，弹出「运行正常」即可。'],
           notes: ['检测失败先看<a href="/faq#cat-setup">常见问题 · 使用与配置</a>：多数情况是模型没保存，或者 Base URL 多带了 /v1。', '终端里的 claude、VS Code 里的 Claude Code 插件都直接生效，打开就能用。', '需要切换模型时，在终端里用 /model 这个指令，命令与参数见<a href="/knowledge/claude-code-cli-cheatsheet">命令速查</a>。'],
-          shot: { src: 'guide_enable_test.png', caption: '启用配置并检测链路，显示运行正常' },
+          shot: { src: 'guide_enable_test.png', caption: '启用配置并检测链路，显示运行正常', zoom: true },
         },
       ],
     },
     {
       id: 'cc-vscode',
-      title: '在 VS Code 里开始使用',
-      lead: '没用过 Claude Code 的，请按下方步骤通过 VS Code 官方插件使用：安装方便，图形界面比命令行更好上手。',
+      title: '在 VS Code 里装插件',
+      lead: 'Anthropic 官方插件在扩展市场里，认准发布者是 Anthropic 就行——认错了装到的是同名的第三方仿冒品。',
       notes: [
-        '会使用 Claude Code CLI 的也可以直接用：CC Switch 已经配置好密钥，打开终端输入 claude 就能启动。',
-        'WorkBuddy、Cursor 等其他客户端同样支持，填法见<a href="/guide/cursor">通用手动配置</a>。',
+        '官方文档同时给了 VS Code 与 Cursor 两个安装入口，同一个扩展 ID（anthropic.claude-code），两边读的是同一份配置。',
+        '在 Cursor 里装的话，直接看下一节；只想在终端里用 Claude Code，看<a href="/guide/cli">Claude Code CLI 教程</a>。',
       ],
       steps: [
         {
-          title: '没装过 VS Code 的先下载安装',
-          goal: '开始使用要先有 VS Code 本体。',
+          title: '先装 VS Code',
+          goal: '插件装在编辑器里，没有编辑器就无处可装。',
           action: ['打开下面这个官网，挑自己电脑的系统下载，一路下一步保持默认安装。'],
           link: { href: 'https://code.visualstudio.com/', label: 'VS Code 官网' },
           shot: { src: 'guide_vscode_site.png', caption: 'VS Code 官网' },
           notes: ['已经装了 VS Code 的跳过这一步，直接装下面那个插件。'],
         },
         {
-          title: '安装 Claude Code 的官方插件',
-          goal: '装好后直接在上面聊天、写代码，用的就是前面配好的那把 Key，不用再输一遍。',
-          action: ['打开 VS Code 的扩展面板（Ctrl+Shift+X）→ 搜索「Claude Code」→ 确认发布者是 Anthropic → 安装。'],
-          notes: ['认准发布者是 Anthropic，同名的第三方插件不要装。', '插件里的 API Key / 登录方式选「使用已有的 API 配置 / API Key」，不需要登录 Anthropic 账号。', '如果提示配置缺失，回 CC Switch 确认配置已启用，然后重启 VS Code。'],
-          shot: { src: 'guide_vscode_plugin.png', caption: 'VS Code 扩展面板里的 Claude Code 官方插件（发布者 Anthropic）' },
+          title: '在扩展面板里装上插件，打开就能用',
+          goal: '认准发布者 Anthropic 装上，确认插件读的是你刚配好的那把 Key，而不是让你再登一次 Anthropic 账号。',
+          action: ['打开 VS Code 的扩展面板（Ctrl+Shift+X）→ 搜索「Claude Code」→ 确认发布者是 Anthropic → 点「安装」。', '装完后左侧活动栏会出现 Claude Code 的图标（一个星形按钮）→ 点开 → 登录方式选「使用已有的 API 配置 / API Key」→ 直接发一句话试。'],
+          notes: ['认准发布者是 Anthropic，同名的第三方插件不要装；扩展 ID 是 anthropic.claude-code，在市场页面的网址里能看到。', '不需要登录 Anthropic 账号，CC Switch 已经把地址和 Key 写进配置了。', '如果提示配置缺失，回 CC Switch 确认配置已启用，然后在编辑器里执行一次「Developer: Reload Window」。', '插件只装在 VS Code 里、想在终端直接跑 claude 命令，见<a href="/guide/cli">Claude Code CLI 教程</a>。'],
+          shot: { src: 'guide_vscode_plugin.png', caption: '扩展面板里搜到 Claude Code（发布者 Anthropic），装完点左侧星形图标就能对话', zoom: true },
+        },
+      ],
+    },
+    {
+      id: 'cc-cursor',
+      title: '在 Cursor 里装同一个插件',
+      lead: 'Cursor 是 VS Code 的分支，同一个 Anthropic 官方插件能直接装——官方文档里就给了 Cursor 的安装入口。',
+      notes: [
+        '装好后的用法和 VS Code 一样：点左侧星形图标，登录方式选「使用已有的 API 配置 / API Key」。',
+        '插件自带一份命令行组件，聊天面板开箱即用；要在 Cursor 的集成终端里跑 claude 命令，另外装一次 CLI，见<a href="/guide/cli">Claude Code CLI 教程</a>。',
+        '不想装插件、只想让 Cursor 自己的补全用本卡的模型，是另一回事，填法见<a href="/guide/cursor">通用手动配置</a>。',
+      ],
+      steps: [
+        {
+          title: '装同一个官方扩展',
+          goal: '和 VS Code 里是同一个扩展，配置也共用同一份。',
+          action: ['打开 Cursor → 按 Ctrl+Shift+X → 搜「Claude Code」→ 认准发布者 Anthropic → 安装。'],
+          notes: ['如果 Cursor 的扩展市场里搜不到，用官方文档给的 Cursor 安装入口（cursor:extension/anthropic.claude-code）直接拉起安装。', '装好后 Cursor 的设置里同样能填环境变量，默认读的是同一份 Claude Code 用户配置。'],
+          shot: { src: 'guide_cursor_extension.webp', caption: 'Cursor 的扩展面板：搜到 Claude Code 官方扩展（发布者 Anthropic），点 Install 安装', zoom: true },
         },
       ],
     },
   ],
-  next: [
-    { text: 'Claude Code 教程：第一次会话之后怎么用', url: '/knowledge/claude-code-tutorial' },
-    { text: 'CLAUDE.md 怎么写：与 AGENTS.md 的关系和 .claude 目录', url: '/knowledge/claude-md-guide' },
-    { text: 'Claude Code 命令与参数速查：会话内和命令行', url: '/knowledge/claude-code-cli-cheatsheet' },
-  ],
+  next: { text: 'CLAUDE.md 怎么写：与 AGENTS.md 的关系和 .claude 目录', url: '/knowledge/claude-md-guide' },
 }
 
-/** Claude 桌面版：在 CC Switch 里新增一个专用供应商，再打开路由，8 步 */
+/**
+ * Claude Code CLI（终端）：官方安装脚本 + 环境变量接入，5 步。
+ *
+ * 与插件页的分工（一个主场页原则）：插件页讲「怎么在编辑器里用」，这一页讲「怎么在终端里用」。
+ * 换 Key 这一步两页共用 shared 块，改一处全站生效。
+ */
+const cliPage: GuidePage = {
+  slug: '/guide/cli',
+  scene: 'cli',
+  nav: 'Claude Code CLI',
+  order: 2,
+  title: 'Claude Code CLI 教程：终端安装与配置',
+  desc: '在终端里用 Claude Code：换 API Key、用官方脚本安装 CLI、设置 Base URL 与 Key 两个环境变量、验证链路，再进项目跑第一次会话。',
+  lead: '终端里跑 Claude Code，跟着走完这五步就能开始第一段会话。',
+  eyebrow: '终端命令行',
+  summary: '终端里的 Claude Code。官方脚本装 CLI，两个环境变量接上网关，装完就能直接用。',
+  answer: 'Claude Code CLI 只要五步：把卡密换成 API Key，用官方安装脚本装上 CLI，设 ANTHROPIC_BASE_URL 与 ANTHROPIC_API_KEY 两个环境变量，在项目目录里跑 claude 验证，最后用 /init 生成 CLAUDE.md 开始第一段会话。',
+  faq: [
+    { q: 'Claude Code CLI 怎么装？', a: 'Windows 在 PowerShell 里跑 irm https://claude.ai/install.ps1 | iex，macOS 与 Linux 跑 curl -fsSL https://claude.ai/install.sh | bash，装完开个新终端输入 claude --version 验证。' },
+    { q: '不用 CC Switch 能配吗？', a: '能。CLI 认两个环境变量：ANTHROPIC_BASE_URL 填网关根地址（不带 /v1），ANTHROPIC_API_KEY 填 sk- 开头的 Key。也可以写进 ~/.claude/settings.json 的 env 块长期生效。' },
+    { q: '装完提示找不到 claude 命令？', a: '安装目录还没进 PATH。关掉当前终端窗口重开一个再试；还不行就把安装目录加进系统 PATH，或者去 CC Switch 一键导入配置，它会替你把配置写好。' },
+    { q: '怎么确认它连的是本卡而不是官方？', a: '进会话后输入 /status，看 Anthropic base URL 那行是不是管理后台的地址、鉴权那行是不是 ANTHROPIC_API_KEY，对了就是走的本卡。' },
+  ],
+  tags: ['claude code cli 安装', 'claude code 命令行', 'claude code 终端', 'anthropic base url 配置', 'claude code 环境变量'],
+  related: [
+    { text: 'Claude Code 命令与参数速查：会话内和命令行', url: '/knowledge/claude-code-cli-cheatsheet' },
+    { text: 'Claude Code 插件教程：VS Code 与 Cursor', url: '/guide/cc' },
+    { text: 'Claude Code 教程：第一次会话之后怎么用', url: '/knowledge/claude-code-tutorial' },
+  ],
+  blocks: [
+    { id: 'cli-get-key', title: '换取 API Key', shared: 'get-key' },
+    {
+      id: 'cli-install',
+      title: '安装 Claude Code CLI',
+      lead: '官方推荐用安装脚本装，Windows、macOS、Linux 各一条命令，装完就有 claude 这个命令。',
+      steps: [
+        {
+          title: '按你的系统跑一条安装命令',
+          goal: '装完先确认版本，别用旧版本。',
+          action: [
+            'Windows（PowerShell）：irm https://claude.ai/install.ps1 | iex',
+            'macOS / Linux：curl -fsSL https://claude.ai/install.sh | bash',
+            '也可以用包管理器：macOS 跑 brew install --cask claude-code，Windows 跑 winget install Anthropic.ClaudeCode',
+          ],
+          notes: ['安装过程没有进度条，是正常现象，等它跑完就行。', '装完要新开一个终端窗口才认得到 claude 命令——当前这个窗口的 PATH 还是旧的。'],
+          shot: { src: 'guide_cli_install.webp', caption: '官方安装文档里的三种安装方式' },
+        },
+        {
+          title: '验证一下装好了',
+          goal: '确认命令能跑，版本号出来了就说明装成功。',
+          action: ['新开一个终端窗口 → 输入 claude --version → 看到版本号就成了。'],
+          notes: ['提示「不是内部或外部命令」就是 PATH 还没生效，关掉窗口重开；仍然不行就加进系统 PATH。'],
+          shot: false,
+        },
+      ],
+    },
+    {
+      id: 'cli-config',
+      title: '设置地址与 Key',
+      lead: 'CLI 只认两个环境变量：ANTHROPIC_BASE_URL 指向网关，ANTHROPIC_API_KEY 放那把 sk- 开头的密钥。',
+      notes: [
+        '想让 CC Switch 帮你写配置（地址、Key、模型一次到位），见<a href="/guide/cc#cc-import">插件教程的一键导入</a>；这一步是纯手填的做法，两条路等效。',
+      ],
+      steps: [
+        {
+          title: '在当前终端里先临时设置两个变量',
+          goal: '先验证这条路走得通，再决定要不要长期保存。',
+          action: [
+            'Windows（PowerShell）：$env:ANTHROPIC_BASE_URL = "' + baseUrl + '"',
+            'Windows（PowerShell）：$env:ANTHROPIC_API_KEY = "sk-你的Key"',
+            'macOS / Linux：export ANTHROPIC_BASE_URL=' + baseUrl,
+            'macOS / Linux：export ANTHROPIC_API_KEY=sk-你的Key',
+          ],
+          notes: ['地址填网关根地址，不要自己加 /v1——CLI 会自己拼 /v1/messages。', '临时变量只在这个终端窗口有效，关掉就没了；下一步说怎么长期保存。'],
+          shot: false,
+        },
+        {
+          title: '要长期用，就写进配置文件',
+          goal: '每次开新终端都自动带着这两个变量，不用再手敲。',
+          action: ['编辑用户配置文件 ~/.claude/settings.json（Windows 在 %USERPROFILE%\\.claude\\settings.json），在 env 块里写这两个变量。'],
+          notes: ['这个文件里还有 hooks、权限等其它配置，改的时候只动 env 块，别把别的内容覆盖掉。', '官方文档说明：同一个变量在 shell 和配置文件里都写了，以配置文件里的为准。'],
+          shot: false,
+        },
+      ],
+      cmd: [
+        {
+          title: '~/.claude/settings.json',
+          lines: [
+            '{',
+            '  "env": {',
+            '    "ANTHROPIC_BASE_URL": "' + baseUrl + '",',
+            '    "ANTHROPIC_API_KEY": "sk-你的Key"',
+            '  }',
+            '}',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'cli-verify',
+      title: '验证链路',
+      lead: '发一句话就能验证：能正常回答，说明地址、Key、模型三样都对。',
+      steps: [
+        {
+          title: '确认连的是本卡',
+          goal: '没走本卡的话，会去连官方地址要你登录。',
+          action: ['cd 进你的项目目录 → 输入 claude → 会话里输入 /status → 看 Anthropic base URL 和鉴权那两行。'],
+          notes: ['base URL 那行显示 ' + baseUrl + '，鉴权那行写着 ANTHROPIC_API_KEY，就说明走的是本卡。', '如果还弹登录界面要你登 Anthropic 账号，先把环境变量或配置文件检查一遍。'],
+          shot: false,
+        },
+        {
+          title: '发一句话试',
+          goal: '真正走通一次请求。',
+          action: ['随便问一句，比如「你是什么模型」，能正常回答就说明整条链路通了。'],
+          notes: ['报 401 多半是 Key 填错或少了 sk- 前缀；报模型不存在就去<a href="/models">模型广场</a>抄一个真实的 model ID。'],
+          shot: false,
+        },
+      ],
+    },
+    {
+      id: 'cli-first',
+      title: '第一次会话怎么开始',
+      lead: '进项目第一件事是 /init，让它先读懂你的仓库再动手。',
+      steps: [
+        {
+          title: '先让它读懂项目',
+          goal: '把项目约定写成文件，之后每个会话都自动带着它。',
+          action: ['在项目目录里输入 /init → 它会扫描仓库并起草 CLAUDE.md → 花一分钟把构建命令、测试命令、约定改对。'],
+          notes: ['根文件建议控制在 200 行以内，更长的内容拆到子目录的 CLAUDE.md。', '写文件的方法见<a href="/knowledge/claude-md-guide">CLAUDE.md 怎么写</a>。'],
+          shot: false,
+        },
+        {
+          title: '大改动先看计划',
+          goal: '改动大的时候先看它的计划，确认了再让它改。',
+          action: ['按 Shift+Tab 切到计划模式，或输入 /plan 让它先给方案；模型用 /model 切，比如 /model claude-opus-5-5。'],
+          notes: ['完整的工作流与常用斜杠命令见<a href="/knowledge/claude-code-tutorial">第一次会话之后怎么用</a>。', '命令与参数速查见<a href="/knowledge/claude-code-cli-cheatsheet">命令速查</a>。'],
+          shot: false,
+        },
+      ],
+    },
+  ],
+  next: { text: 'CLAUDE.md 怎么写：与 AGENTS.md 的关系和 .claude 目录', url: '/knowledge/claude-md-guide' },
+}
+
+/** Claude 桌面版：在 CC Switch 里新增一个专用供应商，再打开路由，9 步 */
 const desktopPage: GuidePage = {
   slug: '/guide/desktop',
   scene: 'desktop',
   nav: 'Claude 桌面版',
-  order: 2,
+  order: 3,
   title: 'Claude 桌面版教程：新增供应商、开启路由与安装',
   desc: 'Claude 无限卡接入 Claude 桌面版：装 CC Switch、换取 API Key、新增桌面版供应商、填地址与 Key、打开路由、启用检测、安装桌面版，以及虚拟机报错的处理。',
-  lead: '桌面版要单独建一个供应商并开路由，比 Claude Code 多两步，这一页带你走完。',
+  lead: '桌面版要多建一个供应商并打开路由，这一页把它和客户端安装一起讲完。',
   eyebrow: '官方桌面客户端',
   summary: '桌面版要单独建一个供应商并开路由，比 Claude Code 多两步。装完桌面版客户端即可用，也不用翻墙。',
   answer: 'Claude 桌面版要用 CC Switch 新增一个「桌面版」供应商，接入方式选直连，填上接口地址与 API Key，再打开路由开关并启用检测，最后安装桌面版客户端即可。',
   faq: [
-    { q: 'Claude 桌面版怎么用 Claude 无限卡？', a: '在 CC Switch 里新增一个供应商，选择 Claude 桌面版并用自定义配置，接入方式选直连，填入接口地址与 API Key，打开路由里的 Claude Code 开关，启用并检测链路后安装桌面版即可。' },
+    { q: 'Claude 桌面版怎么用 Claude 无限卡？', a: '在 CC Switch 里新增一个供应商，选择 Claude 桌面版并用自定义配置，接入方式选直连，填入接口地址与 API Key，打开路由总开关和「路由启用」里的 Claude 开关，启用并检测链路后安装桌面版即可。' },
     { q: '桌面版和 Claude Code 用的地址一样吗？', a: '一样，都是管理后台首页那一行地址。区别在接入方式：桌面版选「直连」，Codex 要选 Anthropic Messages 上游格式。' },
     { q: '桌面版提示要 Virtual Machine Platform 怎么办？', a: '这是 Windows 的可选功能没开。搜索「启用或关闭 Windows 功能」，勾选「虚拟机平台」和「适用于 Linux 的 Windows 子系统」，重启电脑即可。' },
     { q: '桌面版打不开、显示不可用？', a: '通常是配置还没写进客户端。把 Claude 桌面版完全退出（不是最小化），回到 CC Switch 确认配置已启用、路由已打开，再重新打开。' },
@@ -361,16 +543,16 @@ const desktopPage: GuidePage = {
       lead: '桌面版在 CC Switch 里是一个单独的供应商条目，要自己新建，不能用一键导入。',
       steps: [
         {
-          title: '在 CC Switch 里找到 Claude Desktop Official',
-          goal: '先确认客户端版本选对了，桌面版和 Claude Code 是两条不同的配置。',
-          action: ['打开 CC Switch → 在供应商列表里找到「Claude Desktop Official」这一条。'],
-          shot: { src: 'guide_desktop_provider_picker.webp', caption: 'CC Switch 供应商列表里的 Claude Desktop Official 条目' },
+          title: '切到桌面版的配置',
+          goal: '桌面版和 Claude Code 是两套配置，切错了会改到别的客户端。',
+          action: ['打开 CC Switch → 点顶部应用栏里带显示器角标的那个图标 → 列表里出现「Claude Desktop Official」就对了。'],
+          shot: { src: 'guide_desktop_provider_picker.webp', caption: 'CC Switch 供应商列表里的 Claude Desktop Official 条目', zoom: true },
         },
         {
-          title: '点「新建供应商」，选「自定义配置」',
-          goal: '官方预设不适用于本卡，要自己填接口地址与 Key。',
-          action: ['点「添加新供应商」→ 在预设列表里选「自定义配置」→ 填写下面的地址与 Key。'],
-          shot: { src: 'guide_desktop_provider_preset.webp', caption: '「添加新供应商」弹窗，预设列表里选「自定义配置」' },
+          title: '自己建一条配置',
+          goal: '预设都是别家服务，本卡要自己填。',
+          action: ['点右上角橙色「+」→ 在「添加新供应商」页的预设列表里选「自定义配置」。'],
+          shot: { src: 'guide_desktop_provider_preset.webp', caption: '「添加新供应商」弹窗，预设列表里选「自定义配置」', zoom: true },
           notes: ['预设供应商里带「Claude Desktop」字样的那些都不是本卡，填了也不通。'],
         },
       ],
@@ -381,8 +563,8 @@ const desktopPage: GuidePage = {
       lead: '地址填管理后台首页那一行，Key 填上一步换来的那把，接入方式选「直连」——桌面版和 Claude Code 的区别就在这里。',
       steps: [
         {
-          title: '填请求地址与 API Key，接入方式选直连',
-          goal: '这三个填对了桌面版才连得上，填错的表现是连不上或报鉴权错误。',
+          title: '填三个值',
+          goal: '填错的表现是连不上或报鉴权错误。',
           action: [
             '请求地址填 ' + baseUrl + '（不要带 /v1 结尾）',
             'API Key 填上一步换来的 sk- 开头那把',
@@ -399,17 +581,17 @@ const desktopPage: GuidePage = {
       lead: '桌面版必须走本地路由转发，请求才会被送到网关——这一步不做，前面配的全都白配。',
       steps: [
         {
-          title: '进设置里的「路由」，打开总开关与 Claude Code',
-          goal: '总路由和桌面版对应的应用开关都要打开，只开一个不行。',
-          action: ['CC Switch → 设置 → 「路由」标签 → 打开「路由总开关」→ 再打开「Claude Code」那个应用开关。'],
-          shot: { src: 'guide_ccswitch_route_settings.webp', caption: 'CC Switch 设置里的「路由」页：路由总开关与各应用开关' },
+          title: '打开两个开关',
+          goal: '总开关和应用开关缺一个，请求都不会被转发。',
+          action: ['CC Switch → 设置 →「路由」→ 打开「路由总开关」→ 在「路由启用」里打开「Claude」。'],
+          shot: { src: 'guide_ccswitch_route_settings.webp', caption: 'CC Switch 设置里的「路由」页：路由总开关与各应用开关', zoom: true },
           notes: ['路由服务地址默认是本机的 127.0.0.1:15721，不用改。', '改完地址或端口要重启路由服务才生效。'],
         },
         {
-          title: '确认供应商列表里显示「需要路由」',
-          goal: '这是路由生效的标志：条目上标了「需要路由」说明它走本地转发。',
-          action: ['回到 CC Switch 主界面，供应商列表里能看到这条配置旁边标着「需要路由」。'],
-          shot: { src: 'guide_ccswitch_provider_route.webp', caption: 'CC Switch 供应商列表里标着「需要路由」的两条配置' },
+          title: '确认路由已生效',
+          goal: '看到这个标记，才说明请求会走本地转发。',
+          action: ['回到 CC Switch 主界面，这条配置名字旁边有蓝色小标「需要路由」。'],
+          shot: { src: 'guide_ccswitch_provider_route.webp', caption: 'CC Switch 供应商列表里标着「需要路由」的两条配置', zoom: true },
         },
       ],
     },
@@ -419,10 +601,10 @@ const desktopPage: GuidePage = {
       lead: '配完最后启用一下，检测显示连通正常，桌面版就能用了。',
       steps: [
         {
-          title: '点「启用」，再点「检测链路」',
-          goal: '启用才会把配置写进客户端，检测通过说明整条链路都通了。',
-          action: ['回到 CC Switch 主界面 → 点「启用」→ 再点「检测链路」，显示连通正常即可。'],
-          shot: { src: 'guide_desktop_link_ok.webp', caption: '检测链路显示 claude 连通正常' },
+          title: '让配置生效',
+          goal: '不启用的话配置不会写进客户端。',
+          action: ['回到 CC Switch 主界面 → 点「启用」→ 再点「检测链路」，弹出「连通正常」即可。'],
+          shot: { src: 'guide_desktop_link_ok.webp', caption: '检测链路显示 claude 连通正常', zoom: true },
           notes: ['检测失败先看<a href="/faq#cat-setup">常见问题 · 使用与配置</a>。'],
         },
       ],
@@ -433,9 +615,9 @@ const desktopPage: GuidePage = {
       lead: '配置好了，再装桌面版客户端本体，两个下载渠道都放这儿。',
       steps: [
         {
-          title: '从官网下载并安装 Claude 桌面版',
+          title: '装官方客户端',
           goal: '客户端本体是官方的，和前面的 API 配置是两件事。',
-          action: ['打开 Claude 官网下载页 → 选对应系统的安装包 → 下载 → 安装。'],
+          action: ['打开下面的下载页 → 选自己的系统 → 下载后双击安装。'],
           link: { href: desktopUrl, label: 'Claude 桌面版下载' },
           shot: { src: 'guide_desktop_download.webp', caption: 'Claude 官网的桌面版下载页' },
           notes: ['官网页面在国内有时打不开，可以用底下的镜像地址；镜像是第三方文件，装之前自己判断要不要用。'],
@@ -451,7 +633,7 @@ const desktopPage: GuidePage = {
           title: '打开 Claude 桌面版，直接开始对话',
           goal: '验证整条链路：能正常回答、模型对得上，就说明配成了。',
           action: ['打开桌面版 → 随便问一句（比如「你是什么模型」），能正常回答就是配好了。'],
-          shot: { src: 'guide_desktop_cowork.webp', caption: '桌面版里正常对话，模型为 Fable 5.1' },
+          shot: { src: 'guide_desktop_cowork.webp', caption: '桌面版里正常对话，模型为 Fable 5.1', zoom: true },
           notes: ['如果显示「不可用」，先确认 CC Switch 里配置已启用、路由已打开，然后完全退出桌面版再打开（不是最小化到托盘）。'],
         },
       ],
@@ -462,43 +644,39 @@ const desktopPage: GuidePage = {
       lead: '这是 Windows 缺可选功能，和你的 API 配置无关，按系统提示开一下就好。',
       steps: [
         {
-          title: '看到「requires the Virtual Machine Platform」提示',
+          title: '认出这个报错',
           goal: '先分清是系统功能缺失还是配置问题，这一屏的报错只跟系统有关。',
-          action: ['桌面版弹出「Claude\'s workspace requires the Virtual Machine Platform on Windows」时，不用改任何 API 配置。'],
-          shot: { src: 'guide_desktop_vm_error.webp', caption: '提示需要 Virtual Machine Platform 的报错弹窗' },
+          action: ['弹窗里写着 requires the Virtual Machine Platform on Windows，就是这个问题，API 配置不用动。'],
+          shot: { src: 'guide_desktop_vm_error.webp', caption: '提示需要 Virtual Machine Platform 的报错弹窗', zoom: true },
         },
         {
-          title: '搜索「启用或关闭 Windows 功能」',
+          title: '打开功能面板',
           goal: '这个功能在系统设置里，不在 Claude 里面。',
           action: ['打开 Windows 搜索框 → 输入「启用或关闭 Windows 功能」→ 打开它。'],
-          shot: { src: 'guide_desktop_vm_search.webp', caption: 'Windows 搜索「启用或关闭 Windows 功能」' },
+          shot: { src: 'guide_desktop_vm_search.webp', caption: 'Windows 搜索「启用或关闭 Windows 功能」', zoom: true },
         },
         {
-          title: '勾选虚拟机平台与 WSL，重启电脑',
+          title: '勾选两项并重启',
           goal: '两个都勾上，桌面版的代码与文件功能才完整可用。',
           action: ['在列表里勾选「虚拟机平台」和「适用于 Linux 的 Windows 子系统」→ 确定 → 重启电脑。'],
-          shot: { src: 'guide_desktop_vm_features.webp', caption: 'Windows 功能列表里勾选「虚拟机平台」与「适用于 Linux 的 Windows 子系统」' },
+          shot: { src: 'guide_desktop_vm_features.webp', caption: 'Windows 功能列表里勾选「虚拟机平台」与「适用于 Linux 的 Windows 子系统」', zoom: true },
           notes: ['「Windows 虚拟机监控程序平台」不是同一个东西，别勾错。'],
         },
       ],
     },
   ],
-  next: [
-    { text: 'Claude Code 教程：第一次会话之后怎么用', url: '/knowledge/claude-code-tutorial' },
-    { text: 'Claude Code 与 Codex CLI 怎么选', url: '/knowledge/claude-code-vs-codex' },
-    { text: '常见问题：使用与配置', url: '/faq#cat-setup' },
-  ],
+  next: { text: '模型广场：model ID 一览', url: '/models' },
 }
 
-/** Codex：CC Switch 里新增 Codex 供应商，上游格式必须选 Anthropic Messages，8 步 */
+/** Codex：CC Switch 里新增 Codex 供应商，上游格式必须选 Anthropic Messages，9 步 */
 const codexPage: GuidePage = {
   slug: '/guide/codex',
   scene: 'codex',
   nav: 'Codex',
-  order: 3,
+  order: 4,
   title: 'Codex 教程：接入 Claude 无限卡并配置模型列表',
   desc: 'Codex 接入 Claude 无限卡：装 CC Switch、换取 API Key、新增 Codex 供应商、填地址与 Key、上游格式选 Anthropic Messages、启用检测后重启 Codex。',
-  lead: 'Codex 多两个关键动作：上游格式必须选 Anthropic Messages，改完必须彻底重启才生效。',
+  lead: 'Codex 接入本卡比别的客户端多两个关键动作，这一页逐节标出来。',
   eyebrow: '终端 Agent',
   summary: 'Codex 多两个关键动作：上游格式必须选 Anthropic Messages，配置完必须彻底重启 Codex 才会生效。',
   answer: 'Codex 要在 CC Switch 里新增一个 Codex 供应商，上游格式必须选 Anthropic Messages 并开启路由，配置好模型列表后启用并检测链路，最后彻底重启 Codex 才会生效。',
@@ -523,10 +701,10 @@ const codexPage: GuidePage = {
       lead: 'Codex 要在 CC Switch 里单独建一个供应商，不能用一键导入，也不能用桌面版那条配置。',
       steps: [
         {
-          title: '新增供应商时选 Codex 供应商',
-          goal: '先选对供应商类型，后面能填的字段才和 Codex 对得上。',
-          action: ['CC Switch → 「添加新供应商」→ 选「Codex 供应商」这一类 → 进到编辑页。'],
-          shot: { src: 'guide_codex_provider_type.webp', caption: '「添加新供应商」里选择 Codex 供应商' },
+          title: '选对供应商类型',
+          goal: '类型选错，后面能填的字段就对不上。',
+          action: ['顶部应用栏切到 Codex → 点「+」→ 页签选「Codex 供应商」→ 预设里选「自定义配置」。'],
+          shot: { src: 'guide_codex_provider_type.webp', caption: '「添加新供应商」里选择 Codex 供应商', zoom: true },
           notes: ['列表里带「需要路由」标记的那条是本卡的既有配置，可以直接用它的地址与 Key 改。'],
         },
       ],
@@ -537,8 +715,8 @@ const codexPage: GuidePage = {
       lead: 'Codex 的请求地址要带 /v1，和 Claude Code 那边不一样；默认模型填一个网关确实返回的模型名。',
       steps: [
         {
-          title: '填请求地址、API Key 与默认模型',
-          goal: '这三个值决定 Codex 往哪儿发请求、发什么模型，填错的表现是连不上或报模型不存在。',
+          title: '填三个值',
+          goal: '填错的表现是连不上，或报模型不存在。',
           action: [
             'API 请求地址填 ' + baseUrlV1 + '（Codex 这里要带 /v1）',
             'API Key 填上一步换来的 sk- 开头那把',
@@ -555,8 +733,8 @@ const codexPage: GuidePage = {
       lead: '这是 Codex 专有的一步，也是最关键的一步：本卡是 Anthropic 兼容端点，选错格式请求就发不出去。',
       steps: [
         {
-          title: '高级选项里选「Anthropic Messages（需开启路由）」',
-          goal: '让 Codex 按 Anthropic 协议向网关发请求，而不是按 OpenAI 协议。',
+          title: '改请求协议',
+          goal: '默认是 OpenAI 协议，本卡不认。',
           action: ['编辑供应商 → 展开「高级选项」→「上游格式」→ 选「Anthropic Messages」→ 按提示先开启路由。'],
           shot: { src: 'guide_codex_upstream_format.webp', caption: '高级选项里的上游格式：Anthropic Messages（需开启路由）', zoom: true },
           notes: ['Chat Completions 与 Responses 是 OpenAI 协议，本卡用不了。', '这里选 Anthropic Messages，就必须开路由，两步是配套的。'],
@@ -569,19 +747,19 @@ const codexPage: GuidePage = {
       lead: '把网关有的模型加进列表，Codex 的 /model 命令才会列出这些模型名。',
       steps: [
         {
-          title: '获取模型列表并添加模型',
-          goal: 'Codex 只认自己列表里的模型名，没加进去的模型在 /model 里看不到。',
+          title: '把模型加进列表',
+          goal: '这一步决定 Codex 请求时发哪个模型。',
           action: ['编辑供应商 → 「获取模型列表」→ 选「添加模型」→ 填菜单显示名与实际请求模型。'],
           shot: { src: 'guide_codex_model_picker.webp', caption: '获取模型列表后添加模型：菜单显示名与实际请求模型', zoom: true },
-          notes: ['「实际请求模型」要填网关真实返回的 ID（如 claude-opus-5-5），填错了 Codex 会报模型不存在。'],
+          notes: ['实际请求模型填错，Codex 会报模型不存在；真实 ID 见<a href="/models">模型广场</a>。'],
         },
         {
-          title: '在模型映射里配好，生成 model_catalog.json',
-          goal: '模型映射决定 /model 里显示的名字和实际请求的模型；生成 model_catalog.json 之后 Codex 才会列出它们。',
+          title: '生成模型目录',
+          goal: '不生成目录文件，/model 里还是看不到这些名字。',
           action: ['同一页的「模型映射」里填菜单显示名与实际请求模型 → 勾上「生成 Codex model_catalog.json」→ 保存。'],
           shot: [
-            { src: 'guide_codex_model_mapping.webp', caption: '模型映射表：左边菜单显示名，右边实际请求模型' },
-            { src: 'guide_codex_catalog.webp', caption: '高级选项里的「生成 Codex model_catalog.json」开关' },
+            { src: 'guide_codex_model_mapping.webp', caption: '模型映射表：左边菜单显示名，右边实际请求模型', zoom: true },
+            { src: 'guide_codex_catalog.webp', caption: '高级选项里的「生成 Codex model_catalog.json」开关', zoom: true },
           ],
           notes: ['改完 model_catalog.json 必须彻底重启 Codex，模型列表才会刷新。'],
         },
@@ -593,16 +771,16 @@ const codexPage: GuidePage = {
       lead: 'Codex 走本地路由转发，和桌面版一样：总开关与 Codex 应用开关都要开。',
       steps: [
         {
-          title: '设置里的路由页，打开总开关与 Codex',
+          title: '打开两个开关',
           goal: 'Codex 的请求必须被路由接管，否则不会发往网关。',
-          action: ['CC Switch → 设置 → 「路由」→ 打开「路由总开关」→ 再打开「Codex」那个应用开关。'],
+          action: ['CC Switch → 设置 →「路由」→ 打开「路由总开关」→ 在「路由启用」里打开「Codex」。'],
           shot: { src: 'guide_ccswitch_route_settings.webp', caption: '路由页：打开总开关与 Codex 应用开关' },
         },
         {
-          title: '确认供应商标着「需要路由」',
-          goal: '这是路由生效的标志，条目上会显示出来。',
-          action: ['回到主界面，供应商列表里这条配置旁边应显示「需要路由」。'],
-          shot: { src: 'guide_codex_provider_need_route.webp', caption: '供应商列表里标着「需要路由」的 Codex 配置' },
+          title: '确认路由已生效',
+          goal: '看到这个标记，才说明请求会走本地转发。',
+          action: ['回到主界面，这条配置名字旁边有蓝色小标「需要路由」。'],
+          shot: { src: 'guide_codex_provider_need_route.webp', caption: '供应商列表里标着「需要路由」的 Codex 配置', zoom: true },
         },
       ],
     },
@@ -612,12 +790,12 @@ const codexPage: GuidePage = {
       lead: '配置齐了启用一下，检测显示连通正常再往下走。',
       steps: [
         {
-          title: '点「启用」，再点「检测链路」',
-          goal: '启用才会把配置写进 Codex，检测通过说明整条链路都通了。',
-          action: ['回到 CC Switch 主界面 → 点「启用」→ 再点「检测链路」，显示连通正常即可。'],
+          title: '让配置生效',
+          goal: '不启用的话配置不会写进 Codex。',
+          action: ['回到 CC Switch 主界面 → 点「启用」→ 再点右侧波形图标检测链路，弹出「连通正常」即可。'],
           shot: [
-            { src: 'guide_codex_provider_list.webp', caption: '供应商列表里无限卡那条已启用，地址带 /v1' },
-            { src: 'guide_codex_link_ok.webp', caption: '检测链路显示无限卡连通正常' },
+            { src: 'guide_codex_provider_list.webp', caption: '供应商列表里无限卡那条已启用，地址带 /v1', zoom: true },
+            { src: 'guide_codex_link_ok.webp', caption: '检测链路显示无限卡连通正常', zoom: true },
           ],
           notes: ['检测失败先看<a href="/faq#cat-setup">常见问题 · 使用与配置</a>。'],
         },
@@ -629,20 +807,17 @@ const codexPage: GuidePage = {
       lead: 'Codex 只在启动时读一次配置，这一步不做，前面所有配置都不会生效。',
       steps: [
         {
-          title: '在任务管理器里结束 Codex 进程，再重新打开',
-          goal: '彻底重启后新配置才会被加载，模型列表也会刷新。',
+          title: '彻底退出再打开',
+          goal: '关窗口不算退出，它还会在后台驻留。',
           action: ['完全退出 Codex → 打开任务管理器确认没有残留的 Codex 进程 → 结束它 → 重新启动 Codex。'],
-          notes: ['关窗口不算完全退出，Codex 可能还在后台驻留。', '改了模型映射后同样要重启，/model 里的列表才会更新。'],
+          notes: ['改了模型映射后同样要重启，/model 里的列表才会更新。'],
+          shot: false,
         },
       ],
-      shot: { src: 'guide_codex_in_use.webp', caption: '重启后在 Codex 里正常使用，模型为 claude-opus-5-5' },
+      shot: { src: 'guide_codex_in_use.webp', caption: '重启后在 Codex 里正常使用，模型为 claude-opus-5-5', zoom: true },
     },
   ],
-  next: [
-    { text: 'Claude Code 与 Codex CLI 怎么选', url: '/knowledge/claude-code-vs-codex' },
-    { text: 'Claude Code 教程：第一次会话之后怎么用', url: '/knowledge/claude-code-tutorial' },
-    { text: '常见问题：使用与配置', url: '/faq#cat-setup' },
-  ],
+  next: { text: '模型广场：model ID 一览', url: '/models' },
 }
 
 /** WorkBuddy：直接填三个值，不用 CC Switch，3 步 */
@@ -650,10 +825,10 @@ const workbuddyPage: GuidePage = {
   slug: '/guide/workbuddy',
   scene: 'workbuddy',
   nav: 'WorkBuddy',
-  order: 4,
+  order: 5,
   title: 'WorkBuddy 教程：添加自定义模型并切换使用',
   desc: 'WorkBuddy 接入 Claude 无限卡：换取 API Key，在模型设置里添加自定义模型（接口地址带 /v1、填 API Key 与模型名），切换到该模型即可用，不必装 CC Switch。',
-  lead: '最省事的一条路：不用装 CC Switch，三个值填进 WorkBuddy 就能用。',
+  lead: '不用装 CC Switch、不用开路由，填三个值就能在 WorkBuddy 里用上本卡的模型。',
   eyebrow: '国产 Agent 客户端',
   summary: '最省事的一条路，不用装 CC Switch，也不用开路由。三个值填进 WorkBuddy 的自定义模型里就行。',
   answer: 'WorkBuddy 不用装 CC Switch——换取 API Key 后，在设置里添加自定义模型，接口地址填管理后台地址带 /v1、API Key 填 sk- 开头那把、模型名称填 claude-opus-5-5，保存后在模型列表里选中它就能用。',
@@ -677,8 +852,8 @@ const workbuddyPage: GuidePage = {
       lead: 'WorkBuddy 的自定义模型只认 OpenAI 兼容协议，所以接口地址要带 /v1。',
       steps: [
         {
-          title: '在设置里添加自定义模型，填三个值',
-          goal: '把这三个值填对，WorkBuddy 就能把请求发到网关。',
+          title: '填三个值',
+          goal: '填完先别用，等模型列表里能选中它。',
           action: [
             '打开 WorkBuddy → 设置 → 模型 → 「自定义模型」→「添加模型」',
             '接口地址填 ' + baseUrlV1,
@@ -696,20 +871,16 @@ const workbuddyPage: GuidePage = {
       lead: '添加完要在模型列表里选中它才会生效，填完不选还是用的原来的模型。',
       steps: [
         {
-          title: '在模型列表里选中刚加的自定义模型',
-          goal: '确认实际生效的是你刚填的那个模型。',
-          action: ['回到对话框的模型选择器 → 选中刚添加的自定义模型 → 随便问一句，比如「你是什么模型」。'],
-          shot: { src: 'guide_workbuddy_model_picker.webp', caption: '模型列表里选中刚添加的自定义模型' },
+          title: '切过去试一句',
+          goal: '问它是什么模型，答 Claude 就说明走的是本卡。',
+          action: ['回到对话框的模型选择器 → 在「自定义模型」下选中刚加的那个 → 发一句话。'],
+          shot: { src: 'guide_workbuddy_model_picker.webp', caption: '模型列表里选中刚添加的自定义模型', zoom: true },
         },
       ],
-      shot: { src: 'guide_workbuddy_in_use.webp', caption: 'WorkBuddy 里正常使用，模型为 claude-opus-5-5' },
+      shot: { src: 'guide_workbuddy_in_use.webp', caption: 'WorkBuddy 里正常使用，模型为 claude-opus-5-5', zoom: true },
     },
   ],
-  next: [
-    { text: '模型广场：model ID 一览', url: '/models' },
-    { text: 'Claude Code 与 Codex CLI 怎么选', url: '/knowledge/claude-code-vs-codex' },
-    { text: '常见问题：使用与配置', url: '/faq#cat-setup' },
-  ],
+  next: { text: '常见问题：接入与使用', url: '/faq#cat-usage' },
 }
 
 /** Cursor 等其它客户端：手动填三个值，附各客户端填法差异速查表，3 步 */
@@ -717,10 +888,10 @@ const cursorPage: GuidePage = {
   slug: '/guide/cursor',
   scene: 'cursor',
   nav: '其它客户端',
-  order: 5,
+  order: 6,
   title: '通用手动配置：Cursor 等客户端怎么填三个值',
   desc: '在 Cursor 等支持自定义 API 的客户端里接入 Claude 无限卡：手动填接口地址、API Key 与模型名三个值，附各客户端填法差异速查表。',
-  lead: 'Cursor 这类客户端不用 CC Switch，填三个值就行；末尾附各客户端填法差异速查表。',
+  lead: '三个值填进任何支持自定义 API 的客户端就能用，末尾附各家的填法差异速查表。',
   eyebrow: '任意支持自定义 API 的客户端',
   summary: '已经会自己填 API 的人看这一页：三个值怎么填、各客户端的差异，一次说清。',
   answer: '任何支持自定义 API 的客户端都只要填三个值——接口地址、sk- 开头的 API Key、模型名称；Cursor 这类 OpenAI 兼容端点的地址要带 /v1，各客户端的差异见页面末尾的速查表。',
@@ -766,7 +937,7 @@ const cursorPage: GuidePage = {
         columns: ['要不要 CC Switch', '接口地址', '上游格式', '开路由', '默认模型'],
         rows: [
           { label: 'Claude Code', values: ['要（一键导入）', baseUrl, 'Anthropic Messages', '开', '见「拉取并保存模型」'] },
-          { label: 'Claude 桌面版', values: ['要（新增供应商）', baseUrl + '（直连）', 'Anthropic Messages', '开（总路由 + Claude Code 开关）', '在客户端里选'] },
+          { label: 'Claude 桌面版', values: ['要（新增供应商）', baseUrl + '（直连）', 'Anthropic Messages', '开（总路由 + Claude 开关）', '在客户端里选'] },
           { label: 'Codex', values: ['要（新增供应商）', baseUrlV1, 'Anthropic Messages', '开（总路由 + Codex 开关）', 'claude-opus-5-5'] },
           { label: 'WorkBuddy', values: ['不用', baseUrlV1, 'OpenAI 兼容', '不用', 'claude-opus-5-5'] },
           { label: 'Cursor 等 OpenAI 兼容客户端', values: ['不用（手填）', baseUrlV1, 'OpenAI 兼容', '不用', '实时获取'] },
@@ -779,22 +950,18 @@ const cursorPage: GuidePage = {
       ],
     },
   ],
-  next: [
-    { text: '模型广场：model ID 一览', url: '/models' },
-    { text: 'Claude Code 与 Codex CLI 怎么选', url: '/knowledge/claude-code-vs-codex' },
-    { text: '常见问题：接入与使用', url: '/faq#cat-usage' },
-  ],
+  next: { text: 'Claude Code 插件教程：VS Code 与 Cursor', url: '/guide/cc' },
 }
 
 /* ---------------- 索引页（/guide）：选客户端 ---------------- */
 
 export const guideIndex: GuideIndex = {
   title: '使用教程',
-  desc: 'Claude 无限卡使用教程：按客户端选一条路——Claude Code、Claude 桌面版、Codex、WorkBuddy、Cursor 等，每条路都有完整步骤与真实截图。',
+  desc: 'Claude 无限卡使用教程：按客户端选一条路——Claude Code 插件、Claude Code CLI、Claude 桌面版、Codex、WorkBuddy、Cursor 等，每条路都有完整步骤与真实截图。',
   eyebrow: '已经买好了，从这里开始',
-  lead: '从换取 API Key 到检测链路，跟着做就行，不用先懂原理。',
-  answer: '先选你用的客户端——Claude Code、Claude 桌面版、Codex、WorkBuddy、Cursor 各有一条完整路径，每一步都带真实截图，照着做就能跑起来。',
-  tags: ['claude 无限卡 使用教程', 'claude 无限卡 教程', 'claude code 教程', 'claude 桌面版 教程', 'codex 教程', 'workbuddy 教程', 'cursor 配置 claude api'],
+  // 页头下唯一的一段话：先说清做什么（换 Key 到检测链路），再说怎么选（每种用法各一条路）。
+  answer: '从换取 API Key 到检测链路，选你的客户端照着做就行。Claude Code 插件、Claude Code CLI、Claude 桌面版、Codex、WorkBuddy、Cursor 各有一条完整路径，每步都有真实截图，不用先懂原理。',
+  tags: ['claude 无限卡 使用教程', 'claude 无限卡 教程', 'claude code 插件', 'claude code cli', 'claude 桌面版 教程', 'codex 教程', 'workbuddy 教程', 'cursor 配置 claude api'],
   next: [
     { text: 'Claude Code 教程：第一次会话之后怎么用', url: '/knowledge/claude-code-tutorial' },
     { text: 'CLAUDE.md 怎么写：与 AGENTS.md 的关系和 .claude 目录', url: '/knowledge/claude-md-guide' },
@@ -805,26 +972,49 @@ export const guideIndex: GuideIndex = {
 /* ---------------- 装配层：编号与图注在这里生成 ---------------- */
 
 /** 场景页数据，按 order 排列 */
-export const guidePages: GuidePage[] = [ccPage, desktopPage, codexPage, workbuddyPage, cursorPage]
+export const guidePages: GuidePage[] = [ccPage, cliPage, desktopPage, codexPage, workbuddyPage, cursorPage]
 
-/** 索引页的场景卡（步数由小节数派生，不手写） */
+/** 一页的真实步骤数：装配后各小节的 steps 总数。索引卡角标用它，不手写。 */
+function guideStepCountOf(p: GuidePage): string {
+  const steps = guideBlocks(p).reduce((a, b) => a + (b.steps?.length ?? 0), 0)
+  // cursor 页只有速查表，没有可执行步骤
+  if (p.scene === 'cursor') return '三个值 · 两张速查表'
+  return steps + ' 步'
+}
+
+/**
+ * 索引页的场景卡。角标里的「N 步」由真实步骤数派生（guideBlocks 装配后的 steps 总数），
+ * 不是小节数——小节数是版式单位，读者按角标估工作量会估错。
+ * cursor 页是特例：它没有可执行步骤，只有两个「三个值怎么填」的速查表，
+ * 所以角标写「三个值 · 两张速查表」，不写步数。
+ */
 export function guideSceneCards(): GuideSceneCard[] {
   const tags: Record<GuideSceneId, string> = {
     cc: '一键导入',
+    cli: '装 CLI + 变量',
     desktop: '新增供应商',
     codex: '新增供应商',
     workbuddy: '自定义模型',
     cursor: '手动填值',
   }
-  return guidePages.map((p) => ({
+  // 网格是 3 列（见 docs/guide_design_spec.md）。张数是 3 的倍数时正好排满，
+  // 末卡不再横跨两列——否则多出一个空位，视觉上反而是缺口。张数不是倍数时，
+  // 兜底项（「其它客户端」）横跨两列把最后一行补齐。
+  const lastRowFull = guidePages.length % 3 === 0
+  return guidePages.map((p, i) => ({
     id: p.scene,
     title: p.nav,
     desc: p.summary,
-    meta: p.blocks.length + ' 步 · ' + tags[p.scene],
+    meta: guideStepCountOf(p) + ' · ' + tags[p.scene],
     url: p.slug,
-    // 「其它客户端」是兜底项，做横跨两列的收尾卡
-    wide: p.scene === 'cursor' ? true : undefined,
+    // 兜底项是收尾卡：横跨两列，把最后一行补齐
+    wide: !lastRowFull && i === guidePages.length - 1 ? true : undefined,
   }))
+}
+
+/** 全部场景 id（审计脚本从这里派生遍历顺序，加场景不用改脚本） */
+export function guideScenes(): GuideSceneId[] {
+  return guidePages.map((p) => p.scene)
 }
 
 /** 按 slug 找场景页 */
@@ -868,14 +1058,21 @@ export function guideBlocks(page: GuidePage): GuideBlockResolved[] {
   return page.blocks.map((b, i) => {
     // 共享块：正文取 sharedBlocks，本页的 id 与标题保留
     const body = b.shared ? sharedBlocks[b.shared] : b
+    // 占位符替换：{key} → 本页给的词。共享正文因此能写「在 {console} 里…」这种可换的说法。
+    // 拆成两个函数：fill 收 string 返回 string（数组 map 用），fillOpt 收可选值（单值槽位用）。
+    // 合成一个函数会让 map 出来的类型变成 (string | undefined)[]，装不进 string[]。
+    const vars = b.sharedVars ?? {}
+    const fill = (t: string): string => t.replace(/\{(\w+)\}/g, (m, k) => vars[k] ?? m)
+    const fillOpt = (t?: string): string | undefined => (t === undefined ? undefined : fill(t))
     const out: GuideBlockResolved = {
       id: b.id,
       title: b.title,
       h2: i + 1 + '. ' + b.title,
-      lead: body.lead,
-      paras: body.paras,
-      list: body.list,
-      notes: body.notes,
+      lead: fillOpt(body.lead),
+      paras: body.paras?.map(fill),
+      list: body.list?.map(fill),
+      // 共享块的 notes + 本页追加的 notes（共享块仍是唯一真源，本页只加不减）
+      notes: [...(body.notes ?? []).map(fill), ...(b.sharedNotes ?? [])],
       cmd: body.cmd,
       table: body.table,
       url: body.url,
@@ -884,12 +1081,21 @@ export function guideBlocks(page: GuidePage): GuideBlockResolved[] {
     }
     if (body.steps) {
       out.steps = body.steps.map((s): GuideStepResolved => {
-        if (!s.shot) {
-          const { shot: _unused, ...rest } = s
+        const filled: GuideStep = {
+          ...s,
+          title: fill(s.title),
+          goal: fillOpt(s.goal),
+          action: s.action?.map(fill),
+          notes: s.notes?.map(fill),
+        }
+        // shot 为 false（确认不放图）与 undefined（漏写）都不渲染图；
+        // 区别由门禁守：见 check_guide_within.mjs「每个步骤都要显式声明 shot」
+        if (!filled.shot) {
+          const { shot: _unused, ...rest } = filled
           return rest
         }
         const one = (sh: GuideShot): GuideShotLabeled => ({ ...sh, label: label() })
-        return { ...s, shot: Array.isArray(s.shot) ? s.shot.map(one) : one(s.shot) }
+        return { ...filled, shot: Array.isArray(filled.shot) ? filled.shot.map(one) : one(filled.shot) }
       })
     }
     if (body.shot) out.shot = { ...body.shot, label: label() }
@@ -937,6 +1143,7 @@ export const guideLegacyAnchors: Record<string, string> = {
   'models': '/guide/cc#cc-models',
   'enable': '/guide/cc#cc-enable',
   'vscode': '/guide/cc#cc-vscode',
+  'cursor-plugin': '/guide/cc#cc-cursor',
   'pro-key': '/guide/cursor#cursor-get-key',
   'params': '/guide/cursor#cursor-params',
   // 2026-10-20 索引页瘦身时删掉的两段小节：老链接指到内容最接近的地方

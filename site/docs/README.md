@@ -37,18 +37,18 @@
 
 教程子页（2026-10-20 重构）：`docs/guide/<scene>.md` 的 frontmatter 只有 `layout: guide_scene` + `scene: <id>`
 + SEO 三件套（title / description / head），**正文全在 `config/guide.ts`**。`scene` 是路由后缀的来源，
-`guide_scene.vue` 从 frontmatter 读它再反查场景数据。5 个场景页就是 `docs/guide/{cc,desktop,codex,workbuddy,cursor}.md`。
+`guide_scene.vue` 从 frontmatter 读它再反查场景数据。6 个场景页就是 `docs/guide/{cc,cli,desktop,codex,workbuddy,cursor}.md`。
 规范见 `guide_design_spec.md`。
 
 ## 教程怎么写
 
 数据入口只有一个：`config/guide.ts`。它里有三类东西：
 
-1. **`sharedBlocks`** — 装 CC Switch、换取 API Key 这类每个客户端都要做的公共正文，写一份，5 个场景页用 `shared` 字段引用。
-2. **5 个场景页数据**（`ccPage` / `desktopPage` / …）— 每个客户端一条完整路径：小节、步骤、截图、FAQ、相关阅读、长尾词。
+1. **`sharedBlocks`** — 装 CC Switch、换取 API Key 这类每个客户端都要做的公共正文，写一份，6 个场景页用 `shared` 字段引用。
+2. **6 个场景页数据**（`ccPage` / `cliPage` / …）— 每个客户端一条完整路径：小节、步骤、截图、FAQ、相关阅读、长尾词。
 3. **装配层** — `guideBlocks(page)` 合并共享块、给 H2 加页内序号、给截图加图注编号。**全站唯一给教程内容编号的地方**，数据里不许手写 `N. ` 或 `图 NN`。
 
-`GuideIndexPage.vue` 渲染索引页（5 张场景卡 + 旧锚点兼容跳转），`GuideScenePage.vue` 渲染场景页
+`GuideIndexPage.vue` 渲染索引页（6 张场景卡 + 旧锚点兼容跳转），`GuideScenePage.vue` 渲染场景页
 （一句话答案 → `GuideBlockBody` 逐块 → FAQ → 相关阅读 → 接着看 + CTA）。左侧目录（`sections.ts` 的
 `SECTION_NAV`）与页脚「教程」列（`guideNavItems`）全部从同一份数据派生，改一处两处同步。
 

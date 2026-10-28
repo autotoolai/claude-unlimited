@@ -39,15 +39,16 @@ Claude 无限卡是一个独立运营的第三方 API 网关服务，把 Claude 
 
 <!-- readme:guide:start -->
 
-按你用的客户端选一条路，每条路都有完整步骤与真实截图。共 5 条路径。
+按你用的客户端选一条路，每条路都有完整步骤与真实截图。共 6 条路径。
 
 | 客户端 | 这条路讲什么 | 规模 |
 |---|---|---|
-| [Claude Code](https://claude-unlimited.aiautotools.com/guide/cc) | 最主流的一条路。CC Switch 一键导入，VS Code 装官方插件就能写代码，终端里直接 claude 启动。 | 6 步 · 一键导入 |
-| [Claude 桌面版](https://claude-unlimited.aiautotools.com/guide/desktop) | 桌面版要单独建一个供应商并开路由，比 Claude Code 多两步。装完桌面版客户端即可用，也不用翻墙。 | 9 步 · 新增供应商 |
-| [Codex](https://claude-unlimited.aiautotools.com/guide/codex) | Codex 多两个关键动作：上游格式必须选 Anthropic Messages，配置完必须彻底重启 Codex 才会生效。 | 9 步 · 新增供应商 |
+| [Claude Code 插件](https://claude-unlimited.aiautotools.com/guide/cc) | 同一款 Anthropic 官方插件，VS Code 和 Cursor 都能装。图形界面用，比命令行更好上手。 | 10 步 · 一键导入 |
+| [Claude Code CLI](https://claude-unlimited.aiautotools.com/guide/cli) | 终端里的 Claude Code。官方脚本装 CLI，两个环境变量接上网关，装完就能直接用。 | 9 步 · 装 CLI + 变量 |
+| [Claude 桌面版](https://claude-unlimited.aiautotools.com/guide/desktop) | 桌面版要单独建一个供应商并开路由，比 Claude Code 多两步。装完桌面版客户端即可用，也不用翻墙。 | 13 步 · 新增供应商 |
+| [Codex](https://claude-unlimited.aiautotools.com/guide/codex) | Codex 多两个关键动作：上游格式必须选 Anthropic Messages，配置完必须彻底重启 Codex 才会生效。 | 11 步 · 新增供应商 |
 | [WorkBuddy](https://claude-unlimited.aiautotools.com/guide/workbuddy) | 最省事的一条路，不用装 CC Switch，也不用开路由。三个值填进 WorkBuddy 的自定义模型里就行。 | 3 步 · 自定义模型 |
-| [其它客户端](https://claude-unlimited.aiautotools.com/guide/cursor) | 已经会自己填 API 的人看这一页：三个值怎么填、各客户端的差异，一次说清。 | 3 步 · 手动填值 |
+| [其它客户端](https://claude-unlimited.aiautotools.com/guide/cursor) | 已经会自己填 API 的人看这一页：三个值怎么填、各客户端的差异，一次说清。 | 三个值 · 两张速查表 · 手动填值 |
 
 全部路径：[使用教程索引](https://claude-unlimited.aiautotools.com/guide)
 
@@ -57,9 +58,9 @@ Claude 无限卡是一个独立运营的第三方 API 网关服务，把 Claude 
 
 <!-- readme:knowledge:start -->
 
-按读者旅程分 4 类，共 22 篇原创文章。每篇都能在官网读、也能在仓库读同一份源码。
+按读者旅程分 4 类，共 25 篇原创文章。每篇都能在官网读、也能在仓库读同一份源码。
 
-**上手与进阶**（9 篇）—— 装好只是开始：第一次会话、常用命令、计划模式、权限、CLAUDE.md，再往下是子代理与技能。
+**上手与进阶**（11 篇）—— 装好只是开始：第一次会话、常用命令、计划模式、权限、CLAUDE.md，再往下是子代理与技能。
 
 | 文章 | 一句话 | 仓库源码 |
 |---|---|---|
@@ -72,11 +73,14 @@ Claude 无限卡是一个独立运营的第三方 API 网关服务，把 Claude 
 | [Claude Code 命令与参数速查：会话内和命令行](https://claude-unlimited.aiautotools.com/knowledge/claude-code-cli-cheatsheet) | 启动方式、常用参数、会话内斜杠命令表，脚本与 CI 用法。 | [`site/docs/knowledge/claude-code-cli-cheatsheet.md`](site/docs/knowledge/claude-code-cli-cheatsheet.md) |
 | [Claude Code 子代理怎么用](https://claude-unlimited.aiautotools.com/knowledge/claude-code-subagents) | 子代理的独立上下文、定义方式、委派方式与并行上限。 | [`site/docs/knowledge/claude-code-subagents.md`](site/docs/knowledge/claude-code-subagents.md) |
 | [Claude Code 技能怎么写](https://claude-unlimited.aiautotools.com/knowledge/claude-code-skills) | 渐进式披露、三个加载位置、marketplace 与写好技能的要点。 | [`site/docs/knowledge/claude-code-skills.md`](site/docs/knowledge/claude-code-skills.md) |
+| [Claude 桌面版在国内怎么用：注册、网络与登录](https://claude-unlimited.aiautotools.com/knowledge/claude-desktop-china-usage) | 支持地区清单不含中国大陆，客户端可装可用，靠 API Key 与本地路由走通。 | [`site/docs/knowledge/claude-desktop-china-usage.md`](site/docs/knowledge/claude-desktop-china-usage.md) |
+| [Claude 桌面版能做什么：功能、免费额度与和终端版区别](https://claude-unlimited.aiautotools.com/knowledge/claude-desktop-capabilities) | 对话、Claude Code、Cowork 三块功能与计划准入，和终端版的分工。 | [`site/docs/knowledge/claude-desktop-capabilities.md`](site/docs/knowledge/claude-desktop-capabilities.md) |
 
-**原理与机制**（3 篇）—— 想搞懂它为什么这么运行：上下文、token、缓存、限流。
+**原理与机制**（4 篇）—— 想搞懂它为什么这么运行：上下文、token、缓存、限流。
 
 | 文章 | 一句话 | 仓库源码 |
 |---|---|---|
+| [用代码做视频：四个开源技能怎么选](https://claude-unlimited.aiautotools.com/knowledge/code-video-skills-guide) | 四个代码渲染视频技能按场景选型，附素材清单、配音路线与三轮迭代的踩坑记录。 | [`site/docs/knowledge/code-video-skills-guide.md`](site/docs/knowledge/code-video-skills-guide.md) |
 | [为什么 Agent 比聊天更烧 token](https://claude-unlimited.aiautotools.com/knowledge/why-agents-cost-more-tokens) | 输入 token 按轮次平方增长，工具输出是大头，四种控制历史的模式。 | [`site/docs/knowledge/why-agents-cost-more-tokens.md`](site/docs/knowledge/why-agents-cost-more-tokens.md) |
 | [Claude Code 启动时那 33k token 去了哪](https://claude-unlimited.aiautotools.com/knowledge/claude-code-startup-tokens) | 33k 启动 token 的构成，三个可控杠杆，以及它与提示缓存的关系。 | [`site/docs/knowledge/claude-code-startup-tokens.md`](site/docs/knowledge/claude-code-startup-tokens.md) |
 | [提示缓存原理：什么时候省钱、什么时候白花](https://claude-unlimited.aiautotools.com/knowledge/prompt-caching-explained) | 按前缀命中的计费逻辑、cache_control 用法、命中验证与不省的情况。 | [`site/docs/knowledge/prompt-caching-explained.md`](site/docs/knowledge/prompt-caching-explained.md) |
@@ -176,14 +180,14 @@ Claude 无限卡是一个独立运营的第三方 API 网关服务，把 Claude 
 
 <!-- readme:sitepages:start -->
 
-官网共 38 个页面：主页面与索引 11 个、教程场景页 5 个、知识库文章 22 篇。
+官网共 42 个页面：主页面与索引 11 个、教程场景页 6 个、知识库文章 25 篇。
 
 | 页面 | 内容 |
 |---|---|
 | [首页](https://claude-unlimited.aiautotools.com/) | Claude 无限卡：固定订阅价，订阅期内 Claude API 不按 token 计费。支持 Claude Code、Cursor、Cline 等全部主流工具，改一个 Base URL 加一个 Key 即可接入。 |
 | [套餐定价](https://claude-unlimited.aiautotools.com/pricing) | Claude 无限卡套餐内容与价格：订阅期内不按 token 计费，支持 Fable 5.1 与 Opus 5.5。包含与不包含、公平使用、退款规则一次说清。 |
 | [模型广场](https://claude-unlimited.aiautotools.com/models) | 本卡承诺的 Fable 5.1 与 Opus 5.5 两个模型一览：无限卡有效期内不限次数调用，点复制拿 model ID，含分工、获取完整列表与切换方法。 |
-| [使用教程](https://claude-unlimited.aiautotools.com/guide) | Claude 无限卡使用教程：按客户端选一条路——Claude Code、Claude 桌面版、Codex、WorkBuddy、Cursor 等，每条路都有完整步骤与真实截图。 |
+| [使用教程](https://claude-unlimited.aiautotools.com/guide) | Claude 无限卡使用教程：按客户端选一条路——Claude Code 插件、Claude Code CLI、Claude 桌面版、Codex、WorkBuddy、Cursor 等，每条路都有完整步骤与真实截图。 |
 | [Claude 知识库](https://claude-unlimited.aiautotools.com/knowledge) | Claude Code 的用法、原理、成本与报错排查，按四个主题分类查：上手与进阶、原理与机制、成本与计费、报错排查。配置与接入见使用教程。 |
 | [常见问题](https://claude-unlimited.aiautotools.com/faq) | Claude 无限卡全量常见问题：关于商品、购买与支付、接入与使用、限速与封号、数据与安全、关于我们。含退款规则、限速具体数字与申诉流程。 |
 | [管理后台](https://claude-unlimited.aiautotools.com/console) | Claude 无限卡管理后台功能介绍：激活码兑换、提取 API Key、一键导入配置、用量查询与图表、GPT 图像生成、公告与备用域名。 |

@@ -409,6 +409,27 @@ export const knowledgeSources: KnowledgeSourceEntry[] = [
     ],
   },
   {
+    slug: 'code-video-skills-guide',
+    fetchedAt: '2026-10-15',
+    index:
+      '原创文章，素材来自本机实测：四个代码渲染视频技能（产品宣传片、原理讲解、口播教程、纯动效）各自的适用场景、开拍前要准备的素材（文案、配音、配色、字体），中文配音的两条路线（系统 TTS 与云端 TTS）的取舍，以及三轮迭代里踩到的坑。第一帧不对、逐句切时间轴、ffprobe 核对时长、人工审片会漏而断言不会，是本轮得到的具体经验。正文中的四支样片由本机渲染产出，文件与时长登记在 config/video_meta.ts，源文件托管在 R2 媒体域名。',
+    files: [],
+  },
+  {
+    slug: 'claude-desktop-china-usage',
+    fetchedAt: '2026-10-26',
+    index:
+      '原创文章，素材来自 Anthropic 官方文档与政策页（核对日期 2026-10-26）：支持地区政策页列出 184 个国家和地区，含台湾、新加坡、日本、韩国，不含中国大陆与港澳；政策明确未列出地区一律不支持，且限制覆盖人、注册实体、多数控股实体三层，适用范围含 Claude 应用、Claude Code、Cowork、API 与开发者平台。官方安装文档给出系统要求：Windows 10 及以上、macOS 13 Ventura 及以上、Linux 为 Ubuntu 22.04 LTS+ 或 Debian 12+（测试版），并说明安装后需用账户登录。结论是客户端可装可用、官方账号注册路径不通。',
+    files: [],
+  },
+  {
+    slug: 'claude-desktop-capabilities',
+    fetchedAt: '2026-10-26',
+    index:
+      '原创文章，素材来自 Anthropic 官方文档与产品页（核对日期 2026-10-26）：官方安装文档的可用性表列出对话、Claude Code、Claude Cowork 三块功能，对话全计划可用，后两块需付费计划（Pro、Max、团队、企业）。产品页说明 Cowork 可在桌面端直接处理选定文件夹与工具、内置浏览器与桌面端可用范围、连接器与定时任务等能力。系统要求为 Windows 10 及以上、macOS 13 Ventura 及以上、Linux 为 Ubuntu 22.04 LTS+ 或 Debian 12+（测试版）；Windows 上首次使用相关功能会提示要求虚拟机平台。素材站同主题原文只用于选题与事实核对，正文为中文原创改写。',
+    files: [],
+  },
+  {
     slug: 'claude-code-usage-limit-reached',
     fetchedAt: '2026-10-08',
     index:

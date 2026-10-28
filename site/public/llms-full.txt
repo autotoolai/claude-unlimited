@@ -131,6 +131,45 @@ Claude 无限卡是独立的第三方 API 网关服务，与 Anthropic 官方无
   - 技能放在哪几个位置？ —— `~/.claude/skills/<name>/SKILL.md` 是个人技能；`.claude/skills/<name>/SKILL.md` 随仓库提交、团队共享；插件内的技能随插件安装。
   - 技能和插件是一回事吗？ —— 不是。技能是一个能力（一个含 SKILL.md 的目录）；插件是可分发的打包物，可以含多个技能加斜杠命令、子代理和 MCP 服务，从 marketplace 安装。
 
+## Claude 桌面版在国内怎么用：注册、网络与登录
+
+- 分类：上手与进阶
+- 页面：https://claude-unlimited.aiautotools.com/knowledge/claude-desktop-china-usage
+- 发布：2026-10-26
+- 一句话答案：官方支持地区清单里没有中国大陆，184 个支持地区中包含台湾、新加坡、日本、韩国，不含内地与港澳，所以「注册官方账号」这条路在国内走不通。但桌面版客户端本身可以正常下载安装，改用 API Key 加本地路由的方式配置之后，不登录官方账号也能正常使用对话和 Claude Code。
+- 常见问题：
+  - Claude 桌面版在国内能注册账号吗？ —— 不能。官方支持地区清单列出 184 个国家和地区，不含中国大陆，清单外一律视为不支持地区，官方也明确未列出地区属于违规使用范围。
+  - 不注册官方账号，桌面版还能用吗？ —— 能。客户端是本地程序，模型请求发到哪里由本机配置决定。配好 API Key 与本地路由后，不登录官方账号也能正常对话和用 Claude Code。
+  - 香港、澳门能用吗？ —— 这两个地区不在官方支持地区清单里，情况和大陆一致。清单里包含的是台湾、新加坡、日本、韩国。
+  - 桌面版用第三方接口，会不会被判定违规？ —— 要分开看。走 API 通道调用模型和以官方订阅账号身份使用 Claude 服务是两回事，后者的受订阅条款与地区政策约束。两者不要混着用。
+  - 国内用桌面版要开虚拟机平台吗？ —— 要。Windows 上首次使用桌面版的文件与代码能力会提示启用虚拟机平台，这是系统可选功能，在系统设置里勾选后重启即可，与接口配置无关。
+
+## Claude 桌面版能做什么：功能、免费额度与和终端版区别
+
+- 分类：上手与进阶
+- 页面：https://claude-unlimited.aiautotools.com/knowledge/claude-desktop-capabilities
+- 发布：2026-10-26
+- 一句话答案：桌面版是 3 块功能装在一个客户端里——对话、Claude Code、Cowork。按官方计划表，免费版只有对话，Claude Code 和 Cowork 都要付费计划起步。它和终端版 Claude Code 是同一个 agent 的两种外壳：桌面版补上图形界面、文件预览和桌面级工作，终端版在脚本、CI 和长任务上更顺手。
+- 常见问题：
+  - Claude 桌面版免费版能用 Claude Code 吗？ —— 不能。官方计划表里免费版只有对话，Claude Code 和 Cowork 都需要付费计划起步，桌面版只是把这两块功能按计划做了准入限制。
+  - 桌面版和终端版 Claude Code 有什么区别？ —— 同一个 agent 的两种外壳。桌面版补上图形界面、文件与 diff 预览、多会话并排；终端版在脚本、CI 和无人值守长任务上更强，关键能力是 `claude -p` 打印模式。
+  - Cowork 是干什么的？ —— 面向非开发者的桌面 agent，直接在你选定的文件夹和工具之间干活，能开浏览器、在必要时接管屏幕，适合整理文档、批量处理表格这类活。
+  - 桌面版会额外收费吗？ —— 不会单独收费，它消耗的是你账号或接口那边的额度。真正烧钱的是 agent 模式而不是聊天，桌面版跑 Claude Code、改本地文件时 token 消耗结构和纯对话不是一个量级。
+  - 换客户端要重新配 Key 吗？ —— 不用。桌面版和终端版读同一份环境配置，同一把 Key 和同一个地址在两边都生效，终端里用 `/status` 就能确认当前配置。
+
+## 用代码做视频：四个开源技能怎么选
+
+- 分类：原理与机制
+- 页面：https://claude-unlimited.aiautotools.com/knowledge/code-video-skills-guide
+- 发布：2026-10-15
+- 一句话答案：代码做视频不是让模型生成像素，而是让它写一段程序，程序在每一帧算出一个画面，再把帧拼成 MP4。所以产物可复现、可编辑、文字永远清晰；代价是素材要你自己准备，第一次配环境要花点时间。四个开源技能按分工选：宣传片走 video-shotcraft，科普讲解走 anything2explainer，口播教程走 video-talkcraft，想避开 Remotion 授权走 claude-motion-design。
+- 常见问题：
+  - 代码做视频和文生视频差在哪？ —— 文生视频是模型逐帧生成像素，适合实拍质感与人物表演；代码做视频是每一帧由程序算出来，适合字幕条、数据动画、代码演示、宣传片与科普讲解。核心差别是可复现：同一份代码渲染一百次结果完全一样。
+  - 四个技能怎么选？ —— 看画面是真实界面还是抽象示意：真实界面（你的产品、你的终端）用 video-shotcraft；抽象示意图配解说用 anything2explainer；要字级时间戳锁配音用 video-talkcraft；想避开 Remotion 授权用 claude-motion-design。
+  - 我该给技能多少信息？ —— 只给五样：主题或产品入口、时长、要不要解说、配音偏好、素材路径。不要自己写分镜、字幕位置、元素出现帧号——那是技能内部的实现，手填会和它的自动设计冲突。正确做法是让技能先出 30 秒样片，再提修改意见。
+  - 中文配音用什么？出片后怎么检查？ —— 配音用 Kokoro-82M-v1.1-zh 本地跑，免费可商用不联网，四个中文音色；edge-tts 音质自然且有词级边界，但需要能连 speech.platform.bing.com，连不上握手 403。检查用机器闸而非人眼：本文第一轮里人工审帧认为两支片子通过，实际那两支根本没挂载成片（上部像素标准差 0.00）。
+  - 为什么第一帧很重要？ —— 社交平台直接抓视频第一帧当缩略图。第一帧是空白底色或半截入场动画，热度和点击都会打折，所以前 5 帧要放完整画面。
+
 ## 为什么 Agent 比聊天更烧 token
 
 - 分类：原理与机制
@@ -285,30 +324,47 @@ Claude 无限卡是独立的第三方 API 网关服务，与 Anthropic 官方无
   - 「not your usage limit」是什么？ —— 服务端在高峰时限流，你的额度没动。等一分钟，用 `claude -c` 续跑；无人值守的运行设 `CLAUDE_CODE_RETRY_WATCHDOG=1`。
   - 怎么继续工作？ —— 把同样的 Claude Code 指向一个 API 端点：按 token 计费，没有会话窗口和周窗口；订阅重置后再取消环境变量切回来。
 
-## Claude Code 教程：VS Code 插件与终端配置
+## Claude Code 插件教程：VS Code、Cursor
 
 - 页面：https://claude-unlimited.aiautotools.com/guide/cc
-- 一句话答案：Claude Code 是最主流的用法：先在管理后台把卡密换成 API Key，再用 CC Switch 一键导入配置、拉取模型、启用检测，最后在 VS Code 装官方 Claude Code 插件或在终端直接跑 claude。
+- 一句话答案：Claude Code 插件在 VS Code 与 Cursor 里是同一个 Anthropic 官方扩展：先用 CC Switch 一键导入配置并启用检测，再在编辑器的扩展面板里搜「Claude Code」、认准发布者 Anthropic 装上，用的就是前面配好的那把 Key。
 - 步骤：
-  - 1. 安装 CC Switch —— 装好 CC Switch 就算准备好了一半：它是个专门管 API 配置的小工具，全程默认安装，不用填任何东西。
-  - 2. 换取 API Key —— 卡密在发货信息里，换成一把 sk- 开头的 API Key 后面全程只用它——CC Switch、各个客户端、终端都是这一把。
+  - 1. 安装 CC Switch —— 装好 CC Switch 就算准备好了一半：它是个专门管 API 配置的小工具，全程默认安装。
+  - 2. 换取 API Key —— 卡密在发货信息里，在管理后台换成一把 sk- 开头的 API Key，后面全程只用它。
   - 3. 一键导入配置 —— 管理后台里有「一键导入配置」按钮，不用手填 Base URL 和 Key，两边自动对上。
   - 4. 拉取并保存模型 —— 导入的配置要再拉一次模型列表，CC Switch 才知道网关这边有哪些模型可用。
   - 5. 启用并检测链路 —— 前面配完配置已经在 CC Switch 里但还没生效，这一步启用并检测一下，显示运行正常就完成了。
-  - 6. 在 VS Code 里开始使用 —— 没用过 Claude Code 的，请按下方步骤通过 VS Code 官方插件使用：安装方便，图形界面比命令行更好上手。
+  - 6. 在 VS Code 里装插件 —— Anthropic 官方插件在扩展市场里，认准发布者是 Anthropic 就行——认错了装到的是同名的第三方仿冒品。
+  - 7. 在 Cursor 里装同一个插件 —— Cursor 是 VS Code 的分支，同一个 Anthropic 官方插件能直接装——官方文档里就给了 Cursor 的安装入口。
 - 常见问题：
-  - Claude Code 怎么配置 Claude 无限卡？ —— 在管理后台换取 API Key，用 CC Switch 一键导入配置，拉一次模型列表并保存，启用后检测链路显示正常就算配好了。VS Code 里再装官方 Claude Code 插件即可。
+  - Claude Code 插件怎么配置 Claude 无限卡？ —— 在管理后台换取 API Key，用 CC Switch 一键导入配置，拉一次模型列表并保存，启用后检测链路显示正常就算配好了；再到 VS Code 或 Cursor 的扩展面板装官方插件即可。
+  - VS Code 和 Cursor 用的是同一个插件吗？ —— 是。扩展 ID 都是 anthropic.claude-code，Anthropic 官方文档同时给了 VS Code 与 Cursor 的安装入口，两个编辑器里读的是同一份配置。
   - 一键导入后模型列表是空的？ —— 点「获取模型列表」再拉一次，加进模型配置后点保存。列表为空通常是配置刚导入还没刷新，或者 Key 没生效。
-  - 在 VS Code 里能用 Claude 无限卡吗？ —— 能。VS Code 装官方 Claude Code 插件后，选「使用已有的 API 配置 / API Key」，它会读 CC Switch 已经写好的配置，不用再填一遍 Key。
-  - 终端里怎么启动？ —— CC Switch 配置启用后，终端直接输入 claude 就能启动。想在会话里换模型用 /model 命令。
+  - 插件里要填 API Key 吗？ —— 不用。CC Switch 启用后配置已经写进 Claude Code 的用户配置，插件直接读它，登录方式选「使用已有的 API 配置 / API Key」就行。
+
+## Claude Code CLI 教程：终端安装与配置
+
+- 页面：https://claude-unlimited.aiautotools.com/guide/cli
+- 一句话答案：Claude Code CLI 只要五步：把卡密换成 API Key，用官方安装脚本装上 CLI，设 ANTHROPIC_BASE_URL 与 ANTHROPIC_API_KEY 两个环境变量，在项目目录里跑 claude 验证，最后用 /init 生成 CLAUDE.md 开始第一段会话。
+- 步骤：
+  - 1. 换取 API Key —— 卡密在发货信息里，在管理后台换成一把 sk- 开头的 API Key，后面全程只用它。
+  - 2. 安装 Claude Code CLI —— 官方推荐用安装脚本装，Windows、macOS、Linux 各一条命令，装完就有 claude 这个命令。
+  - 3. 设置地址与 Key —— CLI 只认两个环境变量：ANTHROPIC_BASE_URL 指向网关，ANTHROPIC_API_KEY 放那把 sk- 开头的密钥。
+  - 4. 验证链路 —— 发一句话就能验证：能正常回答，说明地址、Key、模型三样都对。
+  - 5. 第一次会话怎么开始 —— 进项目第一件事是 /init，让它先读懂你的仓库再动手。
+- 常见问题：
+  - Claude Code CLI 怎么装？ —— Windows 在 PowerShell 里跑 irm https://claude.ai/install.ps1 | iex，macOS 与 Linux 跑 curl -fsSL https://claude.ai/install.sh | bash，装完开个新终端输入 claude --version 验证。
+  - 不用 CC Switch 能配吗？ —— 能。CLI 认两个环境变量：ANTHROPIC_BASE_URL 填网关根地址（不带 /v1），ANTHROPIC_API_KEY 填 sk- 开头的 Key。也可以写进 ~/.claude/settings.json 的 env 块长期生效。
+  - 装完提示找不到 claude 命令？ —— 安装目录还没进 PATH。关掉当前终端窗口重开一个再试；还不行就把安装目录加进系统 PATH，或者去 CC Switch 一键导入配置，它会替你把配置写好。
+  - 怎么确认它连的是本卡而不是官方？ —— 进会话后输入 /status，看 Anthropic base URL 那行是不是管理后台的地址、鉴权那行是不是 ANTHROPIC_API_KEY，对了就是走的本卡。
 
 ## Claude 桌面版教程：新增供应商、开启路由与安装
 
 - 页面：https://claude-unlimited.aiautotools.com/guide/desktop
 - 一句话答案：Claude 桌面版要用 CC Switch 新增一个「桌面版」供应商，接入方式选直连，填上接口地址与 API Key，再打开路由开关并启用检测，最后安装桌面版客户端即可。
 - 步骤：
-  - 1. 安装 CC Switch —— 装好 CC Switch 就算准备好了一半：它是个专门管 API 配置的小工具，全程默认安装，不用填任何东西。
-  - 2. 换取 API Key —— 卡密在发货信息里，换成一把 sk- 开头的 API Key 后面全程只用它——CC Switch、各个客户端、终端都是这一把。
+  - 1. 安装 CC Switch —— 装好 CC Switch 就算准备好了一半：它是个专门管 API 配置的小工具，全程默认安装。
+  - 2. 换取 API Key —— 卡密在发货信息里，在管理后台换成一把 sk- 开头的 API Key，后面全程只用它。
   - 3. 新增桌面版供应商 —— 桌面版在 CC Switch 里是一个单独的供应商条目，要自己新建，不能用一键导入。
   - 4. 填入接口地址与 API Key —— 地址填管理后台首页那一行，Key 填上一步换来的那把，接入方式选「直连」——桌面版和 Claude Code 的区别就在这里。
   - 5. 打开路由开关 —— 桌面版必须走本地路由转发，请求才会被送到网关——这一步不做，前面配的全都白配。
@@ -317,7 +373,7 @@ Claude 无限卡是独立的第三方 API 网关服务，与 Anthropic 官方无
   - 8. 在桌面版里开始用 —— 打开就能用，桌面版和终端里用的是同一把 Key、同一个模型。
   - 9. 提示要虚拟机平台怎么办 —— 这是 Windows 缺可选功能，和你的 API 配置无关，按系统提示开一下就好。
 - 常见问题：
-  - Claude 桌面版怎么用 Claude 无限卡？ —— 在 CC Switch 里新增一个供应商，选择 Claude 桌面版并用自定义配置，接入方式选直连，填入接口地址与 API Key，打开路由里的 Claude Code 开关，启用并检测链路后安装桌面版即可。
+  - Claude 桌面版怎么用 Claude 无限卡？ —— 在 CC Switch 里新增一个供应商，选择 Claude 桌面版并用自定义配置，接入方式选直连，填入接口地址与 API Key，打开路由总开关和「路由启用」里的 Claude 开关，启用并检测链路后安装桌面版即可。
   - 桌面版和 Claude Code 用的地址一样吗？ —— 一样，都是管理后台首页那一行地址。区别在接入方式：桌面版选「直连」，Codex 要选 Anthropic Messages 上游格式。
   - 桌面版提示要 Virtual Machine Platform 怎么办？ —— 这是 Windows 的可选功能没开。搜索「启用或关闭 Windows 功能」，勾选「虚拟机平台」和「适用于 Linux 的 Windows 子系统」，重启电脑即可。
   - 桌面版打不开、显示不可用？ —— 通常是配置还没写进客户端。把 Claude 桌面版完全退出（不是最小化），回到 CC Switch 确认配置已启用、路由已打开，再重新打开。
@@ -327,8 +383,8 @@ Claude 无限卡是独立的第三方 API 网关服务，与 Anthropic 官方无
 - 页面：https://claude-unlimited.aiautotools.com/guide/codex
 - 一句话答案：Codex 要在 CC Switch 里新增一个 Codex 供应商，上游格式必须选 Anthropic Messages 并开启路由，配置好模型列表后启用并检测链路，最后彻底重启 Codex 才会生效。
 - 步骤：
-  - 1. 安装 CC Switch —— 装好 CC Switch 就算准备好了一半：它是个专门管 API 配置的小工具，全程默认安装，不用填任何东西。
-  - 2. 换取 API Key —— 卡密在发货信息里，换成一把 sk- 开头的 API Key 后面全程只用它——CC Switch、各个客户端、终端都是这一把。
+  - 1. 安装 CC Switch —— 装好 CC Switch 就算准备好了一半：它是个专门管 API 配置的小工具，全程默认安装。
+  - 2. 换取 API Key —— 卡密在发货信息里，在管理后台换成一把 sk- 开头的 API Key，后面全程只用它。
   - 3. 新增 Codex 供应商 —— Codex 要在 CC Switch 里单独建一个供应商，不能用一键导入，也不能用桌面版那条配置。
   - 4. 填入地址、Key 与默认模型 —— Codex 的请求地址要带 /v1，和 Claude Code 那边不一样；默认模型填一个网关确实返回的模型名。
   - 5. 把上游格式设为 Anthropic Messages —— 这是 Codex 专有的一步，也是最关键的一步：本卡是 Anthropic 兼容端点，选错格式请求就发不出去。
@@ -347,7 +403,7 @@ Claude 无限卡是独立的第三方 API 网关服务，与 Anthropic 官方无
 - 页面：https://claude-unlimited.aiautotools.com/guide/workbuddy
 - 一句话答案：WorkBuddy 不用装 CC Switch——换取 API Key 后，在设置里添加自定义模型，接口地址填管理后台地址带 /v1、API Key 填 sk- 开头那把、模型名称填 claude-opus-5-5，保存后在模型列表里选中它就能用。
 - 步骤：
-  - 1. 换取 API Key —— 卡密在发货信息里，换成一把 sk- 开头的 API Key 后面全程只用它——CC Switch、各个客户端、终端都是这一把。
+  - 1. 换取 API Key —— 卡密在发货信息里，在管理后台换成一把 sk- 开头的 API Key，后面全程只用它。
   - 2. 添加自定义模型 —— WorkBuddy 的自定义模型只认 OpenAI 兼容协议，所以接口地址要带 /v1。
   - 3. 切换到自定义模型开始用 —— 添加完要在模型列表里选中它才会生效，填完不选还是用的原来的模型。
 - 常见问题：
@@ -361,7 +417,7 @@ Claude 无限卡是独立的第三方 API 网关服务，与 Anthropic 官方无
 - 页面：https://claude-unlimited.aiautotools.com/guide/cursor
 - 一句话答案：任何支持自定义 API 的客户端都只要填三个值——接口地址、sk- 开头的 API Key、模型名称；Cursor 这类 OpenAI 兼容端点的地址要带 /v1，各客户端的差异见页面末尾的速查表。
 - 步骤：
-  - 1. 换取 API Key —— 卡密在发货信息里，换成一把 sk- 开头的 API Key 后面全程只用它——CC Switch、各个客户端、终端都是这一把。
+  - 1. 换取 API Key —— 卡密在发货信息里，在管理后台换成一把 sk- 开头的 API Key，后面全程只用它。
   - 2. 手动配置三个值 —— 不用 CC Switch 的话，所有客户端都只要这三个值，区别只在地址写法与上游格式。
   - 3. 各客户端填法差异速查 —— 同一个 Key 在不同客户端里，地址写法、上游格式和要不要开路由都不一样，对照这张表填。
 - 常见问题：

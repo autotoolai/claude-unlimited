@@ -139,6 +139,20 @@
   line-height: 1;
 }
 
+/* 序号徽标：每一组都画，单步组也画「1」。
+   2026-10-22 曾把单步组的徽标藏起来（理由是「1」没有信息量），
+   但那会造成同一页里有的看得见、有的看不见——读者会以为看不见的那步不重要或漏画了，
+   反而更像内容缺失。现在统一：H2 的「N.」是节号，组内徽标是子步骤号，两级各画各的，
+   单步组的「1」就是它的子步骤号，不是多余的编号。
+
+   ⚠ 徽标元素任何时候都不能删（只改 visibility）：步骤块是 grid
+   （`--cu-step-num-w minmax(0,1fr)`），徽标占第 1 列、正文列占第 2 列。
+   删掉徽标 → 正文列落回第 1 列，L1 左边线从 65.6px 变成 0，
+   单步组与多步组的 H3 就左右跳，正是规范第八节要避免的「看着像漏了内容」。 */
+.cu-steps-block--single .cu-step-block__no {
+  visibility: visible;
+}
+
 /* ol 的 padding-left 会被内部 li 继承（li 比 ol 更深，同样吃 1.25rem）。
    归零写在 ol 上，li 才能拿到与 ol 同宽的盒子：正文列放宽到 52rem 后，
    li 上残留的 1.25rem 会让步骤块凭空变成 704px，连截图的 700px 上限都放不下。 */
@@ -180,63 +194,42 @@
   margin-right: 0;
 }
 
-/* 块级提示（高手轨的 notes：小节级说明、坑）。此前只有 markup 没有样式，
-   渲染出来就是一串裸段落，与正文没有层级区别。现在按「提示卡」画：前置「提示」标签 +
-   段落改成圆点项 + 圆角容器。视觉重量仍低于步骤块（--cu-bg-soft 底色 + --cu-line 细线，
-   不用 --cu-line-strong），避免每节的补充说明抢走 H2 与截图的注意力。 */
+/* 块级提示（小节级的补充说明、坑）。2026-10-22 改：
+   原来是「提示卡」——边框 + 底色 + 圆角 + 左上角外挂一个「提示」pill 标签，
+   是页面上第二重的块（仅次于 H2），抢了小节标题的注意力；
+   而同页的步骤级提示（.cu-step-block__notes）走的是另一套语言：左细线 + 次级墨色小字。
+   同一页两种提示长相，读者要学两套语法。
+
+   现在统一成步骤级那一种：左侧 1px 竖线 + 次级墨色小字 + 圆点列表。
+   理由：步骤级提示是绝大多数（11 处 vs 块级 3 处），统一到多数派，全站只剩一种提示语言；
+   Google 风格指南与 Docusaurus admonition 也都只有一个提示形态，不按嵌套层级分两套。 */
 .cu-notes {
   position: relative;
-  margin: 1.15rem 0 0;
+  margin: 0.9rem 0 0;
   /* padding 逐侧显式写，不用简写：简写里带 0 的值会漏掉，
      压不过全局 .cu-page ul, ol (0,1,1) 的 1.25rem（规范「缩进层级」第 3 条）。 */
-  padding-top: 0.9rem;
-  padding-right: 1.05rem;
-  padding-bottom: 0.9rem;
-  padding-left: 1.05rem;
-  border: 1px solid var(--cu-line);
-  border-left: 2px solid var(--cu-accent-line);
-  border-radius: var(--cu-r-sm);
-  background: var(--cu-bg-soft);
+  padding-top: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+  padding-left: 0;
+  border: 0;
+  border-left: 1px solid var(--cu-line);
+  border-radius: 0;
+  background: transparent;
+  max-width: var(--cu-guide-text);
 }
 
-/* 「提示」标签贴在卡片左上角外侧一点，避免和首行文字挤在同一水平线上。 */
-.cu-notes::before {
-  content: '提示';
-  position: absolute;
-  top: -0.62rem;
-  left: 1.05rem; /* 与卡片 padding-left 相同，标签左缘和首行文字左缘齐平 */
-  padding: 0.05rem 0.5rem;
-  border: 1px solid var(--cu-line);
-  border-radius: var(--cu-r-pill);
-  background: var(--cu-card-solid);
-  font-family: var(--cu-sans);
-  font-size: 0.68rem;
-  font-weight: 600;
-  line-height: 1.6;
-  letter-spacing: 0.06em;
+/* 段落与步骤级提示完全同形：缩进 --cu-step-indent，不加圆点。
+   两级提示现在共用同一套语言——左细线 + 次级墨色小字 + 同样的悬挂缩进，
+   读者在页面上只需要记一种提示的样子。 */
+.cu-page .cu-guide-rail .cu-notes p {
+  margin: 0 0 0 var(--cu-step-indent);
+  font-size: 0.9rem;
+  line-height: 1.8;
   color: var(--cu-muted);
 }
-
-/* 段落改成列表：同一张卡里两段补充说明靠圆点区分，扫读时不用逐行找断句。 */
-.cu-page .cu-guide-rail .cu-notes p {
-  position: relative;
-  margin: 0 0 0 0.85rem; /* 圆点悬挂缩进只能用 margin：padding-left 会漏进步骤块里 p 的继承 padding，把整块右移 */
-  font-size: 0.92rem;
-  line-height: 1.75;
-  color: var(--cu-ink-2);
-}
-.cu-page .cu-guide-rail .cu-notes p::before {
-  content: '';
-  position: absolute;
-  top: 0.72em;
-  left: -0.72rem;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--cu-accent-line);
-}
 .cu-page .cu-guide-rail .cu-notes p + p {
-  margin-top: 0.4rem;
+  margin-top: 0.25rem;
 }
 
 /* 提示块里的行内链接：补一条 color。
@@ -258,7 +251,7 @@
 .cu-guide-rail h2 {
   text-align: left;
   font-size: 1.32rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.35;
   color: var(--cu-ink);
 }
@@ -269,7 +262,8 @@
   margin-top: 0.5rem;
 }
 
-.cu-step-block__body > h3 {
+.cu-step-block__body > h3,
+.cu-step-block__text > h3 {
   margin: 0.1rem 0 0.5rem;
   font-family: var(--cu-sans);
   font-size: 1.06rem;
@@ -280,7 +274,8 @@
 }
 
 /* 标题与序号徽标顶对齐 */
-.cu-step-block__body > h3 {
+.cu-step-block__body > h3,
+.cu-step-block__text > h3 {
   margin-top: 0.12rem;
 }
 
@@ -364,13 +359,21 @@
    .cu-shot { }            图片盒：细边框 + 圆角，两种布局共用
    .cu-shot img { }        按比例缩放，单图按 --cu-shot-max-w 限宽
    .cu-shot figcaption { } 页面名 + 编号徽标，整行居中
-   〔单图〕--cu-shot-max-w: 34rem (544px)，--cu-shot-max-h: 22rem (352px)
+   〔单图〕--cu-shot-max-w: 37.5rem (600px)，--cu-shot-max-h: 34rem (544px)
    〔并排〕340px + 1fr，两图等高
-   加图或改图只动这三个自定义属性，不要在下面写死数值。 */
+   加图或改图只动这三个自定义属性，不要在下面写死数值。
+
+   2026-10-22 改（原 24rem = 384px）：限高从 384 提到 544px。
+   起因是上面 .cu-shot img 那条形变修复——竖图不再被横向拉宽，
+   它靠高度上限决定显示尺寸，384px 上限下只剩 353px 宽，界面文字太小。
+   544px 下 guide_vscode_plugin（909×989）显示为 500×544，约 0.55 倍原生，
+   配合 zoom: true 点开原图，界面文字能读。
+   宽度上限 37.5rem (600px) 不动：宽图（1200×755 那批）本来就只受宽度约束，
+   抬高度上限对它们没有影响。 */
 .cu-step-block__shot {
   margin: 1rem 0 0;
-  --cu-shot-max-w: 34rem;
-  --cu-shot-max-h: 22rem;
+  --cu-shot-max-w: 37.5rem;
+  --cu-shot-max-h: 34rem;
   max-width: var(--cu-shot-max-w);
 }
 
@@ -394,13 +397,21 @@
   margin: 1.5rem 0;
 }
 /* 单图：宽高两个上限同时生效，图片按比例缩到不超任何一个（object-fit 在这里不参与）。
-   限高是为了竖图——guide_vscode_plugin 是 0.92 的近正方形，只限宽会撑到 590px 高，
-   比正文一屏还高。这里 max-height 与 width:100% 并存，浏览器按比例取小的那档。 */
+   ⚠ 2026-10-22 修一个真缺陷：原来这里是 width:100% + height:auto + max-height，
+   浏览器在限高时**不会回调宽度**——竖图（guide_vscode_plugin 909×989）先被拉到
+   600px 宽，再被 max-height 压到 384px 高，盒子比例从 0.92 变成 1.56，
+   画面被横向拉扁：字变宽、行距压扁、界面文字糊成一片（实测自然宽 909 → 显示 600，
+   横竖两个方向的缩放系数还不一致）。这不是缩放导致的虚，是形变。
+   改法：width/height 都交给 auto，只留 max-width:100% 与 max-height 两个上限，
+   浏览器按图片固有比例换算，两个上限都满足，图片不再变形、图框也跟着贴合画面。
+   这条正好实现设计规范里写的那句「≤1.2 的竖图只受高度上限约束，>1.8 的宽图只受宽度上限约束」——
+   之前 CSS 与规范不一致，规范是对的。 */
 .cu-shot img {
   display: block;
-  width: 100%;
-  max-height: var(--cu-shot-max-h, none);
+  width: auto;
   height: auto;
+  max-width: 100%;
+  max-height: var(--cu-shot-max-h, none);
   border: 1px solid var(--cu-figure-frame, var(--cu-line-strong));
   border-radius: var(--cu-r-sm);
   background: var(--cu-card-solid);
@@ -547,7 +558,7 @@
 .cu-page .cu-guide-rail p,
 .cu-page .cu-guide-rail > div > ul,
 .cu-page .cu-guide-rail > div > ul > li {
-  max-width: none;
+  max-width: var(--cu-guide-text);
   margin-left: 0;
   margin-right: 0;
   text-align: left;
@@ -644,7 +655,36 @@
   }
 }
 
-.cu-step-block__body > h3 {
+/* 图文并排（C1）：短步骤把文字（title/goal/action/link/notes）放左列、图放右列。
+   左列是 .cu-step-block__text 包裹层——不能让 h3/goal/action 直接当网格项：
+   图跨行时行高会被撑开（实测 h3 独占一行 349px，文字行之间出现大空隙）。
+   包裹层里走正常文档流，行距才是正常的。 */
+.cu-step-block__body--aside {
+  display: grid;
+  grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+  gap: 0 1.25rem;
+  align-items: start;
+}
+.cu-step-block__body--aside > .cu-step-block__text {
+  grid-column: 1;
+  min-width: 0;
+}
+.cu-step-block__body--aside > .cu-step-block__shot {
+  grid-column: 2;
+  margin-top: 0;
+  --cu-shot-max-w: none;
+}
+@media (max-width: 760px) {
+  .cu-step-block__body--aside {
+    display: block;
+  }
+  .cu-step-block__body--aside > .cu-step-block__shot {
+    margin-top: 0.75rem;
+  }
+}
+
+.cu-step-block__body > h3,
+.cu-step-block__text > h3 {
   scroll-margin-top: calc(var(--cu-nav-h) + 24px);
 }
 
@@ -654,9 +694,11 @@
 .cu-guide-lead {
   line-height: 1.7;
 }
-/* 文字层限宽 46rem（736px，约 33 个汉字一行）：正文列放宽到 52rem 后，行宽仍由这一层管住，
-   否则每行 39 个汉字，超过中文长读 35-40 字的上限。命令块（代码不折行）与表格不在限宽之列。
-   --cu-guide-text 只在这条规则里出现一次，改文字宽度改这一个数。
+/* 文字层限宽：行宽由 --cu-guide-text 统一管（40rem = 640px ≈ 40 个全角字一行）。
+   命令块（代码不折行）与表格不在限宽之列。
+   这一组选择器必须把 goal / action / notes 一起带上：它们都在 .cu-step-block__body 里，
+   而上面那条 `.cu-page .cu-guide-rail p`（0,2,1）会把 p 类的 goal 一起限住——
+   目标句原先就是这样漏出了限宽（拿到 none，实测 794px = 47.7 字/行，是全页最宽的文字层）。
    列里的 ol.cu-steps-block 是最外层的元素：全局 .cu-page ul, .cu-page ol 给它上了
    max-width: var(--cu-content-w)（44rem = 704px），它比正文层的任何一条都窄，会从外往里
    把整列的步骤块掐到 704px——所以必须一并归零。 */
@@ -664,8 +706,14 @@
 .cu-guide-rail .cu-guide-block > ul,
 .cu-step-block__body > h3,
 .cu-step-block__body > p,
-.cu-step-block__body > ul {
-  max-width: var(--cu-guide-text, 46rem);
+.cu-step-block__body > ul,
+.cu-step-block__text > h3,
+.cu-step-block__text > p,
+.cu-step-block__text > ul,
+.cu-step-block__goal,
+.cu-step-block__action,
+.cu-step-block__notes {
+  max-width: var(--cu-guide-text);
 }
 
 /* ol.cu-steps-block 是教程列里最外层的元素，全局 .cu-page ul, .cu-page ol 给了它
@@ -704,8 +752,14 @@
    figure 改成 flex 列后，img 用 flex:1 + object-fit:contain 吃掉剩余高度，
    两张图的实际显示高度就一致了（宽度仍按各自列宽，不会变形，只是留白边）。
    图注 flex-shrink:0，两条图注永远落在同一条基线上。 */
+/* 两列只在宽屏生效：这条写在 760px 回落单列之后，同优先级后写的赢，
+   不包媒体查询会把回落盖掉，390px 下变成「340px + 0px」，左图溢出视口。 */
+@media (min-width: 761px) {
+  .cu-step-block__shots {
+    grid-template-columns: 340px minmax(0, 1fr);
+  }
+}
 .cu-step-block__shots {
-  grid-template-columns: 340px minmax(0, 1fr);
   align-items: stretch;
 }
 .cu-step-block__shots .cu-shot {
@@ -738,10 +792,22 @@
   font-size: 0.92rem;
 }
 
-/* H3 降一档，让 H2 的节号成为本轨最重的元素 */
-.cu-step-block__body > h3 {
-  font-size: 0.98rem;
+/* H3 是「步骤标题」，必须大于它下面的正文，否则读者找不到结构。
+   2026-10-22 修：原先这里是 0.98rem/600（15.68px），比同块内的目标句（16.64px）
+   与动作行（16px）**都小**——步骤标题反而比正文轻，层级倒挂，读起来「一片平」。
+
+   现在的层级（实测）：H2 21.1px/700/Lora > H3 16.8px/600 > 动作 16px/600
+   > 目标句 15.5px/400 > 提示 14.7px/400，视觉权重单调递减。
+   选择器带 .cu-page .cu-guide-rail 前缀（0,3,1），压得过全局 .cu-page h3（0,1,1）。 */
+.cu-page .cu-guide-rail .cu-step-block__body > h3,
+.cu-page .cu-guide-rail .cu-step-block__text > h3 {
+  font-size: 1.05rem;
   font-weight: 600;
+}
+
+/* 目标句：这一个子动作为什么要做。比动作弱一级，所以用次级墨色、不加粗。 */
+.cu-page .cu-guide-rail .cu-step-block__goal {
+  font-size: 0.97rem;
 }
 
 /* 教程正文块间距统一收一档。
@@ -823,9 +889,34 @@
   text-underline-offset: 3px;
 }
 
+/* 「下一步」那一条：页尾两块合成一块后，next 混在 related 里没有方向感。
+   给它一个「下一步」角标，并去掉前置的「→」（角标已经表意，两个箭头重复）。 */
+.cu-page .cu-guide-links__next a {
+  color: var(--cu-ink);
+  font-weight: 600;
+}
+
+.cu-page .cu-guide-links__next a::before {
+  content: none;
+}
+
+.cu-page .cu-guide-links__next a::after {
+  content: ' 下一步';
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--cu-muted);
+  vertical-align: 1px;
+}
+
 /* ---------------- 教程多场景：索引页与场景页的新增元素 ---------------- */
 
-/* 场景切换条：5 个客户端互跳。是链接不是 tab（5 个是 5 个独立页面，不是同页视图），
+/* 场景切换条：全部场景页互跳。是链接不是 tab（这些是各自独立的页面，不是同页视图），
    所以不用 tablist 语义，只用 aria-current 标当前。 */
 .cu-guide-scenes {
   display: flex;
@@ -864,47 +955,60 @@
 
 /* 一句话答案：结论式独立成段，是被 AI 搜索直接引用的那一段。
    用左侧墨色竖条 + 深墨色文字，与「提示」卡（.cu-notes）区分开——提示是补充，答案是结论。 */
-.cu-guide-answer {
-  margin: 0 0 2rem;
+/* 一句话答案：结论式独立成段，是被 AI 搜索直接引用的那一段。
+   用左侧墨色竖条 + 深墨色文字，与「提示」卡（.cu-notes）区分开——提示是补充，答案是结论。
+
+   2026-10-22 修：这段是 .cu-page p，被全局 `.cu-page p` 的 `margin: .9rem auto` +
+   `max-width: var(--cu-content-w)`（44rem）命中，整段被居中到 44rem 盒子里，
+   左边线比正文列右移 138px（实测 left=162 vs 正文 24）——页面上出现第三条左边线，
+   违反规范第七节「全页只有一条左边线」。这里补 .cu-page 前缀（0,2,0）压过全局 (0,1,1)，
+   把左边线归零、行宽并入 --cu-guide-text。
+
+   2026-10-27：答案段是整页的结论句，也是被 AI 搜索整段引用的那一段，
+   限宽 640px 会在正文列右侧留出 220px 空白、并把结论句折成 4 行。
+   答案段放开到正文列全宽（860px），比正文更宽的句子读起来更像结论；
+   下面的 lead 与步骤正文仍保持 640px，两层宽度有区别，层次才清楚。 */
+.cu-page .cu-guide-answer {
+  margin: 0 0 1.6rem;
   padding: 0 0 0 1rem;
+  max-width: none;
   border-left: 3px solid var(--cu-accent);
   color: var(--cu-ink);
   font-size: 1.02rem;
   font-weight: 500;
   line-height: 1.75;
+  text-align: left;
 }
 
 /* 索引页的 h2：与场景页的小节 h2 区分开（索引页没有小节流，是三段式说明） */
-.cu-guide-h2 {
+/* 页尾两节（常见问题 / 相关阅读）的 H2，必须与正文小节 H2 完全同形。
+   2026-10-22 修：这条原先是 .cu-guide-h2（0,1,0），被全局 .cu-page h2（0,1,1）压成
+   26.73px 且 text-align:center——同一页出现两类 H2，一类 21px 左对齐、一类 26.7px 居中，
+   页尾反而比正文抢眼。补 .cu-page 前缀升到 (0,2,0) 才能压过全局规则。 */
+.cu-page .cu-guide-h2 {
   margin: 2.2rem 0 0.7rem;
-  font-size: 1.24rem;
+  font-family: var(--cu-serif);
+  font-size: 1.32rem;
   font-weight: 700;
   color: var(--cu-ink);
-  line-height: 1.5;
+  line-height: 1.35;
+  text-align: left;
 }
 
 /* ---------- 教程索引页（/guide）：与套餐页 / 模型页同一套轴与卡片语言 ----------
    索引页不是阅读页，是分流页：它跟 /pricing、/models 一样是营销页外壳
    （满宽 1140px、页头居中），场景卡也用模型页 .cu-mcard 的度量。
    这一段的类都带 .cu-guide-index 前缀，只作用于索引页——
-   5 个场景页（.cu-guide-rail）共用 .cu-guide-answer / .cu-guide-h2 等类，不受影响。 */
+   全部场景页（.cu-guide-rail）共用 .cu-guide-answer / .cu-guide-h2 等类，不受影响。
 
-/* 一句话答案：索引页版式是居中，答案条也得居中。
-   原来它被 .cu-page p 的 margin:auto + max-width 压成「缩在中间的引文」，
-   和上方左对齐的标题差 96px。底色用 --cu-bg-soft（比场景卡的 --cu-card 浅一档），
-   与下方 5 张客户端卡区分开。场景页的 .cu-guide-answer 仍是左侧墨条形态。 */
-.cu-guide-index .cu-guide-answer {
-  max-width: 46rem;
-  margin: 1.5rem auto 0;
-  padding: 1.15rem 1.5rem;
-  border: 1px solid var(--cu-line);
-  border-radius: var(--cu-r-md);
-  background: var(--cu-bg-soft);
-  color: var(--cu-ink);
-  font-size: 1.12rem;
-  font-weight: 600;
-  line-height: 1.75;
-  text-align: center;
+   2026-10-21：这里原来还有一条 .cu-guide-index .cu-guide-answer（居中的结论条，
+   浅底 + 1px 边 + 圆角）。索引页的一句话答案已并入页头副标题（.cu-page__lead），
+   版式跟套餐页完全一致，所以这条规则连同那个框一起删掉了。 */
+
+/* 索引页的引导语比套餐页那句长（要交代每条路径各一段），限宽一档，
+   免得在 1140px 的列里摊成一行到底。仍然是居中，跟页头共用一条垂直中轴。 */
+.cu-guide-index .cu-page__lead {
+  max-width: 52rem;
 }
 
 /* 分组标签：抄套餐页 .cu-tgrid-head 的网格头（无衬线 1.25rem 左对齐），

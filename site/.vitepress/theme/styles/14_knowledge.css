@@ -467,11 +467,14 @@
 }
 
 .cu-guide-wrap .cu-page__lead {
+  /* text-align 必须 !important：对手是 01_shell.css 的 `.cu-page__lead { text-align: center !important }`，
+     两边都是 !important 时后加载的胜出——本文件（14_knowledge.css）在 01_shell.css 之后加载。
+     不加 !important 的话，场景页的页头副标题仍是居中，与左对齐的 H1、正文列形成两套轴。 */
+  text-align: left !important;
   margin: 1rem 0 0;
-  /* 固定 46rem，不走 var(--cu-guide-text)：那个变量在 shell_extra.css 里是 52rem（与正文列同宽），
-     兜底值 46rem 永远不生效，这里一旦改变量，教程页引导语会跟着变宽到 52rem。
-     教程正文列 52rem 的余量是留给截图与表格的，纯文字引导语保持 46rem（≈33 字一行）。 */
-  max-width: 46rem;
+  /* 行宽与教程页正文层一致（--cu-guide-text = 40rem ≈ 40 个全角字一行），
+     引导语与下方步骤块的行宽相同，两侧留白也对得上。 */
+  max-width: var(--cu-guide-text);
 }
 
 .cu-shell__body--reading .cu-page {
@@ -776,4 +779,22 @@
   max-width: 42rem;
   color: var(--cu-muted);
   font-size: 0.95rem;
+}
+
+/* ---------- 文章页里的教程截图（2026-10-28）----------
+   知识库文章里引用 GuideShot 组件展示配置截图。文章正文列宽 672px，比教程页（约 474px）宽，
+   图可以放得更大；但两张并排会挤到 300px 以下、界面文字读不清，所以文章页统一单列。
+   --cu-shot-max-h 给竖图（Windows 功能面板那类）限高，否则一张 900×989 的竖图会占满整屏。 */
+.cu-page--doc .vp-doc .cu-shot {
+  margin: 1.25rem 0;
+}
+
+.cu-page--doc .vp-doc .cu-shot img {
+  max-width: 100%;
+  max-height: 34rem;
+  margin: 0 auto;
+}
+
+.cu-page--doc .vp-doc .cu-shot figcaption {
+  text-align: left;
 }

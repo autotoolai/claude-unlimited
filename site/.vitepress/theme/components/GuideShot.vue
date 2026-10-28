@@ -43,6 +43,10 @@ import workbuddyAddModel from '../assets/guide/guide_workbuddy_add_model.webp'
 import workbuddyInUse from '../assets/guide/guide_workbuddy_in_use.webp'
 import workbuddyModelPicker from '../assets/guide/guide_workbuddy_model_picker.webp'
 
+// 官方文档截图：CLI 官方安装文档、Cursor 扩展面板
+import cliInstall from '../assets/guide/guide_cli_install.webp'
+import cursorExtension from '../assets/guide/guide_cursor_extension.webp'
+
 defineProps<{
   /** 图片文件名，对应 theme/assets/guide/<file>（见下方表；config/guide.ts 里写文件名） */
   src: string
@@ -87,6 +91,8 @@ const images: Record<string, string> = {
   'guide_workbuddy_add_model.webp': workbuddyAddModel,
   'guide_workbuddy_in_use.webp': workbuddyInUse,
   'guide_workbuddy_model_picker.webp': workbuddyModelPicker,
+  'guide_cli_install.webp': cliInstall,
+  'guide_cursor_extension.webp': cursorExtension,
 }
 
 function url(src: string): string {

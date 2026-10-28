@@ -50,7 +50,7 @@ export function jsonLdGuideScene(page: GuidePage) {
   }
 }
 
-/** 索引页：CollectionPage + ItemList（5 个客户端各一条，AI 能据此判断该去哪个页面） */
+/** 索引页：CollectionPage + ItemList（每条路径一项，AI 能据此判断该去哪个页面） */
 export function jsonLdGuideIndex() {
   return {
     '@context': 'https://schema.org',
@@ -76,7 +76,7 @@ export function jsonLdGuideIndex() {
   }
 }
 
-/** 页脚「教程」列：索引页 + 5 个客户端页（每页的短名与一句话） */
+/** 页脚「教程」列：索引页 + 全部场景页（每页的短名与一句话） */
 export function guideFooterItems() {
   return [
     { title: guideIndex.title, nav: guideIndex.title, url: '/guide', desc: guideIndex.desc, eyebrow: '教程' },

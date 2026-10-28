@@ -18,9 +18,14 @@
  * 环境变量 AUDIT_BASE 可覆盖预览地址。
  */
 import { chromium } from 'playwright'
+import { register, tsImport } from 'tsx/esm/api'
 
 const BASE = process.env.AUDIT_BASE || 'http://127.0.0.1:41777'
-const SCENES = ['cc', 'desktop', 'codex', 'workbuddy', 'cursor']
+/** 全部场景页。这个脚本用 node 直跑，导 .ts 得走 tsx 的 tsImport（与 check_dist.mjs 同法）。 */
+const unregisterTsx = register()
+const { guideScenes } = await tsImport('../config/guide.ts', import.meta.url)
+unregisterTsx()
+const SCENES = guideScenes()
 const fails = []
 const ok = (cond, msg) => { if (!cond) fails.push(msg) }
 
@@ -93,7 +98,7 @@ for (const scene of SCENES) {
   ok(d.frame !== l.frame, `${scene}: 深浅两套的 --cu-figure-frame 相同（都是 ${d.frame}），框线没跟着换色`)
 }
 
-console.log(`主题验收：测了 ${rows.length} 处（5 个场景页 × 深浅两套）`)
+console.log(`主题验收：测了 ${rows.length} 处（${SCENES.length} 个场景页 × 深浅两套）`)
 if (fails.length) {
   console.error('\n[x] 教程页深浅模式验收未通过:')
   for (const f of fails) console.error('    - ' + f)
