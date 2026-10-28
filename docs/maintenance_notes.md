@@ -56,7 +56,7 @@ npm run check:css    # 改了 .vitepress/theme/**/*.css 必跑
 
 `site/scripts/deploy_claude_unlimited_site.ps1`（先 `npm run build`，再 `wrangler pages deploy`）。站点域名 `claude-unlimited.aiautotools.com` 绑在 Cloudflare Pages 项目 `claude-unlimited-site` 上。
 
-**部署前先清掉 `site/public/videos/*.mp4`**。这些是本地草稿预览用的副本，gitignore 了、不在版本库里，但真实仓库里它们会被复制进 dist。Cloudflare Pages 单文件上限 25 MiB，本地那批 mp4 超过这个上限，会让部署直接失败。线上视频的真实地址是 R2 CDN（`media.claude-unlimited.aiautotools.com`），本地副本只给端口 41802 的草稿预览用。
+视频不进部署包。`site/public/videos/*.mp4` 是本机留存的源文件（gitignore 了），线上视频的真实地址是 R2 CDN（`media.claude-unlimited.aiautotools.com`），本地副本只给端口 41802 的草稿预览用。`scripts/copy_public.mjs` 复制 `public/` 到产物时会显式跳过 mp4——Cloudflare Pages 单文件上限 25 MiB，本地那批 mp4 单支最大 37MB，复制进 dist 会让部署直接失败。早先靠「部署前手动把文件挪走」绕开，那个办法总会忘，现在由脚本兜住。
 
 ## 搜索推送
 
