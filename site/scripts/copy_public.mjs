@@ -73,17 +73,47 @@ function checkSsrMarkers() {
   }
 }
 
+/**
+ * 视频不进部署包。
+ *
+ * 视频源文件走 R2 托管（config/media_cdn.ts 的 VIDEO_KEYS 指向带内容哈希的对象），
+ * public/videos/ 里的是本机留存的源文件，单支最大 37MB。Cloudflare Pages 单文件上限 25 MiB，
+ * 复制进产物后部署会被拒。所以这里显式跳过 mp4，而不是靠「部署前手动把文件挪走」——
+ * 那个办法每次都会忘，或者忘了就炸在部署这一步。
+ *
+ * 海报（videos/poster/*.jpg，几十 KB）照常复制：首帧图要跟着页面走。
+ */
+const SKIP_EXT = new Set(['.mp4'])
+
 function copyAll() {
   mkdirSync(dist, { recursive: true })
+  let skipped = 0
   for (const name of existsSync(src) ? readdirSync(src) : []) {
     const s = join(src, name)
     const d = join(dist, name)
     // 只补拷、绝不先删：public/knowledge/ 与 VitePress 自己生成的 dist/knowledge/ 同名，
     // 先删会把刚构建出来的 23 篇文章产物整个删掉。
-    if (statSync(s).isDirectory()) cpSync(s, d, { recursive: true })
-    else cpSync(s, d)
+    if (statSync(s).isDirectory()) {
+      // 目录也要逐层筛 mp4：videos/ 下面还有 poster/ 子目录
+      cpSync(s, d, {
+        recursive: true,
+        filter: (srcPath) => {
+          if (SKIP_EXT.has(extname(srcPath).toLowerCase())) {
+            skipped++
+            return false
+          }
+          return true
+        },
+      })
+    } else {
+      if (SKIP_EXT.has(extname(s).toLowerCase())) {
+        skipped++
+        continue
+      }
+      cpSync(s, d)
+    }
   }
-  console.log(`[public] 已同步 -> ${dist}`)
+  console.log(`[public] 已同步 -> ${dist}${skipped ? `（跳过 ${skipped} 个 mp4：视频走 R2，Pages 单文件上限 25 MiB）` : ''}`)
 }
 
 /** 只服务 public/ 下的文件（与 .vitepress/theme/middleware.ts 同逻辑，那个插件在 vitepress 下不生效，仅备查） */
