@@ -160,7 +160,7 @@ CC Switch 是一个专门管 API 配置的小工具，装好之后所有供应�
 
 <GuideShot src="guide_desktop_cowork.webp" caption="桌面版里正常对话，模型为 Fable 5.1" zoom />
 
-官网页面在国内有时打不开，可以用底下的镜像地址；镜像是第三方文件，装之前自己判断要不要用。
+官网页面在国内有时打不开，可以用镜像地址：[l1i1.github.io/ClaudeDesktop-Installer](https://l1i1.github.io/ClaudeDesktop-Installer/)；镜像是第三方文件，装之前自己判断要不要用。只装客户端即可，API 继续用前面配好的 CC Switch。
 
 配置过程中的详细步骤与各客户端对照，看[Claude 桌面版教程](/guide/desktop)；换到终端用的话看[Claude Code CLI 教程](/guide/cli)。
 

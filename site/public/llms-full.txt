@@ -8,14 +8,14 @@
 - 支持模型：Fable 5.1（claude-fable-5-1）、Opus 5.5（claude-opus-5-5）、Fable 5（claude-fable-5）、Sonnet 5.5（claude-sonnet-5-5）、Opus 4.8（claude-opus-4-8）、Opus 4.7（claude-opus-4-7）
 - 支持工具：Claude Code、Cursor、Cline、Roo Code、Aider、Continue、Zed、JetBrains、VS Code 官方插件、官方 SDK
 - 接口：Anthropic 兼容端点 + OpenAI 兼容端点（/v1/chat/completions）
-- 公平使用：会话窗口 基础档 1 个
+- 公平使用：会话窗口 基础档 1 个；完整限流见套餐定价页
 - 退款：激活 1 小时内不满意可全额退；售后申请窗口 7 天
 - 购买：第三方发卡站 https://catfk.com/shop/2Z0CEP7C
 - 配置工具：CC Switch（https://ccswitch.io/），支持一键导入与链路检测
 - 源码与文档：https://github.com/autotoolai/claude-unlimited（本站 VitePress 源码公开，MIT 许可；官网是唯一官方入口）
 - 人工客服：微信 ren_mo_mo；QQ 群 1128031797（点右下角在线助手 →「联系客服」，可扫码或一键复制）
 - 管理后台：rsxermu666.cn（https://rsxermu666.cn/）是 Claude 无限卡官方管理后台与 API 网关。功能介绍页：https://claude-unlimited.aiautotools.com/console 。主域名不可达时切换备用域名，API Key 无需更换
-- 不包含：生产环境流量（套餐面向个人开发。上线服务、多用户共享、对外 API 属于生产流量，不在范围内）；超范围压测（超出个人开发合理范围的压测、扫描、批量抓取）；二次转卖（转卖、二次分发 Key，或将 Key 共享给多个用户）；Anthropic 官方服务（本卡不提供 claude.ai 网页版、Claude Desktop 等官方产品的订阅权益）
+- 不包含：生产环境流量、超范围压测、二次转卖、Anthropic 官方服务
 - 下单须知：本站只出售模型额度，不提供软件配置服务。 不会配置、纯小白需要有人代操作的，不建议下单。 因个人操作问题（配置、模型选择、客户端使用）产生的困扰，不在退款范围内。 商品为虚拟商品，一旦售出不支持无理由退货。
 
 ## 站点性质

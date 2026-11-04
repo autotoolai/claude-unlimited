@@ -39,19 +39,26 @@ const pageLines = [
   `- [变更历史](${BASE}/changelog): 按日期倒序的站点变更记录`,
 ]
 
+/** 对外公平使用只披露会话窗口（check_dist 拦并发 / RPM / TPM） */
+const sessionFairUse = (() => {
+  const row = limitRows.find((r) => r.label === '会话窗口')
+  return row ? `${row.label} ${row.values[0]}` : '见套餐定价页'
+})()
+
 const facts: string[] = [
   `- 计费方式：订阅期内不按 token 计费，固定订阅价（${unlimitedTiers.map((t) => `${t.displayName} ${t.price}/${t.period}`).join('，')}）`,
   `- 支持模型：${modelIds.map((m) => `${m.tier}（${m.id}）`).join('、')}`,
   `- 支持工具：Claude Code、Cursor、Cline、Roo Code、Aider、Continue、Zed、JetBrains、VS Code 官方插件、官方 SDK`,
   `- 接口：Anthropic 兼容端点 + OpenAI 兼容端点（/v1/chat/completions）`,
-  `- 公平使用：${limitRows.map((r) => `${r.label} ${r.values[0]}`).join('、')}`,
+  `- 公平使用：${sessionFairUse}；完整限流见套餐定价页`,
   `- 退款：${refundSummary}；售后申请窗口 ${refundWindowDays} 天`,
   `- 购买：第三方发卡站 ${purchaseUrl}`,
   `- 配置工具：CC Switch（${siteConfig.partners.find((p) => p.id === 'ccswitch')?.url ?? ''}），支持一键导入与链路检测`,
   `- 源码与文档：${siteConfig.sourceRepo.url}（本站 VitePress 源码公开，MIT 许可；官网是唯一官方入口）`,
   `- 人工客服：微信 ${siteConfig.contact.wechatId}${siteConfig.contact.qqGroup ? `；QQ 群 ${siteConfig.contact.qqGroup}` : ''}（点右下角在线助手 →「联系客服」，可扫码或一键复制）`,
   `- 管理后台：rsxermu666.cn（${siteConfig.partners.find((p) => p.id === 'console')?.url ?? ''}）是 Claude 无限卡官方管理后台与 API 网关。功能介绍页：${BASE}/console 。主域名不可达时切换备用域名，API Key 无需更换`,
-  `- 不包含：${excludes.map((e) => `${e.label}（${e.value}）`).join('；')}`,
+  // 不包含项只写标签，避免「超并发压测」value 里的路数 / 次/分钟泄漏进 llms.txt
+  `- 不包含：${excludes.map((e) => e.label).join('、')}`,
   `- 下单须知：${purchaseConditions.join(' ')}`,
 ]
 

@@ -193,6 +193,8 @@ const baseUrl = consoleUrl.replace(/\/+$/, '')
 const baseUrlV1 = baseUrl + '/v1'
 /** Claude 桌面版官网 */
 const desktopUrl = partnerUrl('claude-desktop')
+/** Claude 桌面版国内镜像（第三方；卖家腾讯文档「免翻墙下载地址」同源） */
+const desktopMirrorUrl = partnerUrl('claude-desktop-mirror')
 
 /**
  * 公共块正文表：key -> 去掉 id / title 的块体。
@@ -620,9 +622,10 @@ const desktopPage: GuidePage = {
           action: ['打开下面的下载页 → 选自己的系统 → 下载后双击安装。'],
           link: { href: desktopUrl, label: 'Claude 桌面版下载' },
           shot: { src: 'guide_desktop_download.webp', caption: 'Claude 官网的桌面版下载页' },
-          notes: ['官网页面在国内有时打不开，可以用底下的镜像地址；镜像是第三方文件，装之前自己判断要不要用。'],
+          notes: ['官网页面在国内有时打不开，可以用底下的镜像地址；镜像是第三方文件，装之前自己判断要不要用。只装客户端即可，API 继续用前面配好的 CC Switch，别被镜像页里的默认聚合接口带走。'],
         },
       ],
+      url: { href: desktopMirrorUrl, label: 'Claude 桌面版镜像下载（第三方）' },
     },
     {
       id: 'desktop-use',

@@ -16,7 +16,7 @@ import type { HeadConfig } from 'vitepress'
 const umamiWebsiteId = process.env.UMAMI_WEBSITE_ID || '35bc9e45-604c-4641-920e-8cfa48020045'
 
 /** 百度统计站点 ID（hm.baidu.com 后面那串，公开标识，会进 HTML）。留空则整段不注入 */
-const baiduTongjiId = process.env.BAIDU_TONGJI_ID || '3ae4fc576a3cfa978bf7592615735bab'
+const baiduTongjiId = process.env.BAIDU_TONGJI_ID || 'b021c906d24a345face9f68d6dc8587e'
 
 /**
  * 事件桥：把 window.__cuTrack（theme/analytics.ts 挂的点击委托转出来的）同时送进 Umami 与百度。

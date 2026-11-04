@@ -495,8 +495,9 @@ for (const k of knowledgeMod.knowledge) {
         `llms.txt 的「会话窗口」一行没有出现 ${n} —— llms.txt 在漂移（应由 config/rules.ts 派生）`,
       )
     }
+    // 只拦公平使用指标泄漏；勿误伤知识库标题里的「33k token」等用词。
     ok(
-      !/(单会话并发|请求速率|Token 吞吐|\d+\s*路|\d+\s*次\s*\/\s*分钟|\d+k\s*token)/i.test(llms),
+      !/(单会话并发|请求速率|Token 吞吐|\d+\s*路并发|\d+\s*次\s*\/\s*分钟|\d+k\s*token\s*\/\s*分钟)/i.test(llms),
       'llms.txt 仍含并发路数 / RPM / TPM 等不应对外披露的指标',
     )
   }

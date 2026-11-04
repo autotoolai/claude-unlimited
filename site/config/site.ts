@@ -21,7 +21,7 @@ import { entryTier, entryTierDays, shopUrl as purchaseUrl } from './plans'
 
 export interface Partner {
   /** 稳定标识：组件里按 id 取，不写死 URL */
-  id: 'purchase' | 'console' | 'ccswitch' | 'claude-desktop' | 'vscode'
+  id: 'purchase' | 'console' | 'ccswitch' | 'claude-desktop' | 'claude-desktop-mirror' | 'vscode'
   name: string
   /** 站点用途的一句话说明，教程页直接显示 */
   desc: string
@@ -119,6 +119,13 @@ export const siteConfig: SiteConfig = {
       name: 'Claude 桌面版下载',
       desc: 'Anthropic 官方桌面客户端，Windows 与 macOS 都有。装好后在 CC Switch 里新增桌面版供应商并开启路由即可使用本卡。',
       url: 'https://claude.com/download',
+      kind: 'tool',
+    },
+    {
+      id: 'claude-desktop-mirror',
+      name: 'Claude 桌面版镜像下载',
+      desc: '第三方维护的国内安装页（l1i1/ClaudeDesktop-Installer）。官网打不开时备用；装之前自行判断是否可信，只装客户端即可，API 仍走本站 CC Switch 配置。',
+      url: 'https://l1i1.github.io/ClaudeDesktop-Installer/',
       kind: 'tool',
     },
     {
