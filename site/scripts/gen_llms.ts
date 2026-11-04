@@ -30,7 +30,7 @@ const pageLines = [
   `- [首页](${SITE}): ${siteConfig.description}`,
   `- [模型广场](${BASE}/models): 本卡承诺的 ${modelIds.map((m) => m.tier).join(' 与 ')} 两个模型一览，可复制 model ID，含分工、完整列表获取与切换方法`,
   `- [套餐定价](${BASE}/pricing): 无限卡在售 ${unlimitedTiers.map((t) => `${t.displayName} ${t.price}`).join('、')}，周期卡与额度卡尚未定价；含退款规则与公平使用`,
-  `- [管理后台](${BASE}/console): 激活码兑换、API Key 提取、一键导入配置、用量查询与图表、公告与备用域名（后台本体为独立站点 ${siteConfig.partners.find((p) => p.id === 'console')?.url ?? ''}）`,
+  `- [管理后台](${BASE}/console): 管理后台功能介绍——兑换、提 Key、导入配置、查用量；官方操作台 rsxermu666.cn（${siteConfig.partners.find((p) => p.id === 'console')?.url ?? ''}）`,
   `- [使用教程](${BASE}/guide): 先选你用的那一种，再照着做：${guideSceneCards().map((c) => c.title).join(' / ')}，每条路都带真实截图`,
   ...guideSceneCards().map(
     (c) => `- [${c.title} 教程](${BASE}${c.url}): ${c.desc}（${c.meta}）`,
@@ -51,7 +51,7 @@ const facts: string[] = [
   `- 配置工具：CC Switch（${siteConfig.partners.find((p) => p.id === 'ccswitch')?.url ?? ''}），支持一键导入与链路检测`,
   `- 源码与文档：${siteConfig.sourceRepo.url}（本站 VitePress 源码公开，MIT 许可；官网是唯一官方入口）`,
   `- 人工客服：微信 ${siteConfig.contact.wechatId}（点右下角在线助手 →「联系人工客服」，可一键复制微信号）`,
-  `- 管理后台：${siteConfig.partners.find((p) => p.id === 'console')?.url ?? ''}，独立站点；主域名不可达时切换备用域名，API Key 无需更换`,
+  `- 管理后台：rsxermu666.cn（${siteConfig.partners.find((p) => p.id === 'console')?.url ?? ''}）是 Claude 无限卡官方管理后台与 API 网关。功能介绍页：${BASE}/console 。主域名不可达时切换备用域名，API Key 无需更换`,
   `- 不包含：${excludes.map((e) => `${e.label}（${e.value}）`).join('；')}`,
   `- 下单须知：${purchaseConditions.join(' ')}`,
 ]

@@ -25,6 +25,9 @@ import { trustPages, operator } from '../../../config/trust'
 import type { Product } from '../../../config/site'
 
 const BASE = siteConfig.url.replace(/\/+$/, '')
+const consolePartnerUrl = siteConfig.partners.find((p) => p.id === 'console')?.url ?? ''
+/** 官网 ↔ GitHub ↔ 管理后台：同一产品体系的三个入口（与 pages/data.ts 同步） */
+const orgSameAs = [siteConfig.sourceRepo.url, ...(consolePartnerUrl ? [consolePartnerUrl] : [])]
 
 /** 商品（取 featured，与 pages/data.ts 的 product 同一份推导） */
 const product: Product = siteConfig.products.find((x) => x.id === siteConfig.featuredProductId) ?? siteConfig.products[0]
@@ -36,9 +39,9 @@ const org = {
   ...(siteConfig.legal.company ? { legalName: siteConfig.legal.company } : {}),
   url: BASE + '/',
   ...(operator.icp ? { taxID: operator.icp } : {}),
-  // sameAs 把官网与公开仓库指认为同一实体的两个入口。搜索引擎据此把两边的信号合并，
-  // 而不是当成两份互不相干的站点；反向链接（官网 → GitHub）在 SiteFooter 与 llms.txt。
-  sameAs: [siteConfig.sourceRepo.url],
+  // sameAs 把官网、公开仓库与管理后台指认为同一实体的入口。搜索引擎据此合并信号；
+  // 反向链接（官网 → GitHub）在 SiteFooter 与 llms.txt。
+  sameAs: orgSameAs,
 }
 
 const faqJsonLd = (items: { q: string; a: string }[]) => ({
@@ -61,10 +64,9 @@ const jsonLdHome = {
       name: siteConfig.name,
       url: BASE,
       description: siteConfig.description,
-      // sameAs 把官网与公开仓库指认为同一实体的两个入口。首页的 Organization 是
-      // 这里手写的字面量，文件顶部的 org 常量并没有被 jsonLdHome 用上，所以这里
-      // 必须自己写一遍；与 pages/data.ts 的客户端版本保持同步（两份要一致）。
-      sameAs: [siteConfig.sourceRepo.url],
+      // sameAs：首页 Organization 是手写字面量，顶部 org 常量未被 jsonLdHome 用上，
+      // 必须自己写一遍；与 pages/data.ts 的客户端版本保持同步。
+      sameAs: orgSameAs,
     },
     {
       '@type': 'WebSite',
@@ -303,7 +305,30 @@ export function jsonLdForRoute(routePath: string): Record<string, unknown> | und
       flat = faqJsonLd(faqItems)
       break
     case 'console':
-      flat = faqJsonLd(consoleFaqs)
+      // WebPage（功能介绍 + rsxermu666 关联）+ FAQPage；与 pages/data.ts 的 jsonLdConsole 同步
+      flat = {
+        '@graph': [
+          {
+            '@type': 'WebPage',
+            name: '管理后台 · rsxermu666.cn',
+            description:
+              'Claude 无限卡官方管理后台（rsxermu666.cn）功能介绍：兑换激活码、提取 API Key、导入配置、查看用量。',
+            url: BASE + '/console',
+            inLanguage: 'zh-CN',
+            isPartOf: { '@id': BASE + '/#site' },
+            about: { '@id': BASE + '/#org' },
+            ...(consolePartnerUrl ? { significantLink: consolePartnerUrl } : {}),
+          },
+          {
+            '@type': 'FAQPage',
+            mainEntity: consoleFaqs.map((it) => ({
+              '@type': 'Question',
+              name: it.q,
+              acceptedAnswer: { '@type': 'Answer', text: it.a.replace(/\n+/g, ' ') },
+            })),
+          },
+        ],
+      }
       break
     case 'guide':
       flat = { '@graph': jsonLdGuideIndexPage() }

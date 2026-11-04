@@ -7,9 +7,9 @@ import { knowledgeCategories } from '../../../config/knowledge'
  * 谁会显示目录由调用方决定，不是这里：
  * - 教程场景页 PageShell 传 toc="side" → 6 个场景页各用自己的 slug（/guide/cc 等）；
  * - 教程索引页（/guide）不显示目录；"/guide" 这组只留锚点 id 备查；
- * - 后台页 PageShell 传 toc="wide" → 用 console 这组；
+ * - 后台功能介绍页（/console）不显示目录（营销满宽壳）；下面 console 组只留锚点备查；
  * - 知识库文章页目录由 KnowledgeDoc 从正文 h2 客户端读取，不用这张表。
- * 下面 index / models / pricing / faq / knowledge_index 五组是营销页与列表页的，
+ * 下面 index / models / pricing / faq / knowledge_index / console 是营销页与列表页的，
  * 这些页面已不再显示页内目录，数据留着是为了锚点 id 与页面结构一一对应、好排查。 */
 export interface SectionLink {
   id: string
@@ -23,9 +23,8 @@ export const SECTION_NAV: Record<string, SectionLink[]> = {
   index: [],
   models: [],
   console: [
+    { id: 'steps', label: '买完卡密后怎么走' },
     { id: 'features', label: '后台能做什么' },
-    { id: 'keys', label: '关键功能细说' },
-    { id: 'domain', label: '备用域名' },
     { id: 'faq', label: '后台常见问题' },
   ],
   // 定价页已精简到只剩档位网格，无正文小节（2026-10-12 撤掉 UnlimitedValue 区块与页内 FAQ）

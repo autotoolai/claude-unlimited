@@ -13,7 +13,5 @@
 
 User-agent: *
 Allow: /
-# 后台本体在独立站点 rsxermu666.cn，本站的 /console 只是入口页，无独立可索引内容
-Disallow: /console/
 
 Sitemap: https://claude-unlimited.aiautotools.com/sitemap.xml

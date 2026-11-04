@@ -7,7 +7,7 @@ import { siteConfig } from '../../../config/site'
 import { refundSummary } from '../../../config/rules'
 import { modelIds, recommendedIds, modelBrands } from '../../../config/models'
 import { planGroups, allTiers, tiersOf, featuredTierOf, entryTier, planPromos, refundNotes } from '../../../config/plans'
-import { consoleFeatures, consoleBackupDomains, consoleFaqs } from '../../../config/console'
+import { consoleFeatures, consoleBackupDomains, consoleFaqs, consoleSteps } from '../../../config/console'
 import type { FaqItem } from '../../../config/faq'
 import { jsonLdGuideScene, jsonLdGuideIndex, guideFooterItems } from './guide_jsonld'
 import { faqByCategory, faqItems, faqCategories, categoryLabels } from '../../../config/faq'
@@ -32,6 +32,9 @@ export const product = siteConfig.products.find((x) => x.id === siteConfig.featu
 
 /** 站点绝对地址（JSON-LD 的 @id / url 用） */
 const base = siteConfig.url.replace(/\/+$/, '')
+const consolePartnerUrl = siteConfig.partners.find((p) => p.id === 'console')?.url ?? ''
+/** 与 jsonld_server.ts 的 orgSameAs 保持一致 */
+const orgSameAs = [siteConfig.sourceRepo.url, ...(consolePartnerUrl ? [consolePartnerUrl] : [])]
 
 /**
  * 首页「买之前可以先确认」信任条：把原先散在定价页、FAQ、页尾的边界信息收成首页一行，
@@ -69,8 +72,31 @@ const faqJsonLd = (items: { q: string; a: string }[]) => ({
 /** /faq 页 JSON-LD：全量 */
 export const jsonLdFaq = faqJsonLd(faqItems)
 
-/** /console 页 JSON-LD：后台 FAQ */
-export const jsonLdConsole = faqJsonLd(consoleFaqs)
+/** /console 页 JSON-LD：WebPage（功能介绍 + rsxermu666 关联）+ FAQPage */
+export const jsonLdConsole = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      name: '管理后台 · rsxermu666.cn',
+      description:
+        'Claude 无限卡官方管理后台（rsxermu666.cn）功能介绍：兑换激活码、提取 API Key、导入配置、查看用量。',
+      url: base + '/console',
+      inLanguage: 'zh-CN',
+      isPartOf: { '@id': base + '/#site' },
+      about: { '@id': base + '/#org' },
+      ...(consolePartnerUrl ? { significantLink: consolePartnerUrl } : {}),
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: consoleFaqs.map((it) => ({
+        '@type': 'Question',
+        name: it.q,
+        acceptedAnswer: { '@type': 'Answer', text: it.a.replace(/\n+/g, ' ') },
+      })),
+    },
+  ],
+}
 
 /** /models 页 JSON-LD */
 export const jsonLdModels = {
@@ -124,8 +150,8 @@ export const jsonLdHome = {
       name: siteConfig.name,
       url: base,
       description: siteConfig.description,
-      // 与 jsonld_server.ts 的 org.sameAs 保持一致（两份 JSON-LD 必须同步）
-      sameAs: [siteConfig.sourceRepo.url],
+      // 与 jsonld_server.ts 的 orgSameAs 保持一致（两份 JSON-LD 必须同步）
+      sameAs: orgSameAs,
     },
     { '@type': 'WebSite', '@id': base + '/#site', url: base, name: siteConfig.name, description: siteConfig.description, inLanguage: 'zh-CN', publisher: { '@id': base + '/#org' } },
     {
@@ -258,5 +284,5 @@ export { knowledgeCategories, knowledgeCategoryName, knowledgeCategoryShort, kno
 
 /** 套餐、后台相关的导出（/pricing、/console 页直接用） */
 export { planGroups, allTiers, tiersOf, featuredTierOf, entryTier, planPromos, refundNotes }
-export { consoleFeatures, consoleBackupDomains, consoleFaqs }
+export { consoleFeatures, consoleBackupDomains, consoleFaqs, consoleSteps }
 export { modelBrands }

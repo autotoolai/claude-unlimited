@@ -3,6 +3,7 @@ import type { HeadConfig } from 'vitepress'
 import { siteConfig } from '../config/site'
 import { knowledge, knowledgeCategories } from '../config/knowledge'
 import { guidePageBySlug, guideTagsOf, guideIndexTags } from '../config/guide'
+import { consoleTags } from '../config/console'
 import { publicDirPlugin } from './theme/middleware'
 import { baiduHead, umamiHead } from './analytics_snippets'
 import { readFileSync } from 'node:fs'
@@ -81,6 +82,10 @@ export default defineConfig({
       if (tags.length) {
         head.push(['meta', { name: 'keywords', content: tags.join(',') }])
       }
+    }
+    // /console：rsxermu666 品牌域名主场，不能落回全站「claude 无限卡」那条全局 keywords。
+    if (path === 'console' && consoleTags.length) {
+      head.push(['meta', { name: 'keywords', content: consoleTags.join(',') }])
     }
     if (path.startsWith('knowledge/')) {
       const slug = path.slice('knowledge/'.length)

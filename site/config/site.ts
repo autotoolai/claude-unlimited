@@ -100,7 +100,7 @@ export const siteConfig: SiteConfig = {
     {
       id: 'console',
       name: '管理后台',
-      desc: '独立的后台页面：兑换卡密、提取 API Key、一键导入配置、查用量与公告。买完卡密后的所有操作都在这里完成。',
+      desc: '兑换卡密、提取 API Key、一键导入配置、查用量与公告。买完卡密后的官方操作台。',
       url: 'https://rsxermu666.cn/',
     },
     {

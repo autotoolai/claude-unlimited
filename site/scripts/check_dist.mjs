@@ -92,10 +92,10 @@ for (const [route, file] of Object.entries(PAGES)) {
   const where = route
   const isKnowledgeArticle = route.startsWith('/knowledge/') && route !== '/knowledge'
   const isKnowledgeIndex = route === '/knowledge'
-  // 长文页才有左侧目录（.cu-sidenav）：教程场景页（/guide/<scene>）、后台页由 PageShell 传 toc，
-  // 知识库文章页自带。教程索引页（/guide）2026-10-20 起不再显示目录。
+  // 长文页才有左侧目录（.cu-sidenav）：教程场景页（/guide/<scene>）、知识库文章页自带。
+  // 教程索引页（/guide）与后台功能介绍页（/console）走营销满宽壳，不显示目录。
   // 营销页与列表页（/ /models /pricing /faq /knowledge）同样不应该再出现任何页内目录。
-  const hasToc = route.startsWith('/guide/') || route === '/console'
+  const hasToc = route.startsWith('/guide/')
   // 首页的 H1 在 Hero 里（HomeHero 组件），知识库文章页的 H1 在 markdown 里，都没有 cu-page__head
   const headKeys = route === '/' || isKnowledgeArticle ? [] : ['cu-page__head']
   const keys = ['cu-brandbar', 'cu-tabs__inner', 'cu-shell__body', 'cu-foot', ...headKeys, 'cu-kefu__fab']
@@ -435,8 +435,8 @@ for (const k of knowledgeMod.knowledge) {
   }
   // copy_dir_overviews.mjs 会把 guide/index.html 再复制成 guide.html、knowledge/index.html 复制成
   // knowledge.html，两份内容相同，这里按 URL 去重后再比对，避免同一路由被算两次。
-  // robots.txt 里 Disallow 的入口壳（有产物但故意不收录）：/console 正文全靠客户端渲染，
-  // gen_sitemap.ts 已把它排除，两个断言都要跳过，否则会误报成「漏加 srcExclude」。
+  // robots.txt 里 Disallow 的路径（若有）从 sitemap 双向断言里剔除，避免「有产物故意不收录」
+  // 被误报成漏加 srcExclude。/console 说明页现已可收录并进 sitemap，不再 Disallow。
   const robotsDisallowed = new Set(
     fs.readFileSync(path.join(DIST, 'robots.txt'), 'utf8')
       .split(/\r?\n/)

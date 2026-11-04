@@ -1,82 +1,106 @@
 /**
- * 管理后台功能说明 —— /console 介绍页与首页合作平台卡的唯一数据源。
+ * 管理后台功能说明 —— /console 功能介绍页的唯一数据源。
  *
- * 后台是独立 SPA（Element Plus），本文件只写「这是什么 / 什么时候用」，
+ * 后台是独立 SPA（Element Plus），本文件写「能做什么 / 怎么上手」，
  * 不做截图，避免后台改版后官网图文脱节。入口地址取 config/site.ts 的 partners.console。
+ * 用户可见文案以「管理后台」为主；rsxermu666 留给 keywords / FAQ / JSON-LD / llms。
  */
+
+/** per-page keywords（config.mts transformHead 注入）；长尾词，不是堆砌 */
+export const consoleTags: string[] = [
+  'rsxermu666',
+  'rsxermu666.cn',
+  'claude 无限卡管理后台',
+  '卡密兑换',
+  'api key 提取',
+]
+
+/** 买完卡密后的上手路径（/console 三步） */
+export interface ConsoleStep {
+  n: string
+  title: string
+  blurb: string
+}
+
+export const consoleSteps: ConsoleStep[] = [
+  {
+    n: '01',
+    title: '粘贴激活码',
+    blurb: '打开后台「我的面板」，粘贴卡密完成兑换，看套餐状态与公告。',
+  },
+  {
+    n: '02',
+    title: '提取 API Key',
+    blurb: '到「提取 Key」拿到 sk- 开头的专属 Key；首次发起请求时自动激活。',
+  },
+  {
+    n: '03',
+    title: '一键导入配置',
+    blurb: '「使用教程」页一键写入 Claude Code / Cursor / CC Switch（需 ≥ v3.7.0）。',
+  },
+]
 
 export interface ConsoleFeature {
   /** 卡片图标位里的两字缩写 */
   mark: string
   name: string
-  /** 这是什么 */
-  what: string
-  /** 什么时候用 */
-  when: string
+  /** 一句说明 */
+  blurb: string
 }
 
 export const consoleFeatures: ConsoleFeature[] = [
   {
     mark: '面板',
     name: '我的面板',
-    what: '后台首页。粘贴激活码完成兑换，看套餐状态（正常 / 未激活 / 已禁用 / 已过期 / 已退款）、计费方式、已消费额度和最新公告。',
-    when: '买完卡密后的第一站，也是随时查套餐状态的地方。',
+    blurb: '兑换激活码，看套餐状态、计费方式、已消费额度与最新公告。',
   },
   {
     mark: '提取',
     name: '提取 Key',
-    what: '把激活码兑换成专属 API Key（sk- 开头），复制后填进 Claude Code、Cursor、CC Switch。Key 在首次发起 API 请求时自动激活。',
-    when: '拿到激活码后换 Key；Key 泄露或想换一把时重新提取。',
+    blurb: '把激活码换成专属 API Key，复制后填进 Claude Code、Cursor、CC Switch。',
   },
   {
     mark: '详情',
     name: 'Key 详情',
-    what: '查看单个 Key 的状态、计费方式、已消费额度与到期时间，支持提前刷新额度。',
-    when: '怀疑额度或有效期算错了、想确认这把 Key 具体能用多久。',
+    blurb: '查看单把 Key 的状态、额度、到期时间，支持提前刷新额度。',
   },
   {
     mark: '用量',
     name: '查询用量',
-    what: '按时间查询每一次请求用了什么模型、输入 / 输出 Token、缓存命中 Token、成功或失败、累计费用。',
-    when: '对账、排查某次调用为什么失败、看周期卡或额度卡还剩多少额度。',
+    blurb: '按时间查每次请求的模型、Token、缓存命中、成败与累计费用。',
   },
   {
     mark: '图表',
     name: '用量图表',
-    what: '按时间、按额度、时间 + 额度三种口径看每日 Token 消耗、费用趋势和模型使用分布。',
-    when: '想看自己一个月的使用分布，决定要不要升级档位。',
+    blurb: '按时间 / 额度看每日消耗、费用趋势与模型分布。',
   },
   {
     mark: '教程',
     name: '使用教程',
-    what: '后台内建的一键配置：给出 Claude Code / Codex CLI / Cursor 的完整配置文本，以及「一键导入配置」按钮，自动写入 apiKey、baseURL 与 settings.json / config.toml。',
-    when: '装了 CC Switch（≥ v3.7.0）后点一下就能配好，不用手抄字段。',
+    blurb: '给出完整配置文本，并支持一键导入到本机客户端。',
   },
   {
     mark: '生图',
     name: 'GPT 图像生成',
-    what: '文生图与图生图，带独立 Playground，可调图片尺寸与质量。',
-    when: '需要生成配图、封面或效果图时。',
+    blurb: '文生图与图生图 Playground，可调尺寸与质量。',
   },
   {
     mark: '公告',
     name: '公告',
-    what: '服务变更、模型上线、限速调整与活动通知，带发布时间。',
-    when: '模型列表对不上、限速数字变了，先看公告。',
-  },
-  {
-    mark: '主题',
-    name: '界面与主题',
-    what: '侧栏可折叠，亮色 / 暗色主题切换，设置记在本机浏览器里。',
-    when: '纯粹顺手，不是必须。',
+    blurb: '服务变更、模型上线、限速调整与活动通知。',
   },
 ]
 
 /** 备用域名：主域名被运营商屏蔽或网络抖动时切换，API Key 无需更换 */
 export const consoleBackupDomains: string[] = ['bxcv.store']
 
-/** 后台常见问题（/console 页底部 FaqList） */
+/** 后台常见问题（/console 页底部 FaqList）；关系类留给 SEO/GEO，其余是操作类 */
 export const consoleFaqs = [
+  {
+    id: 'console-vs-official-site',
+    q: '管理后台和官网是什么关系？',
+    a: '官网负责介绍、定价、教程与答疑；管理后台（rsxermu666.cn）负责兑换、提 Key、导入配置与查用量。卡密按官网指引购买，进后台完成操作。两者同属 Claude 无限卡官方服务。',
+  },
   {
     id: 'console-key-where',
     q: '后台要注册账号吗？',
@@ -96,11 +120,6 @@ export const consoleFaqs = [
     id: 'console-key-lost',
     q: 'Key 忘了或页面刷新后找不到了？',
     a: '激活码、已提取的 Key 和用量记录都保存在管理后台里。用同一把激活码回到「提取 Key」页面或「Key 详情」就能再看，不需要重新购买。建议第一次提取时就复制一份存进密码管理器。',
-  },
-  {
-    id: 'console-refresh-key',
-    q: 'Key 泄露了怎么办？',
-    a: '到「提取 Key」用同一把激活码重新提取一把新的，旧的不再使用。提取次数与费用以发卡站商品说明为准。',
   },
   {
     id: 'console-infinite',

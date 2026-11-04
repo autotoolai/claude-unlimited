@@ -36,9 +36,7 @@ const urls = walk(dist)
     return origin + '/' + f.replace(/\.html$/, '')
   })
   .filter((u) => !u.endsWith('/knowledge/') || u === origin + '/knowledge') // 双保险：目录总览不带尾斜杠
-  // /console 是后台入口壳（正文全靠客户端渲染，SSR 只剩导航），且 public/robots.txt 已 Disallow 它。
-  // sitemap 是「主动告诉引擎这些 URL 值得收录」，与 Disallow 直接矛盾，所以这里排除，保证两个信号一致。
-  .filter((u) => u !== origin + '/console')
+  // /console 是站内说明页（SSR 完整正文），真实后台仍在 partners.console 外链；两页都进 sitemap。
   .filter((u, i, a) => a.indexOf(u) === i)
   .sort()
 

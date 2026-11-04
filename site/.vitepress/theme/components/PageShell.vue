@@ -6,8 +6,9 @@
  * 结构说明：
  * - 导航合并为一行，滚动后加 .is-scrolled 才显分隔线与投影（use_shell.ts）。
  * - 页内目录由 toc prop 决定，默认没有（营销页与列表页不传）。
- *   toc="side" 是教程页的窄列（46rem），toc="wide" 是后台页的宽列（54rem，卡网格要 3 列）；
- *   两者都是「正文 + 右侧目录」两列，与知识库文章页（KnowledgeDoc.vue 传 variant="side"）同一套骨架。
+ *   toc="side" 是教程页的窄列（46rem），toc="wide" 是宽列（54rem，卡网格要 3 列）；
+ *   两者都是「正文 + 目录」两列，与知识库文章页（KnowledgeDoc.vue 传 variant="side"）同一套骨架。
+ *   /console 功能介绍页不传 toc，走营销满宽壳。
  * - 区块入场动画与导航滚动态统一放在 composables/use_shell.ts，供 KnowledgeDoc.vue 复用。
  */
 import { computed } from 'vue'
@@ -34,7 +35,7 @@ const props = defineProps<{
   eyebrow?: string
   /**
    * 页内目录：不传（默认）= 不显示，只有长文页才开。
-   * 'side' 窄列长读（教程场景页），'wide' 宽列（后台页的 3 列卡网格）。
+   * 'side' 窄列长读（教程场景页），'wide' 宽列（3 列卡网格）。
    * 目录数据仍来自 sections.ts 的 SECTION_NAV[slug]。
    */
   toc?: 'side' | 'wide'

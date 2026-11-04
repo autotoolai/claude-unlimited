@@ -66,7 +66,7 @@ onMounted(() => {
     <CtaBand title="还没上手？">
       <template #tools>
         <a class="cu-btn cu-btn--ghost cu-btn--md" :href="partnerUrl('ccswitch')" target="_blank" rel="noopener sponsored nofollow" data-cta="guide_ccswitch">CC Switch 下载 ↗</a>
-        <a class="cu-btn cu-btn--ghost cu-btn--md" :href="partnerUrl('console')" target="_blank" rel="noopener" data-cta="guide_console">管理后台 ↗</a>
+        <a class="cu-btn cu-btn--ghost cu-btn--md" href="/console" data-cta="guide_console">管理后台</a>
       </template>
     </CtaBand>
   </PageShell>

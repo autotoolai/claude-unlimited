@@ -260,12 +260,12 @@ def main():
             check(f'{u:12} 有 HowTo 与 FAQPage', 'HowTo' in x and 'FAQPage' in x, '')
         check(f'{u:12} canonical', '<link rel="canonical"' in x)
         # 文章页：正文是 VPDoc 的 page 分支（layout: page），没有原生目录 aside，也没有 cu-page__head
-        # 页内目录：只有长文页有（教程页 /guide、后台页 /console 由 PageShell 传 toc，知识库文章页自带），
-        # 形态统一是右侧竖排 cu-sidenav；营销页与列表页（首页 / 模型 / 套餐 / 无限额度 / FAQ / 知识库列表）没有目录。
+        # 页内目录：只有长文页有（教程场景页 /guide/<scene>、知识库文章页自带），
+        # 形态统一是竖排 cu-sidenav；营销页与列表页（首页 / 模型 / 套餐 / FAQ / 知识库列表 / 后台功能介绍页）没有目录。
         # 文章页的目录项在客户端挂载后才从正文 h2 生成，SSR 里整块不渲染（见 KnowledgeDoc.vue 与 SectionNav.vue 的 v-if），
         # 所以文章页只校验两列骨架在，不校验目录节点；锚点一致性由 npm run check:toc 在浏览器里核对
-        # 教程索引页（/guide）2026-10-20 起没有页内目录，只有场景页（/guide/<scene>）有
-        has_toc = u.startswith('/guide/') or u == '/console'
+        # 教程索引页（/guide）与后台功能介绍页（/console）走营销满宽壳，不显示目录
+        has_toc = u.startswith('/guide/')
         shell_keys = ['cu-brandbar', 'cu-tabs', 'cu-shell__body'] + (['vp-doc', 'cu-shell__body--reading'] if is_knowledge_article else ([] if u == '/' else ['cu-page__head']))
         missing = [k for k in shell_keys if k not in x]
         check(f'{u:12} 页面外壳（品牌页头 + 导航条）', not missing, f'缺少 {missing}')

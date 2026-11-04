@@ -161,9 +161,10 @@ Bing（`SubmitFeed` 交 sitemap + `SubmitUrlBatch`，后者只推前 `MaxBingUrl
   拿 A 站的 token 推 B 站会成功、但会扣同一个池子。本站当前用的是 `aiautotools` 账号下 Product 项目的
   同一个 token；想给本站独立配额，去 ziyuan 后台「链接提交」页取本站 token 换进 `config/local/seo_secrets.env` 即可，
   键名不变。
-- **`/console` 故意不收录**：`public/robots.txt` 里 `Disallow: /console/`（入口壳，正文全靠客户端渲染），
-  `scripts/gen_sitemap.ts` 同步把它排除，两个信号必须一致——sitemap 是「主动请引擎收录」，与 Disallow 矛盾。
-  `check_dist.mjs` 的 sitemap 双向断言会自动跳过 robots 里声明禁抓的 URL，改 robots 时不必手改它。
+- **`/console` 可收录**：功能介绍页（SSR 完整正文）进 sitemap；真实操作台仍是外链 `partners.console`
+  （rsxermu666.cn）。历史一度 `Disallow: /console/`（误以为是 CSR 入口壳），已撤销——该页是
+  `rsxermu666` 关键词的 SEO / GEO 主场（keywords / JSON-LD / FAQ / llms），不要再加回 Disallow。
+  `check_dist.mjs` 的 sitemap 双向断言仍会跳过 robots 里声明禁抓的 URL。
 
 ### 收录复核
 
