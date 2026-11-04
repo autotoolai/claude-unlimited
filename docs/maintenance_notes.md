@@ -64,7 +64,7 @@ npm run check:css    # 改了 .vitepress/theme/**/*.css 必跑
 
 ## README 是生成的
 
-仓库根 `README.md` 里的清单区块（知识库、教程索引、套餐价格、精选 FAQ、站点页面）由 `site/scripts/gen_readme_index.ts` 从 `site/config/` 生成。
+仓库根 `README.md` 里的清单区块（精选知识库、教程索引、套餐价格、精选 FAQ）由 `site/scripts/gen_readme_index.ts` 从 `site/config/` 生成。知识库只输出 `featured: true` 的条目。
 
 ```bash
 cd site

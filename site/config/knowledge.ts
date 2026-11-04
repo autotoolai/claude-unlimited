@@ -390,6 +390,7 @@ export const knowledge: KnowledgeMeta[] = [
     cover: '/knowledge/claude-api-pricing-explained.jpg',
     tags: ['claude api 价格', 'token 计费', '成本估算', '缓存计费'],
     minutes: 6,
+    featured: true,
     related: ['prompt-caching-explained', 'why-agents-cost-more-tokens', 'claude-code-usage-limit-reached'],
     sourceSlug: 'claude-api-pricing-explained',
     faq: [
@@ -492,6 +493,7 @@ export const knowledge: KnowledgeMeta[] = [
     cover: '/knowledge/claude-code-429-rate-limit.jpg',
     tags: ['claude code 429', 'rate limit', '并发', 'tpm'],
     minutes: 5,
+    featured: true,
     related: ['claude-code-529-overloaded', 'claude-code-usage-limit-reached', 'claude-code-connection-lost'],
     sourceSlug: 'claude-code-429-rate-limit',
     faq: [

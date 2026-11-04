@@ -2,7 +2,7 @@
  * 从 config/ 与 docs/ 生成仓库根 README.md 里的清单区块。
  *
  * 为什么生成：README 首屏要靠「可核对的数字」建立信任，但手写的数字必然漂移
- * （项目铁律「数字不许手写进文档」）。知识库篇数、教程场景、套餐价格、精选 FAQ
+ * （项目铁律「数字不许手写进文档」）。知识库精选与总篇数、教程场景、套餐价格、精选 FAQ
  * 全部从单一数据源派生，README 只做呈现。
  *
  * 两种模式：
@@ -14,16 +14,15 @@
  *
  * 用法：npx tsx scripts/gen_readme_index.ts [--check]
  */
-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { join, dirname, relative, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { siteConfig } from '../config/site'
 import { knowledge, knowledgeCategories } from '../config/knowledge'
 import { faqItems } from '../config/faq'
-import { planGroups, allTiers } from '../config/plans'
-import { guideSceneCards, guidePages } from '../config/guide'
-import { frontmatterOf } from './readme_frontmatter'
+import { allTiers } from '../config/plans'
+import { guideSceneCards } from '../config/guide'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const SITE = join(HERE, '..')
@@ -58,23 +57,25 @@ function guideBlock(): string {
 }
 
 function knowledgeBlock(): string {
-  const cats = [...knowledgeCategories].sort((a, b) => a.order - b.order)
-  const parts: string[] = []
-  parts.push(
-    `按读者旅程分 ${cats.length} 类，共 ${knowledge.length} 篇原创文章。每篇都能在官网读、也能在仓库读同一份源码。`,
-  )
-  for (const c of cats) {
-    const items = knowledge.filter((k) => k.cat === c.cat)
-    if (!items.length) continue
-    parts.push('')
-    parts.push(`**${c.name}**（${items.length} 篇）—— ${c.desc}`)
-    parts.push('')
-    parts.push('| 文章 | 一句话 | 仓库源码 |')
-    parts.push('|---|---|---|')
-    for (const k of items) {
-      const src = repoPath(join(SITE, 'docs', 'knowledge', `${k.slug}.md`))
-      parts.push(`| [${k.title}](${BASE}/knowledge/${k.slug}) | ${k.summary || k.desc} | [\`${src}\`](${src}) |`)
-    }
+  // README 只放精选：完整篇目在官网知识库。featured 未标时按分类各取一篇兜底，避免空表。
+  let items = knowledge.filter((k) => k.featured)
+  if (!items.length) {
+    const cats = [...knowledgeCategories].sort((a, b) => a.order - b.order)
+    items = cats
+      .map((c) => knowledge.find((k) => k.cat === c.cat))
+      .filter((k): k is (typeof knowledge)[number] => Boolean(k))
+  }
+  const parts: string[] = [
+    `精选 ${items.length} 篇（完整 ${knowledge.length} 篇见[Claude 知识库](${BASE}/knowledge)）。官网与仓库是同一份正文。`,
+    '',
+    '| 文章 | 一句话 | 仓库源码 |',
+    '|---|---|---|',
+  ]
+  for (const k of items) {
+    const src = repoPath(join(SITE, 'docs', 'knowledge', `${k.slug}.md`))
+    parts.push(
+      `| [${k.title}](${BASE}/knowledge/${k.slug}) | ${k.summary || k.desc} | [\`${src}\`](${src}) |`,
+    )
   }
   return parts.join('\n')
 }
@@ -123,74 +124,6 @@ function plansBlock(): string {
   ].join('\n')
 }
 
-/** 站点页面在 README 里的展示顺序：按读者路径排，不按文件名 */
-const PAGE_ORDER = [
-  '首页',
-  '套餐定价',
-  '模型广场',
-  '使用教程',
-  'Claude 知识库',
-  '常见问题',
-  '管理后台',
-  '关于我们',
-  '服务条款',
-  '隐私政策',
-  '变更历史',
-]
-
-function sitePagesBlock(): string {
-  const DOCS = join(SITE, 'docs')
-  const EXCLUDE_FILES = [
-    'README.md',
-    'content_structure.md',
-    'knowledge_writing_guide.md',
-    'plans_sync.md',
-    'guide_design_spec.md',
-    'troubleshooting_guide.md',
-    '404.md',
-  ]
-  const pages: { route: string; title: string; desc: string }[] = []
-  // 主页面：docs 根下的路由壳
-  for (const f of readdirSync(DOCS).sort()) {
-    const abs = join(DOCS, f)
-    if (!statSync(abs).isFile() || !f.endsWith('.md')) continue
-    if (EXCLUDE_FILES.includes(f)) continue
-    const fm = frontmatterOf(abs)
-    if (!fm.title) continue
-    const route = f === 'index.md' ? '' : '/' + f.replace(/\.md$/, '')
-    pages.push({ route, title: fm.title, desc: fm.description || '' })
-  }
-  // 两个索引页：docs/guide/index.md 与 docs/knowledge/index.md
-  for (const [rel, route] of [
-    ['guide/index.md', '/guide'],
-    ['knowledge/index.md', '/knowledge'],
-  ]) {
-    const abs = join(DOCS, rel)
-    if (!existsSync(abs)) continue
-    const fm = frontmatterOf(abs)
-    if (!fm.title) continue
-    pages.push({ route, title: fm.title, desc: fm.description || '' })
-  }
-  // changelog.md 是纯 markdown 页面（没有 frontmatter），单独补
-  if (existsSync(join(DOCS, 'changelog.md'))) {
-    pages.push({ route: '/changelog', title: '变更历史', desc: '站点与服务的变更记录，倒序。' })
-  }
-  // 按 PAGE_ORDER 排；表里没有的排后面，避免新增页面时顺序失控
-  pages.sort((a, b) => {
-    const ia = PAGE_ORDER.indexOf(a.title)
-    const ib = PAGE_ORDER.indexOf(b.title)
-    return (ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib)
-  })
-  const rows = pages.map((p) => `| [${p.title}](${BASE}${p.route || '/'}) | ${p.desc} |`)
-  return [
-    `官网共 ${pages.length + guidePages.length + knowledge.length} 个页面：主页面与索引 ${pages.length} 个、教程场景页 ${guidePages.length} 个、知识库文章 ${knowledge.length} 篇。`,
-    '',
-    '| 页面 | 内容 |',
-    '|---|---|',
-    ...rows,
-  ].join('\n')
-}
-
 /* ---------------------------------------------------------------- 哨兵替换 */
 
 const BLOCKS: { key: string; gen: () => string }[] = [
@@ -198,7 +131,6 @@ const BLOCKS: { key: string; gen: () => string }[] = [
   { key: 'knowledge', gen: knowledgeBlock },
   { key: 'faq', gen: faqBlock },
   { key: 'plans', gen: plansBlock },
-  { key: 'sitepages', gen: sitePagesBlock },
 ]
 
 function replaceBlock(src: string, key: string, body: string): string {

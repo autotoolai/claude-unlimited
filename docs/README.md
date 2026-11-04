@@ -4,7 +4,7 @@
 
 | 项目 | 位置 | 文档 |
 |---|---|---|
-| Claude 无限卡官网（静态展示站） | `site/` | [`site/README.md`](../site/README.md)（现状与命令）· [`site/docs/README.md`](../site/docs/README.md)（文档地图）· [`site/docs/troubleshooting_guide.md`](../site/docs/troubleshooting_guide.md)（故障排除）· [`site/docs/changelog.md`](../site/docs/changelog.md)（变更历史） |
+| Claude 无限卡（文档站与官网前端） | `site/` | [`site/README.md`](../site/README.md)（现状与命令）· [`site/docs/README.md`](../site/docs/README.md)（文档地图）· [`site/docs/troubleshooting_guide.md`](../site/docs/troubleshooting_guide.md)（故障排除）· [`site/docs/changelog.md`](../site/docs/changelog.md)（变更历史） |
 
 ## 仓库级文档
 
