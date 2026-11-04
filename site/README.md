@@ -149,9 +149,9 @@ markdown 编译成 `<template><div>…</div></template>` 并用 inline 渲染模
 ### 开通步骤
 
 1. **Umami（网站已添加，id 已内联；只差 API key）**：注册 [cloud.umami.is](https://cloud.umami.is) → 添加网站（填 `https://claude-unlimited.aiautotools.com`）→ website id `35bc9e45-604c-4641-920e-8cfa48020045` 已写进 `analytics_snippets.ts`；**还差**：头像 → Settings → API keys 建一个 key（只显示一次），填进仓库根 `config/local/analytics_secrets.env` 的 `UMAMI_API_KEY`（文件已建好，模板 `config/analytics_secrets.example.env`）。没这个 key 看板拉不到 Umami 数据，脚本会跳过并提示。
-2. **百度统计（已配置）**：站点 id `3ae4fc576a3cfa978bf7592615735bab` 已写进 `analytics_snippets.ts`，按官方代码注入 `hm.js`（不是旧版 `s.js`）。无需再动，重新部署即生效。
+2. **百度统计（已配置）**：站点 id `b021c906d24a345face9f68d6dc8587e` 已写进 `analytics_snippets.ts`，按官方代码注入 `hm.js`（不是旧版 `s.js`）。无需再动，重新部署即生效。
 3. **Cloudflare Web Analytics：已完成，不需要任何操作。** 站点经 Cloudflare 代理（橙云），该通道**默认就是开启的**，Cloudflare 自动把 `static.cloudflareinsights.com/beacon.min.js` 注进每个页面（已核对线上 `/`、`/pricing`、`/guide`、`/models`、`/knowledge/*`、`/faq` 全部带 beacon）。控制台 Workers & Pages → `claude-unlimited-site` → Metrics → Web Analytics 可看数据，也可 Manage Site 改成手动注入。
-4. 构建门禁 `npm run check:analytics`（`build` 末尾自动跑）会断言：**以产物事实为准**——Umami 脚本与 `data-website-id` 必须同时在或同时不在、百度 `hm.js?id` 出现就必须完整、事件桥在 head、`data-cta` 关键埋点齐全、购买链接仍是 `catfk.com`。channel id 已内联进 `analytics_snippets.ts`（2026-10-13 填入 Umami `35bc9e45…` 与百度 `3ae4fc57…`），换站只需改这一处。
+4. 构建门禁 `npm run check:analytics`（`build` 末尾自动跑）会断言：**以产物事实为准**——Umami 脚本与 `data-website-id` 必须同时在或同时不在、百度 `hm.js?id` 出现就必须完整、事件桥在 head、`data-cta` 关键埋点齐全、购买链接仍是 `catfk.com`。channel id 已内联进 `analytics_snippets.ts`（Umami `35bc9e45…` 与百度 `b021c906…`），换站只需改这一处。
 
 ### 本地看板
 
@@ -189,7 +189,7 @@ pwsh -File scripts/deploy_claude_unlimited_site.ps1 -Branch preview -SkipNotify
 
 1. **卡密兑换与 API Key 的网址**（已就位）：`config/site.ts` 的 `partners` 里 `id: 'activation'` 与 `'console'` 都是管理后台地址，教程的「打开管理后台」「一键导入」「Base URL」按钮都从 `partnerUrl('console')` 取，改地址只改 `site.ts`。`purchase`（`catfk.com`）与 `ccswitch`（`ccswitch.io`）已填。
 2. **微信二维码图片**：已就位 —— 图片在 `site/public/wechat-qr.jpg`，`config/site.ts` 的 `contact.wechatQr = '/wechat-qr.jpg'`，微信号改成 `ren_mo_mo`。换图只改 `public/` 里的文件后重新构建即可；`wechatQr` 留空时助手的人工卡会自动降级为「只显示微信号 + 复制」。
-3. **法务确认**：退款规则、限速数字（单 Key 并发 20、60 次/分钟、300k token/分钟）、商品描述措辞（`config/faq.ts` 与 `config/site.ts` 的 `description`）；`legal.icp` / `legal.company` 填 ICP 备案号与运营主体，填了才会出现在页脚。
+3. **法务确认**：退款规则、会话窗口口径（对外不披露并发路数 / RPM / TPM）、商品描述措辞（`config/faq.ts` 与 `config/site.ts` 的 `description`）；`legal.icp` / `legal.company` 填 ICP 备案号与运营主体，填了才会出现在页脚。
 4. **教程内容核对**：`config/guide.ts` 的单页三步（购买激活码 → 密钥配置 → 开始使用）与 `config/faq.ts` 的「使用与配置」分类是按卖家教程站 `https://wx.bbyy.site/` 的内容与 Claude Code 官方文档重写的，截图已裁掉品牌栏与二维码。买家到底是走自己的兑换页还是卖家站，措辞要按实际情况调一遍。
 5. **SEO 提交**：`scripts/seo_notify.ps1` 已内置（部署脚本不带 `-SkipNotify` 时自动跑）。走 IndexNow + Bing Webmaster API + GSC；百度 token 未配时自动跳过。
    密钥模板在仓库根 `config/seo_secrets.example.env`，真值放 `config/local/seo_secrets.env`（已 gitignore），GSC 服务账号 JSON 在 `config/local/website_gsc_service_account.json`。

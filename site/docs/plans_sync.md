@@ -110,6 +110,6 @@ goods_key，需要人工归组并新建档位 id。
 
 1. 商品名里的模型名是否变了？变了就改 `config/models.ts` 与 `config/site.ts` 的相关文案。
 2. `description` 里的限制条款是否变了？变了就改 `config/rules.ts`。
-3. `public/llms.txt` 的「事实要点」是**手写的**，不像 `plans.ts` 那样自动同步，改规则时必须手动跟。
+3. 改 `config/rules.ts` 后跑 `npm run gen:llms`（或完整 build），让 `public/llms.txt` 跟上。
 4. `scripts/check_dist.mjs` 的档位数断言已改成读 `config/plans.ts`，不需要手改；
    但 `scripts/verify_build.py` 里的 FAQ 数量断言若因改答案而变动，需要手改。

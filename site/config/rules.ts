@@ -1,52 +1,40 @@
 /**
- * 规则数据 —— 「限流数字 / 套餐边界 / 退款条款」的唯一数据源。
+ * 规则数据 —— 「套餐边界 / 退款条款 / 对外公平使用口径」的唯一数据源。
  *
  * 约定：
- * - 具体数字只在本文件出现一次。页面表格、FAQ 答案、首页卖点文案、JSON-LD 都从这里派生，
- *   改一个数字不用去四个地方找（2026-10-10 之前这些数字在 pricing.vue / unlimited.vue /
- *   data.ts / faq.ts 各写了一份，是全站最容易漂移的地方）。
+ * - 对外只披露「会话窗口数」，不披露单会话并发路数、RPM、TPM 等工程指标。
+ * - 页面表格、FAQ、信任页、llms.txt 都从这里派生，改一处即可。
  * - 不 import ./site：本文件只放常量，faq.ts 与页面组件各自单向依赖它，避免循环引用。
  *
- * ⚠ 与发卡站对齐（2026-10-10）：
- *   并发、会话窗口、退款三项以发卡站商品详情 description 为准——发卡站是实际收款方，
- *   用户付款后按卖家描述主张权利。站内这套数字一旦与卖家那边不同，退款争议时
- *   官网就变成不可信的一方。改这里之前先确认卖家那边也改了。
+ * ⚠ 与发卡站对齐：
+ *   会话窗口、退款以发卡站商品详情 description 为准——发卡站是实际收款方。
  *   详见 docs/plans_sync.md。
  */
 
 /**
- * 公平使用：单 Key 速率限制。
- *
- * 并发默认值 = 会话窗口数 × 单窗口并发。
- * 基础档（天 / 周 / 单窗月卡）限制同时 1 个会话窗口，单会话内并发 20 路。
- * 双窗口 / 三窗口月卡按商品页窗口数放宽；FAQ 与限流表写的是基础档数字，多窗档以对应套餐为准。
+ * 公平使用：对外只谈会话窗口。
+ * 基础档（天 / 周 / 单窗月卡）同时 1 个会话窗口；双窗 / 三窗以对应套餐为准。
  */
 export const limits = {
   /** 基础档同时可用会话数；双窗 / 三窗档以商品页为准 */
   sessions: 1,
-  /** 单会话并发路数 */
-  concurrency: 20,
-  /** 每分钟请求次数 */
-  rpm: 60,
-  /** 每分钟 Token 吞吐 */
-  tpm: 300_000,
 } as const
 
-/** 公平使用：限流数字表（定价页「公平使用」小节渲染） */
+/** 公平使用：对外展示表（信任页 / llms 等）——仅窗口 */
 export const limitRows: { label: string; values: [string, string] }[] = [
   { label: '会话窗口', values: [`基础档 ${limits.sessions} 个`, '双窗 / 三窗档见对应套餐'] },
-  { label: '单会话并发', values: [`${limits.concurrency} 路`, '一个会话内并行跑多个请求'] },
-  { label: '请求速率', values: [`${limits.rpm} 次 / 分钟`, '429 时会返回 Retry-After'] },
-  { label: 'Token 吞吐', values: [`${limits.tpm / 1000}k token / 分钟`, '按所有请求合计计算'] },
 ]
 
-/** 公平使用：FAQ 答案里的项目符号版本，措辞与 limitRows 同源 */
+/**
+ * 公平使用：FAQ / 说明里的项目符号版本。
+ * 口径：窗口怎么选 + 子代理正常可用 + 多窗档单开也更从容。
+ */
 export function limitBullets(): string[] {
   return [
-    `- 会话窗口：基础档同时 ${limits.sessions} 个会话；双窗口 / 三窗口档以对应套餐为准；`,
-    `- 单会话并发：默认 ${limits.concurrency} 路；`,
-    `- 请求速率：默认 ${limits.rpm} 次/分钟；`,
-    `- Token 吞吐：默认 ${limits.tpm / 1000}k token/分钟。`,
+    `- 单窗口（天卡 / 周卡 / 月卡）：同时开 ${limits.sessions} 个会话窗口，一台电脑、一个对话窗口，日常编码够用；`,
+    `- 双窗口 / 三窗口月卡：可同时开 2 / 3 个会话窗口；时长与「不按 token 计费」一致，差的是窗口数；`,
+    `- 正常使用主会话和子代理不受影响；`,
+    `- 双窗 / 三窗不只是能多开——即使只开 1 个窗口，单窗响应也会更从容。`,
   ]
 }
 
@@ -54,8 +42,8 @@ export function limitBullets(): string[] {
 export const excludes: { label: string; value: string }[] = [
   { label: '生产环境流量', value: '套餐面向个人开发。上线服务、多用户共享、对外 API 属于生产流量，不在范围内' },
   {
-    label: '超并发压测',
-    value: `超过公平使用速率限制（同时 ${limits.sessions} 个会话、单会话 ${limits.concurrency} 路并发、${limits.rpm} 次/分钟）的压测、扫描、批量抓取`,
+    label: '超范围压测',
+    value: '超出个人开发合理范围的压测、扫描、批量抓取',
   },
   { label: '二次转卖', value: '转卖、二次分发 Key，或将 Key 共享给多个用户' },
   { label: 'Anthropic 官方服务', value: '本卡不提供 claude.ai 网页版、Claude Desktop 等官方产品的订阅权益' },

@@ -114,14 +114,9 @@ export ANTHROPIC_API_KEY="sk-..."
 
 凡是能接 Anthropic 或 OpenAI 兼容接口的都能用，包括：Claude Code、Cursor、Cline、Roo Code、Aider、Continue、Zed、JetBrains、VS Code，以及官方 Python / TypeScript / Go SDK。
 
-**限速和并发的具体数字是多少？**
+**单窗口、双窗口、三窗口怎么选？**
 
-为保证所有用户稳定访问，网关设有公平使用速率限制，具体数值会随上游容量调整：
-
-- 会话窗口：基础档同时 1 个会话；双窗口 / 三窗口档以对应套餐为准；
-- 单会话并发：默认 20 路；
-- 请求速率：默认 60 次/分钟；
-- Token 吞吐：默认 300k token/分钟。
+套餐按时长计费，不按 token 计费；档位差别主要在「同时能开几个会话窗口」。
 
 **被限制了怎么申诉？**
 

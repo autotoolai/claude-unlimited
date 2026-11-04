@@ -18,7 +18,7 @@ head:
 
 > 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-subagents](https://claude-unlimited.aiautotools.com/knowledge/claude-code-subagents) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
 
-> **一句话答案**：子代理是在自己上下文窗口里完成一块任务、只把一段结论交回主会话的执行者。在 `.claude/agents/<name>.md` 里用一个 Markdown 文件定义它，靠 `description` 决定什么时候自动委派，靠 `tools` 收紧它能做什么，靠 `model` 固定档位。它省的是主会话的上下文，不是钱；并行的每个子代理各占一个并发位。
+> **一句话答案**：子代理是在自己上下文窗口里完成一块任务、只把一段结论交回主会话的执行者。在 `.claude/agents/<name>.md` 里用一个 Markdown 文件定义它，靠 `description` 决定什么时候自动委派，靠 `tools` 收紧它能做什么，靠 `model` 固定档位。它省的是主会话的上下文，不是钱；正常并行使用子代理即可。
 
 大代码库里最容易失控的不是模型能力，是主会话的上下文。一个读了四十个文件的任务，那些文件会在此后每一轮被重新发一次，账单和速度一起变差。把这类「读很多、说一句」的活交给子代理，主会话只留下它的结论。
 
@@ -74,7 +74,7 @@ flag untested paths, and stop. Do not edit files.
 
 ## 并行与限流
 
-**结论**：多个子代理可以同时跑，每个都是一个并行的流式请求，这是撞上并发请求上限最快的方式。新环境从两个或三个并行起步，工作负载真实了再提额。撞上限时按[429 限流怎么处理](/knowledge/claude-code-429-rate-limit)的顺序处置。
+**结论**：多个子代理可以同时跑；日常个人开发里正常并行一般不受影响。若短时扇出过猛碰到 429，按[429 限流怎么处理](/knowledge/claude-code-429-rate-limit)的顺序处置。
 
 ## 子代理不免费
 

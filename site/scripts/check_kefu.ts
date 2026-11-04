@@ -64,6 +64,7 @@ const cases: [string, string][] = [
   ['有效期多久？到期会怎样？', 'bot-usage-period'], ['有效期多久', 'bot-usage-period'], ['能用多久', 'bot-usage-period'], ['一个周期是多久', 'bot-usage-period'],
   ['自动续费吗', 'bot-usage-period'],
   ['无限额度是什么意思', 'bot-usage-unlimited'], ['token 限制', 'bot-usage-unlimited'], ['额度上限是多少', 'bot-usage-unlimited'], ['用不完', 'bot-usage-unlimited'],
+  ['单窗口、双窗口、三窗口怎么选？', 'bot-usage-speed'], ['双窗口怎么选', 'bot-usage-speed'], ['几个窗口', 'bot-usage-speed'], ['会话窗口', 'bot-usage-speed'],
   ['上下文窗口多大', 'bot-usage-context'], ['哪个模型上下文最大', 'bot-usage-context'], ['最大上下文', 'bot-usage-context'], ['200k 还是 1m', 'bot-usage-context'],
 
   // ---- 关于 / 数据 ----

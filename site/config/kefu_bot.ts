@@ -187,9 +187,12 @@ export const kefuBotEntries: KefuBotEntry[] = [
   {
     cat: 'usage',
     id: 'bot-usage-speed',
-    keywords: ['限速', '速率', '并发', '并发数', 'rps', 'tpm', 'rpm', '多少并发', '公平使用', 'fair use', '速度', '快不快', '卡不卡', '限速数字', '并发的数字'],
+    keywords: [
+      '限速', '速率', '并发', '并发数', '多少并发', '公平使用', 'fair use', '速度', '快不快', '卡不卡',
+      '单窗口', '双窗口', '三窗口', '怎么选', '几个窗口', '多开', '会话窗口',
+    ],
     tag: '使用',
-    q: '限速和并发的具体数字是多少？',
+    q: '单窗口、双窗口、三窗口怎么选？',
     faqId: 'cat-limits-speed',
   },
 

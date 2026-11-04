@@ -1,9 +1,8 @@
 /**
  * 从 config/ 生成 public/llms.txt 与 public/llms-full.txt。
  *
- * 为什么改成生成（2026-10-13）：原来的 llms.txt 是手写的，「事实要点」里的限流数字与
- * config/rules.ts 是两份来源，改 rpm 只会改页面不会改 llms.txt，AI 读到的就是过期事实。
- * config/rules.ts 的注释已经写明「数字只在本文件出现一次」，llms.txt 也不例外。
+ * 为什么改成生成（2026-10-13）：原来的 llms.txt 是手写的，「事实要点」与
+ * config/rules.ts 是两份来源会漂移。对外公平使用只披露会话窗口，由 rules.ts 派生。
  *
  * 产出两份：
  *   llms.txt      —— 索引层：站点性质 + 页面清单 + 事实要点 + 文章清单（给 AI 判断「该不该引本站」）
@@ -16,7 +15,7 @@ import { writeFileSync, existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { siteConfig } from '../config/site'
 import { knowledge, knowledgeCategories } from '../config/knowledge'
-import { limits, limitRows, excludes, refundSummary, refundWindowDays, purchaseConditions } from '../config/rules'
+import { limitRows, excludes, refundSummary, refundWindowDays, purchaseConditions } from '../config/rules'
 import { unlimitedTiers, shopUrl as purchaseUrl } from '../config/plans'
 import { modelIds } from '../config/models'
 import { guideSceneCards, guidePages, guideBlocks } from '../config/guide'
@@ -79,7 +78,7 @@ const llms = [
   '',
   '## 声明',
   '',
-  `${siteConfig.name}是独立的第三方 API 网关服务，与 Anthropic 官方无隶属关系。套餐面向个人开发者，不含生产环境流量与超并发压测。购买与发卡由第三方发卡站完成，退款以发卡站商品详情为准。`,
+  `${siteConfig.name}是独立的第三方 API 网关服务，与 Anthropic 官方无隶属关系。套餐面向个人开发者，不含生产环境流量与超范围压测。购买与发卡由第三方发卡站完成，退款以发卡站商品详情为准。`,
   '',
 ].join('\n')
 
@@ -111,7 +110,7 @@ const fullParts: string[] = [
   '',
   '## 站点性质',
   '',
-  `${siteConfig.name}是独立的第三方 API 网关服务，与 Anthropic 官方无隶属关系。套餐面向个人开发者，不含生产环境流量与超并发压测。购买与发卡由第三方发卡站完成，退款以发卡站商品详情为准。人工客服微信 ${siteConfig.contact.wechatId}${siteConfig.contact.qqGroup ? `，QQ 群 ${siteConfig.contact.qqGroup}` : ''}。`,
+  `${siteConfig.name}是独立的第三方 API 网关服务，与 Anthropic 官方无隶属关系。套餐面向个人开发者，不含生产环境流量与超范围压测。购买与发卡由第三方发卡站完成，退款以发卡站商品详情为准。人工客服微信 ${siteConfig.contact.wechatId}${siteConfig.contact.qqGroup ? `，QQ 群 ${siteConfig.contact.qqGroup}` : ''}。`,
   '',
 ]
 

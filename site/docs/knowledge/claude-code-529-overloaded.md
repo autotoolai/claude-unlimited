@@ -56,5 +56,5 @@ API Error (529 {"type":"error","error":{"type":"overloaded_error","message":"Ove
 | 500 | 服务端故障 | 上游，看状态页 |
 | 429 | 你超了自己的速率上限 | 你，减少并发或压缩上下文 |
 
-具体的并发和 token 速率数字见[常见问题](/faq)。
+各档会话窗口怎么选见[常见问题](/faq#cat-limits-speed)。
 

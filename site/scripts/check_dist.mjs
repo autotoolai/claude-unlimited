@@ -484,16 +484,8 @@ for (const k of knowledgeMod.knowledge) {
   if (fs.existsSync(llmsPath)) {
     const llms = fs.readFileSync(llmsPath, 'utf8')
     ok(llms.includes('## 知识库文章'), 'llms.txt 缺「## 知识库文章」段')
-    // 限流数字只允许在 config/rules.ts 出现一次，llms.txt 必须由它派生。抽 rpm 与会话数对一下。
+    // 对外公平使用只披露会话窗口；llms.txt 必须由 config/rules.ts 派生。
     const rulesSrc = readFileSafe(path.join(process.cwd(), 'config', 'rules.ts'), 'utf8')
-    const rpm = (rulesSrc.match(/rpm:\s*([\d_]+)/) || [])[1]
-    if (rpm) {
-      const n = Number(String(rpm).replace(/_/g, ''))
-      ok(
-        llms.split('\n').some((l) => l.includes('请求速率') && l.includes(' ' + n + ' ')),
-        `llms.txt 的「请求速率」一行没有出现 ${n} —— llms.txt 在漂移（应由 config/rules.ts 派生）`,
-      )
-    }
     const sessions = (rulesSrc.match(/sessions:\s*([\d_]+)/) || [])[1]
     if (sessions) {
       const n = Number(String(sessions).replace(/_/g, ''))
@@ -503,6 +495,10 @@ for (const k of knowledgeMod.knowledge) {
         `llms.txt 的「会话窗口」一行没有出现 ${n} —— llms.txt 在漂移（应由 config/rules.ts 派生）`,
       )
     }
+    ok(
+      !/(单会话并发|请求速率|Token 吞吐|\d+\s*路|\d+\s*次\s*\/\s*分钟|\d+k\s*token)/i.test(llms),
+      'llms.txt 仍含并发路数 / RPM / TPM 等不应对外披露的指标',
+    )
   }
 
   // 关键 JSON-LD 类型在场（gen_jsonld.ts 注入在最后一个 </body> 前）

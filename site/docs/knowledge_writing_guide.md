@@ -87,7 +87,7 @@ frontmatter 里不写 `date`：发布日期只存在于 `config/knowledge.ts`，
 3. 每个 h2 的**第一个自然段以 `**结论**：` 开头**，独立成段，2–3 句以内。这是被 AI 搜索直接引用的段落。
 4. **每篇必须有「## 常见问题」，3–5 条**，问题用真实搜索句式，答案两段以内、先给结论。问题文本要写进 `config/knowledge.ts` 的 `faq[]`（FAQPage JSON-LD 的来源）；`verify_build.py` 会校验两者一致。
 5. 每篇至少 3 条站内互链（`/knowledge/<同类>`、`/guide`、`/faq`、`/pricing`、`/models`），锚文本用真实关键词。
-6. 具体数字（并发 20 / 60 次每分钟 / 300k token 每分钟）只在 `/faq`、`/pricing` 出现；两者都由 `config/rules.ts` 派生，改数字只改那一处。正文链接过去。
+6. 对外公平使用只谈「会话窗口数」，不披露并发路数 / RPM / TPM。窗口口径由 `config/rules.ts` 派生，正文需要时链接 `/faq#cat-limits-speed`。
 7. 时效性事实标注「截至 2026-10-XX」或改成「以官方文档 / CC Switch『获取模型列表』的实际返回为准」。
 8. 素材页的表格被压成连续文本行，引用时重排成真表格。
 9. 配置示例用 ```bash / ```json 代码块，不截图。

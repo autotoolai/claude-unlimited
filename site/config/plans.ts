@@ -190,6 +190,7 @@ export const unlimitedTiers: PlanTier[] = [
     stock: 1,
     features: [
       '同时可开 2 个会话窗口',
+      '即使只开 1 个窗口，响应也更从容',
       '不限次数调用 Fable 5.1 与 Opus 5.5',
       '不按 token 计费，无单次额度上限',
       'Claude Code、Cursor、VS Code 等多端通用',
@@ -210,6 +211,7 @@ export const unlimitedTiers: PlanTier[] = [
     stock: 1,
     features: [
       '同时可开 3 个会话窗口',
+      '即使只开 1 个窗口，响应也更从容',
       '不限次数调用 Fable 5.1 与 Opus 5.5',
       '不按 token 计费，无单次额度上限',
       'Claude Code、Cursor、VS Code 等多端通用',

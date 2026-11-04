@@ -12,7 +12,6 @@ import { computed } from 'vue'
 import { useData } from 'vitepress'
 import PageShell from './components/PageShell.vue'
 import { trustPages } from '../../config/trust'
-import { limits } from '../../config/rules'
 
 // 一个组件服三页：frontmatter 里写 trustKey: about|terms|privacy，比注册三个 layout 少两处改动点。
 const { frontmatter } = useData()
@@ -35,8 +34,7 @@ const page = computed(() => {
         <p v-for="(it, j) in s.bullets ? [] : s.items" :key="j">{{ it }}</p>
       </section>
       <p class="cu-trust__note">
-        本页数字与站内其它页面同源（限流 {{ limits.sessions }} 个会话窗口、单会话 {{ limits.concurrency }} 路并发、
-        {{ limits.rpm }} 次/分钟）。改动以站内公告与商品详情为准。
+        本页与站内其它页面同源；会话窗口与使用边界以站内公告与商品详情为准。
       </p>
     </div>
   </PageShell>

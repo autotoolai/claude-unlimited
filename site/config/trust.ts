@@ -84,8 +84,9 @@ export const aboutSections: TrustSection[] = [
   {
     h2: '公平使用规则',
     items: [
-      '套餐附带有明确的速率限制，不是「无限并发」。具体数字如下，每个数字都可与商品详情核对：',
+      '套餐按「同时可开几个会话窗口」区分，不是无边界的无限压测。窗口数可与商品详情核对：',
       ...limitRows.map((r) => `${r.label}：${r.values[0]}（${r.values[1]}）`),
+      '正常使用主会话与子代理不受影响；双窗 / 三窗档即使只开 1 个窗口，单窗响应也会更从容。',
     ],
     bullets: true,
   },
@@ -133,7 +134,7 @@ export const termsSections: TrustSection[] = [
   {
     h2: '使用限制',
     items: [
-      `单 Key 的速率上限为：${limitRows.map((r) => `${r.label} ${r.values[0]}`).join('，')}。超过上限的请求会被拒绝并返回 Retry-After。`,
+      `套餐按会话窗口使用：${limitRows.map((r) => `${r.label} ${r.values[0]}`).join('，')}。超出个人开发合理范围的压测、扫描或批量抓取不在服务范围内。`,
       '不得将本服务用于生产环境对外流量、多用户共享、批量抓取、压测或扫描。',
       '不得用于任何违法违规用途。使用者对自己账号下产生的全部调用行为负责。',
     ],
@@ -206,7 +207,7 @@ export const trustPages = {
     title: '关于我们',
     eyebrow: '信任层',
     lead: '这个站点是谁在运营、卖的是什么、卖给了谁、有哪些限制，一次说清。',
-    description: 'Claude 无限卡关于页：运营主体、联系方式、售卖内容、公平使用规则数字、明确不卖给谁。与 Anthropic 官方无隶属关系。',
+    description: 'Claude 无限卡关于页：运营主体、联系方式、售卖内容、会话窗口与公平使用规则、明确不卖给谁。与 Anthropic 官方无隶属关系。',
     sections: aboutSections,
   },
   terms: {
@@ -214,7 +215,7 @@ export const trustPages = {
     title: '服务条款',
     eyebrow: '信任层',
     lead: '退款规则、使用限制、免责范围与条款变更方式。',
-    description: 'Claude 无限卡服务条款：服务性质、退款规则、公平使用限制数字、免责范围与条款变更方式。',
+    description: 'Claude 无限卡服务条款：服务性质、退款规则、会话窗口与使用限制、免责范围与条款变更方式。',
     sections: termsSections,
   },
   privacy: {
