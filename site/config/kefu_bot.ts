@@ -274,7 +274,7 @@ export const kefuBotEntries: KefuBotEntry[] = [
   {
     cat: 'usage',
     id: 'bot-usage-unlimited',
-    keywords: ['无限', '无限额度', '不限量', '真无限', 'token限制', 'token 限制', 'token 上限', '额度上限', '额度上限是多少', '有没有额度限制', '用不完', '到底无限'],
+    keywords: ['无限', '无限额度', '不限量', '真无限', 'token限制', 'token 限制', 'token 上限', '额度上限', '额度上限是多少', '有没有额度限制', '用不完', '到底无限', '续杯', '无限续杯', 'claude无限续杯', 'claude 无限续杯'],
     tag: '使用',
     q: '「无限额度」到底无限到什么程度？',
     faqId: 'cat-product-unlimited',

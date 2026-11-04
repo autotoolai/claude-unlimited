@@ -169,7 +169,7 @@ export default defineConfig({
     // 只靠环境变量会出现「meta 偶尔凭空消失」。换码时改这里（或设同名环境变量覆盖）。
     ['meta', { name: 'baidu-site-verification', content: process.env.BAIDU_VERIFY_CODE || 'fc6022a4ec1c7bb09bfa0e037e3f8496' }],
     ...(process.env.GOOGLE_VERIFY_CODE ? [['meta', { name: 'google-site-verification', content: process.env.GOOGLE_VERIFY_CODE }]] : []),
-    ['meta', { name: 'keywords', content: 'claude 无限额度,claude api 无限,claude 无限卡,claude code 国内,claude api 中转' }],
+    ['meta', { name: 'keywords', content: 'claude 无限额度,claude api 无限,claude 无限卡,claude无限续杯,claude 无限续杯,claude code 国内,claude api 中转' }],
     ['meta', { property: 'og:site_name', content: siteConfig.name }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],

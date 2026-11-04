@@ -125,6 +125,7 @@ export const jsonLdPricing = {
       '@type': 'Product',
       '@id': base + '/pricing#product',
       name: product.name,
+      alternateName: 'Claude 无限续杯',
       description: product.features.join('；'),
       url: base + '/pricing',
       brand: { '@type': 'Brand', name: siteConfig.name },
@@ -148,6 +149,7 @@ export const jsonLdHome = {
       '@type': 'Organization',
       '@id': base + '/#org',
       name: siteConfig.name,
+      alternateName: 'Claude 无限续杯',
       url: base,
       description: siteConfig.description,
       // 与 jsonld_server.ts 的 orgSameAs 保持一致（两份 JSON-LD 必须同步）
@@ -158,6 +160,7 @@ export const jsonLdHome = {
       '@type': 'Product',
       '@id': base + '/pricing#product',
       name: product.name,
+      alternateName: 'Claude 无限续杯',
       description: product.features.join('；'),
       brand: { '@id': base + '/#org' },
       offers: {

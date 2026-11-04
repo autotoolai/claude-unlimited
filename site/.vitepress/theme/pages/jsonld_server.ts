@@ -62,6 +62,7 @@ const jsonLdHome = {
       '@type': 'Organization',
       '@id': BASE + '/#org',
       name: siteConfig.name,
+      alternateName: 'Claude 无限续杯',
       url: BASE,
       description: siteConfig.description,
       // sameAs：首页 Organization 是手写字面量，顶部 org 常量未被 jsonLdHome 用上，
@@ -81,6 +82,7 @@ const jsonLdHome = {
       '@type': 'Product',
       '@id': BASE + '/pricing#product',
       name: product.name,
+      alternateName: 'Claude 无限续杯',
       description: product.features.join('；'),
       brand: { '@id': BASE + '/#org' },
       offers: {
@@ -108,6 +110,7 @@ const jsonLdPricing = {
       '@type': 'Product',
       '@id': BASE + '/pricing#product',
       name: product.name,
+      alternateName: 'Claude 无限续杯',
       description: product.features.join('；'),
       url: BASE + '/pricing',
       brand: { '@type': 'Brand', name: siteConfig.name },
