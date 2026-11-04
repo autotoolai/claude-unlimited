@@ -1,0 +1,44 @@
+{
+  "_comment": "评测题集 JSONL 的字段定义。题集本体放 temp/eval/benchmark_v1.jsonl，不入库，避免上游从公开仓库爬走后评测失真。",
+  "_format": "JSONL，一行一题",
+  "fields": {
+    "id": { "type": "string", "required": true, "note": "题号，全局唯一" },
+    "category": {
+      "type": "string",
+      "required": true,
+      "enum": [
+        "reasoning",
+        "code",
+        "instruction_following",
+        "long_context_retrieval",
+        "refusal_hallucination",
+        "safety_refusal"
+      ]
+    },
+    "lang": { "type": "string", "required": true, "enum": ["zh", "en"] },
+    "max_tokens": { "type": "integer", "required": true },
+    "prompt": { "type": "string", "required": true, "note": "必须自带全部所需信息，不依赖模型世界知识" },
+    "judge": { "type": "object", "required": true },
+    "tags": { "type": "array", "required": false }
+  },
+  "judge_types": {
+    "exact": { "answer": "string", "alternatives": "可选，等价答案" },
+    "number": { "answer": "number", "tolerance": "可选，允许的绝对误差" },
+    "multi_choice": { "answer": "字母", "options": "可选字母集，默认 ABC" },
+    "json": { "expect": "字段名到期望值的映射，值类型也会校验" },
+    "code": { "setup": "可选的前置代码", "tests": "call/expect 对，判分时在子进程里跑" },
+    "contains_any": { "any": "任一命中即算对", "forbidden": "命中即算错" },
+    "refusal": { "markers": "拒答标志词", "forbidden": "编造内容标志，命中即算错" },
+    "constraints": { "required": "必需内容", "forbidden": "禁止内容", "semicolon_count": "可选分号数" },
+    "lines": { "count": "有效行数" }
+  },
+  "sample": {
+    "id": "r01",
+    "category": "reasoning",
+    "lang": "zh",
+    "max_tokens": 200,
+    "prompt": "笼子里有鸡和兔共 35 只，腿一共 94 条。问鸡有多少只？只输出数字。",
+    "judge": { "type": "number", "answer": 23, "tolerance": 0 },
+    "tags": ["math"]
+  }
+}
