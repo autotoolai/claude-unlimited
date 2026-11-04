@@ -9,7 +9,7 @@
  *
  * 交互：单一对话流（用户右 / 助手左）。开场欢迎语就是助手发的一条普通消息（渲染方式与答案完全一致），
  * 下面跟一行「大家都在问」的快捷问题；面板里不做分类、不做追问——站内已有 /faq 页与知识库，再列一遍只会挤掉答案。
- * 答不上来给「换个说法 + 找到客服」；客服不再有独立面板，点按钮后助手发一张卡（二维码 + 微信号 + 一键复制）。
+ * 答不上来给「换个说法 + 找到客服」；客服不再有独立面板，点按钮后助手发一张卡（微信 / QQ 群双通道）。
  */
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { KbEntry } from '../../../config/kefu_types'
@@ -18,7 +18,12 @@ import { matchKefu } from '../kefu_match'
 
 const props = defineProps<{
   entries: KbEntry[]
-  contact: { wechatId?: string; wechatQr?: string }
+  contact: {
+    wechatId?: string
+    wechatQr?: string
+    qqGroup?: string
+    qqGroupQr?: string
+  }
   /** 浮标位置，移动端建议 left */
   position?: 'left' | 'right'
 }>()
@@ -110,8 +115,13 @@ function persistLog() {
 
 const wechatId = computed(() => props.contact.wechatId || '')
 const wechatQr = computed(() => props.contact.wechatQr || '')
-const hasQr = computed(() => !!wechatQr.value)
-const hasHuman = computed(() => !!wechatId.value || hasQr.value)
+const qqGroup = computed(() => props.contact.qqGroup || '')
+const qqGroupQr = computed(() => props.contact.qqGroupQr || '')
+const hasWechat = computed(() => !!wechatId.value || !!wechatQr.value)
+const hasQqGroup = computed(() => !!qqGroup.value || !!qqGroupQr.value)
+const hasHuman = computed(() => hasWechat.value || hasQqGroup.value)
+/** 双通道并排；只有一路时退回单卡，避免空列 */
+const dualChannel = computed(() => hasWechat.value && hasQqGroup.value)
 
 /**
  * 开场欢迎语：也是一条 KbEntry（id 以 bot- 开头、没挂 faqId，答案写在 config/kefu_bot.ts 的 kefuBotGreeting）。
@@ -210,10 +220,11 @@ function onKey(e: KeyboardEvent) {
   if (e.key === 'Escape' && open.value) open.value = false
 }
 
-/** 复制微信号：clipboard API → execCommand → prompt 手动复制，三级兜底见 utils/copy.ts */
-async function copyWechat() {
-  const ok = await copyTextOrPrompt(wechatId.value)
-  copiedKey.value = ok ? 'wechat' : ''
+/** 复制联系号：clipboard API → execCommand → prompt 手动复制，三级兜底见 utils/copy.ts */
+async function copyContact(key: 'wechat' | 'qq', text: string) {
+  if (!text) return
+  const ok = await copyTextOrPrompt(text)
+  copiedKey.value = ok ? key : ''
   setTimeout(() => (copiedKey.value = ''), 2000)
 }
 
@@ -368,40 +379,62 @@ watch([open, scrollTick, () => log.value.length, typing], async ([isOpen]) => {
             </div>
           </template>
 
-          <!-- 客服卡：二维码 + 微信号 + 一键复制（只留微信） -->
+          <!-- 客服卡：微信客服 + QQ 群双通道（可只开一路） -->
           <template v-else-if="m.kind === 'human'">
             <div class="cu-kefu__answer">
               <span class="cu-kefu__tag">客服</span>
-              <p class="cu-kefu__para">微信扫一扫添加，或复制微信号后搜索添加。联系时请附上账号标识、报错原文、发生时间，处理更快。</p>
+              <p class="cu-kefu__para">
+                <template v-if="dualChannel">微信扫码加客服，或 QQ 扫码进交流群。</template>
+                <template v-else-if="hasWechat">微信扫一扫添加，或复制微信号后搜索添加。</template>
+                <template v-else>QQ 扫一扫加群，或复制群号后搜索加入。</template>
+                联系时请附上账号标识、报错原文、发生时间，处理更快。
+              </p>
             </div>
-            <div class="cu-kefu__human-body">
-              <span v-if="hasQr" class="cu-kefu__qr-wrap">
-                <img
-                  class="cu-kefu__qr"
-                  :src="wechatQr"
-                  alt="客服微信二维码，用微信扫一扫"
-                  width="140"
-                  height="140"
-                />
-              </span>
-              <div class="cu-kefu__human-side">
-                <span class="cu-kefu__human-label">客服微信号</span>
-                <code class="cu-kefu__wechat">{{ wechatId || '—' }}</code>
+            <div class="cu-kefu__channels" :class="{ 'cu-kefu__channels--dual': dualChannel }">
+              <div v-if="hasWechat" class="cu-kefu__channel">
+                <span class="cu-kefu__channel-label">微信客服</span>
+                <span v-if="wechatQr" class="cu-kefu__qr-wrap">
+                  <img
+                    class="cu-kefu__qr"
+                    :src="wechatQr"
+                    alt="客服微信二维码，用微信扫一扫"
+                    width="120"
+                    height="120"
+                  />
+                </span>
+                <code class="cu-kefu__id">{{ wechatId || '—' }}</code>
                 <button
                   v-if="wechatId"
                   type="button"
-                  class="cu-kefu__btn cu-kefu__btn--primary cu-kefu__btn--block"
+                  class="cu-kefu__btn cu-kefu__btn--primary cu-kefu__btn--block cu-kefu__btn--sm"
                   :aria-label="copiedKey === 'wechat' ? '微信号已复制' : '一键复制微信号'"
                   data-cta="kefu_copy_wechat"
-                  @click="copyWechat"
+                  @click="copyContact('wechat', wechatId)"
                 >
-                  <svg v-if="copiedKey !== 'wechat'" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
-                    <path d="M9 2h9a1 1 0 0 1 1 1v14h-2V4H9V2Zm-3 4h9a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Zm0 2v12h9V8H6Z" fill="currentColor" />
-                  </svg>
-                  <svg v-else viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
-                    <path d="m9.6 16.2-3.8-3.8L4.4 13.8l5.2 5.2L19.6 9l-1.4-1.4-8.6 8.6Z" fill="currentColor" />
-                  </svg>
-                  {{ copiedKey === 'wechat' ? '已复制' : '一键复制' }}
+                  {{ copiedKey === 'wechat' ? '已复制' : '复制微信号' }}
+                </button>
+              </div>
+              <div v-if="hasQqGroup" class="cu-kefu__channel">
+                <span class="cu-kefu__channel-label">QQ 交流群</span>
+                <span v-if="qqGroupQr" class="cu-kefu__qr-wrap">
+                  <img
+                    class="cu-kefu__qr"
+                    :src="qqGroupQr"
+                    alt="QQ 群二维码，用 QQ 扫一扫加群"
+                    width="120"
+                    height="120"
+                  />
+                </span>
+                <code class="cu-kefu__id">{{ qqGroup || '—' }}</code>
+                <button
+                  v-if="qqGroup"
+                  type="button"
+                  class="cu-kefu__btn cu-kefu__btn--primary cu-kefu__btn--block cu-kefu__btn--sm"
+                  :aria-label="copiedKey === 'qq' ? 'QQ 群号已复制' : '一键复制 QQ 群号'"
+                  data-cta="kefu_copy_qq_group"
+                  @click="copyContact('qq', qqGroup)"
+                >
+                  {{ copiedKey === 'qq' ? '已复制' : '复制群号' }}
                 </button>
               </div>
             </div>

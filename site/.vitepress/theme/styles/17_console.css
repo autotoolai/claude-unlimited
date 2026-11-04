@@ -1,4 +1,18 @@
-/* 管理后台功能介绍页：入口门户 / 功能卡 / 三步上手 / 备用域名（17_console.css） */
+/* 管理后台功能介绍页：入口门户 / 功能卡 / 三步上手 / 备用域名（17_console.css）
+   节奏比营销长页更密：入口 CTA 与「买完怎么走」是同一叙事，不要用 --cu-section-y-lg 切开。 */
+
+/* —— 页内分区：首节贴 CTA，其后用普通分节距 —— */
+.cu-page .cu-console > h2 {
+  margin-top: var(--cu-section-y);
+}
+
+.cu-page .cu-console > .cu-console-portal + h2 {
+  margin-top: 2.25rem;
+}
+
+.cu-page .cu-console > .cu-band {
+  margin-top: var(--cu-section-y);
+}
 
 /* —— 入口门户：把外链跳转做成「进入产品」而不是「离开本站」 —— */
 .cu-console-portal {
@@ -6,7 +20,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.55rem;
-  margin: 0 0 2.75rem;
+  margin: 0;
   text-align: center;
 }
 
@@ -71,12 +85,13 @@
 }
 
 /* 备用入口：主按钮下静默一行（登录页 Having trouble? / 镜像站常见写法） */
-.cu-console-portal__alt {
+.cu-page .cu-console-portal__alt {
   margin: 0;
   max-width: min(100%, 22.5rem);
   font-size: 0.82rem;
   line-height: 1.55;
   color: var(--cu-muted);
+  text-align: center;
 }
 
 .cu-console-portal__alt a {
@@ -94,21 +109,22 @@
   border-bottom-color: var(--cu-ink);
 }
 
-/* 三步上手 */
-.cu-console-steps {
+/* 三步上手：必须带 .cu-page 前缀，否则输给全局 .cu-page ol 的 margin / padding-left */
+.cu-page .cu-console-steps {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
-  margin: 1.25rem 0 2.5rem;
+  margin: 1.1rem 0 0;
   padding: 0;
   list-style: none;
+  max-width: none;
 }
 
 .cu-console-step {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1.25rem 1.3rem;
+  gap: 0.65rem;
+  padding: 1.15rem 1.2rem;
   background: var(--cu-card);
   border: 1px solid var(--cu-line);
   border-radius: var(--cu-r-md);
@@ -122,33 +138,36 @@
   color: var(--cu-muted);
 }
 
-.cu-console-step__title {
-  margin: 0 0 0.35rem;
+.cu-page .cu-console-step__title {
+  margin: 0 0 0.3rem;
   font-size: 1.05rem;
   font-weight: 800;
   color: var(--cu-ink);
+  text-align: left;
 }
 
-.cu-console-step__body p {
+.cu-page .cu-console-step__body p {
   margin: 0;
+  max-width: none;
   font-size: 0.9rem;
-  line-height: 1.75;
+  line-height: 1.7;
   color: var(--cu-ink-2);
+  text-align: left;
 }
 
-/* 功能卡 */
-.cu-cgrid {
+/* 功能卡：三列更易读，避免 1140 宽下挤成四列短卡 */
+.cu-page .cu-cgrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.85rem;
-  margin: 1.25rem 0 2.5rem;
+  margin: 1.1rem 0 0;
 }
 
 .cu-ccard {
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
-  padding: 1.1rem 1.15rem;
+  padding: 1.05rem 1.1rem;
   background: var(--cu-card);
   border: 1px solid var(--cu-line);
   border-radius: var(--cu-r-md);
@@ -184,22 +203,32 @@
   font-weight: 700;
 }
 
-.cu-ccard__name {
+.cu-page .cu-ccard__name {
   margin: 0;
   font-size: 0.95rem;
   font-weight: 800;
   color: var(--cu-ink);
+  text-align: left;
 }
 
-.cu-ccard__blurb {
+.cu-page .cu-ccard__blurb {
   margin: 0;
+  max-width: none;
   font-size: 0.88rem;
-  line-height: 1.7;
+  line-height: 1.65;
   color: var(--cu-ink-2);
+  text-align: left;
+}
+
+@media (max-width: 960px) {
+  .cu-page .cu-cgrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 860px) {
-  .cu-console-steps {
+  .cu-page .cu-console-steps,
+  .cu-page .cu-cgrid {
     grid-template-columns: 1fr;
   }
 

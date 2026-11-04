@@ -221,8 +221,11 @@
   background: var(--cu-bg-soft);
 }
 
-.cu-faq-contact > .cu-btn {
+.cu-faq-contact__acts {
   flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 @media (max-width: 640px) {

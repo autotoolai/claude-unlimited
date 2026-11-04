@@ -16,12 +16,13 @@ const rest = faqGroups
   .map((g) => ({ ...g, items: g.items.filter((it) => !topIds.has(it.id)) }))
   .filter((g) => g.items.length)
 
-/** 末尾联系区块的「复制微信号」，三级兜底与助手面板里的复制按钮共用 utils/copy.ts */
-const copiedWechat = ref(false)
-async function copyWechat() {
-  const ok = await copyTextOrPrompt(siteConfig.contact.wechatId)
-  copiedWechat.value = ok
-  if (ok) setTimeout(() => (copiedWechat.value = false), 2000)
+/** 末尾联系区块的复制按钮，三级兜底与助手面板共用 utils/copy.ts */
+const copiedKey = ref<'wechat' | 'qq' | ''>('')
+async function copyContact(key: 'wechat' | 'qq', text: string) {
+  if (!text) return
+  const ok = await copyTextOrPrompt(text)
+  copiedKey.value = ok ? key : ''
+  if (ok) setTimeout(() => (copiedKey.value = ''), 2000)
 }
 </script>
 
@@ -54,16 +55,33 @@ async function copyWechat() {
     <aside class="cu-faq-contact" aria-label="联系人工客服">
       <div class="cu-faq-contact__text">
         <strong>还是没解决？直接找人工客服。</strong>
-        <p>微信联系，微信号 <code>{{ siteConfig.contact.wechatId }}</code>。附上<strong>账号标识、报错原文、发生时间</strong>，能显著加快处理。也可以打开右下角的在线助手，面板底部有「联系客服」按钮。</p>
+        <p>
+          微信 <code>{{ siteConfig.contact.wechatId }}</code>
+          <template v-if="siteConfig.contact.qqGroup">
+            ，或加 QQ 群 <code>{{ siteConfig.contact.qqGroup }}</code>
+          </template>
+          。附上<strong>账号标识、报错原文、发生时间</strong>，处理更快。也可以打开右下角在线助手，面板底部有「联系客服」按钮（含二维码）。
+        </p>
       </div>
-      <button
-        type="button"
-        class="cu-btn cu-btn--ghost cu-btn--sm"
-        data-cta="faq_copy_wechat"
-        @click="copyWechat"
-      >
-        {{ copiedWechat ? '已复制' : '复制微信号' }}
-      </button>
+      <div class="cu-faq-contact__acts">
+        <button
+          type="button"
+          class="cu-btn cu-btn--ghost cu-btn--sm"
+          data-cta="faq_copy_wechat"
+          @click="copyContact('wechat', siteConfig.contact.wechatId)"
+        >
+          {{ copiedKey === 'wechat' ? '已复制' : '复制微信号' }}
+        </button>
+        <button
+          v-if="siteConfig.contact.qqGroup"
+          type="button"
+          class="cu-btn cu-btn--ghost cu-btn--sm"
+          data-cta="faq_copy_qq_group"
+          @click="copyContact('qq', siteConfig.contact.qqGroup)"
+        >
+          {{ copiedKey === 'qq' ? '已复制' : '复制 QQ 群号' }}
+        </button>
+      </div>
     </aside>
 
     <aside class="cu-band">

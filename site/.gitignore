@@ -29,3 +29,6 @@ __pycache__/
 content/knowledge/preview/
 # open_draft 的预览副本在 docs/knowledge/ 下（41800 原生渲染），按 _draft-<slug> 命名并忽略
 docs/knowledge/_draft-*.md
+
+# ===== 构建中间产物 =====
+.vitepress/dist_tmp/

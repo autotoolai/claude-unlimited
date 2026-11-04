@@ -50,7 +50,7 @@ const facts: string[] = [
   `- 购买：第三方发卡站 ${purchaseUrl}`,
   `- 配置工具：CC Switch（${siteConfig.partners.find((p) => p.id === 'ccswitch')?.url ?? ''}），支持一键导入与链路检测`,
   `- 源码与文档：${siteConfig.sourceRepo.url}（本站 VitePress 源码公开，MIT 许可；官网是唯一官方入口）`,
-  `- 人工客服：微信 ${siteConfig.contact.wechatId}（点右下角在线助手 →「联系人工客服」，可一键复制微信号）`,
+  `- 人工客服：微信 ${siteConfig.contact.wechatId}${siteConfig.contact.qqGroup ? `；QQ 群 ${siteConfig.contact.qqGroup}` : ''}（点右下角在线助手 →「联系客服」，可扫码或一键复制）`,
   `- 管理后台：rsxermu666.cn（${siteConfig.partners.find((p) => p.id === 'console')?.url ?? ''}）是 Claude 无限卡官方管理后台与 API 网关。功能介绍页：${BASE}/console 。主域名不可达时切换备用域名，API Key 无需更换`,
   `- 不包含：${excludes.map((e) => `${e.label}（${e.value}）`).join('；')}`,
   `- 下单须知：${purchaseConditions.join(' ')}`,
@@ -111,7 +111,7 @@ const fullParts: string[] = [
   '',
   '## 站点性质',
   '',
-  `${siteConfig.name}是独立的第三方 API 网关服务，与 Anthropic 官方无隶属关系。套餐面向个人开发者，不含生产环境流量与超并发压测。购买与发卡由第三方发卡站完成，退款以发卡站商品详情为准。人工客服微信 ${siteConfig.contact.wechatId}。`,
+  `${siteConfig.name}是独立的第三方 API 网关服务，与 Anthropic 官方无隶属关系。套餐面向个人开发者，不含生产环境流量与超并发压测。购买与发卡由第三方发卡站完成，退款以发卡站商品详情为准。人工客服微信 ${siteConfig.contact.wechatId}${siteConfig.contact.qqGroup ? `，QQ 群 ${siteConfig.contact.qqGroup}` : ''}。`,
   '',
 ]
 

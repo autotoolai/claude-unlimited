@@ -446,19 +446,42 @@
   width: 100%;
 }
 
-/* —— 客服卡 —— */
-.cu-kefu__human-body {
-  display: flex;
-  gap: 0.8rem;
-  align-items: flex-start;
+/* —— 客服卡：微信 / QQ 通道 —— */
+.cu-kefu__channels {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
   margin-top: 0.7rem;
 }
 
-/* 码区外面垫一层纯白底：二维码在浅色面板上直接贴着暖纸底会降低识别率，深色模式尤其明显 */
+.cu-kefu__channels--dual {
+  grid-template-columns: 1fr 1fr;
+}
+
+.cu-kefu__channel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+  padding: 0.65rem 0.5rem 0.7rem;
+  border: 1px solid var(--cu-line);
+  border-radius: 10px;
+  background: var(--cu-card);
+}
+
+.cu-kefu__channel-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--cu-muted);
+  letter-spacing: 0.02em;
+}
+
+/* 码区外面垫一层纯白底：二维码贴着暖纸底会降低识别率，深色模式尤其明显 */
 .cu-kefu__qr-wrap {
   flex: none;
   display: inline-flex;
-  padding: 0.35rem;
+  padding: 0.3rem;
   border: 1px solid var(--cu-line);
   border-radius: 8px;
   background: #fff;
@@ -466,35 +489,20 @@
 
 .cu-kefu__qr {
   display: block;
-  width: 140px;
-  height: 140px;
+  width: 120px;
+  height: 120px;
 }
 
-.cu-kefu__human-side {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.5rem;
-  align-self: stretch;
-}
-
-.cu-kefu__human-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--cu-muted);
-}
-
-.cu-kefu__wechat {
+.cu-kefu__id {
   display: block;
-  padding: 0.35rem 0.6rem;
+  width: 100%;
+  padding: 0.28rem 0.45rem;
   border: 1px dashed var(--cu-line-strong);
   border-radius: 6px;
   background: var(--cu-code-bg);
   color: var(--cu-ink);
   font-family: var(--cu-mono);
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   text-align: center;
@@ -634,13 +642,13 @@
     display: none;
   }
 
-  .cu-kefu__human-body {
-    gap: 0.7rem;
+  .cu-kefu__qr {
+    width: 108px;
+    height: 108px;
   }
 
-  .cu-kefu__qr {
-    width: 120px;
-    height: 120px;
+  .cu-kefu__channel {
+    padding: 0.55rem 0.4rem 0.6rem;
   }
 }
 

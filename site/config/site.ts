@@ -4,13 +4,13 @@
  * 约定：
  * - 所有平台地址（购买、兑换、CC Switch 下载）只在 partners 里出现，组件内禁止硬编码。
  * - 商品购买按钮的 URL 从 products[].shopUrl 取（= partners.purchase.url）。
- * - 客服浮标二维码、微信号从 contact 取；二维码留空时组件自动降级为「复制微信号」。
+ * - 客服二维码、微信号、QQ 群从 contact 取；某项留空时面板不渲染该项。
  * - 改价格 / 名称 / 周期只改本文件一处；周期天数 days 与首屏承诺 promise 也在这里，页面不另写。
  *
  * TODO（上线前必须替换，见 README「上线前必须确认」）：
  * - R1 正式主域名 url
  * - R2 商品名称 / 价格 / 周期的最终文案
- * - R3 客服微信号 / 微信二维码 / 邮箱
+ * - R3 客服微信号 / 微信二维码 / QQ 群 / 邮箱
  * - R4 运营主体与 ICP 备案号
  *
  * 文案约定：页面上任何「N 天」「分钟级」表述都从 products[].days / products[].promise 派生，
@@ -54,10 +54,14 @@ export interface NavItem {
   enabled?: boolean
 }
 
-/** 人工客服二维码（configurable：留空时面板显示占位并只提供「复制号码」） */
+/** 人工客服联系方式（configurable：某项留空时面板不渲染该项） */
 export interface HumanService {
   wechatId: string
   wechatQr: string
+  /** QQ 交流群号；与 qqGroupQr 任一有值即展示 QQ 通道 */
+  qqGroup: string
+  /** QQ 群纯码图（site/public/），底稿见 qq-group-invite.jpg */
+  qqGroupQr: string
   email: string
 }
 
@@ -169,6 +173,9 @@ export const siteConfig: SiteConfig = {
     wechatId: 'ren_mo_mo',
     // 纯码图，由 scripts/crop_wechat_qr.py 从 public/wechat-qr.jpg（手机截图）裁出；整张截图保留作底稿
     wechatQr: '/wechat-qr-code.png',
+    qqGroup: '1128031797',
+    // 纯码图从 public/qq-group-invite.jpg（QQ 加群邀请卡）裁出；整张邀请卡保留作底稿
+    qqGroupQr: '/qq-group-qr.png',
     email: '',
   },
 

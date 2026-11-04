@@ -18,12 +18,11 @@
  * 公平使用：单 Key 速率限制。
  *
  * 并发默认值 = 会话窗口数 × 单窗口并发。
- * 发卡站商品详情写的是「限制一个会话窗口」——即同时只能开一个 Claude Code 会话，
- * 单个会话内并发 20 路。所以对外不应说「20 路并发」，而是说「同时 1 个会话 × 20 路并发」。
- * 这样用户看到自己只能开一个窗口时不会以为被多收了钱，也与卖家描述一致。
+ * 基础档（天 / 周 / 单窗月卡）限制同时 1 个会话窗口，单会话内并发 20 路。
+ * 双窗口 / 三窗口月卡按商品页窗口数放宽；FAQ 与限流表写的是基础档数字，多窗档以对应套餐为准。
  */
 export const limits = {
-  /** 同时可用会话数（对应商品详情里的「限制一个会话窗口」） */
+  /** 基础档同时可用会话数；双窗 / 三窗档以商品页为准 */
   sessions: 1,
   /** 单会话并发路数 */
   concurrency: 20,
@@ -35,7 +34,7 @@ export const limits = {
 
 /** 公平使用：限流数字表（定价页「公平使用」小节渲染） */
 export const limitRows: { label: string; values: [string, string] }[] = [
-  { label: '会话窗口', values: [`同时 ${limits.sessions} 个`, '开第二个会话需先关掉第一个'] },
+  { label: '会话窗口', values: [`基础档 ${limits.sessions} 个`, '双窗 / 三窗档见对应套餐'] },
   { label: '单会话并发', values: [`${limits.concurrency} 路`, '一个会话内并行跑多个请求'] },
   { label: '请求速率', values: [`${limits.rpm} 次 / 分钟`, '429 时会返回 Retry-After'] },
   { label: 'Token 吞吐', values: [`${limits.tpm / 1000}k token / 分钟`, '按所有请求合计计算'] },
@@ -44,7 +43,7 @@ export const limitRows: { label: string; values: [string, string] }[] = [
 /** 公平使用：FAQ 答案里的项目符号版本，措辞与 limitRows 同源 */
 export function limitBullets(): string[] {
   return [
-    `- 会话窗口：同时 ${limits.sessions} 个会话（商品详情写明的限制）；`,
+    `- 会话窗口：基础档同时 ${limits.sessions} 个会话；双窗口 / 三窗口档以对应套餐为准；`,
     `- 单会话并发：默认 ${limits.concurrency} 路；`,
     `- 请求速率：默认 ${limits.rpm} 次/分钟；`,
     `- Token 吞吐：默认 ${limits.tpm / 1000}k token/分钟。`,
@@ -88,4 +87,4 @@ export function refundConfigConsistent(): string[] {
 }
 
 /** 退款条款要点（一行摘要，首页信任条与 FAQ 用） */
-export const refundSummary = '激活 1 小时内不满意可全额退；周卡与月卡超 3 小时按 15 元/天折算退款'
+export const refundSummary = '激活 1 小时内不满意可全额退'

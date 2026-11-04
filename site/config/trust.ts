@@ -42,6 +42,7 @@ export const operator = {
   /** ICP 备案号 */
   icp: siteConfig.legal.icp,
   wechat: siteConfig.contact.wechatId,
+  qqGroup: siteConfig.contact.qqGroup,
   email: siteConfig.contact.email,
   /** 后台独立站点 */
   consoleUrl: partnerUrl('console'),
@@ -56,8 +57,12 @@ function operatorLines(): string[] {
       : '运营主体：暂未在站点公开。Claude 无限卡是一个独立运营的个人开发者项目，不是公司产品。',
   )
   out.push(operator.icp ? `ICP 备案：${operator.icp}` : 'ICP 备案：暂未提供。该站点部署在中国大陆境外服务器上，因此没有中国大陆要求的 ICP 备案。')
-  out.push(`人工客服：微信 ${operator.wechat}（站内右下角在线助手 →「联系人工客服」可一键复制微信号）`)
-  out.push(operator.email ? `邮件：${operator.email}` : '邮件：暂未提供，只支持微信联系。')
+  out.push(
+    operator.qqGroup
+      ? `人工客服：微信 ${operator.wechat}；QQ 群 ${operator.qqGroup}（站内右下角在线助手 →「联系客服」可扫码或一键复制）`
+      : `人工客服：微信 ${operator.wechat}（站内右下角在线助手 →「联系客服」可一键复制微信号）`,
+  )
+  out.push(operator.email ? `邮件：${operator.email}` : '邮件：暂未提供，请用微信或 QQ 群联系。')
   out.push(`管理后台：${operator.consoleUrl}（独立站点，与本站同属一个运营方）`)
   return out
 }
