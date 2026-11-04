@@ -30,7 +30,7 @@
 - 购买：第三方发卡站 https://catfk.com/shop/2Z0CEP7C
 - 配置工具：CC Switch（https://ccswitch.io/），支持一键导入与链路检测
 - 源码与文档：https://github.com/autotoolai/claude-unlimited（本站 VitePress 源码公开，MIT 许可；官网是唯一官方入口）
-- 人工客服：微信 ren_mo_mo（点右下角在线助手 →「联系人工客服」，可一键复制微信号）
+- 人工客服：微信 ren_mo_mo；QQ 群 1128031797（点右下角在线助手 →「联系客服」，可扫码或一键复制）
 - 管理后台：rsxermu666.cn（https://rsxermu666.cn/）是 Claude 无限卡官方管理后台与 API 网关。功能介绍页：https://claude-unlimited.aiautotools.com/console 。主域名不可达时切换备用域名，API Key 无需更换
 - 不包含：生产环境流量（套餐面向个人开发。上线服务、多用户共享、对外 API 属于生产流量，不在范围内）；超并发压测（超过公平使用速率限制（同时 1 个会话、单会话 20 路并发、60 次/分钟）的压测、扫描、批量抓取）；二次转卖（转卖、二次分发 Key，或将 Key 共享给多个用户）；Anthropic 官方服务（本卡不提供 claude.ai 网页版、Claude Desktop 等官方产品的订阅权益）
 - 下单须知：本站只出售模型额度，不提供软件配置服务。 不会配置、纯小白需要有人代操作的，不建议下单。 因个人操作问题（配置、模型选择、客户端使用）产生的困扰，不在退款范围内。 商品为虚拟商品，一旦售出不支持无理由退货。
