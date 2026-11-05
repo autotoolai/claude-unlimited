@@ -132,11 +132,16 @@ export ANTHROPIC_API_KEY="sk-..."
 
 售后、代理与商务走人工客服；**issue 与 discussion 只处理文档与源码问题，不是客服渠道**。完整说明与可复制微信号见[联系我们](https://claude-unlimited.aiautotools.com/contact)。
 
-| 售后微信（扫码添加，备注来意） | QQ 交流群 `1128031797` |
-|---|---|
-| <img src="site/public/wechat-qr-code.png" alt="Claude 无限卡售后微信二维码" width="200"> | <img src="site/public/qq-group-qr.png" alt="Claude 无限卡 QQ 交流群二维码" width="200"> |
+<p align="center">
+  <img src="docs/wechat-qr-code.png" alt="Claude 无限卡售后微信二维码" width="220">
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="docs/qq-group-qr.png" alt="Claude 无限卡 QQ 交流群二维码" width="220">
+</p>
 
-- 微信号：`ren_mo_mo`（与上表二维码同一通道）
+<p align="center">
+  售后微信 <code>ren_mo_mo</code>（左）· QQ 交流群 <code>1128031797</code>（右）· 添加时请备注来意
+</p>
+
 - **文档或源码有 bug**：提 [issue](https://github.com/autotoolai/claude-unlimited/issues)
 - **用法讨论**：提 [discussion](https://github.com/autotoolai/claude-unlimited/discussions)
 - **站内变更历史**：[changelog](https://claude-unlimited.aiautotools.com/changelog)
