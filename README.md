@@ -1,15 +1,18 @@
 # Claude 无限卡 · 一个 Key，Claude Code 不限量用
 
 > 订阅期内 Claude API **不按 token 计费**：一个 Key，Claude Code / Cursor / Cline / Codex 等主流客户端直接接入。
+>
+> 文档站 [claude-unlimited.aiautotools.com](https://claude-unlimited.aiautotools.com)（介绍 / 定价 / 教程 / 知识库）与管理后台 [rsxermu666.cn](https://rsxermu666.cn/)（兑换卡密、提 Key、查用量）由同一运营方维护。
 
 [![官网](https://img.shields.io/badge/%E5%AE%98%E7%BD%91-claude--unlimited.aiautotools.com-C85A1E?style=flat-square)](https://claude-unlimited.aiautotools.com)
+[![控制台](https://img.shields.io/badge/%E6%8E%A7%E5%88%B6%E5%8F%B0-rsxermu666.cn-C85A1E?style=flat-square)](https://rsxermu666.cn/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-C85A1E?style=flat-square)](LICENSE)
 [![Claude Code 教程](https://img.shields.io/badge/Claude%20Code-%E6%95%99%E7%A8%8B-646C7A?style=flat-square)](https://claude-unlimited.aiautotools.com/guide/cc)
 [![知识库](https://img.shields.io/badge/%E7%9F%A5%E8%AF%86%E5%BA%93-646C7A?style=flat-square)](https://claude-unlimited.aiautotools.com/knowledge)
 
-**[官网 →](https://claude-unlimited.aiautotools.com)** ｜ [套餐定价 →](https://claude-unlimited.aiautotools.com/pricing) ｜ [使用教程 →](https://claude-unlimited.aiautotools.com/guide) ｜ [知识库 →](https://claude-unlimited.aiautotools.com/knowledge) ｜ [兑换 Key →](https://claude-unlimited.aiautotools.com/console)
+**[官网 →](https://claude-unlimited.aiautotools.com)** ｜ [控制台 →](https://rsxermu666.cn/) ｜ [套餐定价 →](https://claude-unlimited.aiautotools.com/pricing) ｜ [使用教程 →](https://claude-unlimited.aiautotools.com/guide) ｜ [知识库 →](https://claude-unlimited.aiautotools.com/knowledge) ｜ [控制台说明 →](https://claude-unlimited.aiautotools.com/console)
 
-<img src="docs/social-preview.png" alt="Claude 无限卡：订阅期内 Claude API 不按 token 计费" width="880">
+<img src="docs/social-preview.png" alt="Claude 无限卡 · Claude Code 中文 · 不按 token 计费 · 控制台 rsxermu666.cn" width="880">
 
 ## 这是什么
 
@@ -28,7 +31,7 @@ Claude 无限卡是独立运营的第三方 API 网关：把 Claude 模型调用
 ## 三步接入
 
 1. **下单拿卡密**。发卡站支付后自动发货，拿到一串卡密。
-2. **兑换成 Key**。在[卡密兑换与 API Key](https://claude-unlimited.aiautotools.com/console)页面粘贴卡密，页面给出 Base URL 与 `sk-` 开头的 API Key。
+2. **兑换成 Key**。打开管理后台 [rsxermu666.cn](https://rsxermu666.cn/) 粘贴卡密，提取 `sk-` 开头的 API Key 与 Base URL（后台能力说明见[控制台介绍页](https://claude-unlimited.aiautotools.com/console)）。
 3. **填进客户端**。装 [CC Switch](https://claude-unlimited.aiautotools.com/guide/cc) 一键导入，或写入环境变量：
 
 ```bash
@@ -61,13 +64,14 @@ export ANTHROPIC_API_KEY="sk-..."
 
 <!-- readme:knowledge:start -->
 
-精选 6 篇（完整 25 篇见[Claude 知识库](https://claude-unlimited.aiautotools.com/knowledge)）。官网与仓库是同一份正文。
+精选 7 篇（完整 26 篇见[Claude 知识库](https://claude-unlimited.aiautotools.com/knowledge)）。官网与仓库是同一份正文。
 
 | 文章 | 一句话 | 仓库源码 |
 |---|---|---|
 | [Claude Code 教程：第一次会话之后怎么用](https://claude-unlimited.aiautotools.com/knowledge/claude-code-tutorial) | 配置完成后怎么把 Claude Code 用顺手：CLAUDE.md、工作流、常用命令。 | [`site/docs/knowledge/claude-code-tutorial.md`](site/docs/knowledge/claude-code-tutorial.md) |
 | [Claude Code 计划模式怎么用：四种权限模式的区别](https://claude-unlimited.aiautotools.com/knowledge/claude-code-plan-mode) | plan / manual / acceptEdits / auto 的差别，何时先要计划再动手。 | [`site/docs/knowledge/claude-code-plan-mode.md`](site/docs/knowledge/claude-code-plan-mode.md) |
 | [CLAUDE.md 怎么写：写什么、放哪](https://claude-unlimited.aiautotools.com/knowledge/claude-md-guide) | CLAUDE.md 写什么放哪，AGENTS.md 何时被读，.claude 目录各文件用途。 | [`site/docs/knowledge/claude-md-guide.md`](site/docs/knowledge/claude-md-guide.md) |
+| [Claude 无限卡是什么：订阅期内不按 token 计费](https://claude-unlimited.aiautotools.com/knowledge/what-is-claude-unlimited) | 第三方订阅制网关的定义与边界；文档站与 rsxermu666.cn 管理后台的分工。 | [`site/docs/knowledge/what-is-claude-unlimited.md`](site/docs/knowledge/what-is-claude-unlimited.md) |
 | [Claude API 怎么计费：token 构成与估算](https://claude-unlimited.aiautotools.com/knowledge/claude-api-pricing-explained) | 输入与输出 token 的构成、缓存价，以及一个可复用的估算公式。 | [`site/docs/knowledge/claude-api-pricing-explained.md`](site/docs/knowledge/claude-api-pricing-explained.md) |
 | [prompt too long 报错怎么处理](https://claude-unlimited.aiautotools.com/knowledge/claude-code-prompt-too-long-fix) | 先 /context 看构成，再按固定成本、单次输出、正常增长三种情况分别处理。 | [`site/docs/knowledge/claude-code-prompt-too-long-fix.md`](site/docs/knowledge/claude-code-prompt-too-long-fix.md) |
 | [Claude Code 报 429 限流怎么办](https://claude-unlimited.aiautotools.com/knowledge/claude-code-429-rate-limit) | 429 的三个上限、Agent 更容易撞上的原因、六步处理顺序。 | [`site/docs/knowledge/claude-code-429-rate-limit.md`](site/docs/knowledge/claude-code-429-rate-limit.md) |
@@ -98,37 +102,21 @@ export ANTHROPIC_API_KEY="sk-..."
 
 买家最常问的几个，完整 FAQ 见[官网常见问题](https://claude-unlimited.aiautotools.com/faq)。
 
-**你们是 Anthropic 官方吗？**
+**「无限额度」到底有没有上限？**
 
-不是：本站是独立的第三方 API 网关服务，仅通过兼容接口转发起调用。
+订阅期内不按 token 计费：每次调用无论消耗多少 token，都包含在订阅价里。
 
-**「无限额度」到底无限到什么程度？**
+**买了之后不满意可以申请退款吗？**
 
-订阅期内不按 token 计费：你发起的每次调用，无论消耗 1 千还是 20 万 token，都包含在订阅价里。
+激活 1 小时内不满意可全额退；售后申请窗口为购买后 7 天内。
 
-**支持哪些模型？新模型上线要换 Key 吗？**
+**有效期从什么时候起算？到期会怎样？**
 
-本卡承诺 Fable 5.1 与 Opus 5.5 两个模型，均在同一订阅价内，不因选择 Opus 产生额外费用。
-
-**支持哪些客户端和工具？**
-
-凡是能接 Anthropic 或 OpenAI 兼容接口的都能用，包括：Claude Code、Cursor、Cline、Roo Code、Aider、Continue、Zed、JetBrains、VS Code，以及官方 Python / TypeScript / Go SDK。
+从管理后台提取 API Key（激活）起算，按 24 小时制：商品页标注天数 × 24 小时（天卡 24 小时，周卡 7×24，月卡 30×24）。付款本身不起算；卡密未提取前不计时。
 
 **单窗口、双窗口、三窗口怎么选？**
 
 套餐按时长计费，不按 token 计费；档位差别主要在「同时能开几个会话窗口」。
-
-**被限制了怎么申诉？**
-
-先看返回的错误类型：429 是速率限制，等待 Retry-After 后自动恢复，不需要申诉。
-
-**我的请求内容会被存储吗？**
-
-我们以提供服务与排查故障所必需的限度记录用量元数据（调用时间、模型、状态、消耗、请求标识），不记录你的 prompt 正文与模型输出。
-
-**稳定性有保障吗？**
-
-网关通过多上游账号智能路由与自动故障转移来提升可用性，目标可用率 99.9%。但服务依赖上游模型供应商与公网，我们不对不中断作绝对保证。
 
 <!-- readme:faq:end -->
 
@@ -142,10 +130,16 @@ export ANTHROPIC_API_KEY="sk-..."
 
 ## 社区与联系
 
-- **买之前有问题**：右下角在线助手，或[官网](https://claude-unlimited.aiautotools.com)的客服入口。issue 与 discussion 不是客服渠道。
-- **文档或源码有 bug**：提 [issue](https://github.com/autotoolai/claude-unlimited/issues)。
-- **用法讨论**：提 [discussion](https://github.com/autotoolai/claude-unlimited/discussions)。
-- **站内变更历史**：[changelog](https://claude-unlimited.aiautotools.com/changelog)。
+售后、代理与商务走人工客服；**issue 与 discussion 只处理文档与源码问题，不是客服渠道**。完整说明与可复制微信号见[联系我们](https://claude-unlimited.aiautotools.com/contact)。
+
+| 售后微信（扫码添加，备注来意） | QQ 交流群 `1128031797` |
+|---|---|
+| <img src="site/public/wechat-qr-code.png" alt="Claude 无限卡售后微信二维码" width="200"> | <img src="site/public/qq-group-qr.png" alt="Claude 无限卡 QQ 交流群二维码" width="200"> |
+
+- 微信号：`ren_mo_mo`（与上表二维码同一通道）
+- **文档或源码有 bug**：提 [issue](https://github.com/autotoolai/claude-unlimited/issues)
+- **用法讨论**：提 [discussion](https://github.com/autotoolai/claude-unlimited/discussions)
+- **站内变更历史**：[changelog](https://claude-unlimited.aiautotools.com/changelog)
 
 ## 给贡献者
 

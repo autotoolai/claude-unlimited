@@ -22,6 +22,7 @@
     "verify": "python scripts/verify_build.py",
     "gen:og": "python scripts/gen_og.py",
     "gen:og:knowledge": "python scripts/gen_knowledge_og.py",
+    "gen:social-preview": "python scripts/gen_social_preview.py",
     "gen:routes": "node scripts/gen_knowledge_routes.mjs",
     "gen:sources": "python scripts/gen_sources.py",
     "check:sources": "python scripts/gen_sources.py --check",
