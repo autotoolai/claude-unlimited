@@ -330,7 +330,7 @@ Claude 无限卡是独立的第三方 API 网关服务，与 Anthropic 官方无
 - 一句话答案：Claude Code 插件在 VS Code 与 Cursor 里是同一个 Anthropic 官方扩展：先用 CC Switch 一键导入配置并启用检测，再在编辑器的扩展面板里搜「Claude Code」、认准发布者 Anthropic 装上，用的就是前面配好的那把 Key。
 - 步骤：
   - 1. 安装 CC Switch —— 装好 CC Switch 就算准备好了一半：它是个专门管 API 配置的小工具，全程默认安装。
-  - 2. 换取 API Key —— 卡密在发货信息里，在管理后台换成一把 sk- 开头的 API Key，后面全程只用它。
+  - 2. 换取 API Key —— 卡密在发货信息里，到 rsxermu666.cn（管理后台）换成一把 sk- 开头的 API Key，后面全程只用它。
   - 3. 一键导入配置 —— 管理后台里有「一键导入配置」按钮，不用手填 Base URL 和 Key，两边自动对上。
   - 4. 拉取并保存模型 —— 导入的配置要再拉一次模型列表，CC Switch 才知道网关这边有哪些模型可用。
   - 5. 启用并检测链路 —— 前面配完配置已经在 CC Switch 里但还没生效，这一步启用并检测一下，显示运行正常就完成了。
@@ -347,7 +347,7 @@ Claude 无限卡是独立的第三方 API 网关服务，与 Anthropic 官方无
 - 页面：https://claude-unlimited.aiautotools.com/guide/cli
 - 一句话答案：Claude Code CLI 只要五步：把卡密换成 API Key，用官方安装脚本装上 CLI，设 ANTHROPIC_BASE_URL 与 ANTHROPIC_API_KEY 两个环境变量，在项目目录里跑 claude 验证，最后用 /init 生成 CLAUDE.md 开始第一段会话。
 - 步骤：
-  - 1. 换取 API Key —— 卡密在发货信息里，在管理后台换成一把 sk- 开头的 API Key，后面全程只用它。
+  - 1. 换取 API Key —— 卡密在发货信息里，到 rsxermu666.cn（管理后台）换成一把 sk- 开头的 API Key，后面全程只用它。
   - 2. 安装 Claude Code CLI —— 官方推荐用安装脚本装，Windows、macOS、Linux 各一条命令，装完就有 claude 这个命令。
   - 3. 设置地址与 Key —— CLI 只认两个环境变量：ANTHROPIC_BASE_URL 指向网关，ANTHROPIC_API_KEY 放那把 sk- 开头的密钥。
   - 4. 验证链路 —— 发一句话就能验证：能正常回答，说明地址、Key、模型三样都对。
@@ -364,7 +364,7 @@ Claude 无限卡是独立的第三方 API 网关服务，与 Anthropic 官方无
 - 一句话答案：Claude 桌面版要用 CC Switch 新增一个「桌面版」供应商，接入方式选直连，填上接口地址与 API Key，再打开路由开关并启用检测，最后安装桌面版客户端即可。
 - 步骤：
   - 1. 安装 CC Switch —— 装好 CC Switch 就算准备好了一半：它是个专门管 API 配置的小工具，全程默认安装。
-  - 2. 换取 API Key —— 卡密在发货信息里，在管理后台换成一把 sk- 开头的 API Key，后面全程只用它。
+  - 2. 换取 API Key —— 卡密在发货信息里，到 rsxermu666.cn（管理后台）换成一把 sk- 开头的 API Key，后面全程只用它。
   - 3. 新增桌面版供应商 —— 桌面版在 CC Switch 里是一个单独的供应商条目，要自己新建，不能用一键导入。
   - 4. 填入接口地址与 API Key —— 地址填管理后台首页那一行，Key 填上一步换来的那把，接入方式选「直连」——桌面版和 Claude Code 的区别就在这里。
   - 5. 打开路由开关 —— 桌面版必须走本地路由转发，请求才会被送到网关——这一步不做，前面配的全都白配。
@@ -384,7 +384,7 @@ Claude 无限卡是独立的第三方 API 网关服务，与 Anthropic 官方无
 - 一句话答案：Codex 要在 CC Switch 里新增一个 Codex 供应商，上游格式必须选 Anthropic Messages 并开启路由，配置好模型列表后启用并检测链路，最后彻底重启 Codex 才会生效。
 - 步骤：
   - 1. 安装 CC Switch —— 装好 CC Switch 就算准备好了一半：它是个专门管 API 配置的小工具，全程默认安装。
-  - 2. 换取 API Key —— 卡密在发货信息里，在管理后台换成一把 sk- 开头的 API Key，后面全程只用它。
+  - 2. 换取 API Key —— 卡密在发货信息里，到 rsxermu666.cn（管理后台）换成一把 sk- 开头的 API Key，后面全程只用它。
   - 3. 新增 Codex 供应商 —— Codex 要在 CC Switch 里单独建一个供应商，不能用一键导入，也不能用桌面版那条配置。
   - 4. 填入地址、Key 与默认模型 —— Codex 的请求地址要带 /v1，和 Claude Code 那边不一样；默认模型填一个网关确实返回的模型名。
   - 5. 把上游格式设为 Anthropic Messages —— 这是 Codex 专有的一步，也是最关键的一步：本卡是 Anthropic 兼容端点，选错格式请求就发不出去。
@@ -403,7 +403,7 @@ Claude 无限卡是独立的第三方 API 网关服务，与 Anthropic 官方无
 - 页面：https://claude-unlimited.aiautotools.com/guide/workbuddy
 - 一句话答案：WorkBuddy 不用装 CC Switch——换取 API Key 后，在设置里添加自定义模型，接口地址填管理后台地址带 /v1、API Key 填 sk- 开头那把、模型名称填 claude-opus-5-5，保存后在模型列表里选中它就能用。
 - 步骤：
-  - 1. 换取 API Key —— 卡密在发货信息里，在管理后台换成一把 sk- 开头的 API Key，后面全程只用它。
+  - 1. 换取 API Key —— 卡密在发货信息里，到 rsxermu666.cn（管理后台）换成一把 sk- 开头的 API Key，后面全程只用它。
   - 2. 添加自定义模型 —— WorkBuddy 的自定义模型只认 OpenAI 兼容协议，所以接口地址要带 /v1。
   - 3. 切换到自定义模型开始用 —— 添加完要在模型列表里选中它才会生效，填完不选还是用的原来的模型。
 - 常见问题：
@@ -417,7 +417,7 @@ Claude 无限卡是独立的第三方 API 网关服务，与 Anthropic 官方无
 - 页面：https://claude-unlimited.aiautotools.com/guide/cursor
 - 一句话答案：任何支持自定义 API 的客户端都只要填三个值——接口地址、sk- 开头的 API Key、模型名称；Cursor 这类 OpenAI 兼容端点的地址要带 /v1，各客户端的差异见页面末尾的速查表。
 - 步骤：
-  - 1. 换取 API Key —— 卡密在发货信息里，在管理后台换成一把 sk- 开头的 API Key，后面全程只用它。
+  - 1. 换取 API Key —— 卡密在发货信息里，到 rsxermu666.cn（管理后台）换成一把 sk- 开头的 API Key，后面全程只用它。
   - 2. 手动配置三个值 —— 不用 CC Switch 的话，所有客户端都只要这三个值，区别只在地址写法与上游格式。
   - 3. 各客户端填法差异速查 —— 同一个 Key 在不同客户端里，地址写法、上游格式和要不要开路由都不一样，对照这张表填。
 - 常见问题：

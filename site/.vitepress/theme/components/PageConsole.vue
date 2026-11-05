@@ -2,8 +2,8 @@
 /**
  * 管理后台功能介绍页：讲清后台能做什么、买完怎么上手。
  * 主 CTA 新标签打开 partners.console，按钮上展示主机名。
- * 品牌词给搜索：document title / meta / lead 首句 / CTA 主机名 / FAQ / JSON-LD；
- * 可见 H1 不塞域名；lead 首句点明 rsxermu666.cn 官方身份（百度正文 + GEO 引用）。
+ * 品牌词给搜索：document title / meta / lead / CTA 主机名 / FAQ / JSON-LD；
+ * 可见 H1 不塞域名；lead 用「官方后台 + 能做什么」，不写本页/操作台分工话术。
  */
 import PageShell from './PageShell.vue'
 import JsonLd from './JsonLd.vue'
@@ -34,7 +34,7 @@ const host = (() => {
   <PageShell
     slug="console"
     title="管理后台"
-    lead="rsxermu666.cn 是 Claude 无限卡官方管理后台与 API 网关。本页说明能做什么；兑换、提 Key、导入配置与查用量在操作台完成。"
+    lead="rsxermu666.cn 是 Claude 无限卡官方管理后台：兑换激活码、提取 API Key、一键导入配置、查看用量与公告。"
     eyebrow="兑换 · 提 Key · 查用量"
   >
     <div class="cu-console">

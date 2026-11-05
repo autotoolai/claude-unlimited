@@ -4,7 +4,7 @@
  * 后台是独立 SPA（Element Plus），本文件写「能做什么 / 怎么上手」，
  * 不做截图，避免后台改版后官网图文脱节。入口地址取 config/site.ts 的 partners.console。
  * 本页是 rsxermu666 搜索主场：title/meta/FAQ/CTA 主机名带品牌；
- * 可见 H1 不塞域名；lead 首句点明 rsxermu666.cn 官方身份（与 FAQ 首条、llms 事实要点同口径）。
+ * 可见 H1 不塞域名；lead 写「官方后台 + 能力清单」，与 description / JSON-LD 同口径。
  */
 
 /** per-page keywords（config.mts transformHead 注入）；长尾词，不是堆砌 */

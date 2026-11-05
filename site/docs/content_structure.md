@@ -23,7 +23,7 @@
 `/unlimited`（无限额度页）已于 2026-10-10 并入 `/pricing` 并 301，不要再新建同类页面。
 
 主导航只放内容页：模型广场 / 套餐定价 / 使用教程 / 知识库。页头「控制台」与页脚「服务」列
-先落到站内 `/console` 功能介绍页（`rsxermu666` 搜索主场：document title / lead 首句 / FAQ / CTA 主机名 / keywords / JSON-LD / llms；可见 H1 不塞域名；其它页不堆词）；
+先落到站内 `/console` 功能介绍页（`rsxermu666` 搜索主场：document title / lead（官方后台 + 能力） / FAQ / CTA 主机名 / keywords / JSON-LD / llms；可见 H1 不塞域名；其它页不堆词）；
 真实操作台在外链 `partners.console`，只由页内主 CTA 与教程「去操作」按钮新标签打开，CTA 上展示主机名。
 站内叙述性链接（页脚、教程索引、关于/隐私、知识库说明）优先链 `/console`，锚文本可用「rsxermu666.cn」或「rsxermu666.cn 管理后台」；Base URL / 粘贴卡密等操作步骤仍直链操作台。
 操作台（`rsxermu666.cn`）页脚或关于区应反链本页，文案示例：「官方介绍：Claude 无限卡官网 /console」。不要再为品牌词新开三级域内容站；vanity 子域若需要只做 301 到 `/console`。
