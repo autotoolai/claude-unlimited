@@ -64,14 +64,13 @@ export ANTHROPIC_API_KEY="sk-..."
 
 <!-- readme:knowledge:start -->
 
-精选 7 篇（完整 26 篇见[Claude 知识库](https://claude-unlimited.aiautotools.com/knowledge)）。官网与仓库是同一份正文。
+精选 6 篇（完整 25 篇见[Claude 知识库](https://claude-unlimited.aiautotools.com/knowledge)）。官网与仓库是同一份正文。
 
 | 文章 | 一句话 | 仓库源码 |
 |---|---|---|
 | [Claude Code 教程：第一次会话之后怎么用](https://claude-unlimited.aiautotools.com/knowledge/claude-code-tutorial) | 配置完成后怎么把 Claude Code 用顺手：CLAUDE.md、工作流、常用命令。 | [`site/docs/knowledge/claude-code-tutorial.md`](site/docs/knowledge/claude-code-tutorial.md) |
 | [Claude Code 计划模式怎么用：四种权限模式的区别](https://claude-unlimited.aiautotools.com/knowledge/claude-code-plan-mode) | plan / manual / acceptEdits / auto 的差别，何时先要计划再动手。 | [`site/docs/knowledge/claude-code-plan-mode.md`](site/docs/knowledge/claude-code-plan-mode.md) |
 | [CLAUDE.md 怎么写：写什么、放哪](https://claude-unlimited.aiautotools.com/knowledge/claude-md-guide) | CLAUDE.md 写什么放哪，AGENTS.md 何时被读，.claude 目录各文件用途。 | [`site/docs/knowledge/claude-md-guide.md`](site/docs/knowledge/claude-md-guide.md) |
-| [Claude 无限卡是什么：订阅期内不按 token 计费](https://claude-unlimited.aiautotools.com/knowledge/what-is-claude-unlimited) | 第三方订阅制网关的定义与边界；文档站与 rsxermu666.cn 管理后台的分工。 | [`site/docs/knowledge/what-is-claude-unlimited.md`](site/docs/knowledge/what-is-claude-unlimited.md) |
 | [Claude API 怎么计费：token 构成与估算](https://claude-unlimited.aiautotools.com/knowledge/claude-api-pricing-explained) | 输入与输出 token 的构成、缓存价，以及一个可复用的估算公式。 | [`site/docs/knowledge/claude-api-pricing-explained.md`](site/docs/knowledge/claude-api-pricing-explained.md) |
 | [prompt too long 报错怎么处理](https://claude-unlimited.aiautotools.com/knowledge/claude-code-prompt-too-long-fix) | 先 /context 看构成，再按固定成本、单次输出、正常增长三种情况分别处理。 | [`site/docs/knowledge/claude-code-prompt-too-long-fix.md`](site/docs/knowledge/claude-code-prompt-too-long-fix.md) |
 | [Claude Code 报 429 限流怎么办](https://claude-unlimited.aiautotools.com/knowledge/claude-code-429-rate-limit) | 429 的三个上限、Agent 更容易撞上的原因、六步处理顺序。 | [`site/docs/knowledge/claude-code-429-rate-limit.md`](site/docs/knowledge/claude-code-429-rate-limit.md) |
