@@ -29,7 +29,7 @@ const pageLines = [
   `- [首页](${SITE}): ${siteConfig.description}`,
   `- [模型广场](${BASE}/models): 本卡承诺的 ${modelIds.map((m) => m.tier).join(' 与 ')} 两个模型一览，可复制 model ID，含分工、完整列表获取与切换方法`,
   `- [套餐定价](${BASE}/pricing): 无限卡在售 ${unlimitedTiers.map((t) => `${t.displayName} ${t.price}`).join('、')}，周期卡与额度卡尚未定价；含退款规则与公平使用`,
-  `- [管理后台](${BASE}/console): 管理后台功能介绍——兑换、提 Key、导入配置、查用量；官方操作台 rsxermu666.cn（${siteConfig.partners.find((p) => p.id === 'console')?.url ?? ''}）`,
+  `- [管理后台](${BASE}/console): Claude 无限卡官方管理后台介绍页（rsxermu666.cn）——兑换、提 Key、导入配置、查用量；操作台 ${siteConfig.partners.find((p) => p.id === 'console')?.url ?? ''}`,
   `- [使用教程](${BASE}/guide): 先选你用的那一种，再照着做：${guideSceneCards().map((c) => c.title).join(' / ')}，每条路都带真实截图`,
   ...guideSceneCards().map(
     (c) => `- [${c.title} 教程](${BASE}${c.url}): ${c.desc}（${c.meta}）`,

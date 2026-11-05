@@ -96,7 +96,7 @@ CC Switch 是一个专门管 API 配置的小工具，装好之后所有供应�
 
 卡密在发货信息里，拿到后到管理后台换成一把 `sk-` 开头的 API Key，后面全程只用它。
 
-打开管理后台（[rsxermu666.cn](https://rsxermu666.cn/)），在「我的面板」或「提取 Key」页面粘贴激活码，提交激活后复制拿到的 Key。
+功能说明见 [rsxermu666.cn 管理后台](/console)。实际兑换请打开 [rsxermu666.cn](https://rsxermu666.cn/)，在「我的面板」或「提取 Key」页面粘贴激活码，提交激活后复制拿到的 Key。
 
 <GuideShot src="guide_site.png" caption="管理后台首页，粘贴卡密的输入框在这里" />
 

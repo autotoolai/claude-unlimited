@@ -3,7 +3,8 @@
  *
  * 后台是独立 SPA（Element Plus），本文件写「能做什么 / 怎么上手」，
  * 不做截图，避免后台改版后官网图文脱节。入口地址取 config/site.ts 的 partners.console。
- * 用户可见文案以「管理后台」为主；rsxermu666 留给 keywords / FAQ / JSON-LD / llms。
+ * 本页是 rsxermu666 搜索主场：title/meta/FAQ/CTA 主机名带品牌；
+ * 可见 H1 不塞域名；lead 首句点明 rsxermu666.cn 官方身份（与 FAQ 首条、llms 事实要点同口径）。
  */
 
 /** per-page keywords（config.mts transformHead 注入）；长尾词，不是堆砌 */
@@ -94,8 +95,13 @@ export const consoleFeatures: ConsoleFeature[] = [
 /** 备用域名：主域名被运营商屏蔽或网络抖动时切换，API Key 无需更换 */
 export const consoleBackupDomains: string[] = ['bxcv.store']
 
-/** 后台常见问题（/console 页底部 FaqList）；关系类留给 SEO/GEO，其余是操作类 */
+/** 后台常见问题（/console 页底部 FaqList）；首条点明品牌域名，其余偏操作 */
 export const consoleFaqs = [
+  {
+    id: 'console-what-is-rsxermu666',
+    q: 'rsxermu666.cn 是什么？',
+    a: 'rsxermu666.cn 是 Claude 无限卡官方管理后台与 API 网关。本页是功能介绍；兑换激活码、提取 API Key、导入配置与查用量在 rsxermu666.cn 完成。主域名不可达时可用页内备用域名，API Key 无需更换。',
+  },
   {
     id: 'console-vs-official-site',
     q: '管理后台和官网是什么关系？',

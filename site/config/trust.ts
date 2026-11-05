@@ -53,7 +53,9 @@ function operatorLines(): string[] {
   )
   if (operator.email) out.push(`邮件：${operator.email}`)
   else out.push('邮件：暂未提供，请用微信或 QQ 群联系。')
-  out.push(`管理后台：[${operator.consoleUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}](${operator.consoleUrl})（与本站同属一个运营方）`)
+  out.push(
+    `管理后台介绍：[rsxermu666.cn](/console)；操作台 [${operator.consoleUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}](${operator.consoleUrl})（与本站同属一个运营方）`,
+  )
   return out
 }
 
@@ -65,7 +67,7 @@ export const aboutCards: TrustCard[] = [
   },
   {
     title: '怎么交付',
-    body: '购买与支付在第三方发卡站完成；卡密兑换、提取 API Key、查用量在管理后台。本站只做介绍与答疑，不处理支付、不托管你的资金。',
+    body: '购买与支付在第三方发卡站完成；卡密兑换、提取 API Key、查用量在 [rsxermu666.cn 管理后台](/console)。本站只做介绍与答疑，不处理支付、不托管你的资金。',
   },
   {
     title: '边界',
@@ -163,7 +165,7 @@ export const privacySections: TrustSection[] = [
     h2: '4. 第三方',
     items: [
       `购买与支付在第三方发卡站 [${operator.purchaseUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}](${operator.purchaseUrl}) 完成，本站不接触支付信息。`,
-      `API Key 的提取与用量查询在管理后台 [${operator.consoleUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}](${operator.consoleUrl}) 完成，该站点属同一运营方。`,
+      `API Key 的提取与用量查询在管理后台完成（介绍见 [rsxermu666.cn](/console)，操作台 [${operator.consoleUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}](${operator.consoleUrl})），该站点属同一运营方。`,
       '页面字体来自 Google Fonts；统计脚本来自 Umami 与百度统计。这些第三方会收到你的 IP 与浏览器信息。',
     ],
     bullets: true,

@@ -80,7 +80,7 @@ export const jsonLdConsole = {
       '@type': 'WebPage',
       name: '管理后台 · rsxermu666.cn',
       description:
-        'Claude 无限卡官方管理后台（rsxermu666.cn）功能介绍：兑换激活码、提取 API Key、导入配置、查看用量。',
+        'rsxermu666.cn 是 Claude 无限卡官方管理后台与 API 网关。本页说明能做什么；兑换激活码、提取 API Key、导入配置与查用量在操作台完成。',
       url: base + '/console',
       inLanguage: 'zh-CN',
       isPartOf: { '@id': base + '/#site' },

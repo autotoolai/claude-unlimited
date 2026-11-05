@@ -163,8 +163,10 @@ Bing（`SubmitFeed` 交 sitemap + `SubmitUrlBatch`，后者只推前 `MaxBingUrl
   键名不变。
 - **`/console` 可收录**：功能介绍页（SSR 完整正文）进 sitemap；真实操作台仍是外链 `partners.console`
   （rsxermu666.cn）。历史一度 `Disallow: /console/`（误以为是 CSR 入口壳），已撤销——该页是
-  `rsxermu666` 关键词的 SEO / GEO 主场（keywords / JSON-LD / FAQ / llms），不要再加回 Disallow。
+  `rsxermu666` 关键词的 SEO / GEO 主场（lead / keywords / JSON-LD / FAQ / llms），不要再加回 Disallow。
   `check_dist.mjs` 的 sitemap 双向断言仍会跳过 robots 里声明禁抓的 URL。
+  百度推送优先级见 `scripts/seo_notify.ps1` 的 `$priority`（`/console` 须排在前，勿删）。
+  发版后用 Bing Webmaster 对 `/console` 再 SubmitUrl 一次；百度资源平台核对索引是否已含该页。
 
 ### 收录复核
 

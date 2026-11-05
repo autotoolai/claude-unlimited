@@ -216,13 +216,13 @@ export const sharedBlocks: Record<SharedBlockKey, Omit<GuideBlock, 'id' | 'title
     ],
   },
   'get-key': {
-    lead: '卡密在发货信息里，在管理后台换成一把 sk- 开头的 API Key，后面全程只用它。',
+    lead: '卡密在发货信息里，到 rsxermu666.cn（管理后台）换成一把 sk- 开头的 API Key，后面全程只用它。',
     steps: [
       {
         title: '把卡密换成 API Key',
         goal: '后面每一步都要填这把 Key，别提前改。',
         action: ['打开下面的管理后台 → 在「我的面板」或「提取 Key」页面粘贴激活码 → 提交激活 → 复制拿到的 Key。'],
-        link: { href: consoleUrl, label: '管理后台' },
+        link: { href: consoleUrl, label: '打开 rsxermu666.cn' },
         shot: { src: 'guide_site.png', caption: '管理后台首页，粘贴卡密的输入框在这里' },
       },
     ],

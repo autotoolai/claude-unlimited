@@ -1,8 +1,9 @@
 <script setup lang="ts">
 /**
  * 管理后台功能介绍页：讲清后台能做什么、买完怎么上手。
- * 主 CTA 新标签打开 partners.console；用户可见文案不强调「本页只做说明」，
- * rsxermu666 域名只出现在 CTA 主机名与 SEO 层（meta / JSON-LD / keywords）。
+ * 主 CTA 新标签打开 partners.console，按钮上展示主机名。
+ * 品牌词给搜索：document title / meta / lead 首句 / CTA 主机名 / FAQ / JSON-LD；
+ * 可见 H1 不塞域名；lead 首句点明 rsxermu666.cn 官方身份（百度正文 + GEO 引用）。
  */
 import PageShell from './PageShell.vue'
 import JsonLd from './JsonLd.vue'
@@ -33,7 +34,7 @@ const host = (() => {
   <PageShell
     slug="console"
     title="管理后台"
-    lead="兑换激活码、提取 API Key、一键导入配置、查看用量与公告——买完卡密后要用的能力都在这里。"
+    lead="rsxermu666.cn 是 Claude 无限卡官方管理后台与 API 网关。本页说明能做什么；兑换、提 Key、导入配置与查用量在操作台完成。"
     eyebrow="兑换 · 提 Key · 查用量"
   >
     <div class="cu-console">

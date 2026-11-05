@@ -36,7 +36,7 @@ const year = new Date().getFullYear()
       <nav aria-label="服务入口">
         <p class="cu-foot__h">服务</p>
         <ul>
-          <li><a href="/console">管理后台</a></li>
+          <li><a href="/console">rsxermu666.cn</a></li>
           <li><a :href="partnerUrl('ccswitch')" target="_blank" rel="noopener sponsored nofollow">CC Switch 下载 ↗</a></li>
           <li><a :href="partnerUrl('purchase')" target="_blank" rel="noopener sponsored nofollow">购买与发卡 ↗</a></li>
           <li><a href="/faq">常见问题</a></li>

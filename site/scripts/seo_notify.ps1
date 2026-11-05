@@ -129,7 +129,8 @@ function Get-BaiduPushOrder {
   #>
   param([string[]]$AllUrls)
 
-  $priority = @('/models', '/pricing', '/', '/guide', '/about', '/faq', '/changelog', '/knowledge', '/terms', '/privacy')
+  # /console 是 rsxermu666 品牌词主场：百度配额紧，必须排进优先队列，否则会被文章页挤掉。
+  $priority = @('/console', '/', '/pricing', '/models', '/guide', '/about', '/faq', '/changelog', '/knowledge', '/terms', '/privacy')
   $stateDir = Join-Path $RepoRoot 'temp\seo_push'
   $recordFile = Join-Path $stateDir 'baidu_pushed.txt'
   $pushed = Get-BaiduPushedSet $recordFile

@@ -7,7 +7,7 @@
 - [首页](https://claude-unlimited.aiautotools.com/): Claude 无限卡官网：订阅期内 Claude API 不按 token 计费，支持 Claude Code、Cursor、Cline 等主流工具。本站只做介绍与答疑，购买跳转第三方发卡站。
 - [模型广场](https://claude-unlimited.aiautotools.com/models): 本卡承诺的 Fable 5.1 与 Opus 5.5 与 Fable 5 与 Sonnet 5.5 与 Opus 4.8 与 Opus 4.7 两个模型一览，可复制 model ID，含分工、完整列表获取与切换方法
 - [套餐定价](https://claude-unlimited.aiautotools.com/pricing): 无限卡在售 天卡 ¥16.5、周卡 ¥80、月卡 ¥145、双窗口月卡 ¥185、三窗口月卡 ¥225，周期卡与额度卡尚未定价；含退款规则与公平使用
-- [管理后台](https://claude-unlimited.aiautotools.com/console): 管理后台功能介绍——兑换、提 Key、导入配置、查用量；官方操作台 rsxermu666.cn（https://rsxermu666.cn/）
+- [管理后台](https://claude-unlimited.aiautotools.com/console): Claude 无限卡官方管理后台介绍页（rsxermu666.cn）——兑换、提 Key、导入配置、查用量；操作台 https://rsxermu666.cn/
 - [使用教程](https://claude-unlimited.aiautotools.com/guide): 先选你用的那一种，再照着做：Claude Code 插件 / Claude Code CLI / Claude 桌面版 / Codex / WorkBuddy / 其它客户端，每条路都带真实截图
 - [Claude Code 插件 教程](https://claude-unlimited.aiautotools.com/guide/cc): 同一款 Anthropic 官方插件，VS Code 和 Cursor 都能装。图形界面用，比命令行更好上手。（10 步 · 一键导入）
 - [Claude Code CLI 教程](https://claude-unlimited.aiautotools.com/guide/cli): 终端里的 Claude Code。官方脚本装 CLI，两个环境变量接上网关，装完就能直接用。（9 步 · 装 CLI + 变量）
