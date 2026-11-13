@@ -168,6 +168,8 @@ export default defineConfig({
     // 码值直接内联做兜底：vitepress 的 SSR 渲染跑在子进程里，process.env 在那一层拿不到 bash 里 set -a 导出的值，
     // 只靠环境变量会出现「meta 偶尔凭空消失」。换码时改这里（或设同名环境变量覆盖）。
     ['meta', { name: 'baidu-site-verification', content: process.env.BAIDU_VERIFY_CODE || 'fc6022a4ec1c7bb09bfa0e037e3f8496' }],
+    // Bing Webmaster：子域独立站点条目的 HTML 标签验证码（与账号 AuthenticationCode 一致；DNS CNAME 已另做）
+    ['meta', { name: 'msvalidate.01', content: process.env.BING_VERIFY_CODE || 'BEB21CDCE0515431F75A447DBBD16B74' }],
     ...(process.env.GOOGLE_VERIFY_CODE ? [['meta', { name: 'google-site-verification', content: process.env.GOOGLE_VERIFY_CODE }]] : []),
     ['meta', { name: 'keywords', content: 'claude 无限额度,claude api 无限,claude 无限卡,claude无限续杯,claude 无限续杯,claude code 国内,claude api 中转' }],
     ['meta', { property: 'og:site_name', content: siteConfig.name }],

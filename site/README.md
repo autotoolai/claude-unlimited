@@ -193,7 +193,7 @@ pwsh -File scripts/deploy_claude_unlimited_site.ps1 -Branch preview -SkipNotify
 4. **教程内容核对**：`config/guide.ts` 的单页三步（购买激活码 → 密钥配置 → 开始使用）与 `config/faq.ts` 的「使用与配置」分类是按卖家教程站 `https://wx.bbyy.site/` 的内容与 Claude Code 官方文档重写的，截图已裁掉品牌栏与二维码。买家到底是走自己的兑换页还是卖家站，措辞要按实际情况调一遍。
 5. **SEO 提交**：`scripts/seo_notify.ps1` 已内置（部署脚本不带 `-SkipNotify` 时自动跑）。走 IndexNow + Bing Webmaster API + GSC；百度 token 未配时自动跳过。
    密钥模板在仓库根 `config/seo_secrets.example.env`，真值放 `config/local/seo_secrets.env`（已 gitignore），GSC 服务账号 JSON 在 `config/local/website_gsc_service_account.json`。
-   **Bing Webmaster 后台还需把 `claude-unlimited.aiautotools.com` 单独加成站点条目**（API key 是账号级的，条目和所有权验证要自己做）。
+   **Bing Webmaster**：子域 `claude-unlimited.aiautotools.com` 已用 API `AddSite` + DNS CNAME（`*.claude-unlimited` → `verify.bing.com`）验证；页面兜底还有 `msvalidate.01` meta 与 `public/BingSiteAuth.xml`（需发版后线上才有）。
    **百度必须先在 ziyuan.baidu.com 为这个子域单独加站并验证**（百度按域名签发 code，没有泛域机制），验证后把 token 填进 `BAIDU_TOKEN`。
 
    GSC 走 Google API，本机直连不通：密钥文件里的 `HTTPS_PROXY` 默认注释着，开 Clash Verge 后按实际端口打开；本机没代理时这两个端点会失败，IndexNow 与 Bing 不受影响。
