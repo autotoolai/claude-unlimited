@@ -255,7 +255,7 @@ const ccPage: GuidePage = {
     { q: '一键导入后模型列表是空的？', a: '点「获取模型列表」再拉一次，加进模型配置后点保存。列表为空通常是配置刚导入还没刷新，或者 Key 没生效。' },
     { q: '插件里要填 API Key 吗？', a: '不用。CC Switch 启用后配置已经写进 Claude Code 的用户配置，插件直接读它，登录方式选「使用已有的 API 配置 / API Key」就行。' },
   ],
-  tags: ['claude code 插件', 'vscode claude code 插件', 'cursor claude code 插件', 'claude code 扩展', 'anthropic claude code'],
+  tags: ['claude code 插件', 'vscode claude code 插件', 'cursor claude code 插件', 'claude code 扩展', 'claude code 无限卡', 'anthropic claude code'],
   related: [
     { text: 'Claude Code CLI 教程：终端安装与配置', url: '/guide/cli' },
     { text: 'Claude Code 教程：第一次会话之后怎么用', url: '/knowledge/claude-code-tutorial' },
@@ -314,7 +314,7 @@ const ccPage: GuidePage = {
           title: '让配置生效',
           goal: '检测这一步能提前暴露地址填错的问题。',
           action: ['回到 CC Switch 主界面 → 点「启用」→ 再点「检测链路」，弹出「运行正常」即可。'],
-          notes: ['检测失败先看<a href="/faq#cat-setup">常见问题 · 使用与配置</a>：多数情况是模型没保存，或者 Base URL 多带了 /v1。', '终端里的 claude、VS Code 里的 Claude Code 插件都直接生效，打开就能用。', '需要切换模型时，在终端里用 /model 这个指令，命令与参数见<a href="/knowledge/claude-code-cli-cheatsheet">命令速查</a>。'],
+          notes: ['检测失败先看<a href="/faq#cat-setup">常见问题 · 开通与配置</a>：多数情况是模型没保存，或者 Base URL 多带了 /v1。', '终端里的 claude、VS Code 里的 Claude Code 插件都直接生效，打开就能用。', '需要切换模型时，在终端里用 /model 这个指令，命令与参数见<a href="/knowledge/claude-code-cli-cheatsheet">命令速查</a>。'],
           shot: { src: 'guide_enable_test.png', caption: '启用配置并检测链路，显示运行正常', zoom: true },
         },
       ],
@@ -391,7 +391,7 @@ const cliPage: GuidePage = {
     { q: '装完提示找不到 claude 命令？', a: '安装目录还没进 PATH。关掉当前终端窗口重开一个再试；还不行就把安装目录加进系统 PATH，或者去 CC Switch 一键导入配置，它会替你把配置写好。' },
     { q: '怎么确认它连的是本卡而不是官方？', a: '进会话后输入 /status，看 Anthropic base URL 那行是不是管理后台的地址、鉴权那行是不是 ANTHROPIC_API_KEY，对了就是走的本卡。' },
   ],
-  tags: ['claude code cli 安装', 'claude code 命令行', 'claude code 终端', 'anthropic base url 配置', 'claude code 环境变量'],
+  tags: ['claude code cli 安装', 'claude code 命令行', 'claude code 终端', 'anthropic base url 配置', 'claude code cli 无限卡', 'claude code 环境变量'],
   related: [
     { text: 'Claude Code 命令与参数速查：会话内和命令行', url: '/knowledge/claude-code-cli-cheatsheet' },
     { text: 'Claude Code 插件教程：VS Code 与 Cursor', url: '/guide/cc' },
@@ -534,7 +534,7 @@ const desktopPage: GuidePage = {
   related: [
     { text: 'Claude Code 教程：第一次会话之后怎么用', url: '/knowledge/claude-code-tutorial' },
     { text: 'Claude Code 与 Codex CLI 怎么选', url: '/knowledge/claude-code-vs-codex' },
-    { text: '常见问题：使用与配置', url: '/faq#cat-setup' },
+    { text: '常见问题：开通与配置', url: '/faq#cat-setup' },
   ],
   blocks: [
     { id: 'desktop-install-ccswitch', title: '安装 CC Switch', shared: 'install-ccswitch' },
@@ -607,7 +607,7 @@ const desktopPage: GuidePage = {
           goal: '不启用的话配置不会写进客户端。',
           action: ['回到 CC Switch 主界面 → 点「启用」→ 再点「检测链路」，弹出「连通正常」即可。'],
           shot: { src: 'guide_desktop_link_ok.webp', caption: '检测链路显示 claude 连通正常', zoom: true },
-          notes: ['检测失败先看<a href="/faq#cat-setup">常见问题 · 使用与配置</a>。'],
+          notes: ['检测失败先看<a href="/faq#cat-setup">常见问题 · 开通与配置</a>。'],
         },
       ],
     },
@@ -689,11 +689,11 @@ const codexPage: GuidePage = {
     { q: '上游格式为什么必须选 Anthropic Messages？', a: '本卡是 Anthropic 兼容端点，Codex 选 Chat Completions 或 Responses 会按 OpenAI 协议发请求而连不上。选 Anthropic Messages 时必须同时开启路由。' },
     { q: '检测链路显示正常但 Codex 里报错？', a: '先确认路由总开关和 Codex 那个应用开关都打开了；只有总开关开着、应用开关没开，请求不会被转发。' },
   ],
-  tags: ['codex 教程', 'codex 配置 claude api', 'codex 接入 api', 'anthropic messages 上游格式', 'codex 模型列表'],
+  tags: ['codex 教程', 'codex 配置 claude api', 'codex 接入 api', 'codex 无限卡', 'anthropic messages 上游格式', 'codex 模型列表'],
   related: [
     { text: 'Claude Code 与 Codex CLI 怎么选', url: '/knowledge/claude-code-vs-codex' },
     { text: 'Claude Code 教程：第一次会话之后怎么用', url: '/knowledge/claude-code-tutorial' },
-    { text: '常见问题：使用与配置', url: '/faq#cat-setup' },
+    { text: '常见问题：开通与配置', url: '/faq#cat-setup' },
   ],
   blocks: [
     { id: 'codex-install-ccswitch', title: '安装 CC Switch', shared: 'install-ccswitch' },
@@ -800,7 +800,7 @@ const codexPage: GuidePage = {
             { src: 'guide_codex_provider_list.webp', caption: '供应商列表里无限卡那条已启用，地址带 /v1', zoom: true },
             { src: 'guide_codex_link_ok.webp', caption: '检测链路显示无限卡连通正常', zoom: true },
           ],
-          notes: ['检测失败先看<a href="/faq#cat-setup">常见问题 · 使用与配置</a>。'],
+          notes: ['检测失败先看<a href="/faq#cat-setup">常见问题 · 开通与配置</a>。'],
         },
       ],
     },
@@ -841,11 +841,11 @@ const workbuddyPage: GuidePage = {
     { q: '接口地址后面要加 /v1 吗？', a: '要。WorkBuddy 的接口地址填管理后台地址加 /v1，界面上也有这句提示，不加会 404。' },
     { q: '保存后模型列表里看不到？', a: '模型名称要和网关返回的 ID 完全一致（claude-opus-5-5），填错就不出现在列表里。填好后记得在模型列表里选中它。' },
   ],
-  tags: ['workbuddy 教程', 'workbuddy 自定义模型', 'workbuddy 接入 claude api', 'workbuddy 配置'],
+  tags: ['workbuddy 教程', 'workbuddy 自定义模型', 'workbuddy 接入 claude api', 'workbuddy 无限卡', 'workbuddy 配置'],
   related: [
     { text: 'Claude Code 与 Codex CLI 怎么选', url: '/knowledge/claude-code-vs-codex' },
     { text: '模型广场：model ID 一览', url: '/models' },
-    { text: '常见问题：使用与配置', url: '/faq#cat-setup' },
+    { text: '常见问题：开通与配置', url: '/faq#cat-setup' },
   ],
   blocks: [
     { id: 'workbuddy-get-key', title: '换取 API Key', shared: 'get-key' },
@@ -883,7 +883,7 @@ const workbuddyPage: GuidePage = {
       shot: { src: 'guide_workbuddy_in_use.webp', caption: 'WorkBuddy 里正常使用，模型为 claude-opus-5-5', zoom: true },
     },
   ],
-  next: { text: '常见问题：接入与使用', url: '/faq#cat-usage' },
+  next: { text: '常见问题：日常使用', url: '/faq#cat-usage' },
 }
 
 /** Cursor 等其它客户端：手动填三个值，附各客户端填法差异速查表，3 步 */
@@ -904,11 +904,11 @@ const cursorPage: GuidePage = {
     { q: '模型名称填什么？', a: '填网关真实返回的 ID，比如 claude-opus-5-5、claude-fable-5-1。填错客户端就选不到这个模型，完整清单见模型广场。' },
     { q: '各家客户端的地址写法都一样吗？', a: '不一样。Claude Code 与桌面版用不带 /v1 的地址，Codex、WorkBuddy、Cursor 这类用带 /v1 的地址。页面末尾的速查表列了全部差异。' },
   ],
-  tags: ['cursor 配置 claude api', 'cursor 接入 claude api', '自定义 api 客户端配置', 'cline 配置', 'openai 兼容端点'],
+  tags: ['cursor 配置 claude api', 'cursor 接入 claude api', 'cursor 无限卡', '自定义 api 客户端配置', 'cline 配置', 'openai 兼容端点'],
   related: [
     { text: '模型广场：model ID 一览', url: '/models' },
     { text: 'Claude Code 与 Codex CLI 怎么选', url: '/knowledge/claude-code-vs-codex' },
-    { text: '常见问题：接入与使用', url: '/faq#cat-usage' },
+    { text: '常见问题：日常使用', url: '/faq#cat-usage' },
   ],
   blocks: [
     { id: 'cursor-get-key', title: '换取 API Key', shared: 'get-key' },

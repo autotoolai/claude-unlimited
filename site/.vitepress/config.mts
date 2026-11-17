@@ -4,6 +4,8 @@ import { siteConfig } from '../config/site'
 import { knowledge, knowledgeCategories } from '../config/knowledge'
 import { guidePageBySlug, guideTagsOf, guideIndexTags } from '../config/guide'
 import { consoleTags } from '../config/console'
+import { agencyTags } from '../config/agency'
+import { homeTags, pricingTags, modelsTags } from '../config/seo_pages'
 import { publicDirPlugin } from './theme/middleware'
 import { baiduHead, umamiHead } from './analytics_snippets'
 import { readFileSync } from 'node:fs'
@@ -83,9 +85,23 @@ export default defineConfig({
         head.push(['meta', { name: 'keywords', content: tags.join(',') }])
       }
     }
+    // 营销页 per-page keywords：首页 / 定价 / 模型不能共用全局那一串（购买复合词主场在定价）。
+    if ((!path || path === 'index') && homeTags.length) {
+      head.push(['meta', { name: 'keywords', content: homeTags.join(',') }])
+    }
+    if (path === 'pricing' && pricingTags.length) {
+      head.push(['meta', { name: 'keywords', content: pricingTags.join(',') }])
+    }
+    if (path === 'models' && modelsTags.length) {
+      head.push(['meta', { name: 'keywords', content: modelsTags.join(',') }])
+    }
     // /console：rsxermu666 品牌域名主场，不能落回全站「claude 无限卡」那条全局 keywords。
     if (path === 'console' && consoleTags.length) {
       head.push(['meta', { name: 'keywords', content: consoleTags.join(',') }])
+    }
+    // /agency：Token 代理 / rsxermu666 代理 复合长尾主场；裸词 rsxermu666 仍归 /console。
+    if (path === 'agency' && agencyTags.length) {
+      head.push(['meta', { name: 'keywords', content: agencyTags.join(',') }])
     }
     if (path.startsWith('knowledge/')) {
       const slug = path.slice('knowledge/'.length)
@@ -101,7 +117,15 @@ export default defineConfig({
         head.push(['meta', { property: 'article:published_time', content: meta.date }])
         head.push(['meta', { property: 'article:modified_time', content: meta.updated ?? meta.date }])
         head.push(['meta', { property: 'article:section', content: knowledgeCategories.find((c) => c.cat === meta.cat)?.name ?? meta.cat }])
+        // GEO：Markdown 副本（gen_md_mirrors.ts → public/knowledge/<slug>.md）
+        head.push(['link', { rel: 'alternate', type: 'text/markdown', href: `${base}/knowledge/${slug}.md` }])
       }
+    }
+    // 教程页 Markdown 副本
+    if (path === 'guide') {
+      head.push(['link', { rel: 'alternate', type: 'text/markdown', href: `${base}/guide.md` }])
+    } else if (path.startsWith('guide/')) {
+      head.push(['link', { rel: 'alternate', type: 'text/markdown', href: `${base}/${path}.md` }])
     }
     return head
   },
@@ -171,7 +195,8 @@ export default defineConfig({
     // Bing Webmaster：子域独立站点条目的 HTML 标签验证码（与账号 AuthenticationCode 一致；DNS CNAME 已另做）
     ['meta', { name: 'msvalidate.01', content: process.env.BING_VERIFY_CODE || 'BEB21CDCE0515431F75A447DBBD16B74' }],
     ...(process.env.GOOGLE_VERIFY_CODE ? [['meta', { name: 'google-site-verification', content: process.env.GOOGLE_VERIFY_CODE }]] : []),
-    ['meta', { name: 'keywords', content: 'claude 无限额度,claude api 无限,claude 无限卡,claude无限续杯,claude 无限续杯,claude code 国内,claude api 中转' }],
+    // 全局兜底：仅给尚无 per-page tags 的页（FAQ/联系/关于等）；首页/定价/模型/教程/知识库/console/agency 由 transformHead 覆盖。
+    ['meta', { name: 'keywords', content: 'claude 无限卡,claude 无限额度,claude api 无限,claude无限续杯,claude 无限续杯' }],
     ['meta', { property: 'og:site_name', content: siteConfig.name }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],

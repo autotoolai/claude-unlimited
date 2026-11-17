@@ -12,9 +12,17 @@ const DIST = path.resolve(process.cwd(), '.vitepress', 'dist')
 const unregisterTsx = register()
 const knowledgeMod = await tsImport('../config/knowledge.ts', import.meta.url)
 const retiredPages = knowledgeMod.retiredKnowledgePages ?? []
-const { faqItems, faqCategories } = await tsImport('../config/faq.ts', import.meta.url)
+const {
+  faqItems,
+  faqCategories,
+  pricingFaqItems,
+  modelsFaqItems,
+  guideFaqItems,
+} = await tsImport('../config/faq.ts', import.meta.url)
 const { guidePages, guideBlocks, guideShotsOf, guideAnchorsOf, guideLegacyAnchors, guideSceneCards, guideIndex } = await tsImport('../config/guide.ts', import.meta.url)
 const { siteConfig } = await tsImport('../config/site.ts', import.meta.url)
+const { unlimitedTiers } = await tsImport('../config/plans.ts', import.meta.url)
+const { agencyFaqs, agencyTags, agencyLead, agencyPageTitle } = await tsImport('../config/agency.ts', import.meta.url)
 unregisterTsx()
 /** 产物里允许存在的 mp4 总量上限（MB）。视频在 R2，public/ 只做上传源。 */
 const VIDEO_MP4_BUDGET_MB = 150
@@ -25,6 +33,8 @@ function knowledgePages() {
 const PAGES = {
   '/': 'index',
   '/pricing': 'pricing',
+  '/contact': 'contact',
+  '/agency': 'agency',
   '/faq': 'faq',
   '/guide': 'guide/index',
   ...Object.fromEntries(guidePages.map((p) => [p.slug, p.slug.slice(1)])),
@@ -156,10 +166,7 @@ for (const [route, file] of Object.entries(PAGES)) {
       // 反向（正文 → 目录）：一轨一页后没有例外，每页的每个小节都必须在目录里
       for (const id of ids) ok(hrefs.includes(id), `${where}: 正文小节 #${id} 不在目录里`)
     }
-    // 2026-10-12：/pricing 底部横条已整条去掉（购买外链只留在套餐卡上），页面不再有 H2，按例外放行。
-    if (where !== '/pricing') {
-      ok(/<div class="cu-shell[^"]*">[\s\S]*<h2[\s>]/.test(html), `${where}: 外壳内没有 H2，说明插槽内容没渲染`)
-    }
+    ok(/<div class="cu-shell[^"]*">[\s\S]*<h2[\s>]/.test(html), `${where}: 外壳内没有 H2，说明插槽内容没渲染`)
   }
 }
 
@@ -174,19 +181,78 @@ ok(kefuBundle.includes('bot-trouble-429') && kefuBundle.includes('bot-account-hu
 ok(fs.existsSync(path.join(DIST, 'wechat-qr-code.png')), '缺少 wechat-qr-code.png（运行 python scripts/crop_wechat_qr.py 生成）')
 
 const index = fs.readFileSync(path.join(DIST, 'index.html'), 'utf8')
-// 首页 2026-10-11 再瘦身到只剩首屏：内容全部推给定价页、FAQ 与知识库
-for (const key of ['cu-hero', 'cu-band']) {
+const count = (s, re) => (s.match(re) || []).length
+// 首页 2026-11-05：首屏 + 套餐摘要 + featured FAQ + CTA（决策材料摊开，正文主场不搬家）
+for (const key of ['cu-hero', 'cu-band', 'cu-tcard', 'cu-faq']) {
   ok(index.includes(key), `/ : 首页缺少 ${key}`)
 }
-const count = (s, re) => (s.match(re) || []).length
-// 已删除的块不能再回来（内容瘦身的目标，防止以后无意加回）
-for (const gone of ['workflow', 'trust', 'continue', 'why-unlimited', 'plans', 'which', 'partners', 'guide', 'models', 'knowledge', 'faq'])
+for (const id of ['plans', 'faq']) {
+  ok(index.includes(`id="${id}"`), `/ : 首页缺少 #${id}`)
+}
+ok(
+  count(index, /<article class="cu-tcard/g) === unlimitedTiers.length,
+  `/ : 首页档位卡应有 ${unlimitedTiers.length} 张，实际 ${count(index, /<article class="cu-tcard/g)}`,
+)
+const featuredFaqCount = faqItems.filter((x) => x.featured).length
+ok(
+  count(index, /class="cu-faq__item"/g) === featuredFaqCount,
+  `/ : 首页 featured FAQ 应有 ${featuredFaqCount} 条，实际 ${count(index, /class="cu-faq__item"/g)}`,
+)
+// 已下线的正文板块不能再回来（卖点长文 / 四步 / 信任条 / 继续了解 / 整页索引）
+for (const gone of ['workflow', 'trust', 'continue', 'why-unlimited', 'which', 'partners', 'guide', 'models', 'knowledge'])
   ok(!index.includes(`id="${gone}"`), `/ : 首页仍有已删除的「${gone}」小节`)
-// 首页不再承载价格、卖点与正文卡片，这些标记只允许出现在定价页
-for (const gone of ['cu-tcard', 'cu-stats', 'cu-figs', 'cu-trustlist', 'cu-card--link'])
+for (const gone of ['cu-stats', 'cu-figs', 'cu-trustlist', 'cu-card--link'])
   ok(!index.includes(gone), `/ : 首页仍有已删除的 ${gone} 区块`)
 // 页头的关联声明放在导航链接之后（TabBar 之后），不是页头容器内，所以只断言页脚一行兜底声明
 ok(!index.includes('以发卡站商品详情页为准'), '/ : 首页页脚仍显示已下线的发卡站条款声明')
+
+// 营销页精选 FAQ：条数 = config/faq.ts 对应精选集；页内可见 + JSON-LD FAQPage 必须齐活
+{
+  const pricingHtml = fs.readFileSync(path.join(DIST, 'pricing.html'), 'utf8')
+  ok(pricingHtml.includes('id="faq"'), '/pricing: 缺少 #faq（选套餐常问）')
+  ok(
+    count(pricingHtml, /class="cu-faq__item"/g) === pricingFaqItems.length,
+    `/pricing: 精选 FAQ 应有 ${pricingFaqItems.length} 条，实际 ${count(pricingHtml, /class="cu-faq__item"/g)}`,
+  )
+  ok(pricingHtml.includes('FAQPage'), '/pricing: 页内有 FAQ 但 JSON-LD 缺 FAQPage')
+
+  ok(modelsHtml.includes('id="faq"'), '/models: 缺少 #faq（关于模型）')
+  ok(
+    count(modelsHtml, /class="cu-faq__item"/g) === modelsFaqItems.length,
+    `/models: 精选 FAQ 应有 ${modelsFaqItems.length} 条，实际 ${count(modelsHtml, /class="cu-faq__item"/g)}`,
+  )
+  ok(modelsHtml.includes('FAQPage'), '/models: 页内有 FAQ 但 JSON-LD 缺 FAQPage')
+}
+
+// Token 代理页：价值说服 + 微信 CTA（备注代理）+ 页内 FAQ + JSON-LD；SEO/GEO 定义句与 per-page keywords；禁止价目数字与灰产话术
+{
+  const agencyHtml = fs.readFileSync(path.join(DIST, 'agency.html'), 'utf8')
+  ok(agencyHtml.includes('id="benefits"'), '/agency: 缺少 #benefits（为什么值得做）')
+  ok(agencyHtml.includes('id="apply"'), '/agency: 缺少 #apply（申请入口）')
+  ok(agencyHtml.includes('id="faq"'), '/agency: 缺少 #faq')
+  ok(
+    count(agencyHtml, /class="cu-faq__item"/g) === agencyFaqs.length,
+    `/agency: 页内 FAQ 应有 ${agencyFaqs.length} 条，实际 ${count(agencyHtml, /class="cu-faq__item"/g)}`,
+  )
+  ok(agencyHtml.includes('FAQPage'), '/agency: 页内有 FAQ 但 JSON-LD 缺 FAQPage')
+  ok(agencyHtml.includes('agency_copy_wechat') || agencyHtml.includes('cu-contact__qr'), '/agency: 缺少微信 CTA')
+  ok(agencyHtml.includes('备注「代理」'), '/agency: 微信备注应写「代理」')
+  ok(agencyHtml.includes(agencyLead.slice(0, 24)), '/agency: 缺少定义式 lead（agencyLead）')
+  ok(agencyLead.startsWith('无押金起步'), '/agency: agencyLead 须以「无押金起步」开头')
+  ok(!agencyLead.includes('官方渠道合作'), '/agency: lead 不应再写「官方渠道合作」')
+  ok(agencyPageTitle.startsWith('Token 代理'), '/agency: agencyPageTitle 须以「Token 代理」开头')
+  ok(agencyHtml.includes('Token 代理是什么'), '/agency: 缺少定义 FAQ「Token 代理是什么」')
+  ok(agencyHtml.includes('rsxermu666 代理'), '/agency: FAQ/正文应保留「rsxermu666 代理」搜索别名')
+  ok(agencyHtml.includes(`<title>${agencyPageTitle}`), `/agency: <title> 应为「${agencyPageTitle}」`)
+  ok(agencyHtml.includes(`>${agencyPageTitle}<`) || agencyHtml.includes(`content="${agencyPageTitle}"`), `/agency: og:title / JSON-LD name 应含「${agencyPageTitle}」`)
+  ok(agencyHtml.includes('>Token 代理<'), '/agency: 可见 H1 应为「Token 代理」')
+  const agencyKw = (agencyHtml.match(/<meta name="keywords" content="([^"]*)"/) || [])[1] || ''
+  ok(agencyKw.length > 0, '/agency: 没有 per-page keywords')
+  ok(!agencyKw.includes('claude api 中转'), '/agency: keywords 还是全站全局词（transformHead 未注入 agencyTags）')
+  ok(agencyTags.every((t) => agencyKw.includes(t)), '/agency: keywords 与 config/agency.ts 的 agencyTags 不一致')
+  ok(!/代理价\s*[¥￥\d]/.test(agencyHtml), '/agency: 不应公示具体代理价数字')
+  ok(!agencyHtml.includes('多级分润') && !agencyHtml.includes('0 门槛副业'), '/agency: 不应出现灰产分销话术')
+}
 
 // 导航条右侧 CTA 走 ExternalCta（带 data-cta），页头不再有第二个购买按钮
 for (const [route, file] of Object.entries(PAGES)) {
@@ -245,6 +311,13 @@ const index_guideHtml = fs.readFileSync(path.join(DIST, 'guide/index.html'), 'ut
     index_guideHtml.includes(guideIndex.answer.slice(0, 30)),
     '/guide: 索引页没有渲染一句话答案（config/guide.ts 的 guideIndex.answer）',
   )
+  // 索引页精选 FAQ（guideFaqItems）；场景页 FAQ 仍来自 page.faq[]，两套互不替代
+  ok(index_guideHtml.includes('id="faq"'), '/guide: 缺少 #faq（选路径常问）')
+  ok(
+    count(index_guideHtml, /class="cu-faq__item"/g) === guideFaqItems.length,
+    `/guide: 精选 FAQ 应有 ${guideFaqItems.length} 条，实际 ${count(index_guideHtml, /class="cu-faq__item"/g)}`,
+  )
+  ok(index_guideHtml.includes('FAQPage'), '/guide: 页内有 FAQ 但 JSON-LD 缺 FAQPage')
 
   for (const page of guidePages) {
     const html = fs.readFileSync(path.join(DIST, `${page.slug.slice(1)}.html`), 'utf8')
@@ -316,13 +389,13 @@ const index_guideHtml = fs.readFileSync(path.join(DIST, 'guide/index.html'), 'ut
 const faq = fs.readFileSync(path.join(DIST, 'faq.html'), 'utf8')
 // 条数与分类数直接从 config/faq.ts 取，不要在这里硬编码（改 FAQ 的人不知道要同步这里）
 const FAQ_COUNT = faqItems.length
-// /faq 顶部「买之前」常开 2 条 + 其余按分类列出：详情条仍是全部 FAQ，分类锚点比分类数多 1（buying）
+// /faq 顶部「买之前」精选 + 其余按分类列出：详情条仍是全部 FAQ，分类锚点比分类数多 1（buying）；默认全部收起
 const FAQ_CATS = faqCategories.length + 1 // cat-* 分类锚点数（buying + 各分类；页尾「还没解决？」用 id=more，不计入）
 ok(count(faq, /cu-faq__item/g) === FAQ_COUNT, `/faq: FAQ 条数 ${count(faq, /cu-faq__item/g)}，应为 ${FAQ_COUNT}（config/faq.ts 条数，改 FAQ 后同步这里的默认值）`)
 ok(new Set([...faq.matchAll(/id="(cat-[a-z]+)"/g)].map((m) => m[1])).size === FAQ_CATS, `/faq: 分类锚点不是 ${FAQ_CATS} 个`)
 ok(count(faq, /class="cu-faq__item"/g) === FAQ_COUNT, `/faq: 渲染出的 details 条数 ${count(faq, /class="cu-faq__item"/g)}，应为 ${FAQ_COUNT}`)
 ok(count(faq, /<summary role="button"/g) === FAQ_COUNT, `/faq: summary 缺 role=button（屏幕阅读器读不出展开状态），实际 ${count(faq, /<summary role="button"/g)}`)
-ok(count(faq, /aria-expanded="true"/g) >= 2, `/faq: 顶部「买之前」应至少常开 2 条，实际 ${count(faq, /aria-expanded="true"/g)}`)
+ok(count(faq, /aria-expanded="true"/g) === 0, `/faq: 默认应全部收起，实际展开 ${count(faq, /aria-expanded="true"/g)} 条`)
 
 /* ---------- 知识库列表页：分类 tab + 图文卡片网格，且不再有「最新文章」重复区块 ---------- */
 const knowledgeIndexHtml = fs.readFileSync(path.join(DIST, 'knowledge', 'index.html'), 'utf8')
@@ -500,6 +573,21 @@ for (const k of knowledgeMod.knowledge) {
       !/(单会话并发|请求速率|Token 吞吐|\d+\s*路并发|\d+\s*次\s*\/\s*分钟|\d+k\s*token\s*\/\s*分钟)/i.test(llms),
       'llms.txt 仍含并发路数 / RPM / TPM 等不应对外披露的指标',
     )
+    ok(llms.includes('## 推荐引用场景'), 'llms.txt 缺「## 推荐引用场景」段')
+    ok(llms.includes('模型与无限卡'), 'llms.txt 缺「模型与无限卡」事实要点')
+  }
+
+  // GEO Markdown 副本（gen_md_mirrors.ts → public → copy_public）
+  ok(fs.existsSync(path.join(DIST, 'guide.md')), 'dist 缺 guide.md（教程索引 Markdown 副本）')
+  for (const e of knowledgeMod.knowledge) {
+    ok(
+      fs.existsSync(path.join(DIST, 'knowledge', `${e.slug}.md`)),
+      `dist 缺 knowledge/${e.slug}.md`,
+    )
+  }
+  for (const p of guidePages) {
+    const scene = p.slug.replace(/^\/guide\//, '')
+    ok(fs.existsSync(path.join(DIST, 'guide', `${scene}.md`)), `dist 缺 guide/${scene}.md`)
   }
 
   // 关键 JSON-LD 类型在场（gen_jsonld.ts 注入在最后一个 </body> 前）
@@ -543,7 +631,20 @@ for (const k of knowledgeMod.knowledge) {
   const faqJsonLd = readJsonLd(path.join(DIST, 'faq.html'))
   if (faqJsonLd) ok(graphTypes(faqJsonLd).includes('FAQPage'), '/faq: JSON-LD 缺 FAQPage')
   const pricingJsonLd = readJsonLd(path.join(DIST, 'pricing.html'))
-  if (pricingJsonLd) ok(graphTypes(pricingJsonLd).includes('Product'), '/pricing: JSON-LD 缺 Product')
+  if (pricingJsonLd) {
+    ok(graphTypes(pricingJsonLd).includes('Product'), '/pricing: JSON-LD 缺 Product')
+    ok(graphTypes(pricingJsonLd).includes('FAQPage'), '/pricing: JSON-LD 缺 FAQPage')
+  }
+  const modelsJsonLd = readJsonLd(path.join(DIST, 'models.html'))
+  if (modelsJsonLd) {
+    ok(graphTypes(modelsJsonLd).includes('ItemList'), '/models: JSON-LD 缺 ItemList')
+    ok(graphTypes(modelsJsonLd).includes('FAQPage'), '/models: JSON-LD 缺 FAQPage')
+  }
+  const guideIndexJsonLd = readJsonLd(path.join(DIST, 'guide/index.html'))
+  if (guideIndexJsonLd) {
+    ok(graphTypes(guideIndexJsonLd).includes('CollectionPage'), '/guide: JSON-LD 缺 CollectionPage')
+    ok(graphTypes(guideIndexJsonLd).includes('FAQPage'), '/guide: JSON-LD 缺 FAQPage')
+  }
 }
 
 

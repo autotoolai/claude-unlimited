@@ -11,6 +11,9 @@
 | 文档 | 讲什么 |
 |---|---|
 | [`seo_geo_infrastructure.md`](seo_geo_infrastructure.md) | 搜索引擎与 AI 检索基建：canonical、JSON-LD、sitemap、llms.txt、主动推送。改 URL 会连带改什么。 |
+| [`seo_geo_keywords.md`](seo_geo_keywords.md) | SEO/GEO 关键词台账：现有词与主场页、待补复合词（如 opus/fable 无限卡）。 |
+| [`seo_geo_optimization_plan.md`](seo_geo_optimization_plan.md) | SEO/GEO 完整优化方案：业界调研、开源选型、双轨 P0–P2、90 天路线图。 |
+| [`geo_audit_baseline.md`](geo_audit_baseline.md) | GEO/llms 本地审计基线（`npm run audit:geo -- --write` 更新）。 |
 | [`maintenance_notes.md`](maintenance_notes.md) | 维护者的操作笔记：凭据与 workflow scope、部署前的清盘动作、README 的生成机制。 |
 
 本机另有 `vpns_beer_agent/`（vpns.beer 代理平台登录自动化，与官网无关且明文存凭据，不随公开仓库发布）、

@@ -2,6 +2,9 @@
 
 官网的搜索引擎与 AI 检索基建。每一项都有对应脚本，改内容时不需要手动改这些文件。
 
+**关键词台账（主场页、待补词）**：见 [`seo_geo_keywords.md`](./seo_geo_keywords.md)。  
+**完整优化方案（调研 + 开源选型 + 路线图）**：见 [`seo_geo_optimization_plan.md`](./seo_geo_optimization_plan.md)。
+
 | 能力 | 位置 | 说明 |
 |---|---|---|
 | canonical / og / keywords | `site/.vitepress/config.mts` 的 `transformHead` | 每页的 canonical、分享卡片与关键词标签，全部跟随 `config/site.ts` 的 `url` |

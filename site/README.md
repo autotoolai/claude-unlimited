@@ -20,7 +20,7 @@
 ```
 config/rules.ts    限流数字 / 套餐边界 / 退款窗口的唯一数据源（页面表格、FAQ 答案、首页卖点都从这里派生）
 config/site.ts     站点元信息 + 商品（价格 / 周期天数 days / 承诺 promise）+ 合作平台地址（purchase / activation / ccswitch）+ 客服联系方式（全站唯一数据源）
-config/faq.ts      FAQ 唯一数据源（页面 + 助手 + JSON-LD 共用；7 个分类，使用与配置分类来自卖家教程站）
+config/faq.ts      FAQ 唯一数据源（页面 + 助手 + JSON-LD 共用；5 个分类按买家路径：商品 / 开通 / 日常 / 报错 / 安全）
 config/models.ts   模型层级与 model ID 表（/models、教程页、FAQ 共用）
 config/guide.ts    使用教程的内容数据（索引页 + 6 个场景页；唯一编辑入口，改教程只改这里）
 config/logo.ts     品牌标记「无限」符号的唯一数据源（几何 + 品牌橙 #C85A1E / 米白 #FFF6EC），派生 favicon.svg、BrandLogo.vue、OG 分享图；改 logo 只改这里再 `npm run gen:logo`
@@ -138,9 +138,38 @@ markdown 编译成 `<template><div>…</div></template>` 并用 inline 渲染模
 
 **百度统计不进本地看板**：它没有公开数据 API（官网文档无 API 条目，`/api/` 返回 403），无法程序化拉取，所以只能在它自己后台看。
 
+### 怎么区分流量来源与设备
+
+三通道已能回答，**不必再加 SDK**：
+
+| 想知道什么 | 看哪里 |
+|---|---|
+| 手机 / 桌面占比 | Umami → Devices；本地看板「Umami 设备 · 国家」 |
+| 从哪个网站点进来 | Umami → Referrers；本地看板「Umami 来源渠道」 |
+| 国内搜索词 / 来源口径 | 百度统计后台（tongji.baidu.com） |
+| 点了哪些购买 / 客服 CTA | Umami Events（事件名 = `data-cta`）；CTA 事件属性里带粗粒度 `device` |
+
+**外部分享 / 投放必须带 UTM**（微信、QQ、社群常无 `document.referrer`，只靠 UTM 才能认渠道）。约定：
+
+```
+https://claude-unlimited.aiautotools.com/?utm_source=wechat&utm_medium=social&utm_campaign=spring_push
+https://claude-unlimited.aiautotools.com/pricing?utm_source=qq&utm_medium=social&utm_campaign=group_pin
+https://claude-unlimited.aiautotools.com/guide?utm_source=xhs&utm_medium=social&utm_campaign=guide_share
+```
+
+- `utm_source`：渠道名（`wechat` / `qq` / `xhs` / `zhihu` / `baidu` …）
+- `utm_medium`：`social` / `cpc` / `email` / `qr`
+- `utm_campaign`：活动短名（英文/拼音，稳定可复用）
+
+Umami 与百度都会把带 query 的落地 URL 记下来；同一活动不要换 campaign 名，否则看板会被拆碎。
+
+本地看板要拉到 Umami「设备 / 来源」卡，需要 `config/local/analytics_secrets.env` 里的 `UMAMI_API_KEY` 非空（Cloud 后台头像 → Settings → API keys）。key 为空时脚本会跳过 Umami，只出 Cloudflare；也可以直接上 [cloud.umami.is](https://cloud.umami.is) 后台看。
+
+窄屏回归：`AUDIT_BASE=http://127.0.0.1:41800 npm run check:mobile`（390 / 768 断言无横滚、购买完整、菜单入口存在）。
+
 ### 埋点是怎么工作的
 
-全站所有转化点（导航购买按钮、套餐卡、客服浮标、复制按钮）都带 `data-cta` 属性，`theme/analytics.ts` 在 `Layout.vue` 挂载时装**一个全局点击委托**（捕获阶段），把 `data-cta` 的值作为事件名，同时送进 Umami（`umami.track`）与百度（`_hmt.push(['trackEvent','cta',…])`）。以后新增按钮只要带 `data-cta` 就自动进统计，不必改组件。事件名清单见 `npm run check:analytics` 输出；非点击类事件可手工调 `window.__cuTrack?.('name', {…})`。
+全站所有转化点（导航购买按钮、套餐卡、客服浮标、复制按钮）都带 `data-cta` 属性，`theme/analytics.ts` 在 `Layout.vue` 挂载时装**一个全局点击委托**（捕获阶段），把 `data-cta` 的值作为事件名，同时送进 Umami（`umami.track`）与百度（`_hmt.push(['trackEvent','cta',…])`）。事件属性自动带 `page` / `referrer`（仅主机名）/ `device`（`mobile`|`desktop`），**不改事件名**以免打爆事件基数。以后新增按钮只要带 `data-cta` 就自动进统计，不必改组件。事件名清单见 `npm run check:analytics` 输出；非点击类事件可手工调 `window.__cuTrack?.('name', {…})`。
 
 两处必守的约束：
 - **埋点脚本放 `head`（`analytics_snippets.ts`）而不是组件里**。VitePress 走 SSR，head 里的脚本服务端就渲染进 HTML 首个响应；写进组件要等 hydration 才注入，会漏掉快速跳走的访问。

@@ -14,8 +14,9 @@
  */
 import { siteConfig } from '../../../config/site'
 import { modelIds } from '../../../config/models'
-import { faqItems } from '../../../config/faq'
+import { faqItems, pricingFaqItems, modelsFaqItems } from '../../../config/faq'
 import { consoleFaqs } from '../../../config/console'
+import { agencyFaqs, agencyLead, agencyPageTitle } from '../../../config/agency'
 import { guidePageBySlug, guidePages } from '../../../config/guide'
 import { jsonLdGuideScene, jsonLdGuideIndex } from './guide_jsonld'
 import { knowledge, knowledgeCategories } from '../../../config/knowledge'
@@ -97,11 +98,19 @@ const jsonLdHome = {
   ],
 }
 
+/** @graph 内嵌 FAQPage（与 pages/data.ts 的 faqPageNode 同形；条目 = 页内可见精选） */
+const faqPageNode = (items: { q: string; a: string }[]) => ({
+  '@type': 'FAQPage',
+  mainEntity: items.map((it) => ({
+    '@type': 'Question',
+    name: it.q,
+    acceptedAnswer: { '@type': 'Answer', text: it.a.replace(/\n+/g, ' ') },
+  })),
+})
+
 /**
- * /pricing：只有 Product。
- * 2026-10-12 起 /pricing 页内不再挂 FAQ 组件，限速与封号规则只在 /faq 维护一份。
- * FAQPage 必须与页面可见内容一致（搜索引擎按「声明了但页面上看不见」判不合格），
- * 所以定价页不输出 FAQPage；/faq 页的 FAQPage 由下面的 faqJsonLd(faqItems) 提供。
+ * /pricing：Product + 页内精选 FAQPage（pricingFaqItems）。
+ * 限速全文主场仍在 /faq；结构化数据必须与页内可见 FaqList 一致。
  */
 const jsonLdPricing = {
   '@context': 'https://schema.org',
@@ -123,20 +132,26 @@ const jsonLdPricing = {
         seller: { '@type': 'Organization', name: siteConfig.name },
       },
     },
+    faqPageNode(pricingFaqItems),
   ],
 }
 
-/** /models：模型 ID 清单 */
+/** /models：ItemList + 页内精选 FAQPage（modelsFaqItems） */
 const jsonLdModels = {
   '@context': 'https://schema.org',
-  '@type': 'ItemList',
-  name: 'Claude 模型与 model ID 一览',
-  itemListElement: modelIds.map((m, i) => ({
-    '@type': 'ListItem',
-    position: i + 1,
-    name: m.id,
-    description: `${m.tier} 档：${m.scene}`,
-  })),
+  '@graph': [
+    {
+      '@type': 'ItemList',
+      name: 'Claude 模型与 model ID 一览',
+      itemListElement: modelIds.map((m, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: m.id,
+        description: `${m.tier} 档：${m.scene}`,
+      })),
+    },
+    faqPageNode(modelsFaqItems),
+  ],
 }
 
 /** /guide 索引页：CollectionPage + ItemList（全部场景路径） */
@@ -213,6 +228,8 @@ function breadcrumbFor(route: string) {
     else if (acc.length === 2 && acc[0] === 'guide') name = guidePages.find((p) => p.slug.slice(1) === acc[1])?.nav ?? s
     else if (acc.length === 1 && s === 'pricing') name = '套餐定价'
     else if (acc.length === 1 && s === 'models') name = '模型广场'
+    else if (acc.length === 1 && s === 'contact') name = '联系我们'
+    else if (acc.length === 1 && s === 'agency') name = 'Token 代理'
     else if (acc.length === 1 && s === 'faq') name = '常见问题'
     out.push({ name, url })
   }
@@ -333,6 +350,30 @@ export function jsonLdForRoute(routePath: string): Record<string, unknown> | und
         ],
       }
       break
+    case 'agency':
+      // 与 pages/data.ts 的 jsonLdAgency 同步；不挂代理后台外链
+      flat = {
+        '@graph': [
+          {
+            '@type': 'WebPage',
+            name: agencyPageTitle,
+            description: agencyLead,
+            url: BASE + '/agency',
+            inLanguage: 'zh-CN',
+            isPartOf: { '@id': BASE + '/#site' },
+            about: { '@id': BASE + '/#org' },
+          },
+          {
+            '@type': 'FAQPage',
+            mainEntity: agencyFaqs.map((it) => ({
+              '@type': 'Question',
+              name: it.q,
+              acceptedAnswer: { '@type': 'Answer', text: it.a.replace(/\n+/g, ' ') },
+            })),
+          },
+        ],
+      }
+      break
     case 'guide':
       flat = { '@graph': jsonLdGuideIndexPage() }
       break
@@ -350,6 +391,10 @@ export function jsonLdForRoute(routePath: string): Record<string, unknown> | und
           inLanguage: 'zh-CN',
           isPartOf: { '@id': BASE + '/#site' },
           about: { '@id': BASE + '/#org' },
+          // 关于页可见「更新日期」与 JSON-LD 同口径（trust.ts aboutPage.updatedAt）
+          ...('updatedAt' in tp && tp.updatedAt
+            ? { dateModified: String(tp.updatedAt) }
+            : {}),
         }
       }
     }
