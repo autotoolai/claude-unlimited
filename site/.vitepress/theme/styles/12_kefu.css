@@ -14,14 +14,14 @@
   --cu-kefu-gap: 12px;
   --cu-kefu-inset: 20px;
   position: fixed;
-  right: var(--cu-kefu-inset);
-  bottom: var(--cu-kefu-inset);
+  right: max(var(--cu-kefu-inset), env(safe-area-inset-right, 0px));
+  bottom: max(var(--cu-kefu-inset), env(safe-area-inset-bottom, 0px));
   z-index: 45;
 }
 
 .cu-kefu--left {
   right: auto;
-  left: var(--cu-kefu-inset);
+  left: max(var(--cu-kefu-inset), env(safe-area-inset-left, 0px));
 }
 
 /* —— 浮标 —— */

@@ -8,12 +8,41 @@ import { refundSummary } from '../../../config/rules'
 import { modelIds, recommendedIds, modelBrands } from '../../../config/models'
 import { planGroups, allTiers, tiersOf, featuredTierOf, entryTier, planPromos, refundNotes } from '../../../config/plans'
 import { consoleFeatures, consoleBackupDomains, consoleFaqs, consoleSteps } from '../../../config/console'
+import {
+  agencyPageTitle,
+  agencyLead,
+  agencyAudiences,
+  agencyBenefits,
+  agencyMindsets,
+  agencyFaqs,
+} from '../../../config/agency'
 import type { FaqItem } from '../../../config/faq'
-import { jsonLdGuideScene, jsonLdGuideIndex, guideFooterItems } from './guide_jsonld'
-import { faqByCategory, faqItems, faqCategories, categoryLabels } from '../../../config/faq'
+import { jsonLdGuideScene, jsonLdGuideIndex } from './guide_jsonld'
+import {
+  faqByCategory,
+  faqItems,
+  faqCategories,
+  categoryLabels,
+  categoryLeads,
+  buyingQuestions,
+  pricingFaqItems,
+  modelsFaqItems,
+  guideFaqItems,
+} from '../../../config/faq'
 import type { FaqCategory } from '../../../config/faq'
 /** 组件从 pages/data 统一引入这些 config 符号，改这里一处即可 */
-export { siteConfig, modelIds, recommendedIds, faqCategories, categoryLabels, faqItems }
+export {
+  siteConfig,
+  modelIds,
+  recommendedIds,
+  faqCategories,
+  categoryLabels,
+  faqItems,
+  buyingQuestions,
+  pricingFaqItems,
+  modelsFaqItems,
+  guideFaqItems,
+}
 
 /** 模型层级说明表（/models 与 /guide 教程页共用） */
 /** 常用 model ID 表 */
@@ -21,11 +50,8 @@ export const modelIdRows = modelIds.map((m) => ({ label: m.id, values: [m.tier, 
 
 export { jsonLdGuideScene, jsonLdGuideIndex }
 
-/** 页脚「教程」列：全部场景页 */
-export const guideNavItems = guideFooterItems()
-
-/** 购买前要问清的两件事（FAQ 页顶部「买之前」区块用），全部对应 config/faq.ts 里的条目 */
-export const buyingQuestions = faqItems.filter((x) => ['cat-limits-speed', 'cat-product-period'].includes(x.id))
+/** 首页「买之前先确认」与 /faq 顶部同一份；全文主场仍在 /faq */
+export const featuredFaqItems = buyingQuestions
 
 /** 商品（取 featured） */
 export const product = siteConfig.products.find((x) => x.id === siteConfig.featuredProductId) ?? siteConfig.products[0]
@@ -58,9 +84,20 @@ export const homeContinueLinks = [
 ]
 
 export const consoleFaqItems = consoleFaqs as FaqItem[]
+export const agencyFaqItems = agencyFaqs as FaqItem[]
 
 const faqJsonLd = (items: { q: string; a: string }[]) => ({
   '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: items.map((it) => ({
+    '@type': 'Question',
+    name: it.q,
+    acceptedAnswer: { '@type': 'Answer', text: it.a.replace(/\n+/g, ' ') },
+  })),
+})
+
+/** @graph 内嵌的 FAQPage 节点（无 @context）；条目必须与页内可见 FaqList 一致 */
+const faqPageNode = (items: { q: string; a: string }[]) => ({
   '@type': 'FAQPage',
   mainEntity: items.map((it) => ({
     '@type': 'Question',
@@ -87,36 +124,48 @@ export const jsonLdConsole = {
       about: { '@id': base + '/#org' },
       ...(consolePartnerUrl ? { significantLink: consolePartnerUrl } : {}),
     },
-    {
-      '@type': 'FAQPage',
-      mainEntity: consoleFaqs.map((it) => ({
-        '@type': 'Question',
-        name: it.q,
-        acceptedAnswer: { '@type': 'Answer', text: it.a.replace(/\n+/g, ' ') },
-      })),
-    },
+    faqPageNode(consoleFaqs),
   ],
 }
 
-/** /models 页 JSON-LD */
+/** /agency 页 JSON-LD：WebPage + FAQPage（Token 代理 / rsxermu666 代理 主场） */
+export const jsonLdAgency = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      name: agencyPageTitle,
+      description: agencyLead,
+      url: base + '/agency',
+      inLanguage: 'zh-CN',
+      isPartOf: { '@id': base + '/#site' },
+      about: { '@id': base + '/#org' },
+    },
+    faqPageNode(agencyFaqs),
+  ],
+}
+
+/** /models 页 JSON-LD：ItemList + 页内精选 FAQPage */
 export const jsonLdModels = {
   '@context': 'https://schema.org',
-  '@type': 'ItemList',
-  name: 'Claude 模型与 model ID 一览',
-  itemListElement: modelIds.map((m, i) => ({
-    '@type': 'ListItem',
-    position: i + 1,
-    name: m.id,
-    description: `${m.tier} 档：${m.scene}`,
-  })),
+  '@graph': [
+    {
+      '@type': 'ItemList',
+      name: 'Claude 模型与 model ID 一览',
+      itemListElement: modelIds.map((m, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: m.id,
+        description: `${m.tier} 档：${m.scene}`,
+      })),
+    },
+    faqPageNode(modelsFaqItems),
+  ],
 }
 
 /**
- * /pricing 页 JSON-LD：只有 Product。
- * 2026-10-12 起 /pricing 页内不再挂 FAQ 组件（限速与封号只在 /faq 维护一份），
- * 结构化数据必须与页面可见内容一致，所以这里不输出 FAQPage——
- * 否则等于向搜索引擎声明「页面上有这 4 条问答」，而页面上根本没有。
- * /faq 页自己的 FAQPage 由 jsonLdFaq 提供。
+ * /pricing 页 JSON-LD：Product + 页内精选 FAQPage。
+ * 精选条目见 config/faq.ts 的 pricingFaqItems；限速全文主场仍在 /faq。
  */
 export const jsonLdPricing = {
   '@context': 'https://schema.org',
@@ -138,6 +187,7 @@ export const jsonLdPricing = {
         seller: { '@type': 'Organization', name: siteConfig.name },
       },
     },
+    faqPageNode(pricingFaqItems),
   ],
 }
 
@@ -175,12 +225,13 @@ export const jsonLdHome = {
   ],
 }
 
-/** FAQ 分类顺序：购买 → 商品 → 限速 → 配置 → 接入 → 安全 → 我们 */
-export const faqGroupOrder: FaqCategory[] = ['product', 'limits', 'setup', 'usage', 'security', 'about']
+/** FAQ 分类顺序：商品 → 开通 → 日常 → 报错 → 安全联系（与 config/faq.ts 的 faqCategories 一致） */
+export const faqGroupOrder: FaqCategory[] = ['product', 'setup', 'usage', 'limits', 'safety']
 
 export const faqGroups = faqGroupOrder.map((cat) => ({
   cat,
   label: categoryLabels[cat],
+  lead: categoryLeads[cat],
   items: faqByCategory(cat),
 }))
 
@@ -288,4 +339,12 @@ export { knowledgeCategories, knowledgeCategoryName, knowledgeCategoryShort, kno
 /** 套餐、后台相关的导出（/pricing、/console 页直接用） */
 export { planGroups, allTiers, tiersOf, featuredTierOf, entryTier, planPromos, refundNotes }
 export { consoleFeatures, consoleBackupDomains, consoleFaqs, consoleSteps }
+export {
+  agencyPageTitle,
+  agencyLead,
+  agencyAudiences,
+  agencyBenefits,
+  agencyMindsets,
+  agencyFaqs,
+}
 export { modelBrands }

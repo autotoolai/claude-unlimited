@@ -28,7 +28,20 @@ const inBrowserRef = typeof document !== 'undefined'
 interface TrackPayload {
   page?: string
   referrer?: string
+  /** 粗粒度设备：mobile | desktop，作事件属性，不进事件名 */
+  device?: 'mobile' | 'desktop'
   [key: string]: unknown
+}
+
+/** 粗粒度设备：触控优先算 mobile，否则按视口宽度 820（与顶栏窄屏断点一致） */
+function deviceOf(): 'mobile' | 'desktop' {
+  try {
+    if (window.matchMedia('(pointer: coarse)').matches) return 'mobile'
+    if (window.matchMedia('(max-width: 820px)').matches) return 'mobile'
+  } catch {
+    /* matchMedia 不可用时退回 desktop */
+  }
+  return 'desktop'
 }
 
 function payloadOf(data?: TrackPayload): Record<string, unknown> {
@@ -36,6 +49,7 @@ function payloadOf(data?: TrackPayload): Record<string, unknown> {
   const ref = document.referrer || ''
   return {
     page: location.pathname + location.search,
+    device: deviceOf(),
     // 只记来源站点，不记完整来源 URL（后者可能带用户自己的搜索词或会话参数）
     ...(ref ? { referrer: safeRefHost(ref) } : {}),
     ...(data ?? {}),
@@ -90,9 +104,11 @@ export function installClickTracking() {
         const el = (e.target as HTMLElement | null)?.closest?.('[data-cta]')
         const name = el?.getAttribute('data-cta')
         if (!name) return
-        const page = location.pathname
-        sendUmami(name, { page, referrer: safeRefHost(document.referrer || '') || undefined })
-        sendBaidu(name, { page })
+        sendUmami(name, {
+          page: location.pathname,
+          referrer: safeRefHost(document.referrer || '') || undefined,
+        })
+        sendBaidu(name, { page: location.pathname })
       } catch {
         /* 统计失败静默 */
       }

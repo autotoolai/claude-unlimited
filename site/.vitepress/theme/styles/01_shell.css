@@ -29,7 +29,9 @@
   position: sticky;
   top: 0;
   z-index: 40;
-  height: var(--cu-nav-h);
+  /* 刘海屏：总高 = 导航行 + 安全区；padding-top 把内容顶到安全区下方 */
+  height: calc(var(--cu-nav-h) + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
   /* 实心底色：原先 85% 透明 + blur，背后的 Hero 光晕会透上来，在顶栏下沿形成一条
      色带（首页最明显，正文区是 --cu-bg-soft，顶栏区是 --cu-bg，差 7 个灰阶）。
      顶栏区域在所有页面都应是同一块颜色，不该被下方内容影响。 */
@@ -212,7 +214,8 @@ html:not(.dark) .cu-navtoggle .cu-icon-moon {
 
 .cu-page {
   width: 100%;
-  padding: 3rem 0 5rem;
+  /* 底 padding 与 .cu-foot 的 margin-top 合计约一个 section-y，避免 5+4=9rem 双重大空档 */
+  padding: 3rem 0 3rem;
 }
 
 /* —— 页面头（内页）：居中，参考站的 section-head —— */
@@ -269,8 +272,8 @@ html:not(.dark) .cu-navtoggle .cu-icon-moon {
 /* —— 正文排版 —— */
 /* 正文直属 h2 = 一节的分节头：居中衬线标题，紧随其后的那段话是这一节的说明（居中、次级色）。
    卡片 / 表格 / 套餐等块跟在说明之后，因此能铺满 1140px；段落本身仍限宽 44rem 保证可读。
-   注意：这组选择器比组件里的类选择器（FAQ 分类头、知识库分类头）优先级更高，
-   它们的 h2 是分类标题而不是分节头，已在 10_faq.css / 14_knowledge.css 里显式改回左对齐。 */
+   FAQ 分类头与「买之前」同级，走这套居中分节头；知识库分类头仍是目录标签，
+   在 14_knowledge.css 里显式改回左对齐（选择器优先级需压过本条）。 */
 .cu-page h2 {
   margin: var(--cu-section-y-lg) 0 0;
   font-family: var(--cu-serif);
@@ -281,7 +284,13 @@ html:not(.dark) .cu-navtoggle .cu-icon-moon {
   color: var(--cu-ink);
   text-align: center;
   text-wrap: balance;
-  scroll-margin-top: calc(var(--cu-nav-h) + 24px);
+  scroll-margin-top: calc(var(--cu-nav-offset) + 24px);
+}
+
+/* 页头后的首个分节：紧接引导语，不要再叠 section-y-lg（那是节与节之间的呼吸）。
+   FAQ「买之前」等内页首节原先空出 ~104px，与页头脱节。 */
+.cu-page__head + h2 {
+  margin-top: 2.25rem;
 }
 
 .cu-page h2 + p {
@@ -389,16 +398,164 @@ html:not(.dark) .cu-navtoggle .cu-icon-moon {
 
 /* 左侧目录与 1280 / 1180 / 1040 断点：见 01_shell_toc.css（内容独立，单独一个文件更好维护） */
 
+/* —— 窄屏主导航抽屉（MobileNavDrawer.vue）——
+   ≥821px：横排 tabs + 控制台/主题；菜单按钮隐藏。
+   ≤820px：顶栏只留 品牌 | 菜单 | 购买；链接/控制台/主题进右侧抽屉。 */
+.cu-nav-menu {
+  display: none;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-sm);
+  background: transparent;
+  color: var(--cu-muted);
+  cursor: pointer;
+  line-height: 1;
+  transition: background-color 0.25s var(--cu-ease), color 0.25s var(--cu-ease);
+}
+
+.cu-nav-menu:hover {
+  background: var(--cu-card);
+  color: var(--cu-ink);
+}
+
+.cu-nav-menu svg {
+  width: 16px;
+  height: 16px;
+}
+
+.cu-nav-drawer__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: color-mix(in srgb, var(--cu-ink) 45%, transparent);
+}
+
+.cu-nav-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 71;
+  width: min(82vw, 320px);
+  padding: 1.1rem 1rem 2rem;
+  overflow-y: auto;
+  background: var(--cu-bg);
+  border-left: 1px solid var(--cu-line);
+  box-shadow: var(--cu-shadow-lift);
+}
+
+.cu-nav-drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+.cu-nav-drawer__title {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--cu-muted);
+}
+
+.cu-nav-drawer__close {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -4px 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--cu-r-sm);
+  background: transparent;
+  color: var(--cu-muted);
+  cursor: pointer;
+}
+
+.cu-nav-drawer__close svg {
+  width: 14px;
+  height: 14px;
+}
+
+.cu-nav-drawer__links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  border-left: 1px solid var(--cu-line);
+}
+
+.cu-nav-drawer__link {
+  display: block;
+  padding: 0.55rem 0.75rem;
+  margin-left: -1px;
+  border-left: 2px solid transparent;
+  border-radius: 0 var(--cu-r-sm) var(--cu-r-sm) 0;
+  color: var(--cu-muted);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.cu-nav-drawer__link:hover {
+  color: var(--cu-ink);
+  background: var(--cu-accent-soft);
+  text-decoration: none;
+}
+
+.cu-nav-drawer__link.is-active {
+  color: var(--cu-ink);
+  border-left-color: var(--cu-accent);
+  font-weight: 600;
+}
+
+.cu-nav-drawer__tools {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--cu-line);
+}
+
+.cu-nav-drawer__console {
+  flex: 1 1 auto;
+}
+
 @media (max-width: 820px) {
-  /* 窄屏只留 logo + 购买 + 主题切换：导航可横滚，后台入口让位；
-     overflow: hidden 让 .cu-tabs__inner 的横向溢出被裁在导航行内，不把整页撑宽 */
+  /* 窄屏：品牌 | 菜单 | 购买；禁止 overflow:hidden 裁掉购买按钮 */
   .cu-brandbar__inner {
     gap: 0.6rem;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .cu-tabs {
-    margin-left: 0;
+    display: none;
+  }
+
+  .cu-navtools__wide {
+    display: none !important;
+  }
+
+  .cu-nav-menu {
+    display: inline-flex;
+  }
+
+  .cu-navtools {
+    gap: 0.45rem;
+  }
+
+  .cu-tabs__cta {
+    flex: 0 0 auto;
   }
 }
 
@@ -412,6 +569,26 @@ html:not(.dark) .cu-navtoggle .cu-icon-moon {
   }
 
   .cu-page__head {
-    padding-top: 1rem;
+    padding-top: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .cu-page {
+    padding-top: 1.75rem;
+    padding-bottom: 2.25rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .cu-page__head h1 {
+    font-size: clamp(1.65rem, 7vw, 2.1rem);
+  }
+
+  .cu-page__lead {
+    font-size: 0.95rem;
+  }
+
+  .cu-brand__text strong {
+    font-size: 0.95rem;
   }
 }

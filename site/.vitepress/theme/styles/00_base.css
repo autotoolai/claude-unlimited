@@ -66,8 +66,8 @@
   --cu-shadow-lift: 0 24px 48px -32px rgba(20, 20, 19, 0.45);
   --cu-shadow-nav: 0 10px 30px -26px rgba(20, 20, 19, 0.5);
   --cu-shadow-pop: 0 20px 50px -24px rgba(20, 20, 19, 0.35);
-  /* 终端窗口：参考站的双层阴影（长投影 + 1px 描边环） */
-  --cu-shadow-term: rgba(20, 20, 19, 0.55) 0 40px 80px -24px, rgba(20, 20, 19, 0.06) 0 0 0 1px;
+  /* 终端不再做大投影：底边齐平裁切，软阴影会拖出一块脏黑带；只留 1px 描边。 */
+  --cu-shadow-term: rgba(20, 20, 19, 0.06) 0 0 0 1px;
 
   /* —— 节奏：动效统一缓动与时长 —— */
   --cu-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -89,7 +89,9 @@
   --cu-guide-text: 40rem;
 
   /* —— 尺寸 —— */
-  --cu-nav-h: 60px; /* 单行吸顶导航高度，锚点定位与目录 sticky 都按它算 */
+  --cu-nav-h: 60px; /* 单行吸顶导航内容行高（不含刘海安全区） */
+  /* 锚点 / sticky 用：内容行 + 刘海安全区，与 .cu-brandbar 总高一致 */
+  --cu-nav-offset: calc(var(--cu-nav-h) + env(safe-area-inset-top, 0px));
   --cu-wrap: 1140px; /* 主容器宽度 */
   --cu-narrow: 46rem; /* 知识库阅读列 */
 
@@ -137,7 +139,8 @@ html:not(.light):has(.dark) {
   --cu-shadow-lift: 0 24px 48px -32px rgba(0, 0, 0, 0.7);
   --cu-shadow-nav: 0 10px 30px -26px rgba(0, 0, 0, 0.8);
   --cu-shadow-pop: 0 20px 50px -24px rgba(0, 0, 0, 0.6);
-  --cu-shadow-term: rgba(0, 0, 0, 0.7) 0 40px 80px -24px, rgba(243, 240, 232, 0.06) 0 0 0 1px;
+  /* 同亮色：去掉大投影，只留描边；暗底上靠浅色发丝勾边。 */
+  --cu-shadow-term: rgba(243, 240, 232, 0.12) 0 0 0 1px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -172,14 +175,14 @@ html:not(.light):has(.dark) {
     --cu-shadow-lift: 0 24px 48px -32px rgba(0, 0, 0, 0.7);
     --cu-shadow-nav: 0 10px 30px -26px rgba(0, 0, 0, 0.8);
     --cu-shadow-pop: 0 20px 50px -24px rgba(0, 0, 0, 0.6);
-    --cu-shadow-term: rgba(0, 0, 0, 0.7) 0 40px 80px -24px, rgba(243, 240, 232, 0.06) 0 0 0 1px;
+    --cu-shadow-term: rgba(243, 240, 232, 0.12) 0 0 0 1px;
   }
 }
 
 /* —— 排版基线 —— */
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--cu-nav-h) + 24px);
+  scroll-padding-top: calc(var(--cu-nav-offset) + 24px);
   -webkit-text-size-adjust: 100%;
 }
 

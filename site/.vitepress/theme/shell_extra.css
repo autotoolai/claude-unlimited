@@ -6,7 +6,8 @@
 }
 
 .cu-foot {
-  margin-top: 4rem;
+  /* 与 .cu-page 底 padding 合计约 5rem（= --cu-section-y），不再各自 4–5rem 叠双倍 */
+  margin-top: 2rem;
   border-top: 1px solid var(--cu-line);
   background: var(--cu-bg-soft);
 }
@@ -15,7 +16,7 @@
   margin-inline: auto;
   padding: 3rem 0 2.75rem;
   display: grid;
-  grid-template-columns: 1.4fr repeat(4, 1fr);
+  grid-template-columns: 1.4fr repeat(3, 1fr);
   gap: 2.5rem 2rem;
 }
 .cu-foot__brand p {
@@ -52,18 +53,35 @@
   color: var(--cu-accent-deep);
 }
 .cu-foot__bottom {
-  border-top: 1px solid var(--cu-line);
-}
-.cu-foot__bottom > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem 1.5rem;
   width: min(var(--cu-wrap), 100% - 3rem);
   margin-inline: auto;
   padding: 0.9rem 0 1.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem 1.2rem;
+  border-top: 1px solid var(--cu-line);
   font-size: 0.78rem;
   color: var(--cu-muted);
   line-height: 1.7;
+}
+.cu-foot__bottom > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+}
+.cu-foot__legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.95rem;
+}
+.cu-foot__legal a {
+  font-size: 0.78rem;
+  color: var(--cu-muted);
+}
+.cu-foot__legal a:hover {
+  color: var(--cu-ink);
 }
 
 @media (max-width: 1000px) {
@@ -74,7 +92,7 @@
 
 @media (max-width: 720px) {
   .cu-foot__inner,
-  .cu-foot__bottom > div {
+  .cu-foot__bottom {
     width: min(1160px, 100% - 2rem);
   }
   .cu-foot__inner {
@@ -624,7 +642,7 @@
    一旦给 figure 加 align-self:start 或固定高度，stretch 就失效了。 */
 .cu-step-block__shots > .cu-step-block__shot:first-child {
   position: sticky;
-  top: calc(var(--cu-nav-h) + 16px);
+  top: calc(var(--cu-nav-offset) + 16px);
 }
 /* 窄屏回落单列的断点 ≤560px：步骤块本身 52rem，减去序号列后临界点已不足 520px。
    ⚠ 上面第 334 行那条 720px 的回落对「宽屏两列」无效——两条选择器优先级相同，
@@ -685,7 +703,7 @@
 
 .cu-step-block__body > h3,
 .cu-step-block__text > h3 {
-  scroll-margin-top: calc(var(--cu-nav-h) + 24px);
+  scroll-margin-top: calc(var(--cu-nav-offset) + 24px);
 }
 
 
@@ -1123,6 +1141,26 @@
 
   .cu-guide-index .cu-guide-scene-card--wide .cu-guide-scene-card__meta {
     margin-top: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  /* 教程场景页：窄屏压缩页头与目录条间距，把正文尽早推到首屏 */
+  .cu-guide-wrap .cu-page {
+    padding-top: 1.25rem;
+  }
+
+  .cu-guide-wrap .cu-page__head {
+    margin-bottom: 1rem;
+  }
+
+  .cu-guide-wrap .cu-page__head h1 {
+    font-size: clamp(1.45rem, 6.5vw, 1.85rem);
+    line-height: 1.28;
+  }
+
+  .cu-shell__body--reading .cu-sidenav {
+    margin-bottom: 0.65rem;
   }
 }
 

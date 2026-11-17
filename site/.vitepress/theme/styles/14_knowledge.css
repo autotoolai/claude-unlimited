@@ -163,7 +163,7 @@
   letter-spacing: -0.01em;
   line-height: 1.35;
   color: var(--cu-ink);
-  scroll-margin-top: calc(var(--cu-nav-h) + 24px);
+  scroll-margin-top: calc(var(--cu-nav-offset) + 24px);
 }
 
 .cu-page--doc .vp-doc h3 {
@@ -171,7 +171,7 @@
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--cu-ink);
-  scroll-margin-top: calc(var(--cu-nav-h) + 24px);
+  scroll-margin-top: calc(var(--cu-nav-offset) + 24px);
 }
 
 .cu-page--doc .vp-doc p {
@@ -330,7 +330,18 @@
     padding: 0.95rem 1rem;
   }
   .cu-page--doc {
-    padding-top: 2.5rem;
+    padding-top: 1.5rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .cu-page--doc .vp-doc h1 {
+    font-size: clamp(1.55rem, 7vw, 1.95rem);
+    line-height: 1.25;
+  }
+
+  .cu-kdoc__meta {
+    margin-bottom: 0.85rem;
   }
 }
 
@@ -669,17 +680,19 @@
     white-space: normal !important;
   }
 
-  /* 窄屏不均分，横向滚动，一项一项读 */
+  /* 窄屏改换行：原先 overflow-x + 藏滚动条，五分类会拖到视口外却看不出可滑，
+     手机上像「缺了成本/排查」。改成 flex-wrap，全部可见、点得到。 */
   .cu-kfilters .cu-seg {
     display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
+    flex-wrap: wrap;
+    overflow-x: visible;
+    width: 100%;
   }
 
   .cu-kfilters .cu-seg__btn {
-    flex: 0 0 auto;
-    scroll-snap-align: start;
-    padding: 0.45rem 0.85rem;
+    flex: 1 1 auto;
+    justify-content: center;
+    padding: 0.45rem 0.7rem;
   }
 
   .cu-kgrid {

@@ -1,0 +1,161 @@
+/* 联系我们页：铺满营销页正文宽（--cu-wrap）。
+   通道卡横排（码左信息右），适用场景走三列卖点卡网格，避免窄列居中留白。 */
+
+.cu-contact {
+  margin-top: 0.5rem;
+}
+
+.cu-contact__channels {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin: 0 0 0.5rem;
+  width: 100%;
+}
+
+.cu-contact__channels--dual {
+  grid-template-columns: 1fr 1fr;
+}
+
+.cu-contact__channel {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.35rem;
+  min-width: 0;
+  padding: 1.5rem 1.5rem 1.5rem 1.35rem;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-lg);
+  background: var(--cu-card);
+  text-align: left;
+  transition: background-color 0.3s var(--cu-ease), border-color 0.3s var(--cu-ease),
+    box-shadow var(--cu-dur) var(--cu-ease), transform var(--cu-dur) var(--cu-ease);
+}
+
+.cu-contact__channel:hover {
+  background: var(--cu-card-hover);
+  border-color: var(--cu-line-strong);
+  transform: translateY(-4px);
+  box-shadow: var(--cu-shadow-lift);
+}
+
+.cu-contact__qr-wrap {
+  flex: 0 0 auto;
+  display: inline-flex;
+  padding: 0.55rem;
+  border-radius: var(--cu-r-md);
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(20, 20, 19, 0.06);
+}
+
+.cu-contact__qr {
+  display: block;
+  width: 176px;
+  height: 176px;
+  border-radius: 4px;
+}
+
+.cu-contact__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45rem;
+  min-width: 0;
+  flex: 1;
+}
+
+/* 选择器要压过 .cu-page p { margin:.9rem auto }（(0,1,1)），否则通道卡内
+   标题/说明会叠出大段空白；代理页竖排 CTA 尤其明显。 */
+.cu-page .cu-contact__channel-title {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--cu-ink);
+  line-height: 1.35;
+}
+
+.cu-page .cu-contact__channel-desc {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--cu-muted);
+}
+
+.cu-contact__row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  max-width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.3rem 0.4rem 0.3rem 0.75rem;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-pill);
+  background: var(--cu-bg-soft);
+}
+
+.cu-contact__id {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--cu-ink);
+  font-family: var(--cu-mono);
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+/* 场景节：跟营销页分节头节奏，三列卡吃满正文宽 */
+.cu-contact__scenes {
+  margin: 0;
+}
+
+.cu-page .cu-contact__scenes > h2 {
+  margin-top: var(--cu-section-y);
+}
+
+.cu-contact__scene-grid {
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+}
+
+.cu-contact__scene-grid .cu-card p {
+  margin-bottom: 0;
+}
+
+.cu-contact__scene-link {
+  margin-top: 0.65rem !important;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+  .cu-contact__channels--dual {
+    grid-template-columns: 1fr;
+  }
+
+  .cu-contact__scene-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .cu-contact__channel {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.35rem 1.15rem;
+    text-align: center;
+  }
+
+  .cu-contact__meta {
+    align-items: center;
+  }
+
+  .cu-contact__qr {
+    width: 152px;
+    height: 152px;
+  }
+}

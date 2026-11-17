@@ -32,7 +32,7 @@ export const consoleSteps: ConsoleStep[] = [
   {
     n: '02',
     title: '提取 API Key',
-    blurb: '到「提取 Key」拿到 sk- 开头的专属 Key；首次发起请求时自动激活。',
+    blurb: '到「提取 Key」拿到 sk- 开头的专属 Key；提取后即激活，有效期按 24 小时制起算。',
   },
   {
     n: '03',
@@ -105,7 +105,8 @@ export const consoleFaqs = [
   {
     id: 'console-vs-official-site',
     q: '管理后台和官网是什么关系？',
-    a: '官网负责介绍、定价、教程与答疑；管理后台（rsxermu666.cn）负责兑换、提 Key、导入配置与查用量。卡密按官网指引购买，进后台完成操作。两者同属 Claude 无限卡官方服务。',
+    a: '官网负责介绍、定价、教程与答疑；管理后台（rsxermu666.cn）负责兑换、提 Key、导入配置与查用量。卡密按官网指引购买，进后台完成操作。两者同属 Claude 无限卡官方服务。想做渠道代理见 Token 代理页，不在本页开通。',
+    links: [{ text: 'Token 代理', url: '/agency' }],
   },
   {
     id: 'console-key-where',
@@ -132,4 +133,10 @@ export const consoleFaqs = [
     q: '无限卡在后台显示什么？',
     a: '显示「无额度 / 时间上限」，用量页只有 token 与请求数的统计，不产生按次费用。',
   },
+  {
+    id: 'console-period',
+    q: '有效期从什么时候开始算？',
+    a: '从「提取 Key」激活起算，按 24 小时制计时（商品页天数 × 24 小时），不是按下单或支付时间。卡密未提取前不计时；多张卡各自独立，不合并。',
+  },
 ]
+

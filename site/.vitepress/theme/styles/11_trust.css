@@ -82,3 +82,19 @@
     padding: 2.5rem 1.25rem;
   }
 }
+
+@media (max-width: 560px) {
+  /* 页底 CTA 条常塞 2–3 个按钮：窄屏竖排全宽，避免「窄胶囊竖着飘、点不准」；
+     首页 Hero 仍是 .cu-hero 内的 cu-cta-row--center，不受这里影响。 */
+  .cu-band .cu-cta-row--center {
+    flex-direction: column;
+    align-items: stretch;
+    width: min(100%, 22rem);
+    margin-inline: auto;
+  }
+
+  .cu-band .cu-cta-row--center .cu-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

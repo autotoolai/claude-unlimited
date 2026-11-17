@@ -7,13 +7,13 @@
 .cu-sidenav.cu-scroll-none {
   position: sticky;
   align-self: start; /* 网格项默认 stretch 会让 sticky 失效 */
-  top: calc(var(--cu-nav-h) + 1rem);
+  top: calc(var(--cu-nav-offset) + 1rem);
   /* 顶部对齐正文的 h1（.cu-page--doc 的 padding-top 3.5rem + .vp-doc h1 自身没有上边距，
      所以 h1 顶边离网格顶约 3.5rem）；目录抓的是 h2 起的标题，天然比 h1 低一层，
      这 3rem 的空白就是那层偏移量，缩到 0 就跟胶囊标签、meta 行错位了。 */
   padding: 3rem 0 1.5rem;
   font-size: 0.875rem;
-  max-height: calc(100dvh - var(--cu-nav-h) - 4.5rem);
+  max-height: calc(100dvh - var(--cu-nav-offset) - 4.5rem);
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -124,7 +124,7 @@
    知识库（knowledge）：一切保持原样，走默认规则。 */
 html.cu-toc-variant-guide .cu-sidenav {
   padding-top: 1.25rem;
-  max-height: calc(100dvh - var(--cu-nav-h) - 2.75rem);
+  max-height: calc(100dvh - var(--cu-nav-offset) - 2.75rem);
 }
 
 html.cu-toc-variant-guide .cu-sidenav__progress {
@@ -272,13 +272,14 @@ html.cu-toc-variant-guide .cu-sidenav__progress {
     position: static;
     max-height: none;
     padding: 0;
-    margin: 0 0 1.25rem;
+    margin: 0 0 0.85rem;
   }
 
   /* 侧栏变成抽屉面板：脱离文档流，固定在右侧。宽 82vw 封顶 320px，
      窄到 400px 的手机上也能留出遮罩提示「这是浮层不是页面」。 */
   .cu-shell__body--reading .cu-sidenav ul,
-  .cu-shell__body--reading .cu-sidenav__progress {
+  .cu-shell__body--reading .cu-sidenav__progress,
+  .cu-shell__body--reading .cu-sidenav__head {
     display: none;
   }
 

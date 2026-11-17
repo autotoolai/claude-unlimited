@@ -1,0 +1,175 @@
+/* Token 代理页：为什么值得做 / 适合谁 / 微信 CTA+心态建议 / FAQ。
+   二维码通道块复用 18_contact.css 的 .cu-contact__*；
+   申请区桌面左右：左码右心态建议；无微信时心态建议单独占满。
+   心态建议用编号列表，不跟上方卖点卡同构。 */
+
+.cu-page .cu-agency > h2 {
+  margin-top: var(--cu-section-y);
+}
+
+.cu-page .cu-agency > h2:first-child {
+  margin-top: 0.5rem;
+}
+
+.cu-agency__grid {
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+}
+
+.cu-agency__grid .cu-card p {
+  margin-bottom: 0;
+}
+
+/* 这句不长，别限 36rem——中文全角在 .cu-page p 字号下会把「联系我们。」单独挤到第二行。 */
+.cu-page .cu-agency__apply-lead {
+  max-width: none;
+  margin: 0.85rem auto 0;
+  text-align: center;
+}
+
+.cu-agency__apply {
+  display: grid;
+  grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: stretch;
+  margin: 1.25rem 0 0;
+  width: 100%;
+}
+
+.cu-agency__apply--solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.cu-agency__cta {
+  margin: 0;
+  width: 100%;
+  display: flex;
+  min-width: 0;
+}
+
+.cu-agency__cta .cu-contact__channel {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  padding: 1.35rem 1.25rem 1.25rem;
+  text-align: center;
+}
+
+/* 转化卡不需要整卡上浮；避免贴 FAQ 时像被裁切 */
+.cu-agency__cta .cu-contact__channel:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.cu-agency__cta .cu-contact__meta {
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.35rem;
+}
+
+.cu-page .cu-agency__cta .cu-contact__channel-title,
+.cu-page .cu-agency__cta .cu-contact__channel-desc {
+  text-align: center;
+}
+
+.cu-agency__cta .cu-contact__row {
+  margin-top: 0.35rem;
+}
+
+.cu-agency__cta .cu-copychip {
+  color: var(--cu-ink);
+  border-color: var(--cu-line-strong);
+  background: var(--cu-bg-soft);
+}
+
+.cu-agency__cta .cu-copychip:hover {
+  background: var(--cu-card-hover);
+}
+
+.cu-agency__mindset-panel {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid var(--cu-line);
+  border-radius: var(--cu-r-lg);
+  background: var(--cu-card);
+  padding: 0.45rem 0;
+}
+
+.cu-agency__mindset {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cu-agency__mindset-item {
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  padding: 0.72rem 1.3rem;
+}
+
+.cu-agency__mindset-item + .cu-agency__mindset-item {
+  border-top: 1px solid var(--cu-line);
+}
+
+.cu-agency__mindset-no {
+  flex: none;
+  font-family: var(--cu-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--cu-muted);
+  line-height: 1.6;
+}
+
+.cu-page .cu-agency__mindset-text {
+  margin: 0;
+  max-width: none;
+  min-width: 0;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--cu-muted);
+}
+
+.cu-agency__mindset-text strong {
+  margin-right: 0.45em;
+  font-weight: 700;
+  color: var(--cu-ink);
+}
+
+@media (max-width: 900px) {
+  .cu-agency__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cu-agency__apply {
+    grid-template-columns: 1fr;
+  }
+
+  .cu-agency__cta .cu-contact__channel {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .cu-agency__cta .cu-contact__channel {
+    padding: 1.35rem 1.15rem;
+  }
+
+  .cu-agency__cta .cu-contact__qr {
+    width: 168px;
+    height: 168px;
+  }
+
+  .cu-agency__mindset-item {
+    padding: 0.68rem 1.1rem;
+  }
+}

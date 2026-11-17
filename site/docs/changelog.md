@@ -2,10 +2,19 @@
 
 倒序记录。每条一行，说清「改了什么、为什么、影响谁」。当前状态与操作方式看 `README.md`，不在这份里。
 
+## 2026-11-09
+
+- **Token 代理页 SEO / GEO**：强化 `/agency` 收录信号（百度推送提到 `/console` 之后；lead / FAQ /
+  keywords / JSON-LD / llms 同口径定义句）。对外页面名统一「Token 代理」；「rsxermu666 代理」
+  只作 FAQ / keywords / llms 搜索别名，不进 title / H1 / 导航锚。裸词 `rsxermu666` 仍归 `/console`。
+
 ## 2026-11-05
 
+- **关于 / 服务条款 / 隐私并成一页**：`/terms`、`/privacy` 301 到 `/about#terms` / `/about#privacy`。
+  去掉三栏卡片与「暂未提供」堆砌，改成页内胶囊导航 + 事实行 + 分节阅读；对外限流只写会话窗口，
+  不再在条款里披露并发 / RPM。页脚底部补上关于与政策三链。
 - **`rsxermu666` 品牌词 SEO / GEO**：`/console` lead 首句改为官方定义（与 FAQ / llms 同口径）；
-  百度推送把 `/console` 提为最高优先；教程索引 / 页脚锚文本、关于与隐私、桌面版知识库改为叙述链
+  百度推送把 `/console` 提为最高优先；教程索引 / 页脚锚文本、关于页、桌面版知识库改为叙述链
   `/console`、操作仍直链 `rsxermu666.cn`。不改 URL、不加带词三级域。
 
 ## 2026-10-26

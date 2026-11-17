@@ -1,0 +1,60 @@
+/* 关于我们：跟首页同一套营销规范——居中分节头（吃 .cu-page h2）+ 满宽 cu-cards。
+   不再做侧栏目录或 40rem 窄列。 */
+
+.cu-legal {
+  margin: 0;
+  max-width: none;
+}
+
+.cu-legal__updated {
+  margin: 0 auto 0.25rem !important;
+  max-width: none !important;
+  font-size: 0.8rem;
+  color: var(--cu-muted) !important;
+  text-align: center !important;
+}
+
+/* 首节无 H2（事实卡直接接页头），其后分节走 .cu-page h2 的 --cu-section-y-lg */
+.cu-page .cu-legal__block:first-of-type > h2 {
+  margin-top: 1.75rem;
+}
+
+.cu-legal__block {
+  scroll-margin-top: calc(var(--cu-nav-offset) + 24px);
+}
+
+.cu-legal__block--bare .cu-cards {
+  margin-top: 0.5rem;
+}
+
+/* 卡片内多段 / 列表：压掉 .cu-page p 的居中限宽，贴卡片左边线 */
+.cu-page .cu-legal .cu-card p {
+  margin: 0 0 0.55rem !important;
+  max-width: none !important;
+  text-align: left !important;
+  color: var(--cu-muted);
+}
+
+.cu-page .cu-legal .cu-card p:last-child {
+  margin-bottom: 0 !important;
+}
+
+.cu-legal__bullets {
+  margin: 0;
+  padding-left: 1.1rem;
+  max-width: none;
+  list-style: disc;
+}
+
+.cu-legal__bullets li {
+  margin: 0 0 0.35rem;
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: var(--cu-muted);
+  text-align: left;
+}
+
+.cu-legal__bullets li:last-child {
+  margin-bottom: 0;
+}
+

@@ -1,127 +1,188 @@
-/* FAQ：折叠项是卡片，静息靠底色分层，展开时底色加深一档 + 投影。+/- 指示器做成方块，展开旋转 45° 成 ×。 */
+/* FAQ：纸面分隔列表（对齐 Stripe / Linear / 参考站语法）。
+   问题行满宽；答案左缩进 + 细竖线标层级（不用卡片底、不限宽）。
+   指示器只留右侧细 ⌄。延伸阅读对齐教程 .cu-guide-links。 */
 
 .cu-faq {
-  margin: 1.5rem 0;
-  display: grid;
-  gap: 0.7rem;
+  margin: 1.25rem 0 1.75rem;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--cu-line);
 }
 
 .cu-faq__item {
-  border: 1px solid var(--cu-line);
-  border-radius: var(--cu-r-md);
-  background: var(--cu-card);
-  overflow: hidden;
-  scroll-margin-top: calc(var(--cu-nav-h) + 24px);
-  transition: background-color 0.3s var(--cu-ease), border-color 0.3s var(--cu-ease),
-    box-shadow 0.4s var(--cu-ease);
-}
-
-.cu-faq__item[open] {
-  background: var(--cu-card-hover);
-  border-color: var(--cu-line-strong);
-  box-shadow: var(--cu-shadow-lift);
+  border: none;
+  border-bottom: 1px solid var(--cu-line);
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+  scroll-margin-top: calc(var(--cu-nav-offset) + 24px);
 }
 
 .cu-faq__item > summary {
   cursor: pointer;
-  padding: 1.05rem 1.25rem;
-  min-height: 52px;
-  font-weight: 600;
+  padding: 1.15rem 0;
+  min-height: 3.1rem;
+  font-weight: 550;
+  font-size: 1.02rem;
+  letter-spacing: -0.01em;
   color: var(--cu-ink);
   list-style: none;
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  transition: color 0.25s var(--cu-ease);
+  gap: 1rem;
+  transition: color 0.2s var(--cu-ease);
 }
 
-.cu-faq__item > summary:hover {
-  color: var(--cu-accent-deep);
+.cu-faq__item > summary:hover .cu-faq__q {
+  color: var(--cu-ink);
 }
 
 .cu-faq__item > summary::-webkit-details-marker {
   display: none;
 }
 
-/* 加号：两条横竖线，展开时整体旋转 45° 变成叉 */
-.cu-faq__item > summary::before {
-  content: '+';
-  flex: none;
-  width: 1.4em;
-  height: 1.4em;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--cu-r-sm);
-  background: var(--cu-card-solid);
-  border: 1px solid var(--cu-line);
-  color: var(--cu-accent);
-  font-weight: 700;
-  transition: transform 0.4s var(--cu-ease), background-color 0.3s var(--cu-ease);
-}
-
-.cu-faq__item[open] > summary::before {
-  transform: rotate(45deg);
-  background: var(--cu-accent-soft);
+.cu-faq__item > summary:focus-visible {
+  outline: 2px solid var(--cu-contrast);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
 .cu-faq__q {
   flex: 1;
   min-width: 0;
+  line-height: 1.5;
 }
 
+/* 右侧细 ⌄：两截边框，无方框、无底色 */
 .cu-faq__item > summary::after {
-  content: '⌄';
+  content: '';
   flex: none;
-  color: var(--cu-muted);
-  font-size: 1.1rem;
-  line-height: 1;
-  transform: translateY(-2px);
-  transition: transform 0.35s var(--cu-ease), color 0.25s var(--cu-ease);
+  width: 0.42rem;
+  height: 0.42rem;
+  margin-right: 0.2rem;
+  border-right: 1.5px solid var(--cu-muted);
+  border-bottom: 1.5px solid var(--cu-muted);
+  transform: rotate(45deg) translateY(-1px);
+  transition: transform 0.28s var(--cu-ease), border-color 0.2s var(--cu-ease);
+}
+
+.cu-faq__item > summary:hover::after {
+  border-color: var(--cu-ink);
 }
 
 .cu-faq__item[open] > summary::after {
-  transform: rotate(180deg) translateY(-2px);
-  color: var(--cu-accent);
+  transform: rotate(225deg) translateY(-1px);
+  border-color: var(--cu-ink);
+}
+
+.cu-faq__item[open] > summary {
+  font-weight: 600;
+  padding-bottom: 0.65rem;
 }
 
 .cu-faq__cat {
   font-size: 0.72rem;
   font-weight: 600;
-  padding: 0.1rem 0.5rem;
+  padding: 0.12rem 0.5rem;
   border-radius: var(--cu-r-pill);
-  background: var(--cu-bg-soft);
+  background: var(--cu-card);
   color: var(--cu-ink-2);
   flex: none;
+  letter-spacing: 0;
 }
 
+/* 答案：左缩进 + 细竖线，和问题拉开父子层级；不限宽、不加底 */
 .cu-faq__body {
-  padding: 0 1.25rem 1.35rem 3.1rem;
+  margin: 0 0 1.2rem 0.1rem;
+  padding: 0.05rem 1.6rem 0.2rem 1.5rem;
+  border-left: 1.5px solid var(--cu-line-strong);
   font-size: 0.94rem;
   color: var(--cu-ink-2);
-  line-height: 1.85;
-  max-width: var(--cu-content-w, 44rem);
+  line-height: 1.78;
+  max-width: none;
 }
 
+/* 首段结论略深一档 */
+.cu-faq__body > .cu-faq__para:first-child {
+  color: var(--cu-ink);
+}
 
 .cu-faq__para {
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.7rem;
+}
+
+.cu-faq__para:last-child {
+  margin-bottom: 0;
 }
 
 .cu-faq__bullets {
-  margin: 0.2rem 0 0.5rem;
-  padding-left: 1.1rem;
+  list-style: none;
+  margin: 0.15rem 0 0.7rem;
+  padding: 0;
   color: var(--cu-ink-2);
 }
 
+.cu-faq__bullets li {
+  position: relative;
+  padding-left: 0.95rem;
+  margin: 0;
+  line-height: 1.7;
+}
+
+.cu-faq__bullets li + li {
+  margin-top: 0.32rem;
+}
+
+.cu-faq__bullets li::before {
+  content: '';
+  position: absolute;
+  left: 0.15rem;
+  top: 0.72em;
+  width: 3.5px;
+  height: 3.5px;
+  border-radius: 50%;
+  background: var(--cu-muted);
+}
+
+/* 延伸阅读：对齐教程 .cu-guide-links（→ 前缀，静息无下划线） */
 .cu-faq__links {
-  margin: 0.5rem 0 0;
-  padding-left: 1.1rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.4rem;
+}
+
+.cu-faq__links li {
+  margin: 0;
+}
+
+.cu-page .cu-faq__links a,
+.cu-faq__links a {
+  color: var(--cu-ink-2);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.cu-page .cu-faq__links a::before,
+.cu-faq__links a::before {
+  content: '→ ';
+  color: var(--cu-muted);
+}
+
+.cu-page .cu-faq__links a:hover,
+.cu-faq__links a:hover {
+  color: var(--cu-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--cu-ink);
+  text-underline-offset: 0.2em;
 }
 
 .cu-faq__code.cu-scroll-none {
   margin: 0.75rem 0 0;
-  padding: 0.8rem 0.9rem;
+  padding: 0.75rem 0.85rem;
   border-radius: var(--cu-r-sm);
   background: var(--cu-code-bg);
   font-size: 0.82rem;
@@ -134,28 +195,19 @@
   padding: 0;
 }
 
-/* 分类小节标题：细上边线 + 条数 */
+/* 分类小节：版式仍走居中分节头，但间距要密一档——
+   全局 .cu-page h2 的 6.5rem 再叠上一段 .cu-faq 底边距会掏出 ~8rem 空洞；
+   分类是同页并列组，不是营销大分节。 */
 .cu-faq-cat-block {
-  margin: 0 0 2.5rem;
+  margin: 0;
 }
 
-.cu-faq-cat-block__head {
-  display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
-  margin-top: 2.5rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--cu-line);
-  scroll-margin-top: calc(var(--cu-nav-h) + 24px);
+.cu-page .cu-faq-cat-block > h2 {
+  margin-top: 3.25rem;
 }
 
-.cu-faq-cat-block__head > span {
-  font-family: var(--cu-sans);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--cu-muted);
+.cu-page .cu-faq-cat-block .cu-faq {
+  margin-bottom: 0;
 }
 
 .cu-anchor-nav {
@@ -165,7 +217,6 @@
   margin: 0 0 1.25rem;
 }
 
-/* FAQ 页「买之前」引导语 */
 .cu-more {
   font-size: 0.92rem;
   color: var(--cu-muted);
@@ -189,17 +240,22 @@
   transform: translateY(-1px);
 }
 
-/* FAQ 页末尾的人工客服联系区块：从列表里的一句说明升级为独立区块，单独强调 */
 .cu-faq-contact {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.25rem;
-  margin: 1.75rem 0 2.5rem;
+  /* 底边距归零：后面紧跟 .cu-band，两边各留大间距会叠出 ~9rem */
+  margin: 1.75rem 0 0;
   padding: 1.15rem 1.25rem;
   border: 1px solid var(--cu-line);
   border-radius: var(--cu-r-lg);
   background: var(--cu-card);
+}
+
+/* 联系卡 → CTA：保留一段呼吸即可，不要再吃满 section-y-lg */
+.cu-page .cu-faq-contact + .cu-band {
+  margin-top: 2.5rem;
 }
 
 .cu-faq-contact__text strong {
@@ -221,6 +277,20 @@
   background: var(--cu-bg-soft);
 }
 
+.cu-page .cu-faq-contact__text a,
+.cu-faq-contact__text a {
+  color: var(--cu-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--cu-line-strong);
+  text-underline-offset: 0.18em;
+}
+
+.cu-page .cu-faq-contact__text a:hover,
+.cu-faq-contact__text a:hover {
+  text-decoration-color: var(--cu-ink);
+}
+
 .cu-faq-contact__acts {
   flex: none;
   display: flex;
@@ -232,5 +302,14 @@
   .cu-faq-contact {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .cu-faq__item > summary {
+    font-size: 0.98rem;
+  }
+
+  .cu-faq__body {
+    padding-right: 0;
+    padding-left: 1.15rem;
   }
 }
