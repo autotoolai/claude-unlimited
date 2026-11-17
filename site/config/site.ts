@@ -91,7 +91,7 @@ export const siteConfig: SiteConfig = {
   tagline: '一个 Key，Claude 不限量用',
   taglinePhrases: ['一个 Key，', 'Claude', '不限量用'],
   description:
-    'Claude 无限卡官网：订阅期内 Claude API 不按 token 计费，支持 Claude Code、Cursor、Cline 等主流工具。本站只做介绍与答疑，购买跳转第三方发卡站。',
+    'Claude 无限卡官网：订阅期内 Claude API 不按 token 计费，支持 Claude Code、Cursor、WorkBuddy、Trae、Codex 等国内外主流工具。本站只做介绍与答疑，购买跳转第三方发卡站。',
   url: 'https://claude-unlimited.aiautotools.com',  // 自定义域（Pages 域 claude-unlimited-site.pages.dev 仍可访问）
 
   partners: [
@@ -137,11 +137,13 @@ export const siteConfig: SiteConfig = {
     },
   ],
 
-  // 主导航只放「内容页」：模型广场 / 套餐定价 / 使用教程 / 知识库。
+  // 主导航只放「内容页」：模型广场 / 套餐定价 / 联系我们 / Token 代理 / 使用教程 / 知识库。
   // 无限额度已并入套餐定价；管理后台是外部站点，页头「控制台」按钮与页脚「服务」列已有入口。
   nav: [
     { text: '模型广场', link: '/models', enabled: true },
     { text: '套餐定价', link: '/pricing', enabled: true },
+    { text: '联系我们', link: '/contact', enabled: true },
+    { text: 'Token 代理', link: '/agency', enabled: true },
     { text: '使用教程', link: '/guide', enabled: true },
     { text: '知识库', link: '/knowledge', enabled: true },
   ],
@@ -166,7 +168,7 @@ export const siteConfig: SiteConfig = {
       highlighted: true,
       features: [
         '有效期内不限次数调用，不按 token 计费，Fable 5.1 与 Opus 5.5 通用',
-        '一个 Key 通吃 Claude Code、Cursor、Cline、Aider 等主流工具',
+        '一个 Key 通吃 Claude Code、Cursor、WorkBuddy、Trae、Codex 等国内外主流工具',
         '支持流式输出、工具调用、扩展思考、视觉输入、长上下文',
         '买完即用，不排队、不审核，分钟级拿到卡密并激活',
       ],

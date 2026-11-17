@@ -79,10 +79,14 @@ ID 都是 anthropic.claude-code，读同一份配置）；`/guide/cli` 讲终端
    ↓
 分组标签（.cu-guide-index__label，「N 条路径」）+ 场景卡网格（3 列 auto-fill minmax(300px,1fr)）
    ↓
+选路径常问（#faq，FaqList；条目 = config/faq.ts 的 guideFaqItems）
+   ↓
 分组标签（「接着看」）+ 链接卡网格（.cu-next）
    ↓
 页尾 CTA（CtaBand，与模型页同一套 .cu-band）
 ```
+
+**索引页精选 FAQ 与场景页 FAQ 的分工**：索引页挂全站 FAQ 的「分流意图」切片（支持哪些工具、看哪篇教程、要不要装 CC Switch、Key 怎么拿），导语链 `/faq#cat-setup`。场景页底部「常见问题」继续用本页 `page.faq[]`（客户端特有问法），**不要**改成套 `faq.ts` 分类，也**不要**在场景页再叠一层全站 FAQ。
 
 **索引页的三条硬约定**
 

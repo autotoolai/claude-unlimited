@@ -17,6 +17,9 @@ import './styles/14_knowledge.css'
 import './styles/15_models.css'
 import './styles/16_plans.css'
 import './styles/17_console.css'
+import './styles/18_contact.css'
+import './styles/19_legal.css'
+import './styles/20_agency.css'
 import type { Theme } from 'vitepress'
 import './shell_extra.css'
 
@@ -47,6 +50,8 @@ import SiteFooter from './components/SiteFooter.vue'
 // 只在 theme/ 下建文件、不 import 到 theme/index.ts，页面会 SSR 成空的 <div>。
 import PageIndex from './index.vue'
 import PagePricing from './pricing.vue'
+import PageContact from './contact.vue'
+import PageAgency from './agency.vue'
 import PageFaq from './faq.vue'
 import PageGuideIndex from './guide_index.vue'
 import PageGuideScene from './guide_scene.vue'
@@ -65,6 +70,8 @@ import KnowledgeFooter from './components/KnowledgeFooter.vue'
 const themePages = {
   index: PageIndex,
   pricing: PagePricing,
+  contact: PageContact,
+  agency: PageAgency,
   faq: PageFaq,
   guide_index: PageGuideIndex,
   guide_scene: PageGuideScene,

@@ -85,7 +85,11 @@ for (const name of ['llms.txt', 'llms-full.txt']) {
   const abs = join(dist, name)
   if (!existsSync(abs)) continue
   const txt = readFileSync(abs, 'utf8')
-  const re = new RegExp(ORIGIN.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(/[^)\\s]*)?', 'g')
+  // 路径在空白、英文括号、中英文标点处截断，避免「URL；也可…」整段被当成路由
+  const re = new RegExp(
+    ORIGIN.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(/[^)\\s\\u3000-\\u303F\\uFF00-\\uFFEF]*)?',
+    'g',
+  )
   let m: RegExpExecArray | null
   while ((m = re.exec(txt))) {
     const route = (m[1] || '/').split('#')[0].split('?')[0]

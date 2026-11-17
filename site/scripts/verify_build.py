@@ -77,7 +77,7 @@ def knowledge_categories():
     return cats
 
 
-PAGES = ['/', '/models', '/console', '/pricing', '/faq', '/guide', '/knowledge'] + ['/knowledge/' + s for s in knowledge_slugs()] + guide_slugs()  # cleanUrls=false 时条目页是 /knowledge/x.html、总览是 /guide.html，Handler 两种路径都接受
+PAGES = ['/', '/models', '/console', '/pricing', '/contact', '/agency', '/faq', '/guide', '/knowledge'] + ['/knowledge/' + s for s in knowledge_slugs()] + guide_slugs()  # cleanUrls=false 时条目页是 /knowledge/x.html、总览是 /guide.html，Handler 两种路径都接受
 def _read_config(name: str) -> str:
     with io.open(os.path.join(SITE, 'config', name), encoding='utf-8') as f:
         return f.read()
@@ -199,7 +199,7 @@ def main():
             print(f'  [!!] {label}  {detail}')
 
     pages = {}
-    for u in PAGES + ['/robots.txt', '/sitemap.xml', '/llms.txt', '/favicon.svg', '/_headers', '/og/models.png', '/og/console.png']:
+    for u in PAGES + ['/robots.txt', '/sitemap.xml', '/llms.txt', '/favicon.svg', '/_headers', '/og/models.png', '/og/console.png', '/og/agency.png']:
         try:
             st, raw = get(base, u)
         except Exception as e:
@@ -305,28 +305,27 @@ def main():
     _faq_cats = len(set(re.findall(r"cat: '([a-z]+)'", faq_src)))
 
     print('\n组件渲染')
-    # 2026-10-11 首页瘦身到只剩首屏：Hero + CTA 带。内容全部推给定价页 / FAQ / 知识库。
-    # 断言只锁「首页不得再承载正文」，不再锁区块数量——区块增减是产品决定，不该让验收脚本变红。
+    # 2026-11-05 起首页恢复「套餐摘要 + 买前 FAQ」；仍禁止已下线的信任条 / 统计条等。
+    _featured_faq = len(re.findall(r'featured:\s*true', faq_src))
     check(
-        '首页：只剩首屏与 CTA 带，不承载正文小节',
-        'cu-hero' in h and 'cu-band' in h
-        and 'cu-tcard' not in h and 'cu-stats' not in h and 'cu-faq__item' not in h,
-        f'tiers={len(re.findall("cu-tcard__name", h))} faq={len(re.findall("cu-faq__item", h))}',
+        f'首页：首屏 + 档位摘要 + featured FAQ {_featured_faq} 条 + CTA',
+        'cu-hero' in h and 'cu-band' in h and 'cu-tcard' in h
+        and 'cu-stats' not in h
+        and len(re.findall('cu-faq__item', h)) == _featured_faq,
+        f'tiers={len(re.findall("cu-tcard__name", h))} faq={len(re.findall("cu-faq__item", h))} want={_featured_faq}',
     )
     pricing = pages['/pricing'].decode('utf-8')
-    # 2026-10-12 起 /pricing 页内不再挂 FAQ 组件：限速与封号规则只在 /faq 维护一份。
-    # 卡片数与限速条数从 config 现算，不写死；「页内 0 条 FAQ」与「限速类在 /faq 齐活」一起断言，
-    # 防止以后有人在定价页把 FAQ 加回来，或把限速条目从 /faq 漏掉。
+    # 定价页挂精选 FAQ（pricingFaqIds）；限速全文主场仍在 /faq。条数从 config 的 id 列表现算。
     _tiers = len(re.findall(r'cu-tcard__name', pricing))
     _pricing_faq = len(re.findall('cu-faq__item', pricing))
+    _pricing_ids = len(re.findall(r"'cat-[a-z0-9-]+'", re.search(r'pricingFaqIds\s*=\s*\[[^\]]+\]', faq_src, re.S).group(0)))
     _limits_faq = len(re.findall(r"cat: 'limits'", faq_src))
     check(
-        f'定价页：{_tiers} 张档位卡，页内不挂 FAQ（限速类 {_limits_faq} 条只在 /faq）',
-        _tiers >= 1 and _pricing_faq == 0,
-        f'tiers={_tiers} faq={_pricing_faq} limits={_limits_faq}',
+        f'定价页：{_tiers} 张档位卡 + 精选 FAQ {_pricing_ids} 条',
+        _tiers >= 1 and _pricing_faq == _pricing_ids,
+        f'tiers={_tiers} faq={_pricing_faq} want={_pricing_ids}',
     )
-    # 结构化数据必须与页面可见内容一致：页内没有 FAQ 就不许声明 FAQPage
-    check('定价页 JSON-LD 不含 FAQPage（页内没有 FAQ）', 'FAQPage' not in pricing, f'命中 {pricing.count("FAQPage")} 处')
+    check('定价页 JSON-LD 含 FAQPage（与页内精选一致）', 'FAQPage' in pricing, '未命中 FAQPage')
     # 每张可购买档位卡一个商品 CTA，指向自己的档位商品页，target/rel/埋点齐活
     _tier_cards = _tiers - len(re.findall('cu-btn--disabled', pricing))
     _tier_ctas = re.findall(r'<a class="[^"]*cu-btn[^"]*"[^>]*href="' + re.escape(ITEM_URL_PREFIX) + r'[^"]*"[^>]*>', pricing)
@@ -339,7 +338,7 @@ def main():
         f'cards={_tier_cards} ctas={len(_tier_ctas)} names={_tier_cta_names}',
     )
     faq = pages['/faq'].decode('utf-8')
-    # 限速类条目必须逐条出现在 /faq（定价页不再挂 FAQ，这里是唯一主场页）
+    # 限速类条目必须逐条出现在 /faq（精选内嵌不替代全文主场）
     _limits_on_page = len(re.findall(r'id="cat-limits-[a-z0-9]+"', faq))
     check(
         f'FAQ 页：限速类 {_limits_faq} 条齐活',

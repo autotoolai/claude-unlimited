@@ -11,7 +11,7 @@
  *   调 /shopApi/Shop/* 系列接口渲染。所以这里直接复刻它那几次请求，稳定且免解析。
  *
  * 受管字段是 id / period / days / price / amount / original / discount / stock。
- * features、badge、featured、cta、status 这些人工撰写的文案与展示决策一律保留——
+ * features、badge、featured、cta、status、tagline、displayName 这些人工撰写的文案与展示决策一律保留——
  * 发卡站的 description 是卖家口吻的 HTML，不能直接进官网。
  *
  * name 2026-10-11 起也退出受管字段：发卡站商品名形如
@@ -353,5 +353,5 @@ if (missing.length) {
 
 writeFileSync(PLANS_FILE, src, 'utf-8')
 console.log(`\n[sync:plans] 已更新 ${changed.length} 个档位 → config/plans.ts`)
-console.log('[sync:plans] 提示：features / badge / featured / cta 属人工撰写区，脚本未改动')
+console.log('[sync:plans] 提示：features / badge / featured / cta / tagline / displayName 属人工撰写区，脚本未改动')
 if (info.card_count !== undefined) console.log(`[sync:plans] 店铺当前在售卡密 ${info.card_count} 个`)

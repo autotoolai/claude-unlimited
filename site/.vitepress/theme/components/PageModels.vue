@@ -1,16 +1,15 @@
 <script setup lang="ts">
 /**
  * 模型广场（目录页）：只回答「有哪些模型、model ID 是什么」。
- * 2026-10-10 起删掉「三种套餐怎么选」（与首页/定价页重复）与「怎么拿到完整列表」
- * （CC Switch 操作已由使用教程 2.2 与知识库覆盖）。
- * 数据来自 config/models.ts 与 config/faq.ts。
+ * 模型卡片之后挂「关于模型」精选 FAQ（config/faq.ts 的 modelsFaqItems），
+ * 全文主场仍在 /faq；场景页操作答疑不在这里重复。
  */
 import PageShell from './PageShell.vue'
 import JsonLd from './JsonLd.vue'
 import ModelCard from './ModelCard.vue'
+import FaqList from './FaqList.vue'
 import CtaBand from './CtaBand.vue'
-import { modelBrands, jsonLdModels } from '../pages/data'
-import { siteConfig } from '../../../config/site'
+import { modelBrands, jsonLdModels, modelsFaqItems } from '../pages/data'
 </script>
 
 <template>
@@ -29,6 +28,12 @@ import { siteConfig } from '../../../config/site'
         <ModelCard v-for="m in g.models" :key="m.id" :model="m" />
       </div>
     </section>
+
+    <h2 id="faq">关于模型</h2>
+    <p>
+      选模型、切模型、列表为空时常见问法；更多见<a href="/faq">常见问题</a>。
+    </p>
+    <FaqList :items="modelsFaqItems" />
 
     <CtaBand title="挑好模型，就差一张卡" />
 

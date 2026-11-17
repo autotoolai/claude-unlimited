@@ -7,13 +7,13 @@
    层级做法换掉了原先的反白实心：三张卡同底同宽，中间那张如果整块墨底，
    视觉上就变成「两张便宜的 + 一张很贵的」，阶梯断裂。
    现在主推卡靠三处轻量信号：顶部 3px 墨色压边、更强的抬升阴影、角标反白。
-   卡片底色用 --cu-card-solid（比 --cu-card 更亮），让卡从页底色上浮起来。 */
+   卡片底色用 --cu-card（比页底深一档，与 CTA band / Ghost 按钮同阶）。 */
 .cu-tcard {
   position: relative;
   display: flex;
   flex-direction: column;
   padding: 1.5rem 1.4rem 1.4rem;
-  background: var(--cu-card-solid);
+  background: var(--cu-card);
   border: 1px solid var(--cu-line);
   border-radius: var(--cu-r-lg);
   overflow: hidden;
@@ -62,6 +62,15 @@
 .cu-tcard__head .cu-tcard__period {
   font-size: 0.85rem;
   font-weight: 600;
+  color: var(--cu-muted);
+}
+
+/* 档位短副标题：给「先试一天 / 日常主力」一类决策场景感，不占卖点列表的名额 */
+.cu-tcard__tagline {
+  margin: 0.35rem 0 0;
+  padding-right: 4.2rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
   color: var(--cu-muted);
 }
 

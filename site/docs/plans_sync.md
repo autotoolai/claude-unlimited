@@ -27,6 +27,7 @@ npm run sync:plans -- --stock           # 额外打印在售库存
 | `stock` | 脚本 | 仅展示，不参与下单判断 |
 | `features` | **人工** | 卖点文案，取自发卡站 description 但要符合官网语气 |
 | `badge` / `featured` | **人工** | 角标与主推高亮 |
+| `tagline` | **人工** | 档位短副标题（如「先试一天」），卡片 displayName 下方 |
 | `cta` | **人工** | 按钮文案 |
 | `status` | **人工** | `live` / `coming-soon`，决定是否走灰化占位卡 |
 

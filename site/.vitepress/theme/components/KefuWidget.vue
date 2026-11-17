@@ -387,7 +387,8 @@ watch([open, scrollTick, () => log.value.length, typing], async ([isOpen]) => {
                 <template v-if="dualChannel">微信扫码加客服，或 QQ 扫码进交流群。</template>
                 <template v-else-if="hasWechat">微信扫一扫添加，或复制微信号后搜索添加。</template>
                 <template v-else>QQ 扫一扫加群，或复制群号后搜索加入。</template>
-                联系时请附上账号标识、报错原文、发生时间，处理更快。
+                添加时请备注来意；联系时请附上账号标识、报错原文、发生时间，处理更快。完整联系页见
+                <a href="/contact">联系我们</a>。
               </p>
             </div>
             <div class="cu-kefu__channels" :class="{ 'cu-kefu__channels--dual': dualChannel }">

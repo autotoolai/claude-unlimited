@@ -1,6 +1,12 @@
 # 无限额度页已并入套餐定价（2026-10-10），保留 301 不让外链与收录失效
 /unlimited /pricing 301
 
+# 服务条款 / 隐私政策已并入关于页（2026-11-05），锚点 #terms / #privacy
+/terms /about#terms 301
+/privacy /about#privacy 301
+/terms/ /about#terms 301
+/privacy/ /about#privacy 301
+
 # 教程三个子页已并入 /guide 的分步小节（2026-10-11），保留 301 不让外链与收录失效
 /guide_models /guide 301
 /guide_clients /guide 301
@@ -8,6 +14,8 @@
 
 # 带尾斜杠 -> 无尾斜杠（Pages 自己会把 .html 308 到无后缀，这里直接 301 少一跳）
 /pricing/ /pricing 301
+/contact/ /contact 301
+/agency/ /agency 301
 /faq/ /faq 301
 /guide/ /guide 301
 /guide/cc/ /guide/cc 301
@@ -42,6 +50,7 @@
 /knowledge/why-agents-cost-more-tokens/ /knowledge/why-agents-cost-more-tokens 301
 /knowledge/claude-code-startup-tokens/ /knowledge/claude-code-startup-tokens 301
 /knowledge/prompt-caching-explained/ /knowledge/prompt-caching-explained 301
+/knowledge/what-is-claude-unlimited/ /knowledge/what-is-claude-unlimited 301
 /knowledge/claude-api-pricing-explained/ /knowledge/claude-api-pricing-explained 301
 /knowledge/reduce-token-usage-tips/ /knowledge/reduce-token-usage-tips 301
 /knowledge/choose-claude-model/ /knowledge/choose-claude-model 301

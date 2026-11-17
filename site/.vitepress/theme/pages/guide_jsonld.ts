@@ -12,6 +12,7 @@
  */
 import { guideIndex, guidePages, guideBlocks, guideSceneCards } from '../../../config/guide'
 import type { GuidePage } from '../../../config/guide'
+import { guideFaqItems } from '../../../config/faq'
 
 const BASE = 'https://claude-unlimited.aiautotools.com'
 
@@ -50,7 +51,7 @@ export function jsonLdGuideScene(page: GuidePage) {
   }
 }
 
-/** 索引页：CollectionPage + ItemList（每条路径一项，AI 能据此判断该去哪个页面） */
+/** 索引页：CollectionPage + ItemList + 页内精选 FAQPage（guideFaqItems，与 FaqList 一致） */
 export function jsonLdGuideIndex() {
   return {
     '@context': 'https://schema.org',
@@ -72,20 +73,14 @@ export function jsonLdGuideIndex() {
           })),
         },
       },
+      {
+        '@type': 'FAQPage',
+        mainEntity: guideFaqItems.map((f) => ({
+          '@type': 'Question',
+          name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/\n+/g, ' ') },
+        })),
+      },
     ],
   }
-}
-
-/** 页脚「教程」列：索引页 + 全部场景页（每页的短名与一句话） */
-export function guideFooterItems() {
-  return [
-    { title: guideIndex.title, nav: guideIndex.title, url: '/guide', desc: guideIndex.desc, eyebrow: '教程' },
-    ...guidePages.map((p) => ({
-      title: p.nav,
-      nav: p.nav,
-      url: p.slug,
-      desc: p.summary,
-      eyebrow: '教程',
-    })),
-  ]
 }

@@ -15,10 +15,11 @@
 import { computed, onMounted } from 'vue'
 import PageShell from './PageShell.vue'
 import JsonLd from './JsonLd.vue'
+import FaqList from './FaqList.vue'
 import CtaBand from './CtaBand.vue'
 import { guideIndex, guideSceneCards, guideLegacyAnchors } from '../../../config/guide'
 import { partnerUrl } from '../../../config/site'
-import { jsonLdGuideIndex } from '../pages/data'
+import { jsonLdGuideIndex, guideFaqItems } from '../pages/data'
 
 const index = guideIndex
 const cards = computed(() => guideSceneCards())
@@ -55,6 +56,12 @@ onMounted(() => {
         <small class="cu-guide-scene-card__meta">{{ c.meta }}</small>
       </a>
     </div>
+
+    <h2 id="faq">选路径常问</h2>
+    <p>
+      先选客户端再动手；开通细节与排错见<a href="/faq#cat-setup">常见问题 · 开通与配置</a>，具体步骤在各场景页。
+    </p>
+    <FaqList :items="guideFaqItems" />
 
     <h2 class="cu-guide-index__label">接着看</h2>
     <nav class="cu-next" aria-label="接着看">

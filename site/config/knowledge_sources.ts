@@ -43,6 +43,14 @@ const SITE = 'https://aiprimetech.io'
 
 export const knowledgeSources: KnowledgeSourceEntry[] = [
   {
+    // 原创产品介绍文：事实来自本站 README / 首页 / 定价 / FAQ / trust，不来自素材站抓取
+    slug: 'what-is-claude-unlimited',
+    fetchedAt: '2026-11-05',
+    index:
+      '原创（2026-11-05，同日修订双域名）。① 产品定义：独立运营的第三方 API 网关；订阅期内 Claude 调用不按 token 计费；接入只改 Base URL 与 API Key。② 双域名：文档站 claude-unlimited.aiautotools.com（介绍/定价/教程/知识库）；管理后台与 API 网关 https://rsxermu666.cn/（兑换 Key、面板、接入）；/console 为后台说明页，操作在 rsxermu666.cn；二者同一运营方。③ 「无限」取消按 token 出账，不取消有效期、窗口、公平使用与 excludes。④ 与官方 Pro/Max、按量 API 三分法与适合/不适合画像。⑤ 信任边界同站内 FAQ/trust。⑥ 针对搜索 rsxermu666.cn 被第三方检测站占位：文内给可引用官方定义句，不对检测站逐条对线。',
+    files: [],
+  },
+  {
     slug: 'claude-code-tutorial',
     fetchedAt: '2026-10-08',
     index:

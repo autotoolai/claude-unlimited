@@ -19,25 +19,31 @@ export interface SectionLink {
 }
 
 export const SECTION_NAV: Record<string, SectionLink[]> = {
-  // 首页只剩首屏，没有正文小节
-  index: [],
-  models: [],
+  // 首页：首屏之外两段决策摘要（锚点与 index.vue 的 h2 id 一致）
+  index: [
+    { id: 'plans', label: '套餐与价格' },
+    { id: 'faq', label: '买之前先确认' },
+  ],
+  models: [
+    { id: 'faq', label: '关于模型' },
+  ],
   console: [
     { id: 'steps', label: '买完卡密后怎么走' },
     { id: 'features', label: '后台能做什么' },
     { id: 'faq', label: '后台常见问题' },
   ],
-  // 定价页已精简到只剩档位网格，无正文小节（2026-10-12 撤掉 UnlimitedValue 区块与页内 FAQ）
-  pricing: [],
-  // 与 pages/data.ts 的 faqGroupOrder 一致：商品 → 限速 → 配置 → 接入 → 安全 → 我们
+  // 档位网格 + 选套餐常问（精选自 faq.ts，主场仍是 /faq）
+  pricing: [
+    { id: 'faq', label: '选套餐常问' },
+  ],
+  // 与 pages/data.ts 的 faqGroupOrder 一致：商品 → 开通 → 日常 → 报错 → 安全联系
   faq: [
     { id: 'cat-buying', label: '买之前' },
-    { id: 'cat-product', label: '关于商品' },
-    { id: 'cat-limits', label: '限速与封号' },
-    { id: 'cat-setup', label: '使用与配置' },
-    { id: 'cat-usage', label: '接入与使用' },
-    { id: 'cat-security', label: '数据与安全' },
-    { id: 'cat-about', label: '关于我们' },
+    { id: 'cat-product', label: '商品与套餐' },
+    { id: 'cat-setup', label: '开通与配置' },
+    { id: 'cat-usage', label: '日常使用' },
+    { id: 'cat-limits', label: '限速与报错' },
+    { id: 'cat-safety', label: '安全与联系' },
     { id: 'more', label: '还没解决？' },
   ],
   // 知识库列表页：精选 + 5 个分类小节（分类项由 config/knowledge.ts 的 knowledgeCategories 按 order 派生，加分类只改一处）
@@ -63,6 +69,9 @@ export const SECTION_NAV: Record<string, SectionLink[]> = {
   ),
   // 教程索引页（/guide）：不显示页内目录（客户端场景页仍有）。
   // 这里只留正文里的锚点 id，与页面结构一一对应，方便排查与老链接定位。
-  '/guide': [{ id: 'pick-client', label: '全部路径' }],
+  '/guide': [
+    { id: 'pick-client', label: '全部路径' },
+    { id: 'faq', label: '选路径常问' },
+  ],
 }
 

@@ -64,6 +64,7 @@ const ctaVariant = computed(() => (props.tier.featured && live ? 'primary' : 'gh
       <h3 class="cu-tcard__name">{{ displayName }}</h3>
       <span class="cu-tcard__period">{{ tier.period }}</span>
     </header>
+    <p v-if="tier.tagline" class="cu-tcard__tagline">{{ tier.tagline }}</p>
 
     <p class="cu-tcard__price" :class="{ 'cu-tcard__price--tbd': !live }">
       <strong>{{ tier.price }}</strong>

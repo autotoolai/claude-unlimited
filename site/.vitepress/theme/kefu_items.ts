@@ -53,7 +53,7 @@ export function tokenize(s: string): string[] {
 }
 
 /**
- * 泛词表：这些词单独出现时说不清用户想问什么（key 可能是「Key 怎么填」「换 Key」「Key 泄露」……），
+ * 泛词表：这些词单独出现时说不清用户想问什么（key 可能是「Key 怎么填」「换 Key」「Key 过期」……），
  * 只在没有更具体命中时才用来作答。名单只登记判定用，真正写在哪里是 config/kefu_bot.ts 的 keywords。
  */
 /**
@@ -61,7 +61,7 @@ export function tokenize(s: string): string[] {
  * 「你们能开发游戏吗」里带「发」这种问题同理，宁可走分词兜底也不要硬答。
  */
 const WEAK_KEYWORDS = new Set([
-  'key', // 裸 key：可能是「Key 怎么填」「换 Key」「Key 泄露」
+  'key', // 裸 key：可能是「Key 怎么填」「换 Key」「Key 过期」
   'sdk',
   'cc',
   '安装',

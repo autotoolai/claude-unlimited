@@ -11,7 +11,8 @@
  *   id / period / days / price / amount / original / discount / stock
  *   这几个字段由 `npm run sync:plans` 从发卡站 catfk.com 的 JSON 接口拉取后回写，
  *   手改会在下次同步时被覆盖。人工维护区是下面这些文案字段：
- *   features（卖点）、badge（角标）、featured（主推高亮）、cta（按钮文案）、status（上线状态）。
+ *   features（卖点）、badge（角标）、featured（主推高亮）、cta（按钮文案）、status（上线状态）、
+ *   tagline（档位短副标题，如「先试一天」）、displayName（卡片短名）。
  *   流程与接口细节见 docs/plans_sync.md。
  */
 
@@ -47,6 +48,8 @@ export interface PlanTier {
    *  缺省回退到 name——但 name 是发卡站的商品名，形如
    *  「fable5.1+opus5.5无限-周卡」，直接当标题会让三张卡几乎一模一样。 */
   displayName?: string,
+  /** 档位短副标题，如「先试一天」。写在 displayName 下方，给决策场景感；同步脚本不覆盖。 */
+  tagline?: string,
   /** 有效期文案，如「7 天」 */
   period: string,
   /** 周期天数，页面上「N 天」表述一律用它，不要从 period 字符串里再解析 */
@@ -122,6 +125,7 @@ export const unlimitedTiers: PlanTier[] = [
     shopUrl: itemUrl('vfzavb'),
     name: 'fable5.1+opus5.5无限-天卡',
     displayName: '天卡',
+    tagline: '先试一天',
     period: '1 天',
     days: 1,
     price: '¥16.5',
@@ -134,7 +138,7 @@ export const unlimitedTiers: PlanTier[] = [
       '不限次数调用 Fable 5.1 与 Opus 5.5',
       '不按 token 计费，无单次额度上限',
       'Claude Code、Cursor、VS Code 等多端通用',
-      '下单后即时激活，密钥长期有效',
+      '提取 Key 后按 24 小时制起算，未激活不计时',
     ],
     cta: '立即订阅',
   },
@@ -143,6 +147,7 @@ export const unlimitedTiers: PlanTier[] = [
     shopUrl: itemUrl('1ga80a'),
     name: 'fable5.1+opus5.5无限-周卡',
     displayName: '周卡',
+    tagline: '赶一个小项目',
     period: '7 天',
     days: 7,
     price: '¥80',
@@ -153,7 +158,7 @@ export const unlimitedTiers: PlanTier[] = [
       '不限次数调用 Fable 5.1 与 Opus 5.5',
       '不按 token 计费，无单次额度上限',
       'Claude Code、Cursor、VS Code 等多端通用',
-      '下单后即时激活，密钥长期有效',
+      '提取 Key 后按 24 小时制起算，未激活不计时',
     ],
     cta: '立即订阅',
   },
@@ -162,6 +167,7 @@ export const unlimitedTiers: PlanTier[] = [
     shopUrl: itemUrl('b8zhn8'),
     name: 'fable5.1+opus5.5无限-月卡',
     displayName: '月卡',
+    tagline: '日常主力',
     period: '30 天',
     days: 30,
     price: '¥145',
@@ -172,7 +178,7 @@ export const unlimitedTiers: PlanTier[] = [
       '不限次数调用 Fable 5.1 与 Opus 5.5',
       '不按 token 计费，无单次额度上限',
       'Claude Code、Cursor、VS Code 等多端通用',
-      '下单后即时激活，密钥长期有效',
+      '提取 Key 后按 24 小时制起算，未激活不计时',
     ],
     badge: '最多人选',
     featured: true,
@@ -183,6 +189,7 @@ export const unlimitedTiers: PlanTier[] = [
     shopUrl: itemUrl('mrj7f7'),
     name: 'fab5.1+opu5.5无限-月卡（双窗口）',
     displayName: '双窗口月卡',
+    tagline: '并行两个会话',
     period: '30 天',
     days: 30,
     price: '¥185',
@@ -194,7 +201,7 @@ export const unlimitedTiers: PlanTier[] = [
       '不限次数调用 Fable 5.1 与 Opus 5.5',
       '不按 token 计费，无单次额度上限',
       'Claude Code、Cursor、VS Code 等多端通用',
-      '下单后即时激活，密钥长期有效',
+      '提取 Key 后按 24 小时制起算，未激活不计时',
     ],
     badge: '双会话',
     cta: '立即订阅',
@@ -204,6 +211,7 @@ export const unlimitedTiers: PlanTier[] = [
     shopUrl: itemUrl('igxkqf'),
     name: 'fable5.1+opus5.5无限-月卡（三窗口）',
     displayName: '三窗口月卡',
+    tagline: '多开更从容',
     period: '30 天',
     days: 30,
     price: '¥225',
@@ -215,7 +223,7 @@ export const unlimitedTiers: PlanTier[] = [
       '不限次数调用 Fable 5.1 与 Opus 5.5',
       '不按 token 计费，无单次额度上限',
       'Claude Code、Cursor、VS Code 等多端通用',
-      '下单后即时激活，密钥长期有效',
+      '提取 Key 后按 24 小时制起算，未激活不计时',
     ],
     badge: '三会话',
     cta: '立即订阅',

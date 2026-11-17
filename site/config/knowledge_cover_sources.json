@@ -2,6 +2,7 @@
   "_说明": "每个 slug 的封面素材来源，由 scripts/fetch_knowledge_covers.py 自动维护。blog:<末段> = 从源站 /blog/<末段>/ 的 hero 图直抓；cover_map:<素材名> = 从本地 temp/aiprimetech_covers/<素材名>.jpg 取（见 config/knowledge_cover_map.json）。",
   "covers": {
     "choose-claude-model": "cover_map:choosing-the-right-model-cost",
+    "what-is-claude-unlimited": "cover_map:streaming-api-guide",
     "claude-api-pricing-explained": "cover_map:getting-started",
     "claude-code-401-403": "cover_map:openrouter-vs-direct-api",
     "claude-code-429-rate-limit": "blog:",
