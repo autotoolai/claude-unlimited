@@ -83,57 +83,22 @@ function Submit-IndexNow {
   }
 }
 
-function Submit-Bing {
-  $apiKey = $env:BING_API_KEY
-  if (-not $apiKey) {
-    Write-Host ''
-    Write-Host 'Bing: skip (未设 BING_API_KEY)'
-    return
-  }
-  $siteUrl = if ($env:BING_SITE_URL) { $env:BING_SITE_URL } else { "$Origin/" }
-  if (-not $siteUrl.EndsWith('/')) { $siteUrl = "$siteUrl/" }
-  $sitemapUrl = "$Origin/sitemap.xml"
-  $qKey = [uri]::EscapeDataString($apiKey)
-
-  Write-Host ''
-  Write-Host "Bing: SubmitFeed $sitemapUrl (site=$siteUrl)"
-  if ($DryRun) { Write-Host 'DryRun: SubmitFeed + SubmitUrlBatch'; return }
-
-  $feedBody = @{ siteUrl = $siteUrl; feedUrl = $sitemapUrl } | ConvertTo-Json -Compress
-  try {
-    $r = Invoke-WebRequest -Uri "https://ssl.bing.com/webmaster/api.svc/json/SubmitFeed?apikey=$qKey" -Method POST -Body ([System.Text.Encoding]::UTF8.GetBytes($feedBody)) -ContentType 'application/json; charset=utf-8' -UseBasicParsing
-    Write-Host "Bing SubmitFeed: HTTP $($r.StatusCode) $($r.Content)"
-  } catch { Write-Warning "Bing SubmitFeed failed: $_" }
-
-  # SubmitUrlBatch 的额度按 URL 条数扣（账号级共享，一天 100 条左右），一次把全站推上去必然超额报 400。
-  # 这里截断到 MaxBingUrls，默认 10；超额时把正文打出来，那句 "Quota remaining ... Submitted: N" 才是真正的诊断信息。
-  $MaxBingUrls = 10
-  $batch = @($Urls)[0..([Math]::Min($MaxBingUrls, $Urls.Count) - 1)]
-  $batchBody = @{ siteUrl = $siteUrl; urlList = $batch } | ConvertTo-Json -Compress
-  try {
-    $r = Invoke-WebRequest -Uri "https://ssl.bing.com/webmaster/api.svc/json/SubmitUrlBatch?apikey=$qKey" -Method POST -Body ([System.Text.Encoding]::UTF8.GetBytes($batchBody)) -ContentType 'application/json; charset=utf-8' -UseBasicParsing
-    Write-Host "Bing SubmitUrlBatch: HTTP $($r.StatusCode) $($r.Content)"
-  } catch {
-    $body = ''
-    try { $body = $_.Exception.Response.GetResponseStream() | ForEach-Object { $sr = New-Object System.IO.StreamReader($_); $sr.ReadToEnd() } } catch { }
-    Write-Warning "Bing SubmitUrlBatch failed: $body $_"
-  }
-}
-
-function Get-BaiduPushOrder {
+function Get-BingPushOrder {
   <#
-    百度配额小（约 10 条/天），所以推送顺序必须按商业价值排，不能按 sitemap 原序。
-    规则：优先级列表里的路径在前；/knowledge/ 下的文章一律压到最后；其余按 sitemap 原序。
-    只重排本次还没推过的 URL（台账见 Get-BaiduPushedSet），让每天的名额都花在没推过的页上。
-    实现用 [Array]::Sort 而非 Sort-Object：后者经脚本作用域调用时会把结果退化成单个字符串。
+    Bing 的 SubmitUrlBatch 额度按 URL 条数扣，账号级共享，一天约 100 条。
+    与百度不同：Bing 配额相对宽裕，但原实现只截断前 10 条且按 sitemap 原序，
+    结果末尾的新文章永远排在后面 —— 实测有 6 条 URL Bing 从未抓取过。
+    规则与百度同源（重要页优先，文章页压后），并叠加台账：只重排还没推过的 URL，
+    让每天的名额都花在没推过的页上。台账为空时（即首次运行）会全量推出去，
+    那 6 条从未抓取的页也就顺带补推了；之后新页面才按此顺序排队。
   #>
   param([string[]]$AllUrls)
 
-  # /console 是 rsxermu666 品牌词主场：百度配额紧，必须排进优先队列，否则会被文章页挤掉。
-  $priority = @('/console', '/', '/pricing', '/models', '/guide', '/about', '/faq', '/changelog', '/knowledge', '/terms', '/privacy')
+  # /console = 裸词 rsxermu666；/agency = Token 代理。两者都有独立搜索别名，优先。
+  $priority = @('/console', '/agency', '/', '/pricing', '/models', '/contact', '/guide', '/about', '/faq', '/changelog', '/knowledge')
   $stateDir = Join-Path $RepoRoot 'temp\seo_push'
-  $recordFile = Join-Path $stateDir 'baidu_pushed.txt'
-  $pushed = Get-BaiduPushedSet $recordFile
+  $recordFile = Join-Path $stateDir 'bing_pushed.txt'
+  $pushed = Get-PushedSet $recordFile
 
   $rows = New-Object 'System.Collections.Generic.List[object]'
   for ($i = 0; $i -lt $AllUrls.Count; $i++) {
@@ -160,7 +125,100 @@ function Get-BaiduPushOrder {
   return @($arr | ForEach-Object { $_.Url })
 }
 
-function Get-BaiduPushedSet {
+function Submit-Bing {
+  $apiKey = $env:BING_API_KEY
+  if (-not $apiKey) {
+    Write-Host ''
+    Write-Host 'Bing: skip (未设 BING_API_KEY)'
+    return
+  }
+  $siteUrl = if ($env:BING_SITE_URL) { $env:BING_SITE_URL } else { "$Origin/" }
+  if (-not $siteUrl.EndsWith('/')) { $siteUrl = "$siteUrl/" }
+  $sitemapUrl = "$Origin/sitemap.xml"
+  $qKey = [uri]::EscapeDataString($apiKey)
+
+  Write-Host ''
+  Write-Host "Bing: SubmitFeed $sitemapUrl (site=$siteUrl)"
+
+  # 队列在 DryRun 下也要算出来并打印，否则预览时看不到推送顺序对不对。
+  $stateDir = Join-Path $RepoRoot 'temp\seo_push'
+  $recordFile = Join-Path $stateDir 'bing_pushed.txt'
+  $MaxBingUrls = if ($env:BING_LIMIT) { [int]$env:BING_LIMIT } else { 50 }
+  $ordered = @(Get-BingPushOrder -AllUrls $Urls)
+  Write-Host "Bing: 待推 $($ordered.Count) 条（总 $($Urls.Count)，上限 $MaxBingUrls）"
+  if ($ordered.Count -eq 0) {
+    Write-Host 'Bing: 没有待推的新 URL（台账已覆盖全部页面）'
+    return
+  }
+  $todo = @($ordered)[0..([Math]::Min($MaxBingUrls, $ordered.Count) - 1)]
+  foreach ($u in $todo) { Write-Host "  队列: $u" }
+  if ($DryRun) { Write-Host 'DryRun: SubmitFeed + SubmitUrlBatch'; return }
+
+  $feedBody = @{ siteUrl = $siteUrl; feedUrl = $sitemapUrl } | ConvertTo-Json -Compress
+  try {
+    $r = Invoke-WebRequest -Uri "https://ssl.bing.com/webmaster/api.svc/json/SubmitFeed?apikey=$qKey" -Method POST -Body ([System.Text.Encoding]::UTF8.GetBytes($feedBody)) -ContentType 'application/json; charset=utf-8' -UseBasicParsing
+    Write-Host "Bing SubmitFeed: HTTP $($r.StatusCode) $($r.Content)"
+  } catch { Write-Warning "Bing SubmitFeed failed: $_" }
+
+  # SubmitUrlBatch 的额度按 URL 条数扣（账号级共享，一天 100 条左右）。
+  # 原实现固定截断前 10 条 —— 白扔 90% 配额，且 sitemap 尾部的文章永远排在后面。
+  # 现在按推送顺序取，且跳过台账里已推过的 URL：默认上限 50，留一半余量给当天其它发布。
+  # 超额时正文会带出 "Quota remaining ... Submitted: N"，那才是真正的诊断信息。
+  $batchBody = @{ siteUrl = $siteUrl; urlList = $todo } | ConvertTo-Json -Compress
+  try {
+    $r = Invoke-WebRequest -Uri "https://ssl.bing.com/webmaster/api.svc/json/SubmitUrlBatch?apikey=$qKey" -Method POST -Body ([System.Text.Encoding]::UTF8.GetBytes($batchBody)) -ContentType 'application/json; charset=utf-8' -UseBasicParsing
+    Write-Host "Bing SubmitUrlBatch: HTTP $($r.StatusCode) $($r.Content)"
+    # 成功才记台账：失败的不能记，否则那一页永远推不出去。
+    foreach ($u in $todo) { Add-Pushed -RecordFile $recordFile -Url $u }
+    Write-Host "Bing: 本次提交 $($todo.Count) 条，台账 $recordFile（已累计 $((Get-PushedSet $recordFile).Count) 条）"
+  } catch {
+    $body = ''
+    try { $body = $_.Exception.Response.GetResponseStream() | ForEach-Object { $sr = New-Object System.IO.StreamReader($_); $sr.ReadToEnd() } } catch { }
+    Write-Warning "Bing SubmitUrlBatch failed: $body $_"
+  }
+}
+
+function Get-BaiduPushOrder {
+  <#
+    百度配额小（约 10 条/天），所以推送顺序必须按商业价值排，不能按 sitemap 原序。
+    规则：优先级列表里的路径在前；/knowledge/ 下的文章一律压到最后；其余按 sitemap 原序。
+    只重排本次还没推过的 URL（台账见 Get-BaiduPushedSet），让每天的名额都花在没推过的页上。
+    实现用 [Array]::Sort 而非 Sort-Object：后者经脚本作用域调用时会把结果退化成单个字符串。
+  #>
+  param([string[]]$AllUrls)
+
+  # /console = 裸词 rsxermu666；/agency = Token 代理（含搜索别名 rsxermu666 代理）。配额紧，两页都须进优先队列。
+  $priority = @('/console', '/agency', '/', '/pricing', '/contact', '/models', '/guide', '/about', '/faq', '/changelog', '/knowledge')
+  $stateDir = Join-Path $RepoRoot 'temp\seo_push'
+  $recordFile = Join-Path $stateDir 'baidu_pushed.txt'
+  $pushed = Get-PushedSet $recordFile
+
+  $rows = New-Object 'System.Collections.Generic.List[object]'
+  for ($i = 0; $i -lt $AllUrls.Count; $i++) {
+    $u = [string]$AllUrls[$i]
+    if ($pushed.Contains($u)) { continue }
+    $path = ([uri]$u).AbsolutePath
+    $rank = [array]::IndexOf($priority, $path)
+    if ($rank -lt 0) { $rank = if ($path -like '*/knowledge/*') { 100 } else { 50 } }
+    $rows.Add([pscustomobject]@{ Url = $u; Rank = $rank; Seq = $i })
+  }
+  if ($rows.Count -le 1) { return @($rows | ForEach-Object { $_.Url }) }
+
+  $arr = $rows.ToArray()
+  [Array]::Sort($arr, [System.Comparison[object]] {
+    param($a, $b)
+    if ($a.Rank -ne $b.Rank) {
+      if ($a.Rank -lt $b.Rank) { return -1 }
+      return 1
+    }
+    if ($a.Seq -lt $b.Seq) { return -1 }
+    if ($a.Seq -gt $b.Seq) { return 1 }
+    return 0
+  })
+  return @($arr | ForEach-Object { $_.Url })
+}
+
+function Get-PushedSet {
   param([string]$RecordFile)
   $set = New-Object 'System.Collections.Generic.HashSet[string]'
   if (Test-Path -LiteralPath $RecordFile) {
@@ -174,7 +232,7 @@ function Get-BaiduPushedSet {
   return ,$set
 }
 
-function Add-BaiduPushed {
+function Add-Pushed {
   param([string]$RecordFile, [string]$Url)
   $dir = Split-Path -Parent $RecordFile
   if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
@@ -212,7 +270,7 @@ function Submit-Baidu {
     try {
       $resp = Invoke-WebRequest -Uri $endpoint -Method POST -Body $u -ContentType 'text/plain' -UseBasicParsing
       Write-Host "Baidu OK: $u -> $($resp.Content)"
-      Add-BaiduPushed -RecordFile $recordFile -Url $u
+      Add-Pushed -RecordFile $recordFile -Url $u
       $ok++
       $j = $null
       try { $j = $resp.Content | ConvertFrom-Json } catch { }
@@ -237,7 +295,7 @@ function Submit-Baidu {
       break
     }
   }
-  Write-Host "Baidu: 本次提交 $ok 条，台账 $recordFile（已累计 $((Get-BaiduPushedSet $recordFile).Count) 条）"
+  Write-Host "Baidu: 本次提交 $ok 条，台账 $recordFile（已累计 $((Get-PushedSet $recordFile).Count) 条）"
 }
 
 # 把 dotenv 里读到的代理变量显式传给 python 子进程。PowerShell 5.1 的子进程默认继承父进程环境变量，

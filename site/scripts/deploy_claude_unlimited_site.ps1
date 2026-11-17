@@ -25,6 +25,22 @@ if (-not $env:CLOUDFLARE_API_TOKEN) {
 npm run build
 if ($LASTEXITCODE -ne 0) { throw 'build failed, deploy aborted' }
 
+# Guard: the build chain copies site/public/ into dist at the very last step
+# (scripts/copy_public.mjs). If any earlier step fails, dist holds only the
+# VitePress html/assets and every public file is missing: _redirects gone, so
+# retired URLs 404 instead of 301; favicon.svg 404; robots.txt replaced by the
+# Cloudflare managed one; og images and public/**/*.md mirrors 404.
+# The HTML pages still look correct, so this is invisible unless asserted here.
+$RequiredDistFiles = @('_redirects', '_headers', 'favicon.svg', 'robots.txt', 'llms.txt')
+$MissingDistFiles = @()
+foreach ($f in $RequiredDistFiles) {
+  if (-not (Test-Path (Join-Path $SiteDir ".vitepress/dist/$f"))) { $MissingDistFiles += $f }
+}
+if ($MissingDistFiles.Count -gt 0) {
+  throw ("dist is missing public files: " + ($MissingDistFiles -join ', ') + ". " +
+    "The build did not reach scripts/copy_public.mjs. Abort before deploying a partial dist.")
+}
+
 # --commit-dirty=true: required when the working tree is dirty or the repo has no commit metadata yet.
 npx --yes wrangler@4 pages deploy .vitepress/dist --project-name=$ProjectName --branch=$Branch --commit-dirty=true
 if ($LASTEXITCODE -ne 0) { throw 'wrangler deploy failed' }

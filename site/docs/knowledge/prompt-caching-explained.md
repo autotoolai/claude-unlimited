@@ -18,7 +18,7 @@ head:
 
 > 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/prompt-caching-explained](https://claude-unlimited.aiautotools.com/knowledge/prompt-caching-explained) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
 
-> **一句话答案**：提示缓存把你请求的一段前缀存下来，之后共享这段前缀的调用按更低的输入价计费。适合缓存系统提示、工具定义、被反复提问的文档、固定示例；不适合缓存用户最新消息、含时间戳的前缀、以及太短的提示。验证方法：看响应 usage 里有没有 cache_read 计数。
+> **一句话答案**：提示缓存把你请求的一段前缀存下来，之后共享这段前缀的调用按更低的输入价计费。适合缓存系统提示、工具定义、被反复提问的文档、固定示例；不适合缓存用户最新消息、含时间戳的前缀、以及太短的提示。验证方法：看响应 usage 里有没有 cache_read 计数。Claude Code 的 33k 启动前缀天然适合缓存，但它只在你保持前缀稳定时有效——会话中途改 CLAUDE.md 会让缓存从改动点之后全部失效。
 
 ## 缓存的工作方式
 
@@ -44,6 +44,8 @@ head:
 | 很短的提示 | 低于最小可缓存长度，没有收益 |
 
 ## 怎么标记
+
+**结论**：在 `system` 数组的文本块上加 `cache_control`，从请求开头到被标记的块（含）构成缓存前缀。稳定内容放前面、易变内容放后面，顺序直接决定能不能命中。
 
 在 `system` 数组的文本块上加 `cache_control`：
 
@@ -84,6 +86,8 @@ head:
 
 ## 上线前的检查清单
 
+**结论**：五问全部为「是」才说明缓存策略是确定的：有没有几千 token 以上的稳定前缀、它是否排在动态内容之前、序列化是否确定、能否记录缓存创建与读取的 token 数、预期复用多少次。三项以上为否就是在猜。
+
 - 至少有一段几千 token 以上的稳定前缀？
 - 它排在所有动态内容之前？
 - 序列化是确定性的？
@@ -96,5 +100,5 @@ head:
 
 **结论**：前缀每次都不同（多租户定制、请求 ID、时间戳混进系统提示）、提示太短、或者本来就不重复。缓存的经济学是「一次创建成本 + 多次低价读取」，没有复用就没有收益。
 
-把不确定的内容从系统提示里挪出去，见[降低 Claude 用量的工程方法](/knowledge/reduce-token-usage-tips)；按场景决定哪类请求值得缓存，见[按任务选模型](/knowledge/choose-claude-model)。
+把不确定的内容从系统提示里挪出去，见[降低 Claude 用量的工程方法：先测量再优化](/knowledge/reduce-token-usage-tips)；按场景决定哪类请求值得缓存，见[按任务选模型：Opus、Sonnet、Haiku 怎么选](/knowledge/choose-claude-model)。
 

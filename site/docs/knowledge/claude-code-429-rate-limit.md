@@ -55,8 +55,8 @@ API Error: 429 rate_limit_error · Retrying in 2s · attempt 2/10
 **结论**：从上到下，多数情况在前三步就解决了。
 
 1. **让它重试**。429 大多在 10 次内置重试内自愈，不要一看到就中断。
-2. **减少并行**。少开子代理，重任务排队而不是扇出。
-3. **`/compact`**。上下文越小，每轮 token 越少，直接压住 TPM。
+2. **减少并行**。少开子代理，重任务排队而不是扇出（扇出为什么更容易撞限见 [Claude Code 子代理怎么用](/knowledge/claude-code-subagents)）。
+3. **`/compact`**。上下文越小，每轮 token 越少，直接压住 TPM。上下文装满了会报另一个错，见 [prompt too long 报错怎么处理](/knowledge/claude-code-prompt-too-long-fix)。
 4. **`/model` 换档**。上限按模型计算，换一个档位就是换一组额度。
 5. **后台工作挪到便宜档**。主循环留给主力档。
 6. **换更高窗口档或联系客服**。本站套餐按会话窗口分档；需要同时开更多窗口时换双窗 / 三窗即可。
@@ -69,5 +69,5 @@ claude -p "..." --max-turns 20
 
 ## 和 529 的区别
 
-**结论**：429 是你超了自己的速率；529 是模型整体容量不足，所有人都受影响。见到 `overloaded` 字样就是 529，处理办法见 [529 怎么处理](/knowledge/claude-code-529-overloaded)。
+**结论**：429 是你超了自己的速率；529 是模型整体容量不足，所有人都受影响。见到 `overloaded` 字样就是 529，处理办法见 [Claude 报错 529 overloaded 怎么处理](/knowledge/claude-code-529-overloaded)。
 

@@ -77,6 +77,6 @@ head:
 
 桌面版跑的是 Claude 模型，不同档位的能力差异明显。需要更细的选型依据，看[按任务选模型：Opus、Sonnet、Haiku 怎么选](/knowledge/choose-claude-model)。
 
-真正烧钱的是 agent 模式而不是聊天。桌面版里跑 Claude Code、改本地文件、循环执行命令，token 消耗结构和纯对话不是一个量级，原理在[为什么 Agent 比聊天更烧 token](/knowledge/why-agents-cost-more-tokens)，省钱的工程做法在[降低 Claude 用量的工程方法](/knowledge/reduce-token-usage-tips)。
+真正烧钱的是 agent 模式而不是聊天。桌面版里跑 Claude Code、改本地文件、循环执行命令，token 消耗结构和纯对话不是一个量级，原理在[为什么 Agent 比聊天更烧 token](/knowledge/why-agents-cost-more-tokens)，省钱的工程做法在[降低 Claude 用量的工程方法：先测量再优化](/knowledge/reduce-token-usage-tips)。
 
 一个实用提醒：桌面版和终端版读同一份环境配置，同一把 Key 和同一个地址在两边都生效，切换客户端不需要换凭据。检查当前配置在终端里用 `/status`，这个命令在桌面版的会话面板里同样可用。

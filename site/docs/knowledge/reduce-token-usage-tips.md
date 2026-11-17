@@ -18,7 +18,7 @@ head:
 
 > 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/reduce-token-usage-tips](https://claude-unlimited.aiautotools.com/knowledge/reduce-token-usage-tips) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
 
-> **一句话答案**：token 成本通常不是模型定价问题，而是信息路由问题。先按「指令 / 上下文 / 任务 / 输出」四段记账，看清大头在哪；然后按顺序做：给每条路由设预算、检索前裁剪、结构化摘要替代整段历史、用 schema 约束输出、把简单子任务路由到便宜档位。衡量口径是「每个成功任务的 token 数」，不是单次调用。
+> **一句话答案**：token 成本通常不是模型定价问题，而是信息路由问题。先按「指令 / 上下文 / 任务 / 输出」这 4 段记账，看清大头在哪；然后按顺序做：给每条路由设预算、检索前裁剪、结构化摘要替代整段历史、用 schema 约束输出、把简单子任务路由到便宜档位。衡量口径是「每个成功任务的 token 数」，不是单次调用——1M 窗口这类能力适合离线分析、整库审查，不适合在线服务里每次请求都重读一遍全量语料。
 
 ## token 用量是架构问题
 
@@ -27,6 +27,8 @@ head:
 失控时，上下文和输出通常是大头。不是用户问了难题所以贵，而是应用把整个世界塞进了 prompt，又允许模型长篇大论。
 
 ## 第一步：按分段记账
+
+**结论**：不记账就优化等于猜。先把一次请求拆成 system、tools、messages、输出几段分别记下数字，大头会自己露出来。
 
 ```json
 {
@@ -130,7 +132,7 @@ head:
 
 但要算清代价：多一次模型调用意味着更多延迟、更多失败点、更复杂的日志。便宜分类省 300 token 却多花 600ms 和一条重试路径，就不划算。
 
-哪一档该承担哪类任务，见[按任务选模型](/knowledge/choose-claude-model)；把大块文件读取整块移出主会话是另一种做法，见[子代理怎么用](/knowledge/claude-code-subagents)。
+哪一档该承担哪类任务，见[按任务选模型：Opus、Sonnet、Haiku 怎么选](/knowledge/choose-claude-model)；把大块文件读取整块移出主会话是另一种做法，见[Claude Code 子代理怎么用](/knowledge/claude-code-subagents)。
 
 ## 第七步：诚实地衡量
 
@@ -142,7 +144,7 @@ head:
 
 诚实的指标不是每次调用的 token，而是每个成功任务的 token。
 
-先算清楚一次请求到底由哪些部分构成，才知道该砍哪里，见[Claude API 怎么计费](/knowledge/claude-api-pricing-explained)。
+先算清楚一次请求到底由哪些部分构成，才知道该砍哪里，见[Claude API 怎么计费：token 构成与估算](/knowledge/claude-api-pricing-explained)。
 
 ## 长上下文不是偷懒的许可
 

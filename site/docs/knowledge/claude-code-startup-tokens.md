@@ -50,9 +50,9 @@ claude mcp remove <名字>
 
 ### 2. 精简 CLAUDE.md
 
-只留真正会改变它行为的规则。模型默认就会做的事不要写，深层文档改成按需引用而不是整段粘进去。写法见 [The.md 怎么写](/knowledge/claude-md-guide)。
+只留真正会改变它行为的规则。模型默认就会做的事不要写，深层文档改成按需引用而不是整段粘进去。写法见 [CLAUDE.md 怎么写：写什么、放哪](/knowledge/claude-md-guide)。
 
-会话里 `/context` 会告诉你各类内容各占多少；The.md 占比过高时先改这里。官方建议根文件控制在 200 行以内，更长的内容拆到子目录的 CLAUDE.md 或 `.claude/rules/` 的路径规则里。
+会话里 `/context` 会告诉你各类内容各占多少；CLAUDE.md 占比过高时先改这里。官方建议根文件控制在 200 行以内，更长的内容拆到子目录的 CLAUDE.md 或 `.claude/rules/` 的路径规则里（写法见 [CLAUDE.md 怎么写：写什么、放哪](/knowledge/claude-md-guide)）。
 
 ### 3. 接受它
 
@@ -64,7 +64,7 @@ claude mcp remove <名字>
 
 缓存是按前缀工作的，所以在会话中途改 CLAUDE.md，会让它之后的内容全部失效。稳定的 33k 前缀，可能比每轮重建的 7k 前缀更便宜。
 
-实操上：把静态内容放在前面，易变内容放在消息里，不要中途重写 CLAUDE.md。机制细节见[提示缓存原理](/knowledge/prompt-caching-explained)。
+实操上：把静态内容放在前面，易变内容放在消息里，不要中途重写 CLAUDE.md。机制细节见[提示缓存原理：什么时候省钱、什么时候白花](/knowledge/prompt-caching-explained)；单次会话的成本结构见 [为什么 Agent 比聊天更烧 token](/knowledge/why-agents-cost-more-tokens)。
 
 ## 这不是浪费
 

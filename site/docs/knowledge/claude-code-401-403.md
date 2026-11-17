@@ -22,6 +22,8 @@ head:
 
 ## 会看到哪些消息
 
+**结论**：这一族报错全部出在「凭据被服务器拒绝」这一层，与模型能力无关。401 是凭据本身不被认可（不存在、过期、填错位置），403 是凭据有效但没有权限（端点不在白名单、Key 没开通对应能力）。
+
 ```text
 API Error: 401 {"type":"authentication_error","message":"Invalid authentication credentials"}
 API Error: 401 invalid x-api-key
@@ -42,7 +44,7 @@ grep -n apiKeyHelper ~/.claude/settings.json
 
 **结论**：优先级很简单——环境里的 `ANTHROPIC_API_KEY`（或 `apiKeyHelper` 返回的值）一旦存在，就替代 OAuth 登录态。几个月前导进 `.bashrc` 的旧 Key，或者另一个服务商的 Key，就是每次 `/login` 之后仍然 401 的经典原因。取消它，或者换成正确的那个。
 
-还没配过环境变量的话，变量名和端点地址见[使用教程](/guide)；如果 curl 直接超时而不是 401，那是网络层的问题，见[连接中断怎么排查](/knowledge/claude-code-connection-lost)。
+还没配过环境变量的话，变量名和端点地址见[使用教程](/guide)；如果 curl 直接超时而不是 401，那是网络层的问题，见[Claude Code 连接中断、等待 API 响应怎么处理](/knowledge/claude-code-connection-lost)。
 
 ## 401（Key 模式）：Key 与端点必须匹配
 
@@ -75,9 +77,11 @@ curl -s "$ANTHROPIC_BASE_URL/v1/models" -H "x-api-key: $ANTHROPIC_API_KEY" -H "a
 - **不再是该组织的成员**：令牌属于你已离开或已变更的组织。退出再登录，重新签发当前组织的令牌。
 - **我们这边返回的 403**：Key 有效，但账户被停用、该模型余额不足，或模型不在套餐内；响应体会写明是哪种。面板里确认，不要先改客户端。
 
-429 和 529 与 401/403 长得完全不一样，走错方向会白折腾，见[429 限流](/knowledge/claude-code-429-rate-limit)和[529 容量不足](/knowledge/claude-code-529-overloaded)。
+429 和 529 与 401/403 长得完全不一样，走错方向会白折腾，见[Claude Code 报 429 限流怎么办](/knowledge/claude-code-429-rate-limit)和[Claude 报错 529 overloaded 怎么处理](/knowledge/claude-code-529-overloaded)。
 
 ## 最快的绕过
+
+**结论**：最快的绕过是决定「用哪套凭据」，而不是修 Key。走订阅就 `unset` 掉环境变量回到 OAuth 登录；走网关就把 `ANTHROPIC_BASE_URL` 和 `ANTHROPIC_API_KEY` 一起换成成对的一组。
 
 ```bash
 unset ANTHROPIC_API_KEY ANTHROPIC_BASE_URL   # 回到订阅登录

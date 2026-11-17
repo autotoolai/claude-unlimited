@@ -16,9 +16,9 @@ head:
 
 # 用代码做视频：四个开源技能怎么选
 
-> **一句话答案**：代码做视频不是让模型生成像素，而是让它写一段程序，程序在每一帧算出一个画面，再把帧拼成 MP4。所以产物可复现、可编辑、文字永远清晰；代价是素材要你自己准备，第一次配环境要花点时间。四个开源技能按分工选：宣传片走 video-shotcraft，科普讲解走 anything2explainer，口播教程走 video-talkcraft，想避开 Remotion 授权走 claude-motion-design。
+> **一句话答案**：代码做视频不是让模型生成像素，而是让它写一段程序，程序在每一帧算出一个画面，再把帧拼成 MP4。所以产物可复现、可编辑、文字永远清晰；代价是素材要你自己准备，第一次配环境要花点时间。四个开源技能按分工选：宣传片走 video-shotcraft，科普讲解走 anything2explainer，口播教程走 video-talkcraft，想避开 Remotion 授权走 claude-motion-design。完整环境搭建走一遍见 [Opus 5.5 做视频教程：Remotion 出第一条 MP4](/knowledge/claude-code-make-video)。
 
-如果你只需要"让画面动起来"，直接去 [Claude Code 教程：从零跑通第一条 MP4](/knowledge/claude-code-make-video)，那篇只讲 Remotion 这一条路。本文讲的是路已经跑通之后的事：四个技能各自擅长什么、开拍前要准备什么、哪些坑会让你白渲一遍。
+如果你只需要"让画面动起来"，直接去 [Opus 5.5 做视频教程：Remotion 出第一条 MP4](/knowledge/claude-code-make-video)，那篇只讲 Remotion 这一条路。本文讲的是路已经跑通之后的事：四个技能各自擅长什么、开拍前要准备什么、哪些坑会让你白渲一遍。
 
 ## 代码做视频和文生视频差在哪
 
@@ -88,6 +88,8 @@ ffmpeg -af loudnorm=I=-14:TP=-1.5:LRA=11 -i in.mp4 out.mp4
 
 ## 四支样片
 
+**结论**：四支都是本机真实渲染产出，每支后面都列了「用了什么」和「开拍前要准备」，可以直接当模板照抄。
+
 以下四支都是本机真实渲染产出，不是概念图。
 
 ### 1. 无限卡宣传片
@@ -104,6 +106,8 @@ ffmpeg -af loudnorm=I=-14:TP=-1.5:LRA=11 -i in.mp4 out.mp4
 
 用了什么：黑底白线稿加紫点缀的固定视觉体系，本地模型配音，逐块对齐字幕，底部章节进度条。两个主题（上下文窗口、提示缓存）并进一支，各占一章。
 
+这两个主题本身的内容在 [Claude Code 启动时那 33k token 去了哪](/knowledge/claude-code-startup-tokens) 与 [提示缓存原理：什么时候省钱、什么时候白花](/knowledge/prompt-caching-explained) 里，片子只讲最直观的结论。
+
 开拍前要准备：解说稿（先定稿）、中文音色选定、幕底选型（点阵波或星点）。
 
 ### 3. MCP 是什么
@@ -111,6 +115,8 @@ ffmpeg -af loudnorm=I=-14:TP=-1.5:LRA=11 -i in.mp4 out.mp4
 <VideoPlayer src="v4_mcp.mp4" caption="36.0 秒 · 1920×1080 · 30fps" />
 
 用了什么：五镜结构（终端 → 装手脚 → 能干什么 → 怎么装 → 装完什么样），句级时间戳锁动效，深空蓝主题。
+
+MCP 本身的安装与配置步骤在 [Claude Code MCP 怎么配：命令、scope 与避坑](/knowledge/claude-code-mcp-config)，技能之间的写法差别在 [Claude Code 技能怎么写](/knowledge/claude-code-skills)。
 
 开拍前要准备：配音成品与时间戳 JSON、脱敏后的配置示例、每镜的语义标注（这句在做什么）。
 
@@ -150,6 +156,8 @@ ffmpeg -af loudnorm=I=-14:TP=-1.5:LRA=11 -i in.mp4 out.mp4
 
 ## 机器闸：人眼审片会漏，断言不会
 
+**结论**：人眼审片和抽静帧都会漏掉「场景没挂载」这类硬伤，所以出片前必须有机器断言。第二轮加的七道闸一条命令跑完，退出码非 0 就不出片。
+
 第一轮人工审帧，认为两支片子通过。实际上那两支的场景根本没挂载成片，上部区域像素标准差是 **0.00**，整片只有字幕。原因是调用 `sceneFrameRanges()` 时少传了参数，返回 `undefined`，五个场景全被 `if (!r) return null` 拦掉。
 
 **这类问题靠人眼和静帧都看不出来。** 当时抽的是静帧，静帧里场景是正常的（那是从 Remotion 直接渲的单帧），只有合成后的视频才暴露。
@@ -165,6 +173,8 @@ python scripts/gates/run_all.py outputs/explainer.mp4 --motion-std=3.0
 七道闸分别是：场景挂载、动画密度、布局侵占、解说一致性、响度、首帧完整度、音轨非空。其中最该先上的是第一道，它拦住的是最贵的一类错误（整片渲染白费）。
 
 ## 三轮迭代实录
+
+**结论**：三轮迭代分别是：先出片发现硬伤、补齐中间产物加七道机器闸、按闸门反馈收敛到可交付。每一轮都有明确输入、明确发现和明确改动。
 
 同一批样片迭代了三轮，每轮都有明确的输入、明确的发现、明确的改动。下面按真实经过写，不美化。
 
@@ -215,11 +225,13 @@ python scripts/gates/run_all.py outputs/explainer.mp4 --motion-std=3.0
 
 ## 踩坑清单
 
+**结论**：七条坑各有明确的症状和解法：TypeScript 版本、图片引用路径、镜头文件后缀、TTS 连不上、motion-design 预载阻塞、渲染脚本硬编码常量、首帧空白。
+
 以下每一条都是真实撞到的，照着避。
 
 | 坑 | 现象 | 解法 |
 |---|---|---|
-| TypeScript 版本 | `npm i -D typescript` 装到 TS 7，Remotion 报 `Cannot read properties of undefined (reading 'readFile')` | 钉 `typescript@5.9.3` |
+| TypeScript 版本 | `npm i -D typescript` 装到 TS 7，Remotion 报 `Cannot read properties of undefined (reading 'readFile')` | 装 `typescript` 的 5.9.3 版本 |
 | 图片引用 | `<Img src="home.png">` 404 | 必须 `staticFile('assets/home.png')` |
 | 文件后缀 | 镜头组件写成 `.ts`，TS 报一堆 `'>' expected` | 镜头文件一律 `.tsx` |
 | edge-tts 连不上 | WebSocket 握手 403 | 开代理，或改用 Kokoro |

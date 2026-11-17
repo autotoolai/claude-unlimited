@@ -34,6 +34,8 @@ Claude Code 这类 agent 工具的官方标准窗口是 200k token，我们不�
 
 ## 按优先级释放
 
+**结论**：按代价从低到高排四步：`/compact` 压缩历史、减少一次性粘贴的大段内容、关掉用不到的 MCP 工具、最后才 `/clear` 完全重来。前三步都在保留上下文的前提下腾空间。
+
 按代价从低到高处理：
 
 1. **`/compact`**：把前面的对话历史压缩成摘要，保留关键决定，释放大量空间。适合「话题没变但聊了太久」。
@@ -42,6 +44,8 @@ Claude Code 这类 agent 工具的官方标准窗口是 200k token，我们不�
 4. **`/clear`**：完全清空，重新描述任务。适合「话题已经变了」或 `/compact` 也压不动的情况（比如一整轮都是巨大的工具输出，没有可折叠的旧对话）。
 
 ## /compact 与 /clear 的区别
+
+**结论**：能 `/compact` 就不 `/clear`。`/compact` 把历史压成摘要并保留「我们刚才决定这么做」这类上下文，`/clear` 之后你要把背景重新交代一遍。
 
 | 命令 | 做什么 | 什么时候用 |
 |---|---|---|
@@ -60,7 +64,7 @@ Claude Code 这类 agent 工具的官方标准窗口是 200k token，我们不�
 
 另外注意：选模型时先看窗口大小。网关上标着 1M 的变体，实测与普通档相同，只是多一层「需要额外用量」的限制，不要选它。以 `/context` 报告的当前窗口为准。
 
-窗口是被什么填满的，直接决定该释放哪一块，见[启动时那 33k token 去了哪](/knowledge/claude-code-startup-tokens)；工具输出为什么是最大的一块，见[为什么 Agent 比聊天更烧 token](/knowledge/why-agents-cost-more-tokens)。
+窗口是被什么填满的，直接决定该释放哪一块，见[Claude Code 启动时那 33k token 去了哪](/knowledge/claude-code-startup-tokens)；工具输出为什么是最大的一块，见[为什么 Agent 比聊天更烧 token](/knowledge/why-agents-cost-more-tokens)。
 
-每次压缩仍会重发全部内容，所以在服务端侧还有更省的办法，见[降低 Claude 用量的工程方法](/knowledge/reduce-token-usage-tips)。
+每次压缩仍会重发全部内容，所以在服务端侧还有更省的办法，见[降低 Claude 用量的工程方法：先测量再优化](/knowledge/reduce-token-usage-tips)。
 

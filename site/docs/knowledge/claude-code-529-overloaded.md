@@ -28,7 +28,7 @@ head:
 API Error (529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"}}) · Retrying in 1 seconds… (attempt 1/10)
 ```
 
-它发生在请求发出之后、响应之前，与你的账户状态无关。碰到同一条错误反复出现，先对照[429 限流](/knowledge/claude-code-429-rate-limit)确认不是自己撞了速率上限。
+它发生在请求发出之后、响应之前，与你的账户状态无关。碰到同一条错误反复出现，先对照[Claude Code 报 429 限流怎么办](/knowledge/claude-code-429-rate-limit)确认不是自己撞了速率上限。
 
 ## 什么会触发
 
@@ -43,12 +43,14 @@ API Error (529 {"type":"error","error":{"type":"overloaded_error","message":"Ove
 **结论**：从上到下。
 
 1. **让内置重试跑完**。多数 529 在 10 次尝试内消失。
-2. **`/model` 换档**。这一步是当前任务继续；忙完再切回来。换哪一档合适见[按任务选模型](/knowledge/choose-claude-model)。
+2. **`/model` 换档**。这一步是当前任务继续；忙完再切回来。换哪一档合适见[按任务选模型：Opus、Sonnet、Haiku 怎么选](/knowledge/choose-claude-model)。
 3. **减少并发并错峰**。不要同时启动十个第一请求；给扇出加延迟或改成串行。
 4. **显式重跑丢失的子任务**。检查每个分支是否真的完成。
 5. **大任务避开高峰**。长时间自主运行在美国工作时间之外撞上容量的概率低得多。
 
 ## 529、500、429 三者的区别
+
+**结论**：三者都返回 5xx 或 4xx，但归属完全不同：529 是上游模型容量不足，所有人都受影响，只能等或换档；500 是上游服务端故障，看状态页；429 是你超了自己的速率上限，该做的是减少并发和压缩上下文。
 
 | 错误 | 含义 | 归谁 |
 |---|---|---|

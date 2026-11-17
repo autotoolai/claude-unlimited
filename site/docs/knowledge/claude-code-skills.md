@@ -18,15 +18,13 @@ head:
 
 > 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-skills](https://claude-unlimited.aiautotools.com/knowledge/claude-code-skills) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
 
-> **一句话答案**：技能是一种渐进式披露——模型起先只看到技能的 `name` 和 `description`，任务匹配上才去读完整的 `SKILL.md` 及其引用的文件。所以 `description` 要写「什么时候用我」。技能放在 `~/.claude/skills/<name>/SKILL.md`（个人）、`.claude/skills/<name>/SKILL.md`（随仓库提交）或插件内。
-
-它是四个扩展点里最轻的一个：不需要子代理、不需要事件、不需要外部服务，只是一个把流程写下来的目录。
+> **一句话答案**：技能是一种渐进式披露——模型起先只看到技能的 `name` 和 `description`，任务匹配上才去读完整的 `SKILL.md` 及其引用的文件。所以 `description` 要写「什么时候用我」。技能放在 `~/.claude/skills/<name>/SKILL.md`（个人）、`.claude/skills/<name>/SKILL.md`（随仓库提交）或插件内这 3 处。它是 4 个扩展点里最轻的一个：不需要子代理、不需要事件、不需要外部服务，只是一个把流程写下来的目录。
 
 ## 技能是什么：渐进式披露
 
 **结论**：模型起初只看到每个技能的 `name` 与 `description`，任务匹配上才读取完整 `SKILL.md` 和它指向的文件。这样上下文始终很小，需要时又能拿到深度、任务特定的知识：流程、风格规则、领域清单，甚至可执行的辅助脚本。
 
-`CLAUDE.md` 是每次会话全文进上下文；技能是按需加载。两者不是替代关系，静态规则放 `CLAUDE.md`，「这类任务按这套流程做」放技能，见 [CLAUDE.md 怎么写](/knowledge/claude-md-guide)。
+`CLAUDE.md` 是每次会话全文进上下文；技能是按需加载。两者不是替代关系，静态规则放 `CLAUDE.md`，「这类任务按这套流程做」放技能，见 [CLAUDE.md 怎么写：写什么、放哪](/knowledge/claude-md-guide)。
 
 ## 最小的一个技能长什么样
 
@@ -86,9 +84,9 @@ description: Write release notes from the git log in this repo's house style. Us
 | 需求 | 用什么 |
 |---|---|
 | 这类任务按这套流程做（按需知识） | 技能 |
-| 派一个独立的人去干，独立上下文 | [子代理](/knowledge/claude-code-subagents) |
+| 派一个独立的人去干，独立上下文 | [Claude Code 子代理怎么用](/knowledge/claude-code-subagents) |
 | 每次都必须发生的确定性动作 | hooks |
-| 外部系统的工具和数据 | MCP |
+| 外部系统的工具和数据 | MCP（见 [Claude Code MCP 怎么配：命令、scope 与避坑](/knowledge/claude-code-mcp-config)） |
 
 技能为三者打包流程，但它本身不做任何事。
 

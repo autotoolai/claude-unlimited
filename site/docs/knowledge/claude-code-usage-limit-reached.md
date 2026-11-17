@@ -18,7 +18,7 @@ head:
 
 > 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-usage-limit-reached](https://claude-unlimited.aiautotools.com/knowledge/claude-code-usage-limit-reached) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
 
-> **一句话答案**：看到「用量上限」先看消息来自哪个计量器。订阅的会话 / 周 / Opus 窗口按计划时间重置，没法修；控制台的指定消费上限与预付余额不足不是 bug，只能改设置或充值；括号里写着「not your usage limit」的是服务端临时限流，等一分钟续跑。`/status` 显示当前是订阅还是 Key 在计费，是排查这类问题的第一步。
+> **一句话答案**：看到「用量上限」先看消息来自哪个计量器，一共 4 类。订阅的会话 / 周 / Opus 窗口按计划时间重置，没法修；控制台的指定消费上限与预付余额不足不是 bug，只能改设置或充值；括号里写着「not your usage limit」的是服务端临时限流，等 1 分钟续跑。最常见的触发是选了默认 1M 窗口的模型变体，在 `/model` 里选非 1M 变体，或设 `CLAUDE_CODE_DISABLE_1M_CONTEXT=1`。`/status` 显示当前是订阅还是 Key 在计费，是排查这类问题的第一步。
 
 ## 四类消息
 
@@ -66,7 +66,7 @@ API Error: Server is temporarily limiting requests (not your usage limit) · Rat
 
 **结论**：括号里的话是全部重点——服务端在高峰时限流，你的额度没动。
 
-等一分钟，用 `claude -c` 续跑；无人值守的运行设 `CLAUDE_CODE_RETRY_WATCHDOG=1`，让它重试而不是退出。它和 529 的处理思路一致，见 [529 怎么处理](/knowledge/claude-code-529-overloaded)。
+等一分钟，用 `claude -c` 续跑；无人值守的运行设 `CLAUDE_CODE_RETRY_WATCHDOG=1`，让它重试而不是退出。它和 529 的处理思路一致，见 [Claude 报错 529 overloaded 怎么处理](/knowledge/claude-code-529-overloaded)；如果你其实是被速率限制卡住，见 [Claude Code 报 429 限流怎么办](/knowledge/claude-code-429-rate-limit)。
 
 ## 怎么继续工作
 
@@ -78,5 +78,5 @@ export ANTHROPIC_API_KEY=<你的 Key>
 claude          # 按 token 计费，没有会话或周窗口
 ```
 
-订阅重置后再取消环境变量切回来。注意每分钟速率限制（429）是另一套机制，见[429 怎么处理](/knowledge/claude-code-429-rate-limit)。
+订阅重置后再取消环境变量切回来。注意每分钟速率限制（429）是另一套机制，见[Claude Code 报 429 限流怎么办](/knowledge/claude-code-429-rate-limit)。
 
