@@ -406,7 +406,7 @@ export const knowledge: KnowledgeMeta[] = [
     sourceSlug: 'what-is-claude-unlimited',
     faq: [
       { q: '「无限」到底无限到什么程度？', a: '订阅期内不按 token 计费：单次调用消耗多少 token 都不单独加价。仍然有有效期、会话窗口档位与公平使用边界，不是没有任何限制。' },
-      { q: 'Opus / Fable 要单独买卡吗？', a: '不用。一份订阅内承诺档位（如 Fable 5.1 与 Opus 5.5）通用，选 Opus 不另计费；价格与档位见套餐定价页。' },
+      { q: 'Opus / Fable 要单独买卡吗？', a: '不用。一份订阅内承诺档位（如 Fable 5.2 与 Opus 5.5）通用，选 Opus 不另计费；价格与档位见套餐定价页。' },
       { q: 'rsxermu666.cn 是什么？', a: 'rsxermu666.cn 是 Claude 无限卡的官方管理后台与 API 网关，用于兑换 Key、查看面板与接入调用；文档与介绍在 claude-unlimited.aiautotools.com，二者同一运营方。' },
       { q: '文档站和控制台分别干什么？', a: '文档站核对产品说明、定价口径与教程；管理后台 rsxermu666.cn 完成卡密兑换与日常操作。文档站 /console 是后台说明页，兑换动作在 rsxermu666.cn。' },
       { q: '和官方 Pro/Max、按量 API 怎么选？', a: '主要在官方产品里聊天选 Pro/Max；调用少且可预测选按量；每天长会话、多 Agent、不想心算 token 时，固定价周期网关更匹配。' },

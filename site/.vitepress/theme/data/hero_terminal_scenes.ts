@@ -61,7 +61,7 @@ export const heroScenes: HeroScene[] = [
     badge: 'SSE 流式 · 边生成边返回',
   }),
   scene({
-    model: pick('claude-fable-5-1'),
+    model: pick('claude-fable-5-2'),
     q: 'Summarize an idea.',
     a: 'A simple starting point for your next project.',
     badge: '多模型同一把 Key',

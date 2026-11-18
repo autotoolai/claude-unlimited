@@ -25,7 +25,7 @@ import {
 
     <h2 id="plans">套餐与价格</h2>
     <p>
-      有效期内不限次数调用 Fable 5.1 与 Opus 5.5，不按 token 计费；差别主要在时长与同时可开几个会话窗口。
+      有效期内不限次数调用 Fable 5.2 与 Opus 5.5，不按 token 计费；差别主要在时长与同时可开几个会话窗口。
       边界与退款细则见<a href="/pricing">套餐定价</a>。
     </p>
     <PlanGrid group-id="unlimited" :show-group-head="false" />

@@ -60,7 +60,7 @@
 
 把要用的模型加进来，不保存下一步启用后模型列表会是空的。
 
-- 把 claude-fable-5-1、claude-opus-5-5、claude-opus-4-8、claude-sonnet-5-5 都添加进去，然后点「保存」。
+- 把 claude-fable-5-2、claude-opus-5-5、claude-opus-4-8、claude-sonnet-5-5 都添加进去，然后点「保存」。
 
 ## 5. 启用并检测链路
 

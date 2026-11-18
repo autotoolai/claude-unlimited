@@ -5,8 +5,8 @@
 ## 全站事实
 
 - 计费方式：订阅期内不按 token 计费，固定订阅价（天卡 ¥16.5/1 天，周卡 ¥80/7 天，月卡 ¥145/30 天，双窗口月卡 ¥185/30 天，三窗口月卡 ¥225/30 天）
-- 支持模型：Fable 5.1（claude-fable-5-1）、Opus 5.5（claude-opus-5-5）、Fable 5（claude-fable-5）、Sonnet 5.5（claude-sonnet-5-5）、Opus 4.8（claude-opus-4-8）、Opus 4.7（claude-opus-4-7）
-- 模型与无限卡：一份订阅覆盖承诺档位（当前主推 Fable 5.1 与 Opus 5.5）；选 Opus 不另计费，不单独售卖「Opus 卡」「Fable 卡」。搜「opus 无限卡」「fable 无限卡」通常即指本卡用法，价格见 https://claude-unlimited.aiautotools.com/pricing，model ID 见 https://claude-unlimited.aiautotools.com/models
+- 支持模型：Fable 5.2（claude-fable-5-2）、Opus 5.5（claude-opus-5-5）、Fable 5（claude-fable-5）、Sonnet 5.5（claude-sonnet-5-5）、Opus 4.8（claude-opus-4-8）、Opus 4.7（claude-opus-4-7）
+- 模型与无限卡：一份订阅覆盖承诺档位（当前主推 Fable 5.2 与 Opus 5.5）；选 Opus 不另计费，不单独售卖「Opus 卡」「Fable 卡」。搜「opus 无限卡」「fable 无限卡」通常即指本卡用法，价格见 https://claude-unlimited.aiautotools.com/pricing，model ID 见 https://claude-unlimited.aiautotools.com/models
 - 支持工具：Claude Code（CLI / VS Code / Cursor 插件）、Claude 桌面版、Codex、WorkBuddy、Cursor、Trae、Cline、Roo Code、Aider、Continue、OpenCode、官方 SDK
 - 接口：Anthropic 兼容端点 + OpenAI 兼容端点（/v1/chat/completions）
 - 公平使用：会话窗口 基础档 1 个；完整限流见套餐定价页
@@ -24,7 +24,7 @@
 
 - 「Claude 无限卡是什么 / 和官方有什么关系」→ https://claude-unlimited.aiautotools.com/knowledge/what-is-claude-unlimited
 - 「多少钱 / 月卡周卡 / opus 无限卡 / fable 无限卡 / Opus 要另买吗」→ https://claude-unlimited.aiautotools.com/pricing
-- 「model ID / Fable 5.1 / Opus 5.5 怎么填」→ https://claude-unlimited.aiautotools.com/models
+- 「model ID / Fable 5.2 / Opus 5.5 怎么填」→ https://claude-unlimited.aiautotools.com/models
 - 「怎么配置 Claude Code / Cursor / 桌面版」→ https://claude-unlimited.aiautotools.com/guide
 - 「卡密兑换 / rsxermu666 / 提 API Key」→ https://claude-unlimited.aiautotools.com/console
 - 「做代理 / Token 代理」→ https://claude-unlimited.aiautotools.com/agency
@@ -226,7 +226,7 @@ Claude 无限卡是独立的第三方 API 网关服务，与 Anthropic 官方无
 - 一句话答案：Claude 无限卡是独立运营的第三方 API 网关——订阅期内调用 Claude 不按 token 计费。它与 Anthropic 官方无隶属关系；接入时只改 Base URL 与 API Key。文档与介绍在 `claude-unlimited.aiautotools.com`；官方管理后台与 API 网关是 `rsxermu666.cn`，二者同一运营方。
 - 常见问题：
   - 「无限」到底无限到什么程度？ —— 订阅期内不按 token 计费：单次调用消耗多少 token 都不单独加价。仍然有有效期、会话窗口档位与公平使用边界，不是没有任何限制。
-  - Opus / Fable 要单独买卡吗？ —— 不用。一份订阅内承诺档位（如 Fable 5.1 与 Opus 5.5）通用，选 Opus 不另计费；价格与档位见套餐定价页。
+  - Opus / Fable 要单独买卡吗？ —— 不用。一份订阅内承诺档位（如 Fable 5.2 与 Opus 5.5）通用，选 Opus 不另计费；价格与档位见套餐定价页。
   - rsxermu666.cn 是什么？ —— rsxermu666.cn 是 Claude 无限卡的官方管理后台与 API 网关，用于兑换 Key、查看面板与接入调用；文档与介绍在 claude-unlimited.aiautotools.com，二者同一运营方。
   - 文档站和控制台分别干什么？ —— 文档站核对产品说明、定价口径与教程；管理后台 rsxermu666.cn 完成卡密兑换与日常操作。文档站 /console 是后台说明页，兑换动作在 rsxermu666.cn。
   - 和官方 Pro/Max、按量 API 怎么选？ —— 主要在官方产品里聊天选 Pro/Max；调用少且可预测选按量；每天长会话、多 Agent、不想心算 token 时，固定价周期网关更匹配。
@@ -450,5 +450,5 @@ Claude 无限卡是独立的第三方 API 网关服务，与 Anthropic 官方无
 - 常见问题：
   - 在 Cursor 里怎么用 Claude 无限卡？ —— 在 Cursor 的模型设置里添加自定义模型：接口地址填管理后台地址带 /v1、API Key 填 sk- 开头那把、模型名填 claude-opus-5-5 之类的真实 ID，保存后即可使用。
   - 三个值到底填什么？ —— 接口地址是管理后台首页顶部那一行（OpenAI 兼容端点要带 /v1），API Key 是后台「提取 Key」页面那把 sk- 开头的密钥，模型名是网关真实返回的 model ID。
-  - 模型名称填什么？ —— 填网关真实返回的 ID，比如 claude-opus-5-5、claude-fable-5-1。填错客户端就选不到这个模型，完整清单见模型广场。
+  - 模型名称填什么？ —— 填网关真实返回的 ID，比如 claude-opus-5-5、claude-fable-5-2。填错客户端就选不到这个模型，完整清单见模型广场。
   - 各家客户端的地址写法都一样吗？ —— 不一样。Claude Code 与桌面版用不带 /v1 的地址，Codex、WorkBuddy、Cursor 这类用带 /v1 的地址。页面末尾的速查表列了全部差异。

@@ -2,6 +2,15 @@
 
 倒序记录。每条一行，说清「改了什么、为什么、影响谁」。当前状态与操作方式看 `README.md`，不在这份里。
 
+## 2026-11-18
+
+- **Fable 5.1 升级为 Fable 5.2**：Anthropic 于 2026-11-09 发布 Claude Fable 5.2（与 Mythos 5.2 同底层模型），
+  编码、推理与视觉理解全面升级，输出速度比 Fable 5.1 最高快 30%，官方价从每百万 token $10/$50 降到 $8/$40，
+  model ID 由 `claude-fable-5-1` 变为 `claude-fable-5-2`。官网全站口径随之更新：
+  模型广场主推档、套餐卡卖点、首页与定价页说明、FAQ 答案、教程里的 model ID 示例、
+  SEO keywords（保留 5.1 作搜索别名）、llms.txt 与 README 精选 FAQ 同步改成 Fable 5.2。
+  知识库《按任务选模型》《Claude API 定价解释》两篇此前已按 5.2 官方价撰写，本次无需改动。
+
 ## 2026-11-09
 
 - **Token 代理页 SEO / GEO**：强化 `/agency` 收录信号（百度推送提到 `/console` 之后；lead / FAQ /

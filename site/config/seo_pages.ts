@@ -29,6 +29,7 @@ export const pricingTags: string[] = [
   'fable 无限卡',
   'fable无限卡',
   'claude fable 无限卡',
+  'fable 5.2 无限卡',
   'fable 5.1 无限卡',
   'sonnet 无限卡',
   'claude 不按 token 计费',
@@ -37,11 +38,13 @@ export const pricingTags: string[] = [
 /** 模型广场：型号与 model ID（购买仍指定价） */
 export const modelsTags: string[] = [
   'claude opus 5.5',
+  'claude fable 5.2',
   'claude fable 5.1',
   'claude sonnet 5.5',
   'opus 模型 id',
   'fable 模型 id',
   'claude-opus-5-5',
+  'claude-fable-5-2',
   'claude-fable-5-1',
   'claude 无限卡 模型',
 ]

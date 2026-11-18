@@ -106,7 +106,8 @@
 | fable 无限卡 | 购买 / 产品 | `/pricing` | 同 opus | **已上线** |
 | fable无限卡 | 同上 | `/pricing` | 别名 | **已上线** |
 | claude fable 无限卡 | 同上 | `/pricing` | keywords | **已上线** |
-| fable 5.1 无限卡 | 型号精确 | `/pricing` + `/models` | 同上 | **已上线** |
+| fable 5.2 无限卡 | 型号精确 | `/pricing` + `/models` | 同上 | **已上线** |
+| fable 5.1 无限卡 | 型号精确（上一代） | `/pricing` + `/models` | 同上 | **已上线** |
 | sonnet 无限卡 | 次主推 | `/pricing` | keywords（弱于 opus/fable） | **已上线** |
 
 正文口径（避免误导）：
@@ -197,7 +198,7 @@
 
 1. **可引用段落优先于 meta keywords**  
    AI 更吃：一句话答案、FAQ、`llms.txt` 事实要点。模型复合词要在这些位置**自然出现完整句**，例如：  
-   > Claude 无限卡有效期内可调用 Opus 5.5 与 Fable 5.1，不按 token 计费；不需要单独购买「Opus 卡」。
+   > Claude 无限卡有效期内可调用 Opus 5.5 与 Fable 5.2，不按 token 计费；不需要单独购买「Opus 卡」。
 
 2. **llms.txt**  
    `gen_llms.ts` 事实要点已列模型与价格；补一句「Opus/Fable 与无限卡关系」后重建。门禁会扫 llms 死链。

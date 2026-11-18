@@ -167,7 +167,7 @@ export const siteConfig: SiteConfig = {
       shopUrl: purchaseUrl,
       highlighted: true,
       features: [
-        '有效期内不限次数调用，不按 token 计费，Fable 5.1 与 Opus 5.5 通用',
+        '有效期内不限次数调用，不按 token 计费，Fable 5.2 与 Opus 5.5 通用',
         '一个 Key 通吃 Claude Code、Cursor、WorkBuddy、Trae、Codex 等国内外主流工具',
         '支持流式输出、工具调用、扩展思考、视觉输入、长上下文',
         '买完即用，不排队、不审核，分钟级拿到卡密并激活',

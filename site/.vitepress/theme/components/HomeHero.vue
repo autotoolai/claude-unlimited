@@ -26,7 +26,7 @@ useHeroReveal()
         <span v-for="(w, i) in siteConfig.taglinePhrases" :key="i" class="cu-hero__w"><span class="cu-hero__i" :style="{ '--i': i }">{{ w }}</span></span>
       </h1>
       <p class="cu-lead">
-        <span class="cu-lead__line">订阅期内调用 Claude 不按 token 计费；Fable 与 Opus 同价通用，不必另买模型卡。</span>
+        <span class="cu-lead__line">订阅期内调用 Claude 不按 token 计费；Fable 5.2 与 Opus 5.5 同价通用，不必另买模型卡。</span>
         <span class="cu-lead__line">在 Claude Code 里重构项目、用 Cursor 读长代码库、让 agent 执行多步任务，都不必盯着用量仪表盘。</span>
         <span class="cu-lead__line">改一个 Base URL 加一个 Key，即可接入你现有的工具和 SDK。</span>
       </p>

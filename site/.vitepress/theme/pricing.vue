@@ -15,7 +15,7 @@ import { jsonLdPricing, pricingFaqItems } from './pages/data'
 /**
  * 档位名从 config/models.ts 派生：文案里不再手写模型名单。
  * 只取 recommendedIds（pick=primary）而不是全量 modelIds：模型广场会列出网关实际可用的全部档位，
- * 但商品详情只承诺 Fable 5.1 与 Opus 5.5。定价页是下单页，列全量属于过度承诺。
+ * 但商品详情只承诺 Fable 5.2 与 Opus 5.5。定价页是下单页，列全量属于过度承诺。
  */
 const tierNames = modelIds.filter((m) => recommendedIds.includes(m.id)).map((m) => m.tier).join('、')
 </script>

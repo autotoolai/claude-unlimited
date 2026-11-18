@@ -299,7 +299,7 @@ const ccPage: GuidePage = {
         {
           title: '选择你需要的模型并保存',
           goal: '把要用的模型加进来，不保存下一步启用后模型列表会是空的。',
-          action: ['把 claude-fable-5-1、claude-opus-5-5、claude-opus-4-8、claude-sonnet-5-5 都添加进去，然后点「保存」。'],
+          action: ['把 claude-fable-5-2、claude-opus-5-5、claude-opus-4-8、claude-sonnet-5-5 都添加进去，然后点「保存」。'],
           notes: ['完整的模型介绍见<a href="/models">模型广场</a>。'],
           shot: { src: 'guide_save_models.png', caption: '选择模型并点「保存」', zoom: true },
         },
@@ -901,7 +901,7 @@ const cursorPage: GuidePage = {
   faq: [
     { q: '在 Cursor 里怎么用 Claude 无限卡？', a: '在 Cursor 的模型设置里添加自定义模型：接口地址填管理后台地址带 /v1、API Key 填 sk- 开头那把、模型名填 claude-opus-5-5 之类的真实 ID，保存后即可使用。' },
     { q: '三个值到底填什么？', a: '接口地址是管理后台首页顶部那一行（OpenAI 兼容端点要带 /v1），API Key 是后台「提取 Key」页面那把 sk- 开头的密钥，模型名是网关真实返回的 model ID。' },
-    { q: '模型名称填什么？', a: '填网关真实返回的 ID，比如 claude-opus-5-5、claude-fable-5-1。填错客户端就选不到这个模型，完整清单见模型广场。' },
+    { q: '模型名称填什么？', a: '填网关真实返回的 ID，比如 claude-opus-5-5、claude-fable-5-2。填错客户端就选不到这个模型，完整清单见模型广场。' },
     { q: '各家客户端的地址写法都一样吗？', a: '不一样。Claude Code 与桌面版用不带 /v1 的地址，Codex、WorkBuddy、Cursor 这类用带 /v1 的地址。页面末尾的速查表列了全部差异。' },
   ],
   tags: ['cursor 配置 claude api', 'cursor 接入 claude api', 'cursor 无限卡', '自定义 api 客户端配置', 'cline 配置', 'openai 兼容端点'],
@@ -922,7 +922,7 @@ const cursorPage: GuidePage = {
         rows: [
           { label: '接口地址（Base URL）', values: [baseUrlV1, '管理后台首页顶部那一行后面加 /v1（OpenAI 兼容端点要带）；主域名打不开就换备用域名 ' + consoleBackupDomains.join('、')] },
           { label: 'API Key', values: ['sk- 开头的密钥', '上一步在后台提取的那把；忘了就回后台的「Key 详情」再看'] },
-          { label: '模型名', values: ['claude-opus-5-5、claude-fable-5-1 等', '网关实时返回，「获取模型列表」里能看到的都在；完整清单见<a href="/models">模型广场</a>'] },
+          { label: '模型名', values: ['claude-opus-5-5、claude-fable-5-2 等', '网关实时返回，「获取模型列表」里能看到的都在；完整清单见<a href="/models">模型广场</a>'] },
         ],
       },
       notes: [

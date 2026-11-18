@@ -112,7 +112,7 @@ export ANTHROPIC_API_KEY="sk-..."
 
 **Opus / Fable 要单独买一张「无限卡」吗？**
 
-不用。Claude 无限卡是一份订阅制通道：有效期内承诺的 Fable 5.1 与 Opus 5.5 都在同一订阅价内，选 Opus 不另计费，也不单独售卖「Opus 卡」或「Fable 卡」。
+不用。Claude 无限卡是一份订阅制通道：有效期内承诺的 Fable 5.2 与 Opus 5.5 都在同一订阅价内，选 Opus 不另计费，也不单独售卖「Opus 卡」或「Fable 卡」。
 
 **有效期从什么时候起算？到期会怎样？**
 

@@ -43,20 +43,24 @@ export interface ModelRow {
   summary: string
 }
 
-/** 实测验证时间，用于在页脚标注 */
-export const verifiedAt = '2026-10-13'
+/**
+ * 档位信息核对时间。
+ * - 网关可用性以 2026-10-13 的 /v1/models 实测快照为准（config/models_upstream.json）。
+ * - claude-fable-5-2 于 2026-11-18 按官方发布页（anthropic.com/claude-fable-and-mythos-5-2）更新。
+ */
+export const verifiedAt = '2026-11-18'
 
 
 export const modelIds: ModelRow[] = [
   {
-    id: 'claude-fable-5-1',
-    tier: 'Fable 5.1',
-    scene: '速度与质量均衡，日常编码主力',
+    id: 'claude-fable-5-2',
+    tier: 'Fable 5.2',
+    scene: '最难的编码与推理，长周期自主任务',
     pick: 'primary',
     brand: 'Claude',
-    tags: ['自适应思考', '长期自主 Agent', '高阶软件工程', '高性价比多模态', '极限推理预算'],
+    tags: ['自适应思考', '长期自主 Agent', '高阶软件工程', '多模态理解', '极限推理预算'],
     summary:
-      'Fable 5.1 极限推理档位，拉满思考预算，支持多路径并行推演与交叉复盘，推理准确率拉满，耗时更高，专为零容错硬核难题、高风险终审决策设计。日常编码与文档任务同样够用，速度与质量最均衡，不确定用什么时从它开始。',
+      'Claude Fable 5.2 是 Anthropic 于 2026 年 11 月 9 日发布的当前最强模型，面向最硬核的技术工作。编码、推理与视觉理解全面升级，输出速度比 Fable 5.1 最高快 30%，官方价从每百万 token $10/$50 降到 $8/$40。它能独立拆解跨仓库的模糊需求、边做边验证自己的产出，也更愿意质疑既有结论，因此常常能挖出前几代模型漏掉的根因。',
   },
   {
     id: 'claude-opus-5-5',
@@ -76,7 +80,7 @@ export const modelIds: ModelRow[] = [
     brand: 'Claude',
     tags: ['自适应思考', '长期自主 Agent', '高阶软件工程', '高性价比多模态', '极限推理预算'],
     summary:
-      'Fable-5 极限推理档位，拉满思考预算，支持多路径并行推演与交叉复盘，推理准确率拉满，耗时更高。可用模型里响应最快的一档，轻量任务上比 Fable 5.1 更省时间；思考强度固定不可调，需按预算调节思考量时改用 Opus 4.7 或 4.8。',
+      'Fable-5 极限推理档位，拉满思考预算，支持多路径并行推演与交叉复盘，推理准确率拉满，耗时更高。可用模型里响应最快的一档，轻量任务上比 Fable 5.2 更省时间；思考强度固定不可调，需按预算调节思考量时改用 Opus 4.7 或 4.8。',
   },
   {
     id: 'claude-sonnet-5-5',

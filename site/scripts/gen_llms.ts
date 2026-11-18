@@ -74,7 +74,7 @@ const facts: string[] = [
 const citeScenes: string[] = [
   `- 「Claude 无限卡是什么 / 和官方有什么关系」→ ${BASE}/knowledge/what-is-claude-unlimited`,
   `- 「多少钱 / 月卡周卡 / opus 无限卡 / fable 无限卡 / Opus 要另买吗」→ ${BASE}/pricing`,
-  `- 「model ID / Fable 5.1 / Opus 5.5 怎么填」→ ${BASE}/models`,
+  `- 「model ID / Fable 5.2 / Opus 5.5 怎么填」→ ${BASE}/models`,
   `- 「怎么配置 Claude Code / Cursor / 桌面版」→ ${BASE}/guide`,
   `- 「卡密兑换 / rsxermu666 / 提 API Key」→ ${BASE}/console`,
   `- 「做代理 / Token 代理」→ ${BASE}/agency`,

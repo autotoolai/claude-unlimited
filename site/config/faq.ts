@@ -102,11 +102,11 @@ export const faqItems: FaqItem[] = [
   {
     cat: 'product',
     id: 'cat-product-models',
-    keywords: ['模型', '支持哪些模型', 'opus', 'fable', '5.5', '5.1', '版本', '新模型', '有哪些模型', '支持什么模型'],
+    keywords: ['模型', '支持哪些模型', 'opus', 'fable', '5.5', '5.2', '5.1', '版本', '新模型', '有哪些模型', '支持什么模型'],
     q: '支持哪些模型？选 Opus 多花钱吗？',
-    a: `本卡承诺 Fable 5.1 与 Opus 5.5，均在同一订阅价内，选 Opus 不另收费。
+    a: `本卡承诺 Fable 5.2 与 Opus 5.5，均在同一订阅价内，选 Opus 不另收费。
 
-model ID：claude-fable-5-1（速度与质量均衡，日常编码主力）、claude-opus-5-5（复杂推理、架构设计）。以工具「获取模型列表」实际返回的 ID 为准；新模型上线一般只需更新 model ID，不必换 Key。`,
+model ID：claude-fable-5-2（最强档，编码与推理拉满，适合难任务）、claude-opus-5-5（复杂推理、架构设计、深度代码分析）。以工具「获取模型列表」实际返回的 ID 为准；新模型上线一般只需更新 model ID，不必换 Key。`,
     links: [
       { text: '模型广场', url: '/models' },
       { text: '教程 · 拉取并保存模型', url: '/guide/cc#cc-models' },
@@ -118,11 +118,11 @@ model ID：claude-fable-5-1（速度与质量均衡，日常编码主力）、cl
     featured: true,
     keywords: [
       'opus 无限卡', 'opus无限卡', 'claude opus 无限卡', 'opus 5.5 无限卡',
-      'fable 无限卡', 'fable无限卡', 'claude fable 无限卡', 'fable 5.1 无限卡',
+      'fable 无限卡', 'fable无限卡', 'claude fable 无限卡', 'fable 5.2 无限卡', 'fable 5.1 无限卡',
       'sonnet 无限卡', '单独买 opus', 'opus 要另买吗', '要不要单独买',
     ],
     q: 'Opus / Fable 要单独买一张「无限卡」吗？',
-    a: `不用。Claude 无限卡是一份订阅制通道：有效期内承诺的 Fable 5.1 与 Opus 5.5 都在同一订阅价内，选 Opus 不另计费，也不单独售卖「Opus 卡」或「Fable 卡」。
+    a: `不用。Claude 无限卡是一份订阅制通道：有效期内承诺的 Fable 5.2 与 Opus 5.5 都在同一订阅价内，选 Opus 不另计费，也不单独售卖「Opus 卡」或「Fable 卡」。
 
 搜「opus 无限卡」「fable 无限卡」通常就是指这类用法；档位与价格见套餐定价，复制 model ID 见模型广场。`,
     links: [
@@ -252,10 +252,10 @@ OpenAI SDK、LangChain、LiteLLM、Cursor、WorkBuddy：填带 /v1 的地址。
     id: 'cat-setup-model-switch',
     keywords: ['切换模型', 'model 指令', '/model', '换模型', '切模型', 'fable', 'opus', '新模型', '要换key吗'],
     q: '怎么切换模型？新模型要换 Key 吗？',
-    a: `在 Claude Code 会话里输入 /model 打开列表，或 /model claude-fable-5-1 切到指定模型。所有模型同一订阅价，选 Opus 不多花钱。
+    a: `在 Claude Code 会话里输入 /model 打开列表，或 /model claude-fable-5-2 切到指定模型。所有模型同一订阅价，选 Opus 不多花钱。
 
 新模型上线后刷新模型列表再切即可，一般不必换 Key。`,
-    code: ['/model', '/model claude-fable-5-1'],
+    code: ['/model', '/model claude-fable-5-2'],
     links: [{ text: '教程 · 拉取并保存模型', url: '/guide/cc#cc-models' }],
   },
   {

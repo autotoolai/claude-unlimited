@@ -70,7 +70,7 @@ export const homeTrustNotes = [
   siteConfig.notice,
   '套餐面向个人开发，不含上线服务、多用户共享与对外 API；生产流量、二次转卖不在范围内。',
   `${refundSummary}。`,
-  '有效期内不限次数调用 Fable 5.1 与 Opus 5.5，选 Opus 不额外计费；全部档位与规则见套餐定价。',
+  '有效期内不限次数调用 Fable 5.2 与 Opus 5.5，选 Opus 不额外计费；全部档位与规则见套餐定价。',
 ]
 
 /** 知识库文章总数：所有「N 篇」文案从这里派生，config/knowledge.ts 增删后不会失真 */

@@ -5,7 +5,7 @@
 ## 页面
 
 - [首页](https://claude-unlimited.aiautotools.com/): Claude 无限卡官网：订阅期内 Claude API 不按 token 计费，支持 Claude Code、Cursor、WorkBuddy、Trae、Codex 等国内外主流工具。本站只做介绍与答疑，购买跳转第三方发卡站。
-- [模型广场](https://claude-unlimited.aiautotools.com/models): 本卡承诺的 Fable 5.1 与 Opus 5.5 与 Fable 5 与 Sonnet 5.5 与 Opus 4.8 与 Opus 4.7 两个模型一览，可复制 model ID，含分工、完整列表获取与切换方法
+- [模型广场](https://claude-unlimited.aiautotools.com/models): 本卡承诺的 Fable 5.2 与 Opus 5.5 与 Fable 5 与 Sonnet 5.5 与 Opus 4.8 与 Opus 4.7 两个模型一览，可复制 model ID，含分工、完整列表获取与切换方法
 - [套餐定价](https://claude-unlimited.aiautotools.com/pricing): 无限卡在售 天卡 ¥16.5、周卡 ¥80、月卡 ¥145、双窗口月卡 ¥185、三窗口月卡 ¥225，周期卡与额度卡尚未定价；含退款规则与公平使用
 - [联系我们](https://claude-unlimited.aiautotools.com/contact): 微信客服与 QQ 交流群二维码；售后、代理与商务共用通道，添加时备注来意
 - [Token 代理](https://claude-unlimited.aiautotools.com/agency): 无押金起步，客户复购稳定，适合长期副业；没有经验也能做，我们提供基础 Agent 用法教学与答疑。加微信备注「代理」了解合作。
@@ -25,8 +25,8 @@
 ## 事实要点
 
 - 计费方式：订阅期内不按 token 计费，固定订阅价（天卡 ¥16.5/1 天，周卡 ¥80/7 天，月卡 ¥145/30 天，双窗口月卡 ¥185/30 天，三窗口月卡 ¥225/30 天）
-- 支持模型：Fable 5.1（claude-fable-5-1）、Opus 5.5（claude-opus-5-5）、Fable 5（claude-fable-5）、Sonnet 5.5（claude-sonnet-5-5）、Opus 4.8（claude-opus-4-8）、Opus 4.7（claude-opus-4-7）
-- 模型与无限卡：一份订阅覆盖承诺档位（当前主推 Fable 5.1 与 Opus 5.5）；选 Opus 不另计费，不单独售卖「Opus 卡」「Fable 卡」。搜「opus 无限卡」「fable 无限卡」通常即指本卡用法，价格见 https://claude-unlimited.aiautotools.com/pricing，model ID 见 https://claude-unlimited.aiautotools.com/models
+- 支持模型：Fable 5.2（claude-fable-5-2）、Opus 5.5（claude-opus-5-5）、Fable 5（claude-fable-5）、Sonnet 5.5（claude-sonnet-5-5）、Opus 4.8（claude-opus-4-8）、Opus 4.7（claude-opus-4-7）
+- 模型与无限卡：一份订阅覆盖承诺档位（当前主推 Fable 5.2 与 Opus 5.5）；选 Opus 不另计费，不单独售卖「Opus 卡」「Fable 卡」。搜「opus 无限卡」「fable 无限卡」通常即指本卡用法，价格见 https://claude-unlimited.aiautotools.com/pricing，model ID 见 https://claude-unlimited.aiautotools.com/models
 - 支持工具：Claude Code（CLI / VS Code / Cursor 插件）、Claude 桌面版、Codex、WorkBuddy、Cursor、Trae、Cline、Roo Code、Aider、Continue、OpenCode、官方 SDK
 - 接口：Anthropic 兼容端点 + OpenAI 兼容端点（/v1/chat/completions）
 - 公平使用：会话窗口 基础档 1 个；完整限流见套餐定价页
@@ -44,7 +44,7 @@
 
 - 「Claude 无限卡是什么 / 和官方有什么关系」→ https://claude-unlimited.aiautotools.com/knowledge/what-is-claude-unlimited
 - 「多少钱 / 月卡周卡 / opus 无限卡 / fable 无限卡 / Opus 要另买吗」→ https://claude-unlimited.aiautotools.com/pricing
-- 「model ID / Fable 5.1 / Opus 5.5 怎么填」→ https://claude-unlimited.aiautotools.com/models
+- 「model ID / Fable 5.2 / Opus 5.5 怎么填」→ https://claude-unlimited.aiautotools.com/models
 - 「怎么配置 Claude Code / Cursor / 桌面版」→ https://claude-unlimited.aiautotools.com/guide
 - 「卡密兑换 / rsxermu666 / 提 API Key」→ https://claude-unlimited.aiautotools.com/console
 - 「做代理 / Token 代理」→ https://claude-unlimited.aiautotools.com/agency

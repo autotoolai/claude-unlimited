@@ -173,7 +173,7 @@ export const kefuBotEntries: KefuBotEntry[] = [
     id: 'bot-usage-opus-fable-card',
     keywords: [
       'opus 无限卡', 'opus无限卡', 'claude opus 无限卡', 'opus 5.5 无限卡',
-      'fable 无限卡', 'fable无限卡', 'claude fable 无限卡', 'fable 5.1 无限卡',
+      'fable 无限卡', 'fable无限卡', 'claude fable 无限卡', 'fable 5.2 无限卡', 'fable 5.1 无限卡',
       'sonnet 无限卡', '单独买 opus', 'opus 要另买吗', '要不要单独买', '要单独买卡吗',
     ],
     tag: '使用',

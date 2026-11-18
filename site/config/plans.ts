@@ -46,7 +46,7 @@ export interface PlanTier {
   name: string,
   /** 卡片上展示的短档位名，如「天卡」。人工撰写，同步脚本不覆盖。
    *  缺省回退到 name——但 name 是发卡站的商品名，形如
-   *  「fable5.1+opus5.5无限-周卡」，直接当标题会让三张卡几乎一模一样。 */
+   *  「fable5.2+opus5.5无限-周卡」，直接当标题会让三张卡几乎一模一样。 */
   displayName?: string,
   /** 档位短副标题，如「先试一天」。写在 displayName 下方，给决策场景感；同步脚本不覆盖。 */
   tagline?: string,
@@ -88,7 +88,7 @@ export const planGroups: PlanGroup[] = [
   {
     id: 'unlimited',
     name: '无限卡',
-    desc: '有效期内不限次数调用 Fable 5.1 与 Opus 5.5，不按 token 计费，不设每日额度上限。适合每天在 Claude Code / Cursor 里干活的人。',
+    desc: '有效期内不限次数调用 Fable 5.2 与 Opus 5.5，不按 token 计费，不设每日额度上限。适合每天在 Claude Code / Cursor 里干活的人。',
     badge: '不限额度',
   },
   {
@@ -135,7 +135,7 @@ export const unlimitedTiers: PlanTier[] = [
     stock: 2,
     features: [
       '同时 1 个会话窗口',
-      '不限次数调用 Fable 5.1 与 Opus 5.5',
+      '不限次数调用 Fable 5.2 与 Opus 5.5',
       '不按 token 计费，无单次额度上限',
       'Claude Code、Cursor、VS Code 等多端通用',
       '提取 Key 后按 24 小时制起算，未激活不计时',
@@ -155,7 +155,7 @@ export const unlimitedTiers: PlanTier[] = [
     stock: 2,
     features: [
       '同时 1 个会话窗口',
-      '不限次数调用 Fable 5.1 与 Opus 5.5',
+      '不限次数调用 Fable 5.2 与 Opus 5.5',
       '不按 token 计费，无单次额度上限',
       'Claude Code、Cursor、VS Code 等多端通用',
       '提取 Key 后按 24 小时制起算，未激活不计时',
@@ -175,7 +175,7 @@ export const unlimitedTiers: PlanTier[] = [
     stock: 0,
     features: [
       '同时 1 个会话窗口',
-      '不限次数调用 Fable 5.1 与 Opus 5.5',
+      '不限次数调用 Fable 5.2 与 Opus 5.5',
       '不按 token 计费，无单次额度上限',
       'Claude Code、Cursor、VS Code 等多端通用',
       '提取 Key 后按 24 小时制起算，未激活不计时',
@@ -198,7 +198,7 @@ export const unlimitedTiers: PlanTier[] = [
     features: [
       '同时可开 2 个会话窗口',
       '即使只开 1 个窗口，响应也更从容',
-      '不限次数调用 Fable 5.1 与 Opus 5.5',
+      '不限次数调用 Fable 5.2 与 Opus 5.5',
       '不按 token 计费，无单次额度上限',
       'Claude Code、Cursor、VS Code 等多端通用',
       '提取 Key 后按 24 小时制起算，未激活不计时',
@@ -220,7 +220,7 @@ export const unlimitedTiers: PlanTier[] = [
     features: [
       '同时可开 3 个会话窗口',
       '即使只开 1 个窗口，响应也更从容',
-      '不限次数调用 Fable 5.1 与 Opus 5.5',
+      '不限次数调用 Fable 5.2 与 Opus 5.5',
       '不按 token 计费，无单次额度上限',
       'Claude Code、Cursor、VS Code 等多端通用',
       '提取 Key 后按 24 小时制起算，未激活不计时',
