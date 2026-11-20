@@ -64,6 +64,27 @@ ChatGPT / Perplexity / 文心 / 豆包 会不会引用 claude-unlimited.aiautoto
 **填表约定**：引用本站记 URL 路径（如 `/knowledge/what-is-claude-unlimited`）；
 未引用记「否」；引用了但口径错记 `FAIL:价格` 这样。
 
+## 搜索引擎侧实测（2026-11-21，非 AI 平台但同一件事的代理指标）
+
+搜索引擎的收录与 AI 平台的引用是两条链路，但「有没有被当成一个独立实体」是共同前提。
+本轮实测结果：
+
+| 渠道 | 问法 | 结果 |
+|---|---|---|
+| 百度 | `claude无限卡` | 第 3 位是官网首页（前面是 claude.com 系与知乎转载） |
+| 百度 | `site:github.com/autotoolai/claude-unlimited` | **0 结果**（「抱歉，未找到相关结果」） |
+| Bing | `"claude无限卡"`（带引号） | 前 10 全是 claude.com / claude.ai / support.claude.com，**官网与 GitHub 都不在** |
+| Bing | `site:github.com/autotoolai/claude-unlimited` | 只 2 条：`/security` 与 `docs/social-preview.png`，**README 与仓库首页未进索引** |
+| Bing | `claude无限卡`（不带引号，脚本抓） | 前 10 同上，无我们的页面 |
+
+**怎么读**：GitHub 侧缺的不是「内容量」而是「索引入口 + 实体权重」。
+仓库根已有 `knowledge/` 26 篇与 `tutorials/` 7 篇镜像，但 GitHub 不读我们的 sitemap，
+这些页面要等 GitHub 自己的爬虫重新抓取并重新评估权重，需要时间。
+`/security` 与图片被收录、README 没被收录，说明爬虫进过仓库但没认为 README 有检索价值。
+
+**这一节的行动项**：README 首屏关键词与目录已在本轮补齐（commit `80d2e9d` 之前），
+接下来 2–4 周复查 `site:` 索引量是否从 2 条涨到 10 条以上并含 README 页。
+
 ## 机器门禁能替我们做什么
 
 人工抽检和机器门禁各管一半，别互相替代：

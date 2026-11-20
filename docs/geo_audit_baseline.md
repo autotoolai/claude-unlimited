@@ -7,41 +7,41 @@
 | 口径 | 分数 | 说明 |
 |---|---|---|
 | 自研 audit_geo | 100/100 | 产物齐全度与内容质量，43 页在线审计 |
-| 第三方 geo-optimizer | 78.98/100 | 平均分，等级 good；成功 43 页 / 失败 0 页 |
+| 第三方 geo-optimizer | 79.47/100 | 平均分，等级 good；成功 43 页 / 失败 0 页 |
 
-审计时间：2026-11-20T16:53:02.181021+00:00｜对象：https://claude-unlimited.aiautotools.com/sitemap.xml
+审计时间：2026-11-20T17:33:15.539039+00:00｜对象：https://claude-unlimited.aiautotools.com/sitemap.xml
 
 ## 第三方评分明细（平均分拆解）
 
 | 维度 | 得分 |
 |---|---|
 | ai_discovery | 0 |
-| brand_entity | 4.21 |
+| brand_entity | 4.23 |
 | content | 12.33 |
 | google_ai | 19.21 |
 | llms | 6 |
 | meta | 10.91 |
 | negative_penalty | -0.4 |
 | robots | 14 |
-| schema | 8.47 |
-| signals | 4.26 |
+| schema | 8.88 |
+| signals | 4.3 |
 
 ## 分级分布
 
 | 等级 | 页数 |
 |---|---|
-| good | 41 |
-| foundation | 2 |
+| good | 42 |
+| foundation | 1 |
 
 ## 最低分页面
 
 | 分数 | 等级 | 页面 |
 |---|---|---|
-| 57 | foundation | /changelog |
-| 66 | foundation | /contact |
+| 67 | foundation | /changelog |
 | 72 | good | /faq |
 | 73 | good | /agency |
 | 73 | good | /knowledge |
+| 74 | good | /contact |
 | 75 | good | /models |
 | 76 | good | /guide |
 | 76 | good | /guide/cc |
