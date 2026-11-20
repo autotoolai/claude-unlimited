@@ -1,6 +1,6 @@
 # GEO 审计基线
 
-> 由 `npm run audit:geo -- --write` 生成。上次：2026-11-13 · 分数 **100/100**（43/43）。
+> 由 `npm run audit:geo -- --write` 生成。上次：2026-11-20 · 分数 **100/100**（50/50）。
 
 | 检查项 | 结果 | 说明 |
 |---|---|---|
@@ -12,6 +12,7 @@
 | `llms-sec:## 声明` | PASS | ## 声明 |
 | `llms-cite-ge5` | PASS | 推荐引用场景 7 条 |
 | `llms-model-fact` | PASS | 事实要点含「模型与无限卡」 |
+| `llms-full-pointer` | PASS | llms.txt 指向 llms-full.txt |
 | `md-knowledge:claude-code-tutorial` | PASS | C:\Users\Administrator\Documents\Token_Platform\claude-unlimited\site\public\knowledge\claude-code-tutorial.md |
 | `md-knowledge:claude-code-mcp-config` | PASS | C:\Users\Administrator\Documents\Token_Platform\claude-unlimited\site\public\knowledge\claude-code-mcp-config.md |
 | `md-knowledge:claude-code-make-video` | PASS | C:\Users\Administrator\Documents\Token_Platform\claude-unlimited\site\public\knowledge\claude-code-make-video.md |
@@ -47,6 +48,12 @@
 | `md-guide:workbuddy` | PASS | C:\Users\Administrator\Documents\Token_Platform\claude-unlimited\site\public\guide\workbuddy.md |
 | `md-guide:cursor` | PASS | C:\Users\Administrator\Documents\Token_Platform\claude-unlimited\site\public\guide\cursor.md |
 | `md-guide-count` | PASS | 6/6 |
+| `geo-capsule-all` | PASS | 26 篇文章的答案胶囊都 ≥ 40 字（其中 24 篇超过 120 字，只统计不判失败） |
+| `geo-md-no-absolute-links` | PASS | md 镜像里残留 0 处站内绝对链接 |
+| `geo-llms-covers-pages` | PASS | llms.txt 覆盖全部已登记页面 |
+| `llms-full-exists` | PASS | C:\Users\Administrator\Documents\Token_Platform\claude-unlimited\site\public\llms-full.txt |
+| `geo-llms-full-answers` | PASS | llms-full.txt 里 32 条一句话答案（文章 26 篇） |
+| `geo-llms-full-size` | PASS | llms-full.txt 31310 字符 |
 
 ## 人工抽检（P2）
 
