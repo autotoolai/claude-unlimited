@@ -27,7 +27,7 @@ head:
 
 另一半是「能不能用桌面版这个客户端」：能。客户端是一个本地程序，装上之后它只是个壳，真正干活的模型调用可以走第三方兼容接口。把这一步拆开看，桌面版在国内是能用的，而且用的是完整功能，不是阉割版。
 
-本文按这个顺序展开：先说清官方支持地区到底怎么规定的，再说清楚客户端和账号是两件事，然后给出国内用户实际可行的完整配置路径（每一步都有截图），最后收拢常见疑问。配置流程与[使用教程](/guide/desktop)同源，文章版更紧凑，看完这一篇就能装好。
+本文按这个顺序展开：先说清官方支持地区到底怎么规定的，再说清楚客户端和账号是两件事，然后给出国内用户实际可行的完整配置路径（每一步都有截图），最后收拢常见疑问。配置流程与[使用教程](https://claude-unlimited.aiautotools.com/guide/desktop)同源，文章版更紧凑，看完这一篇就能装好。
 
 ## 官方支持地区清单是怎么规定的
 
@@ -97,7 +97,7 @@ CC Switch 是一个专门管 API 配置的小工具，装好之后所有供应�
 
 卡密在发货信息里，拿到后到管理后台换成一把 `sk-` 开头的 API Key，后面全程只用它。
 
-功能说明见 [rsxermu666.cn 管理后台](/console)。实际兑换请打开 [rsxermu666.cn](https://rsxermu666.cn/)，在「我的面板」或「提取 Key」页面粘贴激活码，提交激活后复制拿到的 Key。
+功能说明见 [rsxermu666.cn 管理后台](https://claude-unlimited.aiautotools.com/console)。实际兑换请打开 [rsxermu666.cn](https://rsxermu666.cn/)，在「我的面板」或「提取 Key」页面粘贴激活码，提交激活后复制拿到的 Key。
 
 <GuideShot src="guide_site.png" caption="管理后台首页，粘贴卡密的输入框在这里" />
 
@@ -163,7 +163,7 @@ CC Switch 是一个专门管 API 配置的小工具，装好之后所有供应�
 
 官网页面在国内有时打不开，可以用镜像地址：[l1i1.github.io/ClaudeDesktop-Installer](https://l1i1.github.io/ClaudeDesktop-Installer/)；镜像是第三方文件，装之前自己判断要不要用。只装客户端即可，API 继续用前面配好的 CC Switch。
 
-配置过程中的详细步骤与各客户端对照，看[Claude 桌面版教程](/guide/desktop)；换到终端用的话看[Claude Code CLI 教程](/guide/cli)。
+配置过程中的详细步骤与各客户端对照，看[Claude 桌面版教程](https://claude-unlimited.aiautotools.com/guide/desktop)；换到终端用的话看[Claude Code CLI 教程](https://claude-unlimited.aiautotools.com/guide/cli)。
 
 ## 国内用桌面版要额外准备什么
 
@@ -183,7 +183,7 @@ CC Switch 是一个专门管 API 配置的小工具，装好之后所有供应�
 
 不依赖官方账号的功能是客户端本地的那部分：本地文件读写、项目目录管理、界面本身。这些走第三方接口一样能用。
 
-如果想了解客户端在配置完成之后具体能做什么、桌面版和终端里的 Claude Code 有什么区别，看[Claude Code 与 Codex CLI 怎么选](/knowledge/claude-code-vs-codex)和[Claude Code 教程：第一次会话之后怎么用](/knowledge/claude-code-tutorial)。
+如果想了解客户端在配置完成之后具体能做什么、桌面版和终端里的 Claude Code 有什么区别，看[Claude Code 与 Codex CLI 怎么选](https://claude-unlimited.aiautotools.com/knowledge/claude-code-vs-codex)和[Claude Code 教程：第一次会话之后怎么用](https://claude-unlimited.aiautotools.com/knowledge/claude-code-tutorial)。
 
 ## 什么情况下这条路会失效
 
@@ -201,8 +201,8 @@ CC Switch 是一个专门管 API 配置的小工具，装好之后所有供应�
 
 <GuideShot src="guide_desktop_vm_features.webp" caption="Windows 功能列表里勾选「虚拟机平台」与「适用于 Linux 的 Windows 子系统」" zoom />
 
-第二类是配置没有真正生效。常见表现是界面能打开但发不出请求，或者报鉴权错误。排查顺序是先确认本地路由开关是打开的，再确认供应商条目处于启用状态，然后完全退出客户端（不是最小化到托盘）再重开。终端侧的鉴权类问题可以看[Claude Code 报错 401 / 403 怎么解决](/knowledge/claude-code-401-403)。
+第二类是配置没有真正生效。常见表现是界面能打开但发不出请求，或者报鉴权错误。排查顺序是先确认本地路由开关是打开的，再确认供应商条目处于启用状态，然后完全退出客户端（不是最小化到托盘）再重开。终端侧的鉴权类问题可以看[Claude Code 报错 401 / 403 怎么解决](https://claude-unlimited.aiautotools.com/knowledge/claude-code-401-403)。
 
-第三类是网络链路本身不通。桌面版能启动但请求超时，往下查就是 DNS、代理与企业中间人证书的问题，方法在[Claude Code 连接中断、等待 API 响应怎么处理](/knowledge/claude-code-connection-lost)里，本文不重复。
+第三类是网络链路本身不通。桌面版能启动但请求超时，往下查就是 DNS、代理与企业中间人证书的问题，方法在[Claude Code 连接中断、等待 API 响应怎么处理](https://claude-unlimited.aiautotools.com/knowledge/claude-code-connection-lost)里，本文不重复。
 
 还有一类风险不在这三类里，但值得提前知道：把账号登录当成唯一入口的人，最后往往卡在「注册不了」这一步。桌面版真正的价值在于它是个本地客户端，谁提供模型是另一件事。把这两层拆开，绕开的是路径选择，不是绕过任何技术限制。

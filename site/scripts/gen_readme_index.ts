@@ -18,11 +18,15 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { join, dirname, relative, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import GithubSlugger from 'github-slugger'
+
 import { siteConfig } from '../config/site'
 import { knowledge, knowledgeCategories } from '../config/knowledge'
 import { faqItems } from '../config/faq'
 import { allTiers } from '../config/plans'
 import { guideSceneCards } from '../config/guide'
+import { homeTags, pricingTags } from '../config/seo_pages'
+import { REPO_MIRROR_DIRS } from './md_link_rules'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const SITE = join(HERE, '..')
@@ -72,9 +76,12 @@ function knowledgeBlock(): string {
     '|---|---|---|',
   ]
   for (const k of items) {
+    // 仓库侧指「仓库副本」（根 knowledge/ 目录），源文件在 site/docs/knowledge/。
+    // 副本由 gen_repo_mirrors 生成，访客点开就是可直接读的正文页。
+    const mirror = `${REPO_MIRROR_DIRS.knowledge}/${k.slug}.md`
     const src = repoPath(join(SITE, 'docs', 'knowledge', `${k.slug}.md`))
     parts.push(
-      `| [${k.title}](${BASE}/knowledge/${k.slug}) | ${k.summary || k.desc} | [\`${src}\`](${src}) |`,
+      `| [${k.title}](${BASE}/knowledge/${k.slug}) | ${k.summary || k.desc} | [\`${mirror}\`](${mirror}) · [源码](${src}) |`,
     )
   }
   return parts.join('\n')
@@ -98,9 +105,14 @@ function faqBlock(): string {
   const parts: string[] = ['买家最常问的几个，完整 FAQ 见[官网常见问题](%s/faq)。'.replace('%s', BASE)]
   for (const f of items) {
     parts.push('')
-    parts.push(`**${f.q}**`)
+    // 折叠起来：README 首屏不该被 FAQ 撑高。GitHub 会把 details 里的内容也渲染进 DOM，
+    // 爬虫照样能读到问题与答案，所以折叠不影响可检索性。
+    parts.push('<details>')
+    parts.push(`<summary><strong>${f.q}</strong></summary>`)
     parts.push('')
     parts.push(answerLead(f.a))
+    parts.push('')
+    parts.push('</details>')
   }
   return parts.join('\n')
 }
@@ -124,13 +136,69 @@ function plansBlock(): string {
   ].join('\n')
 }
 
+/* ---------------------------------------------------------------- 目录与关键词 */
+
+/**
+ * 抽 README 自身的 H2 标题（哨兵区块之外的手写小节也算）。
+ *
+ * 为什么要目录：README 有十几个 H2，GitHub 上默认全展开、读者没法跳。
+ * 爬虫也拿不到「这个页面有哪些主题」的结构信号。目录锚点用 GitHub 自己的
+ * slug 规则生成（github-slugger，与 GitHub 服务端同一份实现），不能手写。
+ */
+function readmeH2Titles(src: string): string[] {
+  const out: string[] = []
+  for (const line of src.split('\n')) {
+    // H2 与 H3 都收：H3（本地开发、文档与贡献）是给贡献者的入口，
+    // 爬虫判断 README 的主题覆盖面时也看得到它们。
+    const m = line.match(/^(##|###)\s+(.+?)\s*$/)
+    if (!m) continue
+    const t = m[2].trim()
+    if (!t || t.startsWith('<!--')) continue
+    out.push(t)
+  }
+  return out
+}
+
+/** 目录区块：指向 GitHub 生成的 `user-content-*` 锚点 */
+function tocBlock(src: string): string {
+  const titles = readmeH2Titles(src)
+  // 「目录」这个 H2 自己要出现在目录里（读者第一眼能跳回来），
+  // 但不能生成一条指向自己的条目。
+  const slugger = new GithubSlugger()
+  const selfSlug = slugger.slug('目录')
+  const rows = titles
+    .filter((t) => t !== '目录')
+    .map((t) => {
+      const slug = slugger.slug(t)
+      return `- [${t}](#user-content-${slug})`
+    })
+  return ['**目录**', '', `- [目录](#user-content-${selfSlug})`, ...rows].join('\n')
+}
+
+/**
+ * 关键词行：品牌词 + 购买意图词，来自 config/seo_pages.ts。
+ *
+ * 为什么在 README 里放关键词：GitHub 页的抓取动机主要看首屏与 title，
+ * 首屏只有品牌名时爬虫判不出主题。词表仍以 config 为唯一真源，不在 README 手写。
+ */
+function seoBlock(): string {
+  const words = [...new Set([...homeTags, ...pricingTags])]
+  return [
+    `关键词：${words.join(' / ')}`,
+    '',
+    `本仓库是[Claude 无限卡](${BASE})官网的公开仓库：文档、接入教程、Claude Code 与 Claude 桌面版知识库正文，以及 VitePress 站点源码。`,
+  ].join('\n')
+}
+
 /* ---------------------------------------------------------------- 哨兵替换 */
 
-const BLOCKS: { key: string; gen: () => string }[] = [
-  { key: 'guide', gen: guideBlock },
-  { key: 'knowledge', gen: knowledgeBlock },
-  { key: 'faq', gen: faqBlock },
-  { key: 'plans', gen: plansBlock },
+const BLOCKS: { key: string; gen: (src: string) => string }[] = [
+  { key: 'guide', gen: () => guideBlock() },
+  { key: 'knowledge', gen: () => knowledgeBlock() },
+  { key: 'faq', gen: () => faqBlock() },
+  { key: 'plans', gen: () => plansBlock() },
+  { key: 'seo', gen: () => seoBlock() },
+  { key: 'toc', gen: (src) => tocBlock(src) },
 ]
 
 function replaceBlock(src: string, key: string, body: string): string {
@@ -159,7 +227,8 @@ if (!existsSync(README)) {
 const original = readFileSync(README, 'utf-8')
 let next = original
 for (const b of BLOCKS) {
-  next = replaceBlock(next, b.key, b.gen())
+  // 目录区块的源是 README 自身（改区块不影响标题集合），所以每轮都传最新文本
+  next = replaceBlock(next, b.key, b.gen(next))
 }
 
 if (next === original) {

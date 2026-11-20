@@ -27,7 +27,7 @@ head:
 
 **结论**：子代理有自己独立的上下文窗口、自己的系统提示、自己的工具访问权和独立的权限。它发出的请求**计入和主会话同一个用量限制**。
 
-它和「在同一个会话里让它分几步做」的区别就在这个独立窗口：主会话不需要为子代理读过的每一行内容付费。与它并列的编排方式还有[Claude Code 计划模式怎么用：四种权限模式的区别](/knowledge/claude-code-plan-mode)（先想清楚再动手）和权限模式（决定实施阶段谁能直接做）。
+它和「在同一个会话里让它分几步做」的区别就在这个独立窗口：主会话不需要为子代理读过的每一行内容付费。与它并列的编排方式还有[Claude Code 计划模式怎么用：四种权限模式的区别](https://claude-unlimited.aiautotools.com/knowledge/claude-code-plan-mode)（先想清楚再动手）和权限模式（决定实施阶段谁能直接做）。
 
 **判断该不该用子代理**：如果某个副任务会把搜索结果、日志、文件内容灌进主对话，而你之后不会再引用它们，就交给子代理。反过来，如果你**反复需要同一类工人、同样的指令**，那就该把它定义成一个自定义子代理，而不是每次手动重复一遍。
 
@@ -129,11 +129,11 @@ flag untested paths, and stop. Do not edit files.
 
 **结论**：Claude Code 每轮都重发整个对话。子代理读四十个文件发生在它自己的窗口里，父会话只收到一段话。
 
-大代码库的常见分工是：Haiku 子代理侦察（找出相关文件）、Sonnet 子代理评审（读那几个文件给结论）、主会话只留决策。上下文为什么按平方增长见[为什么 Agent 比聊天更烧 token](/knowledge/why-agents-cost-more-tokens)。
+大代码库的常见分工是：Haiku 子代理侦察（找出相关文件）、Sonnet 子代理评审（读那几个文件给结论）、主会话只留决策。上下文为什么按平方增长见[为什么 Agent 比聊天更烧 token](https://claude-unlimited.aiautotools.com/knowledge/why-agents-cost-more-tokens)。
 
 ## 并行与限流
 
-**结论**：多个子代理可以同时跑；日常个人开发里正常并行一般不受影响。若短时扇出过猛碰到 429，按[Claude Code 报 429 限流怎么办](/knowledge/claude-code-429-rate-limit)的顺序处置。
+**结论**：多个子代理可以同时跑；日常个人开发里正常并行一般不受影响。若短时扇出过猛碰到 429，按[Claude Code 报 429 限流怎么办](https://claude-unlimited.aiautotools.com/knowledge/claude-code-429-rate-limit)的顺序处置。
 
 ## 子代理不免费
 

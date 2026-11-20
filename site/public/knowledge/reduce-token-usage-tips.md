@@ -133,7 +133,7 @@ head:
 
 但要算清代价：多一次模型调用意味着更多延迟、更多失败点、更复杂的日志。便宜分类省 300 token 却多花 600ms 和一条重试路径，就不划算。
 
-哪一档该承担哪类任务，见[按任务选模型：Opus、Sonnet、Haiku 怎么选](/knowledge/choose-claude-model)；把大块文件读取整块移出主会话是另一种做法，见[Claude Code 子代理怎么用](/knowledge/claude-code-subagents)。
+哪一档该承担哪类任务，见[按任务选模型：Opus、Sonnet、Haiku 怎么选](https://claude-unlimited.aiautotools.com/knowledge/choose-claude-model)；把大块文件读取整块移出主会话是另一种做法，见[Claude Code 子代理怎么用](https://claude-unlimited.aiautotools.com/knowledge/claude-code-subagents)。
 
 ## 第七步：诚实地衡量
 
@@ -145,7 +145,7 @@ head:
 
 诚实的指标不是每次调用的 token，而是每个成功任务的 token。
 
-先算清楚一次请求到底由哪些部分构成，才知道该砍哪里，见[Claude API 怎么计费：token 构成与估算](/knowledge/claude-api-pricing-explained)。
+先算清楚一次请求到底由哪些部分构成，才知道该砍哪里，见[Claude API 怎么计费：token 构成与估算](https://claude-unlimited.aiautotools.com/knowledge/claude-api-pricing-explained)。
 
 ## 长上下文不是偷懒的许可
 

@@ -19,7 +19,7 @@ head:
 
 > 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-tutorial](https://claude-unlimited.aiautotools.com/knowledge/claude-code-tutorial) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
 
-> **一句话答案**：安装、配置 Base URL 与 Key、装模型这些步骤在[使用教程](/guide)里。本文只讲配置完成之后的事：进项目目录跑 `/init` 生成 CLAUDE.md 并改对，先用 Shift+Tab 切到计划模式让它给方案，批准后再动手，告诉它测试命令（`npm run test`，单文件 `npm run test -- path/to/file`）并要求自跑自修。上下文占了多少用 `/context` 就能看到各类内容各占多少；会话内常用的斜杠命令有 11 个，完整清单见[Claude Code 命令与参数速查：会话内和命令行](/knowledge/claude-code-cli-cheatsheet)。
+> **一句话答案**：安装、配置 Base URL 与 Key、装模型这些步骤在[使用教程](https://claude-unlimited.aiautotools.com/guide)里。本文只讲配置完成之后的事：进项目目录跑 `/init` 生成 CLAUDE.md 并改对，先用 Shift+Tab 切到计划模式让它给方案，批准后再动手，告诉它测试命令（`npm run test`，单文件 `npm run test -- path/to/file`）并要求自跑自修。上下文占了多少用 `/context` 就能看到各类内容各占多少；会话内常用的斜杠命令有 11 个，完整清单见[Claude Code 命令与参数速查：会话内和命令行](https://claude-unlimited.aiautotools.com/knowledge/claude-code-cli-cheatsheet)。
 
 配置完成后，`cd` 进项目目录，终端输入 `claude`，第一件事是 `/init`。
 
@@ -54,7 +54,7 @@ claude
 - 支付相关的文件不要动，改之前先问我
 ```
 
-**不要**把整份 API 文档、目录树、历史决策粘进去。它们会占掉每次会话的上下文，真正需要时让它去读文件更好。怎么知道占了多少，会话里输入 `/context` 就能看到各类内容各占多少。更多关于这个文件的细节见 [CLAUDE.md 怎么写：写什么、放哪](/knowledge/claude-md-guide)。
+**不要**把整份 API 文档、目录树、历史决策粘进去。它们会占掉每次会话的上下文，真正需要时让它去读文件更好。怎么知道占了多少，会话里输入 `/context` 就能看到各类内容各占多少。更多关于这个文件的细节见 [CLAUDE.md 怎么写：写什么、放哪](https://claude-unlimited.aiautotools.com/knowledge/claude-md-guide)。
 
 ## 先要计划，再让它动手
 
@@ -67,7 +67,7 @@ claude
 - **已知路径**：`@src/auth/login.ts` 直接指定文件，比让它自己搜更快也更准；
 - **验收标准**：比如「改完后 `npm run test -- auth` 要通过，并且不能改动 public API 的签名」。
 
-写一条好的计划比反复纠正要省时间。详见 [Claude Code 计划模式怎么用：四种权限模式的区别](/knowledge/claude-code-plan-mode)。
+写一条好的计划比反复纠正要省时间。详见 [Claude Code 计划模式怎么用：四种权限模式的区别](https://claude-unlimited.aiautotools.com/knowledge/claude-code-plan-mode)。
 
 ## 让它自跑测试与自修
 
@@ -105,13 +105,13 @@ claude
 | `/review` | 审查一个 PR |
 | `/doctor` | 检查安装 |
 
-完整的命令与命令行参数见 [Claude Code 命令与参数速查：会话内和命令行](/knowledge/claude-code-cli-cheatsheet)。
+完整的命令与命令行参数见 [Claude Code 命令与参数速查：会话内和命令行](https://claude-unlimited.aiautotools.com/knowledge/claude-code-cli-cheatsheet)。
 
 ## 会话太长时：/compact 与 /clear
 
 **结论**：话题没变就 `/compact`，换了任务就 `/clear`。压缩保留脉络，清空只留你重新交代的那几句话。
 
-如果 `Compact` 反复失败，通常是这次会话只有一次巨大的往返（例如一次超大的工具输出），没有更早的轮次可以折叠，改用 `/clear`。窗口被什么填满、报错怎么处理，见 [prompt too long 报错怎么处理](/knowledge/claude-code-prompt-too-long-fix)。
+如果 `Compact` 反复失败，通常是这次会话只有一次巨大的往返（例如一次超大的工具输出），没有更早的轮次可以折叠，改用 `/clear`。窗口被什么填满、报错怎么处理，见 [prompt too long 报错怎么处理](https://claude-unlimited.aiautotools.com/knowledge/claude-code-prompt-too-long-fix)。
 
 ## 环境变量冲突：连不上时先查这里
 

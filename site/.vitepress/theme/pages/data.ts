@@ -191,6 +191,37 @@ export const jsonLdPricing = {
   ],
 }
 
+/**
+ * /contact 页 JSON-LD：WebPage + ContactPoint。
+ *
+ * 与 jsonld_server.ts 的 contact / changelog 分支同步（两份必须一致）。
+ * 变更历史页没有客户端组件（正文就是 markdown），只由构建期注入，这里不重复定义。
+ */
+export const jsonLdContact = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      name: '联系我们',
+      description:
+        'Claude 无限卡的售后、技术支持、代理与商务合作联系方式：微信客服 ren_mo_mo 与 QQ 交流群，添加时备注来意。',
+      url: base + '/contact',
+      inLanguage: 'zh-CN',
+      isPartOf: { '@id': base + '/#site' },
+      about: { '@id': base + '/#org' },
+    },
+    {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      ...(siteConfig.contact.wechatId ? { telephone: siteConfig.contact.wechatId } : {}),
+      ...(siteConfig.contact.qqGroup ? { contactOption: siteConfig.contact.qqGroup } : {}),
+      ...(siteConfig.contact.email ? { email: siteConfig.contact.email } : {}),
+      availableLanguage: ['zh-CN'],
+      url: base + '/contact',
+    },
+  ],
+}
+
 /** 首页 JSON-LD */
 export const jsonLdHome = {
   '@context': 'https://schema.org',
@@ -222,6 +253,8 @@ export const jsonLdHome = {
         seller: { '@id': base + '/#org' },
       },
     },
+    // 首页可见的 5 条「买之前先确认」FAQ 必须在 schema 里同源出现（与 jsonld_server.ts 同步）
+    faqPageNode(buyingQuestions),
   ],
 }
 

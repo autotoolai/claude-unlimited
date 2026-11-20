@@ -14,6 +14,7 @@ import { join } from 'node:path'
 import { knowledge } from '../config/knowledge'
 import { guideIndex, guidePages, guideBlocks, guideSceneCards } from '../config/guide'
 import { siteConfig } from '../config/site'
+import { rewriteMdLinks } from './md_link_rules'
 
 const root = process.cwd()
 const publicDir = join(root, 'public')
@@ -40,7 +41,9 @@ function writeKnowledgeMirrors(): number {
       `<!-- markdown mirror for AI / agents; HTML: ${BASE}/knowledge/${e.slug} -->`,
       '',
     ].join('\n')
-    writeFileSync(join(outDir, `${e.slug}.md`), header + body, 'utf8')
+    // 站内根相对链接改成官网绝对 URL：这份 md 也会被 GitHub 上的访客读，
+    // `](/pricing)` 在那里会解析成仓库里的一个不存在的路径（实测 404）。
+    writeFileSync(join(outDir, `${e.slug}.md`), header + rewriteMdLinks(body, { repoRelative: false }), 'utf8')
     n++
   }
   return n

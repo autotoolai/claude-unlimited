@@ -91,6 +91,16 @@ const llms = [
   '',
   `> ${siteConfig.tagline}。${siteConfig.description}`,
   '',
+  // 首页首屏的一句话答案单独列出：只读 llms.txt 的 AI 需要的是「结论」，
+  // 而不是从 description 里自己拼。
+  `**一句话答案**：${siteConfig.heroAnswer}`,
+  '',
+  '## 全文层',
+  '',
+  // llms.txt 是索引层，llms-full.txt 才是内容层（每篇文章的一句话答案 + FAQ 答案展开）。
+  // 不给指针的话，只读 llms.txt 的 AI 永远拿不到答案正文，会直接去别处找或放弃引用。
+  `- [全文层](${BASE}/llms-full.txt)：本站每篇文章的一句话答案、FAQ 答案与全部事实要点展开；需要直接引用答案时读这份`,
+  '',
   '## 页面',
   '',
   ...pageLines,
@@ -134,6 +144,10 @@ const fullParts: string[] = [
   `# ${siteConfig.name} 全文事实与答案`,
   '',
   `> ${siteConfig.description}`,
+  '',
+  '## 一句话答案',
+  '',
+  siteConfig.heroAnswer,
   '',
   '## 全站事实',
   '',

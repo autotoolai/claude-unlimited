@@ -2,6 +2,10 @@
 
 > Claude 无限卡官网：订阅期内 Claude API 不按 token 计费，支持 Claude Code、Cursor、WorkBuddy、Trae、Codex 等国内外主流工具。本站只做介绍与答疑，购买跳转第三方发卡站。
 
+## 一句话答案
+
+Claude 无限卡是独立运营的第三方 API 网关：订阅期内调用 Claude 不按 token 计费，按固定订阅价收费，Fable 5.2 与 Opus 5.5 同价通用。接入只需改 Base URL 与 API Key，Claude Code、Cursor、Codex 等客户端直接可用。
+
 ## 全站事实
 
 - 计费方式：订阅期内不按 token 计费，固定订阅价（天卡 ¥16.5/1 天，周卡 ¥80/7 天，月卡 ¥145/30 天，双窗口月卡 ¥185/30 天，三窗口月卡 ¥225/30 天）

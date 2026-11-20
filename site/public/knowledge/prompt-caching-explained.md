@@ -83,7 +83,7 @@ head:
 
 **结论**：Claude Code 的 33k 启动前缀天然适合缓存，但它只在你保持前缀稳定时有效。会话中途改 CLAUDE.md 会让缓存从改动点之后全部失效。
 
-把它和「启动时那 33k token 去了哪」放在一起理解更清楚，见 [Claude Code 启动时那 33k token 去了哪](/knowledge/claude-code-startup-tokens)。
+把它和「启动时那 33k token 去了哪」放在一起理解更清楚，见 [Claude Code 启动时那 33k token 去了哪](https://claude-unlimited.aiautotools.com/knowledge/claude-code-startup-tokens)。
 
 ## 上线前的检查清单
 
@@ -101,5 +101,5 @@ head:
 
 **结论**：前缀每次都不同（多租户定制、请求 ID、时间戳混进系统提示）、提示太短、或者本来就不重复。缓存的经济学是「一次创建成本 + 多次低价读取」，没有复用就没有收益。
 
-把不确定的内容从系统提示里挪出去，见[降低 Claude 用量的工程方法：先测量再优化](/knowledge/reduce-token-usage-tips)；按场景决定哪类请求值得缓存，见[按任务选模型：Opus、Sonnet、Haiku 怎么选](/knowledge/choose-claude-model)。
+把不确定的内容从系统提示里挪出去，见[降低 Claude 用量的工程方法：先测量再优化](https://claude-unlimited.aiautotools.com/knowledge/reduce-token-usage-tips)；按场景决定哪类请求值得缓存，见[按任务选模型：Opus、Sonnet、Haiku 怎么选](https://claude-unlimited.aiautotools.com/knowledge/choose-claude-model)。
 

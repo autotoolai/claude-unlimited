@@ -14,7 +14,7 @@
  */
 import { siteConfig } from '../../../config/site'
 import { modelIds } from '../../../config/models'
-import { faqItems, pricingFaqItems, modelsFaqItems } from '../../../config/faq'
+import { faqItems, pricingFaqItems, modelsFaqItems, buyingQuestions } from '../../../config/faq'
 import { consoleFaqs } from '../../../config/console'
 import { agencyFaqs, agencyLead, agencyPageTitle } from '../../../config/agency'
 import { guidePageBySlug, guidePages } from '../../../config/guide'
@@ -23,6 +23,8 @@ import { knowledge, knowledgeCategories } from '../../../config/knowledge'
 import { videos } from '../../../config/video_meta'
 import { posterUrl, videoUrl } from '../../../config/media_cdn'
 import { trustPages, operator } from '../../../config/trust'
+import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import type { Product } from '../../../config/site'
 
 const BASE = siteConfig.url.replace(/\/+$/, '')
@@ -45,8 +47,47 @@ const org = {
   sameAs: orgSameAs,
 }
 
+/**
+ * ContactPoint：联系我们页的联系方式。
+ *
+ * 从 siteConfig.contact 派生，微信号与 QQ 群留空时不写该字段（编造联系方式的信任损害更大）。
+ * 页面上的可见文案与这里同源：微信客服 + QQ 交流群，添加时备注来意。
+ */
+const contactPoint: Record<string, unknown> = {
+  '@type': 'ContactPoint',
+  contactType: 'customer support',
+  ...(siteConfig.contact.wechatId ? { telephone: siteConfig.contact.wechatId } : {}),
+  ...(siteConfig.contact.qqGroup ? { contactOption: siteConfig.contact.qqGroup } : {}),
+  ...(siteConfig.contact.email ? { email: siteConfig.contact.email } : {}),
+  availableLanguage: ['zh-CN'],
+  url: BASE + '/contact',
+}
+
+/**
+ * 变更历史页的最新日期（YYYY-MM-DD），作为 dateModified。
+ *
+ * 从 docs/changelog.md 的「## YYYY-MM-DD」标题里取最大的一条。
+ * 读文件而不是在 config 里再维护一份日期：日期只在正文里出现一次才不会被漂移。
+ */
+const changelogLatestDate: string | undefined = (() => {
+  const p = join(process.cwd(), 'docs', 'changelog.md')
+  if (!existsSync(p)) return undefined
+  const dates = [...readFileSync(p, 'utf8').matchAll(/^##\s+(\d{4}-\d{2}-\d{2})/gm)].map((m) => m[1])
+  return dates.sort().pop()
+})()
+
 const faqJsonLd = (items: { q: string; a: string }[]) => ({
   '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: items.map((it) => ({
+    '@type': 'Question',
+    name: it.q,
+    acceptedAnswer: { '@type': 'Answer', text: it.a.replace(/\n+/g, ' ') },
+  })),
+})
+
+/** @graph 内嵌 FAQPage（与 pages/data.ts 的 faqPageNode 同形；条目 = 页内可见精选） */
+const faqPageNode = (items: { q: string; a: string }[]) => ({
   '@type': 'FAQPage',
   mainEntity: items.map((it) => ({
     '@type': 'Question',
@@ -95,18 +136,11 @@ const jsonLdHome = {
         seller: { '@id': BASE + '/#org' },
       },
     },
+    // 首页可见的 5 条「买之前先确认」FAQ 必须在 schema 里同源出现，
+    // 否则 Google 富摘要拿不到最高购买意图的问句。条目 = config/faq.ts 的 buyingQuestions。
+    faqPageNode(buyingQuestions),
   ],
 }
-
-/** @graph 内嵌 FAQPage（与 pages/data.ts 的 faqPageNode 同形；条目 = 页内可见精选） */
-const faqPageNode = (items: { q: string; a: string }[]) => ({
-  '@type': 'FAQPage',
-  mainEntity: items.map((it) => ({
-    '@type': 'Question',
-    name: it.q,
-    acceptedAnswer: { '@type': 'Answer', text: it.a.replace(/\n+/g, ' ') },
-  })),
-})
 
 /**
  * /pricing：Product + 页内精选 FAQPage（pricingFaqItems）。
@@ -370,6 +404,45 @@ export function jsonLdForRoute(routePath: string): Record<string, unknown> | und
               name: it.q,
               acceptedAnswer: { '@type': 'Answer', text: it.a.replace(/\n+/g, ' ') },
             })),
+          },
+        ],
+      }
+      break
+    case 'contact':
+      // 联系我们：WebPage + ContactPoint。没有 FAQPage——这页没有问句，
+      // 硬造 FAQ 只会让 schema 里的问答与页面可见内容对不上。
+      flat = {
+        '@graph': [
+          {
+            '@type': 'WebPage',
+            name: '联系我们',
+            description:
+              'Claude 无限卡的售后、技术支持、代理与商务合作联系方式：微信客服 ren_mo_mo 与 QQ 交流群，添加时备注来意。',
+            url: BASE + '/contact',
+            inLanguage: 'zh-CN',
+            isPartOf: { '@id': BASE + '/#site' },
+            about: { '@id': BASE + '/#org' },
+          },
+          // ContactPoint 单独成一个 @graph 节点：爬虫按节点类型扫，
+          // 塞在 mainEntity 里容易被当成 WebPage 的属性忽略掉。
+          contactPoint,
+        ],
+      }
+      break
+    case 'changelog':
+      // 变更历史：WebPage + dateModified（取正文里最新的日期条目）。
+      flat = {
+        '@graph': [
+          {
+            '@type': 'WebPage',
+            name: '变更历史',
+            description:
+              'Claude 无限卡官网与仓库的变更记录：改了什么、为什么改、影响谁，按日期倒序。',
+            url: BASE + '/changelog',
+            inLanguage: 'zh-CN',
+            isPartOf: { '@id': BASE + '/#site' },
+            about: { '@id': BASE + '/#org' },
+            ...(changelogLatestDate ? { dateModified: changelogLatestDate } : {}),
           },
         ],
       }

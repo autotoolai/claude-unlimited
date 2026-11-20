@@ -118,7 +118,7 @@ See @README for project overview and @package.json for available npm commands fo
 
 `managed-only` 只在启动时读托管的 CLAUDE.md 和 auto memory；项目级、本地级、用户级的 CLAUDE.md、`.claude/rules/` 文件和所有 AGENTS.md 都不加载，但子目录的 CLAUDE.md、`.claude/rules/` 文件和路径规则仍会按需加载。
 
-这层指令每轮会话都会重发，长文件尤其明显，写的时候按这个成本来取舍，见[降低 Claude 用量的工程方法：先测量再优化](/knowledge/reduce-token-usage-tips)；把流程固化下来交给技能，见 [Claude Code 技能怎么写](/knowledge/claude-code-skills)。
+这层指令每轮会话都会重发，长文件尤其明显，写的时候按这个成本来取舍，见[降低 Claude 用量的工程方法：先测量再优化](https://claude-unlimited.aiautotools.com/knowledge/reduce-token-usage-tips)；把流程固化下来交给技能，见 [Claude Code 技能怎么写](https://claude-unlimited.aiautotools.com/knowledge/claude-code-skills)。
 
 **限制**：这项配置属于 plugin 配置，只能写在用户设置 `~/.claude/settings.json`、`--settings` 传入的文件或托管设置里，项目级 `.claude/settings.json` 不生效，改动下次重载后生效。对应的 JSON 是：
 
@@ -134,7 +134,7 @@ See @README for project overview and @package.json for available npm commands fo
 
 v2.1.285 之前这个 plugin 的 ID 是 `agents-md@builtin`，Claude Code 会忽略写在新 ID 下的条目；v2.1.285 及以后两个 ID 都认。
 
-同样的项目级/用户级优先级问题在子代理上也会出现，见[Claude Code 子代理怎么用](/knowledge/claude-code-subagents)。
+同样的项目级/用户级优先级问题在子代理上也会出现，见[Claude Code 子代理怎么用](https://claude-unlimited.aiautotools.com/knowledge/claude-code-subagents)。
 
 ## 用 .claude/rules/ 按路径拆规则
 

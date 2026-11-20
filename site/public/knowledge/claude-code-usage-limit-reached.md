@@ -67,7 +67,7 @@ API Error: Server is temporarily limiting requests (not your usage limit) · Rat
 
 **结论**：括号里的话是全部重点——服务端在高峰时限流，你的额度没动。
 
-等一分钟，用 `claude -c` 续跑；无人值守的运行设 `CLAUDE_CODE_RETRY_WATCHDOG=1`，让它重试而不是退出。它和 529 的处理思路一致，见 [Claude 报错 529 overloaded 怎么处理](/knowledge/claude-code-529-overloaded)；如果你其实是被速率限制卡住，见 [Claude Code 报 429 限流怎么办](/knowledge/claude-code-429-rate-limit)。
+等一分钟，用 `claude -c` 续跑；无人值守的运行设 `CLAUDE_CODE_RETRY_WATCHDOG=1`，让它重试而不是退出。它和 529 的处理思路一致，见 [Claude 报错 529 overloaded 怎么处理](https://claude-unlimited.aiautotools.com/knowledge/claude-code-529-overloaded)；如果你其实是被速率限制卡住，见 [Claude Code 报 429 限流怎么办](https://claude-unlimited.aiautotools.com/knowledge/claude-code-429-rate-limit)。
 
 ## 怎么继续工作
 
@@ -79,5 +79,5 @@ export ANTHROPIC_API_KEY=<你的 Key>
 claude          # 按 token 计费，没有会话或周窗口
 ```
 
-订阅重置后再取消环境变量切回来。注意每分钟速率限制（429）是另一套机制，见[Claude Code 报 429 限流怎么办](/knowledge/claude-code-429-rate-limit)。
+订阅重置后再取消环境变量切回来。注意每分钟速率限制（429）是另一套机制，见[Claude Code 报 429 限流怎么办](https://claude-unlimited.aiautotools.com/knowledge/claude-code-429-rate-limit)。
 

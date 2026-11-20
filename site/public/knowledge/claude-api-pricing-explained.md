@@ -28,7 +28,7 @@ head:
 **结论**：你发给模型的一切都算输入，不只是用户输入的那句话。
 
 - 系统提示与开发者指令、格式规则、安全约束；
-- 历史对话（每轮都重发，见[为什么 Agent 比聊天更烧 token](/knowledge/why-agents-cost-more-tokens)）；
+- 历史对话（每轮都重发，见[为什么 Agent 比聊天更烧 token](https://claude-unlimited.aiautotools.com/knowledge/why-agents-cost-more-tokens)）；
 - 检索到的文档片段（RAG）、上传文件的抽取文本；
 - 工具 / 函数定义的 schema（开了缓存则按缓存读写价计）；
 - 工具调用的返回结果（JSON 也算）。
@@ -58,7 +58,7 @@ Bash 工具的定义本身还会再加 **325 个 token**（4.7 及更新的模�
 
 ## 缓存与 Batch 的价怎么算
 
-**结论**：除了标准输入与输出，缓存读取与缓存写入是单独计价的两类；Batch API 对输入与输出打 5 折。具体数值以[套餐定价](/pricing)页与官方文档为准。
+**结论**：除了标准输入与输出，缓存读取与缓存写入是单独计价的两类；Batch API 对输入与输出打 5 折。具体数值以[套餐定价](https://claude-unlimited.aiautotools.com/pricing)页与官方文档为准。
 
 | 计费类别 | 含义 | 倍数（相对基础输入价） |
 |---|---|---|
@@ -68,7 +68,7 @@ Bash 工具的定义本身还会再加 **325 个 token**（4.7 及更新的模�
 | 缓存写入（1 小时） | 建立长 TTL 缓存的一次性成本 | 2× |
 | 缓存读取 | 命中提示缓存的输入前缀 | 0.1×（多数模型） |
 
-估算时要把这几类分开，不要用「输入价 × 全部输入」一刀切，否则缓存策略的效果会算不出来。缓存机制见[提示缓存原理：什么时候省钱、什么时候白花](/knowledge/prompt-caching-explained)。
+估算时要把这几类分开，不要用「输入价 × 全部输入」一刀切，否则缓存策略的效果会算不出来。缓存机制见[提示缓存原理：什么时候省钱、什么时候白花](https://claude-unlimited.aiautotools.com/knowledge/prompt-caching-explained)。
 
 ### 缓存的倍率因模型而异
 
@@ -116,9 +116,9 @@ Claude 4.6 及之后的模型（Haiku 5.5 除外）**整个 100 万 token 窗口
 | **按 token 计费 API** | 用量付费 | HTTP 接口，用多少算多少 | 程序化调用，用量小或波动大 |
 | **固定费率不限量** | 周期套餐 | 订阅期内不按 token 计费 | 每天跑 Claude Code 跑长任务、处理大代码库或多个子代理 |
 
-**结论**：Pro/Max 的 API 与 Claude Code 用量是「附带的」，不是「为主的」。它按 token 而不是按消息消耗，带子代理的长会话掉得很快，重度用户常在计费周期前几天就用完。额度用完只能等重置或额外接 API，见[Claude 提示用量上限：分清是哪个计量器](/knowledge/claude-code-usage-limit-reached)。
+**结论**：Pro/Max 的 API 与 Claude Code 用量是「附带的」，不是「为主的」。它按 token 而不是按消息消耗，带子代理的长会话掉得很快，重度用户常在计费周期前几天就用完。额度用完只能等重置或额外接 API，见[Claude 提示用量上限：分清是哪个计量器](https://claude-unlimited.aiautotools.com/knowledge/claude-code-usage-limit-reached)。
 
-**结论**：「不限量」取消的是按 token 计费，不是无边界。套餐按「同时可开几个会话窗口」区分，也不包含生产流量与压测（怎么选见[常见问题](/faq#cat-limits-speed)）。取消的是计费压力，不是使用边界。
+**结论**：「不限量」取消的是按 token 计费，不是无边界。套餐按「同时可开几个会话窗口」区分，也不包含生产流量与压测（怎么选见[常见问题](https://claude-unlimited.aiautotools.com/faq#cat-limits-speed)）。取消的是计费压力，不是使用边界。
 
 判断依据很简单，不用心算「这次大概多少 token」就选固定费率；如果一周只调用几次、每次规模可预测，按量更省：
 
@@ -127,7 +127,7 @@ Claude 4.6 及之后的模型（Haiku 5.5 除外）**整个 100 万 token 窗口
 - 每天用 Claude Code 跑长任务、大代码库、多个子代理：固定费率不限量。
 - 用量小、波动大、需要精确控制每次调用成本：按 token 计费。
 
-接入方式（Base URL + Key）三种都一样，换计费方式不用换配置，见[套餐定价](/pricing)。
+接入方式（Base URL + Key）三种都一样，换计费方式不用换配置，见[套餐定价](https://claude-unlimited.aiautotools.com/pricing)。
 
 ## 四步估算一个月要花多少
 

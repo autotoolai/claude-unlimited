@@ -36,7 +36,7 @@ head:
 
 这条代价决定了下面所有取舍：装 4 到 6 个够用，每个都要有明确的用途，装之前先问「这件事我现在是不是在靠复制粘贴做」。
 
-MCP 和技能、子代理的分工可以一句话记住：MCP 管「外部系统的工具和数据」，技能管「一套做事的流程」，子代理管「把任务拆给并行的人」。三者的详细对比见 [Claude Code 技能怎么写](/knowledge/claude-code-skills) 与 [Claude Code 子代理怎么用](/knowledge/claude-code-subagents)。
+MCP 和技能、子代理的分工可以一句话记住：MCP 管「外部系统的工具和数据」，技能管「一套做事的流程」，子代理管「把任务拆给并行的人」。三者的详细对比见 [Claude Code 技能怎么写](https://claude-unlimited.aiautotools.com/knowledge/claude-code-skills) 与 [Claude Code 子代理怎么用](https://claude-unlimited.aiautotools.com/knowledge/claude-code-subagents)。
 
 ## 第 1 步：装第一个服务器
 
@@ -145,7 +145,7 @@ claude mcp login <名字>    # 需要 OAuth 的远程服务器
 
 **坑二：装 4 到 6 个就够了。** 一份 2026 年的实测清单开头就写：装 15 个服务器可能意味着上百个工具定义常驻在提示词里，既烧 token，又让模型选工具时犯迷糊；那份清单自己给的建议是 4 到 6 个，并给了唯一的选型标准——先问「这件事我现在是不是靠复制粘贴在做」。按「看起来很酷」装的服务器，一个月后都会变成上下文垃圾。
 
-还有一个本地已有的经验可以互相印证：本机的 Claude Code 只连了 Playwright 一个服务器，开场开销就是 3 万多 token，其中一大块来自工具 schema（构成见 [Claude Code 启动时那 33k token 去了哪](/knowledge/claude-code-startup-tokens)）。所以每次准备 `claude mcp add` 之前，先问一句这个工具是不是命令行就能做（Read、Grep、Glob、WebFetch 已经是内置的），能命令行解决的就别装。
+还有一个本地已有的经验可以互相印证：本机的 Claude Code 只连了 Playwright 一个服务器，开场开销就是 3 万多 token，其中一大块来自工具 schema（构成见 [Claude Code 启动时那 33k token 去了哪](https://claude-unlimited.aiautotools.com/knowledge/claude-code-startup-tokens)）。所以每次准备 `claude mcp add` 之前，先问一句这个工具是不是命令行就能做（Read、Grep、Glob、WebFetch 已经是内置的），能命令行解决的就别装。
 
 ## 第 5 步：Windows 上的两个细节
 

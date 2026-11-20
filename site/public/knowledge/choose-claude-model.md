@@ -86,9 +86,9 @@ head:
 4. 分类、抽取、路由这类步骤下沉到 Haiku 5.5；
 5. 只有 Opus 5.5 在更高 effort 下评测仍不达标时，才上 Fable 5.2。
 
-省下来的不只是单价，还有每一轮重发的上下文，原理见[为什么 Agent 比聊天更烧 token](/knowledge/why-agents-cost-more-tokens)。
+省下来的不只是单价，还有每一轮重发的上下文，原理见[为什么 Agent 比聊天更烧 token](https://claude-unlimited.aiautotools.com/knowledge/why-agents-cost-more-tokens)。
 
-更好的做法是在调度层自动做这件事：根据任务类型、上下文长度、失败次数和测试结果选模型，而不是让用户每次手动判断。缓存也是同一层的事，能命中前缀的请求单价低得多，见[提示缓存原理：什么时候省钱、什么时候白花](/knowledge/prompt-caching-explained)。
+更好的做法是在调度层自动做这件事：根据任务类型、上下文长度、失败次数和测试结果选模型，而不是让用户每次手动判断。缓存也是同一层的事，能命中前缀的请求单价低得多，见[提示缓存原理：什么时候省钱、什么时候白花](https://claude-unlimited.aiautotools.com/knowledge/prompt-caching-explained)。
 
 ## 用你自己的任务评测，而不是排行榜
 
@@ -169,4 +169,4 @@ claude --effort high
 
 ### 命中提示缓存更便宜
 
-提示缓存读取只要基础输入价的 **10%**（Fable 5.2 与 Fable 5.1 是 2.5%，Opus 5.5 与 Sonnet 5.5 是 5%）。把稳定的前缀放在前面，收益立竿见影，见[提示缓存原理：什么时候省钱、什么时候白花](/knowledge/prompt-caching-explained)。
+提示缓存读取只要基础输入价的 **10%**（Fable 5.2 与 Fable 5.1 是 2.5%，Opus 5.5 与 Sonnet 5.5 是 5%）。把稳定的前缀放在前面，收益立竿见影，见[提示缓存原理：什么时候省钱、什么时候白花](https://claude-unlimited.aiautotools.com/knowledge/prompt-caching-explained)。

@@ -8,6 +8,8 @@ import { computed } from 'vue'
 import PageShell from './components/PageShell.vue'
 import CopyChip from './components/CopyChip.vue'
 import { siteConfig } from '../../config/site'
+import JsonLd from './components/JsonLd.vue'
+import { jsonLdContact } from './pages/data'
 
 const contact = siteConfig.contact
 const hasWechat = computed(() => !!contact.wechatId || !!contact.wechatQr)
@@ -32,6 +34,7 @@ const scenes = [
 </script>
 
 <template>
+  <JsonLd id="cu-jsonld-contact" :json="jsonLdContact" />
   <PageShell
     slug="contact"
     title="联系我们"

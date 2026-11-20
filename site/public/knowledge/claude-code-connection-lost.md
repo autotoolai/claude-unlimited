@@ -48,7 +48,7 @@ claude --debug     # 日志里有每个请求的耗时与重试原因
 
 **结论**：curl 秒回 401 且没有代理变量，基本可以确定是上游波动。这种情况本地改不了，重试和时间会解决；多人同时报告同一时段出问题时，停止排查。
 
-curl 返回 401 之后如果连接本身是通的，下一步要分清凭据、端点和服务端三个方向，那是[Claude Code 报错 401 / 403 怎么解决](/knowledge/claude-code-401-403)的排查路径。
+curl 返回 401 之后如果连接本身是通的，下一步要分清凭据、端点和服务端三个方向，那是[Claude Code 报错 401 / 403 怎么解决](https://claude-unlimited.aiautotools.com/knowledge/claude-code-401-403)的排查路径。
 
 ## 等待 API 响应不代表你的网络有问题
 
@@ -64,7 +64,7 @@ export CLAUDE_CODE_MAX_TOOL_USE_CONCURRENCY=2        # 网络不稳时减少并�
 
 对不稳定链路，降低首字节超时和并发数是最有效的两项。
 
-退避机制本身和[Claude Code 报 429 限流怎么办](/knowledge/claude-code-429-rate-limit)是同一套：等太久却没报 429，多半是上游在安静地丢包而不是你的速率超了。
+退避机制本身和[Claude Code 报 429 限流怎么办](https://claude-unlimited.aiautotools.com/knowledge/claude-code-429-rate-limit)是同一套：等太久却没报 429，多半是上游在安静地丢包而不是你的速率超了。
 
 ## 代理、VPN 与企业网络
 
@@ -83,5 +83,5 @@ VPN 出口在会话中途切换会重置所有打开的流，重连一次就会�
 
 把 `ANTHROPIC_BASE_URL` 指向网关后，链路变成「客户端 → 网关 → 上游」。它不会让你本地的坏网络变好，但对「上游重置」这一类问题，它去掉了对单一上游账户的依赖：网关会在一个账户饱和时换另一个。
 
-切换前先对网关地址跑一遍上面的 curl 自查，确认链路通。还没配置过端点和 Key 的话，先看[使用教程](/guide)。
+切换前先对网关地址跑一遍上面的 curl 自查，确认链路通。还没配置过端点和 Key 的话，先看[使用教程](https://claude-unlimited.aiautotools.com/guide)。
 

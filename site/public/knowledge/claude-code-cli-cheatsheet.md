@@ -220,7 +220,7 @@ claude -p "按文件里的要求做" < prompt.txt
 - 脚本里加 `--max-turns`，避免死循环。
 - 跑脚本时加 `--bare`，跳过所有自动发现，启动更快。
 
-原理和更多方法见[为什么 Agent 比聊天更烧 token](/knowledge/why-agents-cost-more-tokens)与[降低 Claude 用量的工程方法：先测量再优化](/knowledge/reduce-token-usage-tips)；会话内其它命令的完整说明见 [Claude Code 教程：第一次会话之后怎么用](/knowledge/claude-code-tutorial)。
+原理和更多方法见[为什么 Agent 比聊天更烧 token](https://claude-unlimited.aiautotools.com/knowledge/why-agents-cost-more-tokens)与[降低 Claude 用量的工程方法：先测量再优化](https://claude-unlimited.aiautotools.com/knowledge/reduce-token-usage-tips)；会话内其它命令的完整说明见 [Claude Code 教程：第一次会话之后怎么用](https://claude-unlimited.aiautotools.com/knowledge/claude-code-tutorial)。
 
 ## 实战案例
 

@@ -21,7 +21,7 @@ head:
 
 > **一句话答案**：Claude 无限卡是独立运营的第三方 API 网关——订阅期内调用 Claude 不按 token 计费。它与 Anthropic 官方无隶属关系；接入时只改 Base URL 与 API Key。文档与介绍在 `claude-unlimited.aiautotools.com`；官方管理后台与 API 网关是 `rsxermu666.cn`，二者同一运营方。
 
-截至 2026-11-05，本文口径与站点首页、[套餐定价](/pricing)、[常见问题](/faq)、[管理后台说明](/console)一致。在售档位与价格以定价页为准，本文不把价格写死。
+截至 2026-11-05，本文口径与站点首页、[套餐定价](https://claude-unlimited.aiautotools.com/pricing)、[常见问题](https://claude-unlimited.aiautotools.com/faq)、[管理后台说明](https://claude-unlimited.aiautotools.com/console)一致。在售档位与价格以定价页为准，本文不把价格写死。
 
 ## Claude 无限卡是什么
 
@@ -40,9 +40,9 @@ head:
 - **官方 Pro / Max 等订阅**：消费级产品附带额度，聊天与 Claude Code 常共用；
 - **Claude 无限卡**：周期内固定价、不按 token 计费的网关通道。
 
-搜「opus 无限卡」「fable 无限卡」时，通常指的就是本卡这类用法：一份订阅覆盖承诺档位，**不必另买 Opus 卡或 Fable 卡**；档位与价格见[套餐定价](/pricing)，model ID 见[模型广场](/models)。
+搜「opus 无限卡」「fable 无限卡」时，通常指的就是本卡这类用法：一份订阅覆盖承诺档位，**不必另买 Opus 卡或 Fable 卡**；档位与价格见[套餐定价](https://claude-unlimited.aiautotools.com/pricing)，model ID 见[模型广场](https://claude-unlimited.aiautotools.com/models)。
 
-token 账单怎么构成，见[Claude API 怎么计费：token 构成与估算](/knowledge/claude-api-pricing-explained)。
+token 账单怎么构成，见[Claude API 怎么计费：token 构成与估算](https://claude-unlimited.aiautotools.com/knowledge/claude-api-pricing-explained)。
 
 ## 两个域名分别干什么
 
@@ -53,7 +53,7 @@ token 账单怎么构成，见[Claude API 怎么计费：token 构成与估算](
 | `claude-unlimited.aiautotools.com` | 文档站 / 官网介绍 | 看产品说明、定价口径、使用教程、知识库、FAQ |
 | `https://rsxermu666.cn/` | 管理后台 / API 网关 | 粘贴卡密兑换 Key、查看面板、把 Base URL 与 Key 接到客户端 |
 
-文档站上的[管理后台说明](/console)介绍后台能做什么；**兑换与日常操作在 `rsxermu666.cn` 完成**。二者同属 Claude 无限卡运营方，不是两套互不相关的服务。
+文档站上的[管理后台说明](https://claude-unlimited.aiautotools.com/console)介绍后台能做什么；**兑换与日常操作在 `rsxermu666.cn` 完成**。二者同属 Claude 无限卡运营方，不是两套互不相关的服务。
 
 若搜索引擎里先跳出第三方「中转站检测」页，请回到本文或文档站核对：域名是否为 `rsxermu666.cn`、文案是否写明它是 Claude 无限卡的管理后台与网关。
 
@@ -64,14 +64,14 @@ token 账单怎么构成，见[Claude API 怎么计费：token 构成与估算](
 **取消的是**
 
 - 订阅期内，单次调用消耗多少 token，都不单独加价；
-- 同一订阅价内可选本卡承诺档位的模型，不因选更高档模型再付按量差价（档位内模型见[模型广场](/models)）；
+- 同一订阅价内可选本卡承诺档位的模型，不因选更高档模型再付按量差价（档位内模型见[模型广场](https://claude-unlimited.aiautotools.com/models)）；
 - 不必一边跑长会话一边盯按量仪表盘。
 
 **不取消的是**
 
-- 套餐有效期（天 / 周 / 月等，以[套餐定价](/pricing)为准）；
+- 套餐有效期（天 / 周 / 月等，以[套餐定价](https://claude-unlimited.aiautotools.com/pricing)为准）；
 - 档位差别主要在「同时能开几个会话窗口」，不是「token 池有多大」；
-- 仍可能遇到速率类限制（例如 429）——这是公平使用与容量保护，不是按 token 扣费，见[Claude Code 报 429 限流怎么办](/knowledge/claude-code-429-rate-limit)；
+- 仍可能遇到速率类限制（例如 429）——这是公平使用与容量保护，不是按 token 扣费，见[Claude Code 报 429 限流怎么办](https://claude-unlimited.aiautotools.com/knowledge/claude-code-429-rate-limit)；
 - 不包含生产环境多用户流量、超范围压测、二次转卖，也不包含 claude.ai 网页版等官方产品订阅权益。
 
 ## 和官方按量、官方订阅怎么选
@@ -84,7 +84,7 @@ token 账单怎么构成，见[Claude API 怎么计费：token 构成与估算](
 | 官方按量 API | 用多少算多少 | 调用少、规模可预测、要精确控单次成本 | 每天大仓库重构、多步 Agent |
 | Claude 无限卡 | 周期固定价、不按 token 计费 | 每天在 Claude Code / Cursor 里写代码、长上下文、多步 Agent | 用量极小；要企业 SLA / 合同发票；必须每条请求直连官方 |
 
-官方订阅撞上限时的分流，见[Claude 提示用量上限：分清是哪个计量器](/knowledge/claude-code-usage-limit-reached)。
+官方订阅撞上限时的分流，见[Claude 提示用量上限：分清是哪个计量器](https://claude-unlimited.aiautotools.com/knowledge/claude-code-usage-limit-reached)。
 
 ## 适合谁，不适合谁
 
@@ -99,7 +99,7 @@ token 账单怎么构成，见[Claude API 怎么计费：token 构成与估算](
 **不匹配**
 
 - 一周只调用几次、每次规模很小——按量往往更省；
-- 需要企业级 SLA、合同与发票流程——本站是个人开发者运营的网关服务，边界见[关于页面](/about)；
+- 需要企业级 SLA、合同与发票流程——本站是个人开发者运营的网关服务，边界见[关于页面](https://claude-unlimited.aiautotools.com/about)；
 - 要求每一条请求都必须直连 Anthropic 官方、不经任何中间层。
 
 ## 文档与接入入口在哪
@@ -110,20 +110,20 @@ token 账单怎么构成，见[Claude API 怎么计费：token 构成与估算](
 
 | 你想核对什么 | 看哪一页 | 这一页解决什么 |
 |---|---|---|
-| 品牌与文档域名是否对得上 | [站点首页](/) | 确认文档站为 `claude-unlimited.aiautotools.com` |
-| 时长、窗口档位与现行价格 | [套餐定价](/pricing) | 以该页与商品详情为最终准价，避免转载文写死过期价格 |
-| 卡密如何换成 Base URL 与 Key | [管理后台](https://rsxermu666.cn/)（说明见[/console](/console)） | 在 `rsxermu666.cn` 粘贴卡密，得到接入所需的两个值 |
-| 各客户端怎么填 | [使用教程](/guide) | 按 Claude Code / 桌面版 / Cursor 等分路径，带截图 |
-| 规则与售后口径 | [常见问题](/faq) | 窗口、不包含项、退款摘要等 |
+| 品牌与文档域名是否对得上 | [站点首页](https://claude-unlimited.aiautotools.com/) | 确认文档站为 `claude-unlimited.aiautotools.com` |
+| 时长、窗口档位与现行价格 | [套餐定价](https://claude-unlimited.aiautotools.com/pricing) | 以该页与商品详情为最终准价，避免转载文写死过期价格 |
+| 卡密如何换成 Base URL 与 Key | [管理后台](https://rsxermu666.cn/)（说明见[/console](https://claude-unlimited.aiautotools.com/console)） | 在 `rsxermu666.cn` 粘贴卡密，得到接入所需的两个值 |
+| 各客户端怎么填 | [使用教程](https://claude-unlimited.aiautotools.com/guide) | 按 Claude Code / 桌面版 / Cursor 等分路径，带截图 |
+| 规则与售后口径 | [常见问题](https://claude-unlimited.aiautotools.com/faq) | 窗口、不包含项、退款摘要等 |
 
-已经拿到 Key、只差配置时，优先打开[使用教程](/guide)；Claude Code 可从[插件路径](/guide/cc)或[CLI 路径](/guide/cli)入手。
+已经拿到 Key、只差配置时，优先打开[使用教程](https://claude-unlimited.aiautotools.com/guide)；Claude Code 可从[插件路径](https://claude-unlimited.aiautotools.com/guide/cc)或[CLI 路径](https://claude-unlimited.aiautotools.com/guide/cli)入手。
 
 ## 接入只需改两处配置
 
 **结论**：不必重写业务逻辑；兼容 Anthropic 接口的客户端，通常只改 Base URL 与 API Key。
 
-1. 按[套餐定价](/pricing)选定档位并完成支付后，会收到卡密；
-2. 打开管理后台 [https://rsxermu666.cn/](https://rsxermu666.cn/)，粘贴卡密，页面给出 Base URL 与 `sk-` 开头的 Key（后台能力说明见[/console](/console)）；
+1. 按[套餐定价](https://claude-unlimited.aiautotools.com/pricing)选定档位并完成支付后，会收到卡密；
+2. 打开管理后台 [https://rsxermu666.cn/](https://rsxermu666.cn/)，粘贴卡密，页面给出 Base URL 与 `sk-` 开头的 Key（后台能力说明见[/console](https://claude-unlimited.aiautotools.com/console)）；
 3. 写入客户端或环境变量：
 
 ```bash
@@ -131,7 +131,7 @@ export ANTHROPIC_BASE_URL="https://<兑换页给出的 Base URL>"
 export ANTHROPIC_API_KEY="sk-..."
 ```
 
-兑换页给出的 Base URL 即控制台侧网关地址（域名属于 `rsxermu666.cn` 这一套）。分客户端截图与差异以[使用教程索引](/guide)为准；本文不重复逐步截图，避免与教程页两套口径。
+兑换页给出的 Base URL 即控制台侧网关地址（域名属于 `rsxermu666.cn` 这一套）。分客户端截图与差异以[使用教程索引](https://claude-unlimited.aiautotools.com/guide)为准；本文不重复逐步截图，避免与教程页两套口径。
 
 ## 信任边界：先看清再决定
 
@@ -140,6 +140,6 @@ export ANTHROPIC_API_KEY="sk-..."
 - **不是官方**：不提供 Anthropic 官方账号，也不出售官方网页版 / 桌面版订阅权益。
 - **请求内容**：以提供服务与排障所必需为限记录用量元数据（时间、模型、状态、消耗、请求标识）；不记录 prompt 正文与模型输出。细则见站点隐私说明。
 - **稳定性**：网关用多上游路由与故障转移提升可用；服务仍依赖上游与公网，不对「绝不中断」作绝对保证。
-- **售后与规则**：退款、窗口、不包含项以[套餐定价](/pricing)与商品详情为准；本仓库 issue 只处理文档与源码问题，不是客服工单。
+- **售后与规则**：退款、窗口、不包含项以[套餐定价](https://claude-unlimited.aiautotools.com/pricing)与商品详情为准；本仓库 issue 只处理文档与源码问题，不是客服工单。
 
-若你仍在比较计费形态，继续读[Claude API 怎么计费：token 构成与估算](/knowledge/claude-api-pricing-explained)。若定义与边界已经够用，请同时核对两个域名：文档站 `claude-unlimited.aiautotools.com`，管理后台与网关 `rsxermu666.cn`；站外也可搜索「Claude 无限卡」「rsxermu666.cn」交叉确认。
+若你仍在比较计费形态，继续读[Claude API 怎么计费：token 构成与估算](https://claude-unlimited.aiautotools.com/knowledge/claude-api-pricing-explained)。若定义与边界已经够用，请同时核对两个域名：文档站 `claude-unlimited.aiautotools.com`，管理后台与网关 `rsxermu666.cn`；站外也可搜索「Claude 无限卡」「rsxermu666.cn」交叉确认。

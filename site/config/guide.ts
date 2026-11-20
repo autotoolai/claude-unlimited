@@ -135,6 +135,14 @@ export interface GuidePage {
   answer: string
   /** 常见问题（FAQPage JSON-LD 的来源） */
   faq: { q: string; a: string }[]
+  /**
+   * 人工维护的编辑时间（YYYY-MM-DD），sitemap 的 lastmod 取它。
+   *
+   * 为什么不用文件 mtime：教程正文在 config/guide.ts 里，改一个字 mtime 就变，
+   * 等于每次发版都宣称「教程更新了」，爬虫会降低对 lastmod 的信任。
+   * 页面没有实质变化时不要动这个字段。
+   */
+  updated: string
   /** 该页长尾搜索词，注入 per-page keywords */
   tags: string[]
   /** 相关阅读：≥3 条站内链接，锚文本用真实关键词 */
@@ -261,6 +269,7 @@ const ccPage: GuidePage = {
     { text: 'Claude Code 教程：第一次会话之后怎么用', url: '/knowledge/claude-code-tutorial' },
     { text: 'Claude Code 命令与参数速查：会话内和命令行', url: '/knowledge/claude-code-cli-cheatsheet' },
   ],
+  updated: '2026-11-18',
   blocks: [
     { id: 'cc-install-ccswitch', title: '安装 CC Switch', shared: 'install-ccswitch' },
     { id: 'cc-get-key', title: '换取 API Key', shared: 'get-key' },
@@ -397,6 +406,7 @@ const cliPage: GuidePage = {
     { text: 'Claude Code 插件教程：VS Code 与 Cursor', url: '/guide/cc' },
     { text: 'Claude Code 教程：第一次会话之后怎么用', url: '/knowledge/claude-code-tutorial' },
   ],
+  updated: '2026-11-18',
   blocks: [
     { id: 'cli-get-key', title: '换取 API Key', shared: 'get-key' },
     {
@@ -536,6 +546,7 @@ const desktopPage: GuidePage = {
     { text: 'Claude Code 与 Codex CLI 怎么选', url: '/knowledge/claude-code-vs-codex' },
     { text: '常见问题：开通与配置', url: '/faq#cat-setup' },
   ],
+  updated: '2026-11-18',
   blocks: [
     { id: 'desktop-install-ccswitch', title: '安装 CC Switch', shared: 'install-ccswitch' },
     { id: 'desktop-get-key', title: '换取 API Key', shared: 'get-key' },
@@ -695,6 +706,7 @@ const codexPage: GuidePage = {
     { text: 'Claude Code 教程：第一次会话之后怎么用', url: '/knowledge/claude-code-tutorial' },
     { text: '常见问题：开通与配置', url: '/faq#cat-setup' },
   ],
+  updated: '2026-11-18',
   blocks: [
     { id: 'codex-install-ccswitch', title: '安装 CC Switch', shared: 'install-ccswitch' },
     { id: 'codex-get-key', title: '换取 API Key', shared: 'get-key' },
@@ -847,6 +859,7 @@ const workbuddyPage: GuidePage = {
     { text: '模型广场：model ID 一览', url: '/models' },
     { text: '常见问题：开通与配置', url: '/faq#cat-setup' },
   ],
+  updated: '2026-11-18',
   blocks: [
     { id: 'workbuddy-get-key', title: '换取 API Key', shared: 'get-key' },
     {
@@ -910,6 +923,7 @@ const cursorPage: GuidePage = {
     { text: 'Claude Code 与 Codex CLI 怎么选', url: '/knowledge/claude-code-vs-codex' },
     { text: '常见问题：日常使用', url: '/faq#cat-usage' },
   ],
+  updated: '2026-11-18',
   blocks: [
     { id: 'cursor-get-key', title: '换取 API Key', shared: 'get-key' },
     {

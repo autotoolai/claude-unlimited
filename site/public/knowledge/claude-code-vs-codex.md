@@ -33,7 +33,7 @@ head:
 
 **结论**：同样形状换了个大脑——只跑 Claude 模型，命令行闭源，但扩展面更大：子代理、hooks、技能、插件、MCP、GitHub Action 和 Agent SDK。
 
-它的执行方式是权限提示：破坏性动作问你，你可以逐条放行也可以收紧（见 [Claude Code 权限模式有哪些](/knowledge/claude-code-permission-modes)）。用户实际能感知的差别是三条：长任务的规划与持续性、权限提示与 Codex 审批模式的手感、以及成本。
+它的执行方式是权限提示：破坏性动作问你，你可以逐条放行也可以收紧（见 [Claude Code 权限模式有哪些](https://claude-unlimited.aiautotools.com/knowledge/claude-code-permission-modes)）。用户实际能感知的差别是三条：长任务的规划与持续性、权限提示与 Codex 审批模式的手感、以及成本。
 
 ## OpenCode 在哪
 
@@ -57,7 +57,7 @@ head:
 
 **结论**：三个 agent 的循环已经趋同。同一个 Claude 模型、同一端点下，Claude Code 的会话和 OpenCode 的会话产出的工作相似、花费相似。换端点才会同时改变两者的成本。
 
-所以选 agent 之前，先看三件事：能用哪档模型、这档模型多少钱、按任务路由的成本杠杆能不能用（见 [按任务选模型：Opus、Sonnet、Haiku 怎么选](/knowledge/choose-claude-model)）。模型选型和计费的细节见 [Claude API 怎么计费：token 构成与估算](/knowledge/claude-api-pricing-explained)。
+所以选 agent 之前，先看三件事：能用哪档模型、这档模型多少钱、按任务路由的成本杠杆能不能用（见 [按任务选模型：Opus、Sonnet、Haiku 怎么选](https://claude-unlimited.aiautotools.com/knowledge/choose-claude-model)）。模型选型和计费的细节见 [Claude API 怎么计费：token 构成与估算](https://claude-unlimited.aiautotools.com/knowledge/claude-api-pricing-explained)。
 
 ## 怎么选
 
@@ -68,5 +68,5 @@ head:
 - 开源或按任务换模型比生态更重要：OpenCode。
 - 很多人两个都留：Claude Code 作默认，另一个给难 bug 提供第二意见。
 
-建议在自己的仓库上各试一天。命令与参数见 [Claude Code 命令与参数速查：会话内和命令行](/knowledge/claude-code-cli-cheatsheet)。
+建议在自己的仓库上各试一天。命令与参数见 [Claude Code 命令与参数速查：会话内和命令行](https://claude-unlimited.aiautotools.com/knowledge/claude-code-cli-cheatsheet)。
 

@@ -6,6 +6,7 @@ import { readdirSync, statSync, writeFileSync, existsSync } from 'node:fs'
 import { join, relative, sep } from 'node:path'
 import { siteConfig } from '../config/site'
 import { knowledge } from '../config/knowledge'
+import { guidePages } from '../config/guide'
 
 const dist = join(process.cwd(), '.vitepress', 'dist')
 if (!existsSync(dist)) {
@@ -43,7 +44,8 @@ const urls = walk(dist)
 /**
  * lastmod：爬虫靠它判断内容有没有变、要不要重抓。取值优先级：
  *  1) 知识库文章用 config/knowledge.ts 的 updated（不填则 date）——人工维护的编辑时间，稳定且语义准确；
- *  2) 其余页面用 docs/ 下对应 md 源文件的修改时间。
+ *  2) 教程场景页用 config/guide.ts 的 updated——正文在 TS 里，改一个字 mtime 就变，等于每次发版都宣称更新；
+ *  3) 其余页面用 docs/ 下对应 md 源文件的修改时间。
  * 不能用 dist 里 html 的 mtime：那是本次构建时间，等于宣称每次发版全站都更新了，会稀释新建文章的信号。
  */
 function lastmodFor(url: string): string | undefined {
@@ -51,6 +53,11 @@ function lastmodFor(url: string): string | undefined {
   if (route.startsWith('knowledge/')) {
     const e = knowledge.find((k) => k.slug === route.slice('knowledge/'.length))
     if (e) return e.updated ?? e.date
+  }
+  if (route.startsWith('guide/')) {
+    const scene = route.slice('guide/'.length)
+    const g = guidePages.find((p) => p.scene === scene)
+    if (g) return g.updated
   }
   // 首页 -> docs/index.md；目录总览（guide / knowledge）-> docs/<dir>/index.md；其余 -> docs/<route>.md
   const md = join(process.cwd(), 'docs', route === '' ? 'index.md' : existsSync(join(process.cwd(), 'docs', route, 'index.md')) ? route + '/index.md' : route + '.md')

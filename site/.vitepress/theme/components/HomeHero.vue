@@ -30,6 +30,12 @@ useHeroReveal()
         <span class="cu-lead__line">在 Claude Code 里重构项目、用 Cursor 读长代码库、让 agent 执行多步任务，都不必盯着用量仪表盘。</span>
         <span class="cu-lead__line">改一个 Base URL 加一个 Key，即可接入你现有的工具和 SDK。</span>
       </p>
+      <!--
+        一句话答案（GEO）：上面三行是叙述式引导语，不能被 AI 当成一个答案直接引用。
+        这一句是自包含结论：谁、怎么计费、包含哪些模型、怎么接入。
+        放在 H1 之后、引导语之前，页面上与 llms.txt / 知识库的一句话答案同一形态。
+      -->
+      <p class="cu-hero-answer">{{ siteConfig.heroAnswer }}</p>
       <div class="cu-cta-row cu-cta-row--center">
         <ExternalCta label="立即购买" variant="primary" size="lg" cta="hero_primary" />
         <a class="cu-btn cu-btn--ghost cu-btn--lg" href="/pricing">看档位与价格</a>

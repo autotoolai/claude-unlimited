@@ -127,7 +127,7 @@ claude \
 - `--max-turns`：即使它绕不出来也只烧 30 轮；
 - `-p`：非交互，输出完就退出，适合 cron 与 CI。
 
-这组参数的完整列表在[Claude Code 命令与参数速查：会话内和命令行](/knowledge/claude-code-cli-cheatsheet)；`--max-turns` 为什么能兜住失控的循环，见[Claude Code 报 429 限流怎么办](/knowledge/claude-code-429-rate-limit)。
+这组参数的完整列表在[Claude Code 命令与参数速查：会话内和命令行](https://claude-unlimited.aiautotools.com/knowledge/claude-code-cli-cheatsheet)；`--max-turns` 为什么能兜住失控的循环，见[Claude Code 报 429 限流怎么办](https://claude-unlimited.aiautotools.com/knowledge/claude-code-429-rate-limit)。
 
 ## 为什么在项目设置里配 auto 没反应
 
@@ -179,7 +179,7 @@ claude \
 
 ## 和隔离措施一起用
 
-**结论**：权限模式只是其中一层，容器与沙箱是另一层。跳过权限 + 一次性容器，是跑陌生代码或批量任务时唯一稳妥的组合。先在本地把动作验证过再放进这个组合，见[Claude Code 教程：第一次会话之后怎么用](/knowledge/claude-code-tutorial)。
+**结论**：权限模式只是其中一层，容器与沙箱是另一层。跳过权限 + 一次性容器，是跑陌生代码或批量任务时唯一稳妥的组合。先在本地把动作验证过再放进这个组合，见[Claude Code 教程：第一次会话之后怎么用](https://claude-unlimited.aiautotools.com/knowledge/claude-code-tutorial)。
 
 至少把工作目录放在容器里、网络出站限制到 API 端点、容器可随时销毁。
 

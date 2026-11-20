@@ -2,6 +2,12 @@
 
 > 一个 Key，Claude 不限量用。Claude 无限卡官网：订阅期内 Claude API 不按 token 计费，支持 Claude Code、Cursor、WorkBuddy、Trae、Codex 等国内外主流工具。本站只做介绍与答疑，购买跳转第三方发卡站。
 
+**一句话答案**：Claude 无限卡是独立运营的第三方 API 网关：订阅期内调用 Claude 不按 token 计费，按固定订阅价收费，Fable 5.2 与 Opus 5.5 同价通用。接入只需改 Base URL 与 API Key，Claude Code、Cursor、Codex 等客户端直接可用。
+
+## 全文层
+
+- [全文层](https://claude-unlimited.aiautotools.com/llms-full.txt)：本站每篇文章的一句话答案、FAQ 答案与全部事实要点展开；需要直接引用答案时读这份
+
 ## 页面
 
 - [首页](https://claude-unlimited.aiautotools.com/): Claude 无限卡官网：订阅期内 Claude API 不按 token 计费，支持 Claude Code、Cursor、WorkBuddy、Trae、Codex 等国内外主流工具。本站只做介绍与答疑，购买跳转第三方发卡站。

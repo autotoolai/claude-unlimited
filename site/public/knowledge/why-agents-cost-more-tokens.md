@@ -58,7 +58,7 @@ head:
 | 每任务新会话 | 话题一变就 `/clear` | 免费，而且通常最正确 |
 | 状态外部化 | 状态写进文件或数据库，按需读回 | 工作量最大，效果最好 |
 
-在 Claude Code 里对应 `/compact`（滚动摘要）与 `/clear`（新会话）。把状态写进文件对应 CLAUDE.md 的用法，见 [CLAUDE.md 怎么写：写什么、放哪](/knowledge/claude-md-guide)。
+在 Claude Code 里对应 `/compact`（滚动摘要）与 `/clear`（新会话）。把状态写进文件对应 CLAUDE.md 的用法，见 [CLAUDE.md 怎么写：写什么、放哪](https://claude-unlimited.aiautotools.com/knowledge/claude-md-guide)。
 
 ## 摘要压缩要用便宜的档位
 
@@ -77,11 +77,11 @@ head:
 
 **结论**：会话里输入 `/context` 会按类别列出窗口构成：系统提示、工具定义、MCP 工具、历史对话、文件内容各占多少。
 
-看到「固定成本」占比高时，压缩对话没用，应该去清理 MCP 服务器和技能；看到「历史对话」占比高时才用 `/compact`。具体处置见 [prompt too long 报错怎么处理](/knowledge/claude-code-prompt-too-long-fix)。
+看到「固定成本」占比高时，压缩对话没用，应该去清理 MCP 服务器和技能；看到「历史对话」占比高时才用 `/compact`。具体处置见 [prompt too long 报错怎么处理](https://claude-unlimited.aiautotools.com/knowledge/claude-code-prompt-too-long-fix)。
 
 ## 长上下文窗口不等于免账单
 
 **结论**：更大的窗口只是把天花板抬高。你付的是实际发送的 token，不是窗口大小。
 
-1M 窗口的价值在于「需要时可以真的塞进去」，而不是「每次都塞满」。每次把同一份大文档重发一遍，账单照常增长；对稳定前缀开提示缓存才是省这类重复的办法，见[提示缓存原理：什么时候省钱、什么时候白花](/knowledge/prompt-caching-explained)。
+1M 窗口的价值在于「需要时可以真的塞进去」，而不是「每次都塞满」。每次把同一份大文档重发一遍，账单照常增长；对稳定前缀开提示缓存才是省这类重复的办法，见[提示缓存原理：什么时候省钱、什么时候白花](https://claude-unlimited.aiautotools.com/knowledge/prompt-caching-explained)。
 

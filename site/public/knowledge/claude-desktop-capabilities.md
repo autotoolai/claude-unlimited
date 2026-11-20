@@ -66,18 +66,18 @@ head:
 | 脚本与 CI | 不适合 | 打印模式，`claude -p` |
 | 批量与长跑 | 受限于人盯着 | 后台跑，配合 `-c` 续接 |
 
-**结论**：日常开发写代码，两边都能用，选你顺手的；一旦要做成脚本、进 CI、或者让它长时间无人值守地跑，必须回终端。终端版的关键能力是 `claude -p` 打印模式加 `--allowedTools` 预授权、`--max-turns` 限轮次，具体参数见[Claude Code 命令与参数速查：会话内和命令行](/knowledge/claude-code-cli-cheatsheet)。
+**结论**：日常开发写代码，两边都能用，选你顺手的；一旦要做成脚本、进 CI、或者让它长时间无人值守地跑，必须回终端。终端版的关键能力是 `claude -p` 打印模式加 `--allowedTools` 预授权、`--max-turns` 限轮次，具体参数见[Claude Code 命令与参数速查：会话内和命令行](https://claude-unlimited.aiautotools.com/knowledge/claude-code-cli-cheatsheet)。
 
 选择逻辑上有个实用原则：需要人随时插手、要看过程和 diff 的，放桌面版；需要结果确定、能复现、能塞进流水线的，放终端。
 
-想更系统地比较不同客户端的取舍，看[Claude Code 与 Codex CLI 怎么选](/knowledge/claude-code-vs-codex)。
+想更系统地比较不同客户端的取舍，看[Claude Code 与 Codex CLI 怎么选](https://claude-unlimited.aiautotools.com/knowledge/claude-code-vs-codex)。
 
 ## 模型、额度与成本怎么看
 
 **结论**：桌面版本身不单独收费，它消耗的是你账号或接口那边的额度。模型选型直接决定成本和效果。
 
-桌面版跑的是 Claude 模型，不同档位的能力差异明显。需要更细的选型依据，看[按任务选模型：Opus、Sonnet、Haiku 怎么选](/knowledge/choose-claude-model)。
+桌面版跑的是 Claude 模型，不同档位的能力差异明显。需要更细的选型依据，看[按任务选模型：Opus、Sonnet、Haiku 怎么选](https://claude-unlimited.aiautotools.com/knowledge/choose-claude-model)。
 
-真正烧钱的是 agent 模式而不是聊天。桌面版里跑 Claude Code、改本地文件、循环执行命令，token 消耗结构和纯对话不是一个量级，原理在[为什么 Agent 比聊天更烧 token](/knowledge/why-agents-cost-more-tokens)，省钱的工程做法在[降低 Claude 用量的工程方法：先测量再优化](/knowledge/reduce-token-usage-tips)。
+真正烧钱的是 agent 模式而不是聊天。桌面版里跑 Claude Code、改本地文件、循环执行命令，token 消耗结构和纯对话不是一个量级，原理在[为什么 Agent 比聊天更烧 token](https://claude-unlimited.aiautotools.com/knowledge/why-agents-cost-more-tokens)，省钱的工程做法在[降低 Claude 用量的工程方法：先测量再优化](https://claude-unlimited.aiautotools.com/knowledge/reduce-token-usage-tips)。
 
 一个实用提醒：桌面版和终端版读同一份环境配置，同一把 Key 和同一个地址在两边都生效，切换客户端不需要换凭据。检查当前配置在终端里用 `/status`，这个命令在桌面版的会话面板里同样可用。

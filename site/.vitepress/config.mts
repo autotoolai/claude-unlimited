@@ -50,7 +50,7 @@ export default defineConfig({
    * canonical / og:url / og:image / twitter:image 统一从 config/site.ts 的 url 生成，改域名只改一处。
    * 不用 frontmatter 里的 {{ }} 模板：VitePress 不渲染 frontmatter head 的模板表达式，会原样输出成死链。
    */
-  transformHead({ page }) {
+  transformHead({ page, title, description }) {
     const base = SITE_URL
     let path = page.replace(/\.md$/, '').replace(/index$/, '')
     // 目录总览页路由是 /guide、/knowledge（无尾斜杠，public/_redirects 把带斜杠的 301 过来）。
@@ -65,6 +65,13 @@ export default defineConfig({
       ['meta', { property: 'og:image', content: ogImage }],
       ['meta', { name: 'twitter:image', content: ogImage }],
     ]
+    // Twitter 卡片：per-page 标题与描述。
+    // 全局 head 里那两条是写死的站点名与站点描述 → 46 页的分享卡片标题全都一样，
+    // 分享到社交平台时没有区分度。这里按当前页的 title / description 覆盖。
+    // VitePress 1.6 的 mergeHead 用 hasTag 按 meta 的第一个属性键去重（name 相同即视为同一条），
+    // 所以 transformHead 里追加就会替换掉全局那条，不需要动全局 head。
+    head.push(['meta', { name: 'twitter:title', content: title }])
+    head.push(['meta', { name: 'twitter:description', content: description }])
     // 知识库文章页的 keywords：全站只有 head 里一条全局 keywords 的话，20 篇文章共用同一串词，
     // 对中文 SEO 没有区分度。这里按路由从 config/knowledge.ts 反查该篇的 tags（列表页卡片已渲染这组词），
     // 覆盖掉全局那条。tags 是人工维护的真实搜索词，不是堆砌。

@@ -41,3 +41,14 @@ jobs:
       - name: 验收（逐页断言）
         working-directory: site
         run: npm run verify
+
+      - name: 仓库根镜像校验（knowledge/ tutorials/ llms.txt 与 site/public 同源）
+        # GitHub 侧的索引入口是仓库根的 knowledge/ 与 tutorials/，它们是 site/public/** 的派生物。
+        # 漂移 = GitHub 上的正文与官网口径不一致，所以这道门禁必须过。
+        working-directory: site
+        run: npm run check:repo-mirrors
+
+      - name: README 目录锚点校验
+        # 目录锚点算错 = GitHub 上目录全是死链，对访客和爬虫都是负面信号。
+        working-directory: site
+        run: npm run check:readme-anchors

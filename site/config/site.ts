@@ -70,6 +70,15 @@ export interface SiteConfig {
   tagline: string
   /** tagline 按短语切分后的数组：首页 H1 逐词上浮入场用（不改变 tagline 本身） */
   taglinePhrases: string[]
+  /**
+   * 首页首屏的一句话答案（GEO 用）。
+   *
+   * 为什么单独一条：/pricing 的页头引导语已经是自包含结论句，首页却没有。
+   * 搜索引擎与 AI 抓首页时最想要的就是「这个服务到底是什么、怎么算钱、怎么用」，
+   * 三句引导语是拆开的叙述句，不能被当成一个答案直接引用。
+   * 一句话说清：谁、怎么计费、包含哪些模型、怎么接入。
+   */
+  heroAnswer: string
   description: string
   /** 正式域名，构建期用于 canonical / sitemap / OG。TODO R1 */
   url: string
@@ -90,6 +99,8 @@ export const siteConfig: SiteConfig = {
   name: 'Claude 无限卡',
   tagline: '一个 Key，Claude 不限量用',
   taglinePhrases: ['一个 Key，', 'Claude', '不限量用'],
+  heroAnswer:
+    'Claude 无限卡是独立运营的第三方 API 网关：订阅期内调用 Claude 不按 token 计费，按固定订阅价收费，Fable 5.2 与 Opus 5.5 同价通用。接入只需改 Base URL 与 API Key，Claude Code、Cursor、Codex 等客户端直接可用。',
   description:
     'Claude 无限卡官网：订阅期内 Claude API 不按 token 计费，支持 Claude Code、Cursor、WorkBuddy、Trae、Codex 等国内外主流工具。本站只做介绍与答疑，购买跳转第三方发卡站。',
   url: 'https://claude-unlimited.aiautotools.com',  // 自定义域（Pages 域 claude-unlimited-site.pages.dev 仍可访问）

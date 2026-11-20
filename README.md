@@ -1,18 +1,52 @@
 # Claude 无限卡 · 一个 Key，Claude Code 不限量用
 
-> 订阅期内 Claude API **不按 token 计费**：一个 Key，Claude Code / Cursor / Cline / Codex 等主流客户端直接接入。
->
-> 文档站 [claude-unlimited.aiautotools.com](https://claude-unlimited.aiautotools.com)（介绍 / 定价 / 教程 / 知识库）与管理后台 [rsxermu666.cn](https://rsxermu666.cn/)（兑换卡密、提 Key、查用量）由同一运营方维护。
+订阅期内 Claude API **不按 token 计费**：一个 Key，Claude Code / Cursor / Cline / Codex 等主流客户端直接接入。文档站 [claude-unlimited.aiautotools.com](https://claude-unlimited.aiautotools.com)（介绍 / 定价 / 教程 / 知识库）与管理后台 [rsxermu666.cn](https://rsxermu666.cn/)（兑换卡密、提 Key、查用量）由同一运营方维护。
+
+<!-- readme:seo:start -->
+
+关键词：claude 无限卡 / claude 无限额度 / claude api 无限 / claude无限续杯 / claude 无限续杯 / claude code 国内 / claude api 中转 / claude api key / claude 无限卡 多少钱 / claude 无限卡价格 / claude 无限卡 月卡 / opus 无限卡 / opus无限卡 / claude opus 无限卡 / opus 5.5 无限卡 / fable 无限卡 / fable无限卡 / claude fable 无限卡 / fable 5.2 无限卡 / fable 5.1 无限卡 / sonnet 无限卡 / claude 不按 token 计费 / claude 无限卡 价格 / claude 无限卡 购买 / claude 无限卡 周卡
+
+本仓库是[Claude 无限卡](https://claude-unlimited.aiautotools.com)官网的公开仓库：文档、接入教程、Claude Code 与 Claude 桌面版知识库正文，以及 VitePress 站点源码。
+
+<!-- readme:seo:end -->
 
 [![官网](https://img.shields.io/badge/%E5%AE%98%E7%BD%91-claude--unlimited.aiautotools.com-C85A1E?style=flat-square)](https://claude-unlimited.aiautotools.com)
 [![控制台](https://img.shields.io/badge/%E6%8E%A7%E5%88%B6%E5%8F%B0-rsxermu666.cn-C85A1E?style=flat-square)](https://rsxermu666.cn/)
+[![CI](https://github.com/autotoolai/claude-unlimited/actions/workflows/ci.yml/badge.svg)](https://github.com/autotoolai/claude-unlimited/actions/workflows/ci.yml)
+[![Stars](https://img.shields.io/github/stars/autotoolai/claude-unlimited?style=flat-square)](https://github.com/autotoolai/claude-unlimited/stargazers)
+[![Forks](https://img.shields.io/github/forks/autotoolai/claude-unlimited?style=flat-square)](https://github.com/autotoolai/claude-unlimited/network/members)
 [![License: MIT](https://img.shields.io/badge/License-MIT-C85A1E?style=flat-square)](LICENSE)
 [![Claude Code 教程](https://img.shields.io/badge/Claude%20Code-%E6%95%99%E7%A8%8B-646C7A?style=flat-square)](https://claude-unlimited.aiautotools.com/guide/cc)
 [![知识库](https://img.shields.io/badge/%E7%9F%A5%E8%AF%86%E5%BA%93-646C7A?style=flat-square)](https://claude-unlimited.aiautotools.com/knowledge)
 
 **[官网 →](https://claude-unlimited.aiautotools.com)** ｜ [控制台 →](https://rsxermu666.cn/) ｜ [套餐定价 →](https://claude-unlimited.aiautotools.com/pricing) ｜ [使用教程 →](https://claude-unlimited.aiautotools.com/guide) ｜ [知识库 →](https://claude-unlimited.aiautotools.com/knowledge) ｜ [控制台说明 →](https://claude-unlimited.aiautotools.com/console)
 
+仓库内可直接读：[知识库目录](knowledge/index.md) ｜ [教程目录](tutorials/index.md) ｜ [llms.txt](llms.txt) ｜ [llms-full.txt（全文层）](https://claude-unlimited.aiautotools.com/llms-full.txt)
+
 <img src="docs/social-preview.png" alt="Claude 无限卡 · Claude Code 中文 · 不按 token 计费 · 控制台 rsxermu666.cn" width="880">
+
+## 目录
+
+<!-- readme:toc:start -->
+
+**目录**
+
+- [目录](#user-content-目录)
+- [这是什么](#user-content-这是什么)
+- [适合谁](#user-content-适合谁)
+- [三步接入](#user-content-三步接入)
+- [使用教程：按你用的客户端选一条路](#user-content-使用教程按你用的客户端选一条路)
+- [Claude 知识库](#user-content-claude-知识库)
+- [套餐与价格](#user-content-套餐与价格)
+- [常见问题](#user-content-常见问题)
+- [信任与合规](#user-content-信任与合规)
+- [社区与联系](#user-content-社区与联系)
+- [给贡献者](#user-content-给贡献者)
+- [本地开发](#user-content-本地开发)
+- [文档与贡献](#user-content-文档与贡献)
+- [License](#user-content-license)
+
+<!-- readme:toc:end -->
 
 ## 这是什么
 
@@ -68,13 +102,13 @@ export ANTHROPIC_API_KEY="sk-..."
 
 | 文章 | 一句话 | 仓库源码 |
 |---|---|---|
-| [Claude Code 教程：第一次会话之后怎么用](https://claude-unlimited.aiautotools.com/knowledge/claude-code-tutorial) | 配置完成后怎么把 Claude Code 用顺手：CLAUDE.md、工作流、常用命令。 | [`site/docs/knowledge/claude-code-tutorial.md`](site/docs/knowledge/claude-code-tutorial.md) |
-| [Claude Code 计划模式怎么用：四种权限模式的区别](https://claude-unlimited.aiautotools.com/knowledge/claude-code-plan-mode) | plan / manual / acceptEdits / auto 的差别，何时先要计划再动手。 | [`site/docs/knowledge/claude-code-plan-mode.md`](site/docs/knowledge/claude-code-plan-mode.md) |
-| [CLAUDE.md 怎么写：写什么、放哪](https://claude-unlimited.aiautotools.com/knowledge/claude-md-guide) | CLAUDE.md 写什么放哪，AGENTS.md 何时被读，.claude 目录各文件用途。 | [`site/docs/knowledge/claude-md-guide.md`](site/docs/knowledge/claude-md-guide.md) |
-| [Claude 无限卡是什么：订阅期内不按 token 计费](https://claude-unlimited.aiautotools.com/knowledge/what-is-claude-unlimited) | 第三方订阅制网关的定义与边界；文档站与 rsxermu666.cn 管理后台的分工。 | [`site/docs/knowledge/what-is-claude-unlimited.md`](site/docs/knowledge/what-is-claude-unlimited.md) |
-| [Claude API 怎么计费：token 构成与估算](https://claude-unlimited.aiautotools.com/knowledge/claude-api-pricing-explained) | 输入与输出 token 的构成、缓存价，以及一个可复用的估算公式。 | [`site/docs/knowledge/claude-api-pricing-explained.md`](site/docs/knowledge/claude-api-pricing-explained.md) |
-| [prompt too long 报错怎么处理](https://claude-unlimited.aiautotools.com/knowledge/claude-code-prompt-too-long-fix) | 先 /context 看构成，再按固定成本、单次输出、正常增长三种情况分别处理。 | [`site/docs/knowledge/claude-code-prompt-too-long-fix.md`](site/docs/knowledge/claude-code-prompt-too-long-fix.md) |
-| [Claude Code 报 429 限流怎么办](https://claude-unlimited.aiautotools.com/knowledge/claude-code-429-rate-limit) | 429 的三个上限、Agent 更容易撞上的原因、六步处理顺序。 | [`site/docs/knowledge/claude-code-429-rate-limit.md`](site/docs/knowledge/claude-code-429-rate-limit.md) |
+| [Claude Code 教程：第一次会话之后怎么用](https://claude-unlimited.aiautotools.com/knowledge/claude-code-tutorial) | 配置完成后怎么把 Claude Code 用顺手：CLAUDE.md、工作流、常用命令。 | [`knowledge/claude-code-tutorial.md`](knowledge/claude-code-tutorial.md) · [源码](site/docs/knowledge/claude-code-tutorial.md) |
+| [Claude Code 计划模式怎么用：四种权限模式的区别](https://claude-unlimited.aiautotools.com/knowledge/claude-code-plan-mode) | plan / manual / acceptEdits / auto 的差别，何时先要计划再动手。 | [`knowledge/claude-code-plan-mode.md`](knowledge/claude-code-plan-mode.md) · [源码](site/docs/knowledge/claude-code-plan-mode.md) |
+| [CLAUDE.md 怎么写：写什么、放哪](https://claude-unlimited.aiautotools.com/knowledge/claude-md-guide) | CLAUDE.md 写什么放哪，AGENTS.md 何时被读，.claude 目录各文件用途。 | [`knowledge/claude-md-guide.md`](knowledge/claude-md-guide.md) · [源码](site/docs/knowledge/claude-md-guide.md) |
+| [Claude 无限卡是什么：订阅期内不按 token 计费](https://claude-unlimited.aiautotools.com/knowledge/what-is-claude-unlimited) | 第三方订阅制网关的定义与边界；文档站与 rsxermu666.cn 管理后台的分工。 | [`knowledge/what-is-claude-unlimited.md`](knowledge/what-is-claude-unlimited.md) · [源码](site/docs/knowledge/what-is-claude-unlimited.md) |
+| [Claude API 怎么计费：token 构成与估算](https://claude-unlimited.aiautotools.com/knowledge/claude-api-pricing-explained) | 输入与输出 token 的构成、缓存价，以及一个可复用的估算公式。 | [`knowledge/claude-api-pricing-explained.md`](knowledge/claude-api-pricing-explained.md) · [源码](site/docs/knowledge/claude-api-pricing-explained.md) |
+| [prompt too long 报错怎么处理](https://claude-unlimited.aiautotools.com/knowledge/claude-code-prompt-too-long-fix) | 先 /context 看构成，再按固定成本、单次输出、正常增长三种情况分别处理。 | [`knowledge/claude-code-prompt-too-long-fix.md`](knowledge/claude-code-prompt-too-long-fix.md) · [源码](site/docs/knowledge/claude-code-prompt-too-long-fix.md) |
+| [Claude Code 报 429 限流怎么办](https://claude-unlimited.aiautotools.com/knowledge/claude-code-429-rate-limit) | 429 的三个上限、Agent 更容易撞上的原因、六步处理顺序。 | [`knowledge/claude-code-429-rate-limit.md`](knowledge/claude-code-429-rate-limit.md) · [源码](site/docs/knowledge/claude-code-429-rate-limit.md) |
 
 <!-- readme:knowledge:end -->
 
@@ -102,25 +136,40 @@ export ANTHROPIC_API_KEY="sk-..."
 
 买家最常问的几个，完整 FAQ 见[官网常见问题](https://claude-unlimited.aiautotools.com/faq)。
 
-**「无限额度」到底有没有上限？**
+<details>
+<summary><strong>「无限额度」到底有没有上限？</strong></summary>
 
 订阅期内不按 token 计费：每次调用无论消耗多少 token，都包含在订阅价里。
 
-**买了之后不满意可以申请退款吗？**
+</details>
+
+<details>
+<summary><strong>买了之后不满意可以申请退款吗？</strong></summary>
 
 激活 1 小时内不满意可全额退；售后申请窗口为购买后 7 天内。
 
-**Opus / Fable 要单独买一张「无限卡」吗？**
+</details>
+
+<details>
+<summary><strong>Opus / Fable 要单独买一张「无限卡」吗？</strong></summary>
 
 不用。Claude 无限卡是一份订阅制通道：有效期内承诺的 Fable 5.2 与 Opus 5.5 都在同一订阅价内，选 Opus 不另计费，也不单独售卖「Opus 卡」或「Fable 卡」。
 
-**有效期从什么时候起算？到期会怎样？**
+</details>
+
+<details>
+<summary><strong>有效期从什么时候起算？到期会怎样？</strong></summary>
 
 从管理后台提取 API Key（激活）起算，按 24 小时制：商品页标注天数 × 24 小时（天卡 24 小时，周卡 7×24，月卡 30×24）。付款本身不起算；卡密未提取前不计时。
 
-**单窗口、双窗口、三窗口怎么选？**
+</details>
+
+<details>
+<summary><strong>单窗口、双窗口、三窗口怎么选？</strong></summary>
 
 套餐按时长计费，不按 token 计费；档位差别主要在「同时能开几个会话窗口」。
+
+</details>
 
 <!-- readme:faq:end -->
 
@@ -146,6 +195,7 @@ export ANTHROPIC_API_KEY="sk-..."
   售后微信 <code>ren_mo_mo</code>（左）· QQ 交流群 <code>1128031797</code>（右）· 添加时请备注来意
 </p>
 
+- **觉得有用**：给个 [star](https://github.com/autotoolai/claude-unlimited/stargazers) 让更多人搜到；转发或 fork 也行，但别用来倒卖或改品牌冒充官方。
 - **文档或源码有 bug**：提 [issue](https://github.com/autotoolai/claude-unlimited/issues)
 - **用法讨论**：提 [discussion](https://github.com/autotoolai/claude-unlimited/discussions)
 - **站内变更历史**：[changelog](https://claude-unlimited.aiautotools.com/changelog)
@@ -158,6 +208,9 @@ export ANTHROPIC_API_KEY="sk-..."
 
 ```
 claude-unlimited/
+├─ knowledge/                Claude 知识库（仓库副本，正文 + 索引）
+├─ tutorials/                使用教程（仓库副本，6 个客户端场景 + 索引）
+├─ llms.txt                  给 AI 读的站点索引（与官网同源）
 ├─ site/                     文档站与官网前端（VitePress）
 │  ├─ config/                数据源：商品、模型、FAQ、教程、知识库元数据
 │  ├─ docs/                  内容根：路由壳 + knowledge/ 正文
@@ -167,6 +220,8 @@ claude-unlimited/
 ├─ .github/                  Issue / PR 模板、CI
 └─ docs/                     仓库级文档索引
 ```
+
+仓库根的 `knowledge/` 与 `tutorials/` 由 `site/scripts/gen_repo_mirrors.ts` 从 `site/public/**` 生成。改内容请改 `site/config/` 或 `site/docs/knowledge/`，然后在 `site/` 下跑 `npm run gen:md && npm run gen:repo-mirrors`。
 
 ### 本地开发
 

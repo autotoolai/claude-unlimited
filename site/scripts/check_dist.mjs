@@ -73,6 +73,28 @@ ok(
 )
 
 
+// —— Twitter 卡片 per-page 断言 ——
+// 全局 head 里 twitter:title / twitter:description 写死站点名与站点描述，
+// 46 页的分享卡片标题全都一样。transformHead 现在按页注入，产物里必须逐页不同。
+// 例外：404 页与内容重复的 /guide/index.html 允许与全局兜底相同。
+{
+  const seen = new Map()
+  for (const f of distHtmlFiles) {
+    const rel = path.relative(DIST, f).split(path.sep).join('/')
+    if (rel === '404.html') continue
+    const html = fs.readFileSync(f, 'utf8')
+    const tt = (html.match(/<meta name="twitter:title" content="([^"]*)"/) || [])[1] || ''
+    const td = (html.match(/<meta name="twitter:description" content="([^"]*)"/) || [])[1] || ''
+    ok(tt.length > 0, `${rel}: 没有 twitter:title`)
+    ok(td.length > 0, `${rel}: 没有 twitter:description`)
+    if (!seen.has(tt)) seen.set(tt, rel)
+  }
+  ok(
+    seen.size >= 20,
+    `twitter:title 应逐页不同（至少 20 个不同值），实际只有 ${seen.size} 个`,
+  )
+}
+
 // —— 2026-10-13 样式作用域断言 ——
 // 模型广场的引导语此前被两处规则误伤，都是「全局状态类 / 页面标记用错层级」的通病，这里钉死。
 const modelsHtml = fs.readFileSync(path.join(DIST, 'models.html'), 'utf8')
@@ -185,6 +207,18 @@ const count = (s, re) => (s.match(re) || []).length
 // 首页 2026-11-05：首屏 + 套餐摘要 + featured FAQ + CTA（决策材料摊开，正文主场不搬家）
 for (const key of ['cu-hero', 'cu-band', 'cu-tcard', 'cu-faq']) {
   ok(index.includes(key), `/ : 首页缺少 ${key}`)
+}
+// 首页首屏的一句话答案（GEO）：必须是自包含结论句，被 AI 直接引用的一段。
+// 长度上限 160 字：超了就不是「一句话」，是段落。
+{
+  const m = index.match(/class="cu-hero-answer"[^>]*>([\s\S]*?)<\/p>/)
+  ok(!!m, '/ : 首页缺少首屏一句话答案（.cu-hero-answer）')
+  if (m) {
+    const txt = m[1].replace(/<[^>]+>/g, '').replace(/\s+/g, '').trim()
+    ok(txt.length >= 40, `/ : 首页一句话答案过短（${txt.length} 字），说不清结论`)
+    ok(txt.length <= 160, `/ : 首页一句话答案过长（${txt.length} 字），应压到 160 字内`)
+    ok(txt.includes('不按token计费'), '/ : 首页一句话答案必须点明「不按 token 计费」')
+  }
 }
 for (const id of ['plans', 'faq']) {
   ok(index.includes(`id="${id}"`), `/ : 首页缺少 #${id}`)
@@ -607,8 +641,17 @@ for (const k of knowledgeMod.knowledge) {
   const homeJsonLd = readJsonLd(path.join(DIST, 'index.html'))
   ok(!!homeJsonLd, '首页没有 data-cu-jsonld 脚本（gen_jsonld 没跑）')
   if (homeJsonLd) {
-    for (const t of ['Organization', 'WebSite', 'Product']) {
+    for (const t of ['Organization', 'WebSite', 'Product', 'FAQPage']) {
       ok(graphTypes(homeJsonLd).includes(t), `首页 JSON-LD 缺 ${t}`)
+    }
+    // 首页 FAQPage 的问句必须与页内可见的「买之前先确认」同源（config/faq.ts 的 buyingQuestions）
+    const homeFaqNode = (homeJsonLd['@graph'] || []).find((x) => x['@type'] === 'FAQPage')
+    if (homeFaqNode) {
+      const names = (homeFaqNode.mainEntity || []).map((q) => q.name)
+      ok(
+        names.length === featuredFaqCount,
+        `首页 FAQPage 问句数应与页内可见一致（${featuredFaqCount}），实际 ${names.length}`,
+      )
     }
   }
   // 知识库文章：TechArticle + FAQPage + BreadcrumbList + dateModified
@@ -639,6 +682,18 @@ for (const k of knowledgeMod.knowledge) {
   if (modelsJsonLd) {
     ok(graphTypes(modelsJsonLd).includes('ItemList'), '/models: JSON-LD 缺 ItemList')
     ok(graphTypes(modelsJsonLd).includes('FAQPage'), '/models: JSON-LD 缺 FAQPage')
+  }
+  // /contact 与 /changelog：这两页以前完全没有结构化数据（sitemap 里有、schema 里空）
+  const contactJsonLd = readJsonLd(path.join(DIST, 'contact.html'))
+  if (contactJsonLd) {
+    ok(graphTypes(contactJsonLd).includes('WebPage'), '/contact: JSON-LD 缺 WebPage')
+    ok(graphTypes(contactJsonLd).includes('ContactPoint'), '/contact: JSON-LD 缺 ContactPoint')
+  }
+  const changelogJsonLd = readJsonLd(path.join(DIST, 'changelog.html'))
+  if (changelogJsonLd) {
+    ok(graphTypes(changelogJsonLd).includes('WebPage'), '/changelog: JSON-LD 缺 WebPage')
+    const wp = (changelogJsonLd['@graph'] || []).find((x) => x['@type'] === 'WebPage')
+    if (wp) ok(!!wp.dateModified, '/changelog: WebPage 缺 dateModified')
   }
   const guideIndexJsonLd = readJsonLd(path.join(DIST, 'guide/index.html'))
   if (guideIndexJsonLd) {

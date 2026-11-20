@@ -17,9 +17,9 @@ head:
 
 # 用代码做视频：四个开源技能怎么选
 
-> **一句话答案**：代码做视频不是让模型生成像素，而是让它写一段程序，程序在每一帧算出一个画面，再把帧拼成 MP4。所以产物可复现、可编辑、文字永远清晰；代价是素材要你自己准备，第一次配环境要花点时间。四个开源技能按分工选：宣传片走 video-shotcraft，科普讲解走 anything2explainer，口播教程走 video-talkcraft，想避开 Remotion 授权走 claude-motion-design。完整环境搭建走一遍见 [Opus 5.5 做视频教程：Remotion 出第一条 MP4](/knowledge/claude-code-make-video)。
+> **一句话答案**：代码做视频不是让模型生成像素，而是让它写一段程序，程序在每一帧算出一个画面，再把帧拼成 MP4。所以产物可复现、可编辑、文字永远清晰；代价是素材要你自己准备，第一次配环境要花点时间。四个开源技能按分工选：宣传片走 video-shotcraft，科普讲解走 anything2explainer，口播教程走 video-talkcraft，想避开 Remotion 授权走 claude-motion-design。完整环境搭建走一遍见 [Opus 5.5 做视频教程：Remotion 出第一条 MP4](https://claude-unlimited.aiautotools.com/knowledge/claude-code-make-video)。
 
-如果你只需要"让画面动起来"，直接去 [Opus 5.5 做视频教程：Remotion 出第一条 MP4](/knowledge/claude-code-make-video)，那篇只讲 Remotion 这一条路。本文讲的是路已经跑通之后的事：四个技能各自擅长什么、开拍前要准备什么、哪些坑会让你白渲一遍。
+如果你只需要"让画面动起来"，直接去 [Opus 5.5 做视频教程：Remotion 出第一条 MP4](https://claude-unlimited.aiautotools.com/knowledge/claude-code-make-video)，那篇只讲 Remotion 这一条路。本文讲的是路已经跑通之后的事：四个技能各自擅长什么、开拍前要准备什么、哪些坑会让你白渲一遍。
 
 ## 代码做视频和文生视频差在哪
 
@@ -107,7 +107,7 @@ ffmpeg -af loudnorm=I=-14:TP=-1.5:LRA=11 -i in.mp4 out.mp4
 
 用了什么：黑底白线稿加紫点缀的固定视觉体系，本地模型配音，逐块对齐字幕，底部章节进度条。两个主题（上下文窗口、提示缓存）并进一支，各占一章。
 
-这两个主题本身的内容在 [Claude Code 启动时那 33k token 去了哪](/knowledge/claude-code-startup-tokens) 与 [提示缓存原理：什么时候省钱、什么时候白花](/knowledge/prompt-caching-explained) 里，片子只讲最直观的结论。
+这两个主题本身的内容在 [Claude Code 启动时那 33k token 去了哪](https://claude-unlimited.aiautotools.com/knowledge/claude-code-startup-tokens) 与 [提示缓存原理：什么时候省钱、什么时候白花](https://claude-unlimited.aiautotools.com/knowledge/prompt-caching-explained) 里，片子只讲最直观的结论。
 
 开拍前要准备：解说稿（先定稿）、中文音色选定、幕底选型（点阵波或星点）。
 
@@ -117,7 +117,7 @@ ffmpeg -af loudnorm=I=-14:TP=-1.5:LRA=11 -i in.mp4 out.mp4
 
 用了什么：五镜结构（终端 → 装手脚 → 能干什么 → 怎么装 → 装完什么样），句级时间戳锁动效，深空蓝主题。
 
-MCP 本身的安装与配置步骤在 [Claude Code MCP 怎么配：命令、scope 与避坑](/knowledge/claude-code-mcp-config)，技能之间的写法差别在 [Claude Code 技能怎么写](/knowledge/claude-code-skills)。
+MCP 本身的安装与配置步骤在 [Claude Code MCP 怎么配：命令、scope 与避坑](https://claude-unlimited.aiautotools.com/knowledge/claude-code-mcp-config)，技能之间的写法差别在 [Claude Code 技能怎么写](https://claude-unlimited.aiautotools.com/knowledge/claude-code-skills)。
 
 开拍前要准备：配音成品与时间戳 JSON、脱敏后的配置示例、每镜的语义标注（这句在做什么）。
 

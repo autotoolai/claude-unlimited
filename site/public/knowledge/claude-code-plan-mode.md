@@ -35,7 +35,7 @@ head:
 | 适合场景 | 单文件、目标明确 | 多文件重构、原因不明的 bug、新功能骨架 |
 | 风险控制 | 依赖你逐条点批准 | 计划阶段本身零写入风险 |
 
-把它想成「只带笔记本的建筑师」：可以勘察现场、画施工图，但不会搬砖。批准计划之后，你再决定用 `default`、`acceptEdits` 还是 `auto` 去施工——计划权限和实施权限是两层开关。六种模式的完整对照见 [Claude Code 权限模式有哪些](/knowledge/claude-code-permission-modes)。
+把它想成「只带笔记本的建筑师」：可以勘察现场、画施工图，但不会搬砖。批准计划之后，你再决定用 `default`、`acceptEdits` 还是 `auto` 去施工——计划权限和实施权限是两层开关。六种模式的完整对照见 [Claude Code 权限模式有哪些](https://claude-unlimited.aiautotools.com/knowledge/claude-code-permission-modes)。
 
 ## 为什么先规划再动手
 
@@ -155,15 +155,15 @@ head:
 
 ### 在 CLAUDE.md 里约定计划模板
 
-在项目 `CLAUDE.md` 写清：涉及 3 个以上文件的改动，先输出「目标 / 文件清单 / 步骤 / 风险 / 验收」五段再动手。细节见 [CLAUDE.md 怎么写：写什么、放哪](/knowledge/claude-md-guide)。
+在项目 `CLAUDE.md` 写清：涉及 3 个以上文件的改动，先输出「目标 / 文件清单 / 步骤 / 风险 / 验收」五段再动手。细节见 [CLAUDE.md 怎么写：写什么、放哪](https://claude-unlimited.aiautotools.com/knowledge/claude-md-guide)。
 
 ### 计划阶段用子代理做探索
 
-大仓库可以先让探索型子代理只读扫目录，再汇总进主会话的计划，避免主上下文被搜索刷爆。见 [Claude Code 子代理怎么用](/knowledge/claude-code-subagents)。
+大仓库可以先让探索型子代理只读扫目录，再汇总进主会话的计划，避免主上下文被搜索刷爆。见 [Claude Code 子代理怎么用](https://claude-unlimited.aiautotools.com/knowledge/claude-code-subagents)。
 
 ### 长计划会话配 `/compact`
 
-调查轮次多了之后，用 `/compact` 压掉过程噪音，保留「已确认的计划要点」。注意 compact 也会花一次模型调用，见 [降低 Claude 用量的工程方法：先测量再优化](/knowledge/reduce-token-usage-tips)。
+调查轮次多了之后，用 `/compact` 压掉过程噪音，保留「已确认的计划要点」。注意 compact 也会花一次模型调用，见 [降低 Claude 用量的工程方法：先测量再优化](https://claude-unlimited.aiautotools.com/knowledge/reduce-token-usage-tips)。
 
 ### 用计划模式做代码审查
 
@@ -173,7 +173,7 @@ head:
 
 **结论**：没有固定节省比例；它减少的是返工，不是「读文件免费」。
 
-已知路径省掉的是搜索 token，验收标准省掉的是返工轮次。计划本身要读文件、生成方案，也消耗 token。准确表述是「减少不必要的搜索与修改轮次」，不是「计划模式更省」。更多工程降本见[降低 Claude 用量的工程方法：先测量再优化](/knowledge/reduce-token-usage-tips)。
+已知路径省掉的是搜索 token，验收标准省掉的是返工轮次。计划本身要读文件、生成方案，也消耗 token。准确表述是「减少不必要的搜索与修改轮次」，不是「计划模式更省」。更多工程降本见[降低 Claude 用量的工程方法：先测量再优化](https://claude-unlimited.aiautotools.com/knowledge/reduce-token-usage-tips)。
 
 ## 让计划模式成为默认
 
@@ -195,4 +195,4 @@ head:
 
 **结论**：选模型和是否先规划是两个独立开关，可以自由组合。用哪个模型想是 `/model` 的事，要不要先想再做是权限模式的事，两者互不约束。
 
-`/model` 里「用 Opus 规划、其它工作用 Sonnet」这类搭配（以 `/model` 实际列表为准），与计划权限模式不是一回事。一个是「用哪个模型想」，一个是「要不要先想再做」，两者可以独立组合。选模型见 [按任务选模型：Opus、Sonnet、Haiku 怎么选](/knowledge/choose-claude-model)。
+`/model` 里「用 Opus 规划、其它工作用 Sonnet」这类搭配（以 `/model` 实际列表为准），与计划权限模式不是一回事。一个是「用哪个模型想」，一个是「要不要先想再做」，两者可以独立组合。选模型见 [按任务选模型：Opus、Sonnet、Haiku 怎么选](https://claude-unlimited.aiautotools.com/knowledge/choose-claude-model)。

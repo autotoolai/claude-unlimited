@@ -19,7 +19,7 @@ head:
 
 > 正式发布地址：[claude-unlimited.aiautotools.com/knowledge/claude-code-make-video](https://claude-unlimited.aiautotools.com/knowledge/claude-code-make-video) ｜ 源码与文档：[GitHub 仓库](https://github.com/autotoolai/claude-unlimited)
 
-> **一句话答案**：最近刷屏的「Opus 5.5 一句话出视频」，不是它学会了拍视频，而是它用代码把画面画出来，再用 Remotion 逐帧渲染成 MP4。框架用 Remotion（用 React 写视频），让 Claude Code 先把项目骨架建好、把 Remotion 官方技能装上，然后你用中文描述需求、它生成代码、你在预览里看效果、最后一条命令导出。全程八步，第一次大概半小时。工具装好见[使用教程](/guide)，本文不重复接入步骤。多个开源技能的分工对比见 [用代码做视频：四个开源技能怎么选](/knowledge/code-video-skills-guide)。
+> **一句话答案**：最近刷屏的「Opus 5.5 一句话出视频」，不是它学会了拍视频，而是它用代码把画面画出来，再用 Remotion 逐帧渲染成 MP4。框架用 Remotion（用 React 写视频），让 Claude Code 先把项目骨架建好、把 Remotion 官方技能装上，然后你用中文描述需求、它生成代码、你在预览里看效果、最后一条命令导出。全程八步，第一次大概半小时。工具装好见[使用教程](https://claude-unlimited.aiautotools.com/guide)，本文不重复接入步骤。多个开源技能的分工对比见 [用代码做视频：四个开源技能怎么选](https://claude-unlimited.aiautotools.com/knowledge/code-video-skills-guide)。
 
 2026 年 9 月 22 日 Opus 5.5 发布后，一批用代码渲染的动画在社交平台爆火，中文社区称之为「Vibe Video」，教程与实测文章大量出现。截至 2026-10-10，本文流程已在 Remotion 官方文档与 remotion-dev/skills 仓库核对过，中文社区的实测记录也逐条对照过（来源登记见知识库素材记录）。Remotion 版本号与命令以官方文档为准，标注日期是因为这类工具更新较快。
 
@@ -64,7 +64,7 @@ head:
 
 ## 开始前：三样东西
 
-**结论**：Node.js、Claude Code、FFmpeg。Claude Code 见[使用教程](/guide)；下面只核对另外两个。
+**结论**：Node.js、Claude Code、FFmpeg。Claude Code 见[使用教程](https://claude-unlimited.aiautotools.com/guide)；下面只核对另外两个。
 
 Node.js 用 nvm-windows 装，版本选 20 或 22 的 LTS，装完重开终端：
 

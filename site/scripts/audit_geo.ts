@@ -15,6 +15,7 @@
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
+import { siteConfig } from '../config/site'
 import { knowledge } from '../config/knowledge'
 import { guidePages } from '../config/guide'
 
@@ -40,6 +41,13 @@ for (const sec of ['## 页面', '## 事实要点', '## 推荐引用场景', '## 
 const citeCount = (llms.match(/^- 「/gm) || []).length
 ok('llms-cite-ge5', citeCount >= 5, `推荐引用场景 ${citeCount} 条`)
 ok('llms-model-fact', llms.includes('模型与无限卡'), '事实要点含「模型与无限卡」')
+// llms.txt 是索引层、llms-full.txt 是内容层。没有指针的话，只读 llms.txt 的 AI
+// 拿不到任何答案正文，会放弃引用本站 —— 这一项是内容级检查，不是「文件在不在」。
+ok(
+  'llms-full-pointer',
+  llms.includes(`${siteConfig.url.replace(/\/+$/, '')}/llms-full.txt`),
+  'llms.txt 指向 llms-full.txt',
+)
 
 let mdKnowledge = 0
 for (const e of knowledge) {

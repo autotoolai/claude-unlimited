@@ -65,7 +65,7 @@ Claude Code 这类 agent 工具的官方标准窗口是 200k token，我们不�
 
 另外注意：选模型时先看窗口大小。网关上标着 1M 的变体，实测与普通档相同，只是多一层「需要额外用量」的限制，不要选它。以 `/context` 报告的当前窗口为准。
 
-窗口是被什么填满的，直接决定该释放哪一块，见[Claude Code 启动时那 33k token 去了哪](/knowledge/claude-code-startup-tokens)；工具输出为什么是最大的一块，见[为什么 Agent 比聊天更烧 token](/knowledge/why-agents-cost-more-tokens)。
+窗口是被什么填满的，直接决定该释放哪一块，见[Claude Code 启动时那 33k token 去了哪](https://claude-unlimited.aiautotools.com/knowledge/claude-code-startup-tokens)；工具输出为什么是最大的一块，见[为什么 Agent 比聊天更烧 token](https://claude-unlimited.aiautotools.com/knowledge/why-agents-cost-more-tokens)。
 
-每次压缩仍会重发全部内容，所以在服务端侧还有更省的办法，见[降低 Claude 用量的工程方法：先测量再优化](/knowledge/reduce-token-usage-tips)。
+每次压缩仍会重发全部内容，所以在服务端侧还有更省的办法，见[降低 Claude 用量的工程方法：先测量再优化](https://claude-unlimited.aiautotools.com/knowledge/reduce-token-usage-tips)。
 
