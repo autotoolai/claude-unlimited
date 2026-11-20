@@ -245,3 +245,7 @@ SEO 与 GEO 是**两条轨**（业界实测 ChatGPT 引用源与 Google 自然�
 | 2026-11-13 | P0 已实施：营销页 per-page tags、定价答案胶囊+FAQ、llms 引用场景、guide/定义文后缀 |
 | 2026-11-13 | P1 已实施：Markdown 副本、`audit:geo`、定价 FAQ 默认展开 2 条、关于页实体/更新日期 |
 | 2026-11-17 | 知识库 26 篇逐篇优化（§4.5 写法标准）：补 H2 结论段、锚文本对齐目标页 H1、正文互链补到 3 条以上、清掉正文第三方平台名与残留「相关阅读」小节；已上线 |
+| 2026-11-20 | P0 全部落地：GitHub 侧建索引入口（仓库根 knowledge/ 26 篇 + tutorials/ 7 篇正文镜像 + README 目录锚点 / 关键词 / 折叠 FAQ / llms 入口）、md 镜像站内死链改写、官网侧首页 FAQPage、twitter per-page、/contact 与 /changelog JSON-LD、教程页 sitemap lastmod、关键词补强、首页答案胶囊与套餐卡去重 |
+| 2026-11-20 | P1 落地：Dependabot 8 个 PR 清零（typescript 保持 5.9，TS7 的 exports 变更会让 vue-tsc 无法启动）、首个 release v1.0.0、GitHub profile README 升级、llms.txt 规范校验门禁（check:llms-txt）、GEO 审计从存在性升级到内容质量（44 → 50 项） |
+| 2026-11-20 | llms.txt 改合规链接清单：实测第三方校验器（@aia-matrix/llms-txt-validator，MIT）原判 3 FAIL + 2 WARN，改后 9 PASS / 0 WARN / 0 FAIL；全站 HTML 加 rel="describedby" 指向 /llms.txt |
+| 2026-11-20 | 基础设施发现：官网在国内访问频繁 25s 超时的根因是 Cloudflare anycast 边缘选路（DNS 返回的两个 IP 落在不同 colo，LAX 那个约 40% 超时、HKG 那个零超时），不是代码或源站问题。爬虫重试会浪费抓取预算，是「被收录但排名上不去」的一个成因。详见记忆 cf-pages-cn-edge-routing |
