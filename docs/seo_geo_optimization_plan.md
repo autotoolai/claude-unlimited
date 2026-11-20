@@ -130,6 +130,7 @@ SEO 与 GEO 是**两条轨**（业界实测 ChatGPT 引用源与 Google 自然�
 | P1-1 | 知识库/教程页提供 **Markdown 副本**（或 `Link: rel=alternate; type=text/markdown`） | **已上线**：`gen:md` + alternate link；llms 知识库链 `.md` |
 | P1-2 | 各 `/guide/*` tags 加「客户端 × 无限卡」1～2 个 | **已上线**（随 P0） |
 | P1-3 | 引入 **geo-optimizer-skill** 或 llms validator：本地/`CI` 月度审计，分数与缺口记入本仓 `docs/` 或 issue | **已上线**：`npm run audit:geo`（`--write` 写 `docs/geo_audit_baseline.md`）；线上可选 `npx llms-txt-check` |
+| P1-6 | 第三方审计独立入口（不进 build 链）：`geo-optimizer-skill` 跑全站 sitemap，两把尺子并列写同一份基线 | **已上线**：`npm run audit:geo:external` → `docs/geo_audit_baseline.md`（自研 100/100 · 第三方 78.98/100 good） |
 | P1-4 | 关键 FAQ：**定价页前 1～2 条默认展开**（兼顾 GEO 实验「可见 FAQ」与 UX） | **已上线**：`default-open=2` |
 | P1-5 | Organization / 关于页补强：**运营主体、更新日期、同源 GitHub sameAs**（已有则核对） | **已上线**：关于页「实体」事实卡 + `updatedAt` + WebPage.dateModified；主体名仍不编造 |
 
@@ -139,7 +140,7 @@ SEO 与 GEO 是**两条轨**（业界实测 ChatGPT 引用源与 Google 自然�
 |---|---|---|
 | P2-1 | **站外分发节奏**：每月 1 篇「可引用」长文同步知乎 / V2EX / 掘金（链回定义文或定价，锚文本统一「Claude 无限卡」） | 参考同类靠 GitHub 横评抢词；我们抢「订阅制怎么算账 / 和按量中转区别」 |
 | P2-2 | 可选内容：`Claude 无限卡 vs 按量中转 vs 官方 Pro`（一张表 + 日期 + 数字） | 主场可放知识库；keywords 谨慎，title 不写竞品堆砌 |
-| P2-3 | 建立 **GEO 抽检台账**：固定 10 个问句，每双周问 ChatGPT/Perplexity/文心/豆包，记是否引用本站 | 比盲目上 SaaS 便宜 |
+| P2-3 | 建立 **GEO 抽检台账**：固定 10 个问句，每双周问 ChatGPT/Perplexity/文心/豆包，记是否引用本站 | 比盲目上 SaaS 便宜；台账已建（`docs/geo_citation_ledger.md`），首轮待人工跑 |
 | P2-4 | GSC/百度：盯「opus」「fable」「无限卡」「续杯」「价格」；按展现决定是否加文 | 数据驱动 P2 |
 
 ### 4.5 内容写法标准（全站统一）
@@ -248,4 +249,6 @@ SEO 与 GEO 是**两条轨**（业界实测 ChatGPT 引用源与 Google 自然�
 | 2026-11-20 | P0 全部落地：GitHub 侧建索引入口（仓库根 knowledge/ 26 篇 + tutorials/ 7 篇正文镜像 + README 目录锚点 / 关键词 / 折叠 FAQ / llms 入口）、md 镜像站内死链改写、官网侧首页 FAQPage、twitter per-page、/contact 与 /changelog JSON-LD、教程页 sitemap lastmod、关键词补强、首页答案胶囊与套餐卡去重 |
 | 2026-11-20 | P1 落地：Dependabot 8 个 PR 清零（typescript 保持 5.9，TS7 的 exports 变更会让 vue-tsc 无法启动）、首个 release v1.0.0、GitHub profile README 升级、llms.txt 规范校验门禁（check:llms-txt）、GEO 审计从存在性升级到内容质量（44 → 50 项） |
 | 2026-11-20 | llms.txt 改合规链接清单：实测第三方校验器（@aia-matrix/llms-txt-validator，MIT）原判 3 FAIL + 2 WARN，改后 9 PASS / 0 WARN / 0 FAIL；全站 HTML 加 rel="describedby" 指向 /llms.txt |
+| 2026-11-21 | 第三方 GEO 审计落地：`site/scripts/run_geo_audit.ts`（npm script `audit:geo:external`）调 `geo-optimizer-skill` 跑全站 sitemap，结果与自研 `audit:geo` 并列写进 `docs/geo_audit_baseline.md`。首轮基线：自研 100/100（50 项全过）、第三方 78.98/100（good，43 页全成功，41 good + 2 foundation）。最低分 `/changelog` 57、`/contact` 66（两页无 JSON-LD，属代码已改但线上未发版）。踩坑记录：第三方工具的 SSRF 防护会拦 127.0.0.1，所以只能打线上；国内线路 Cloudflare 选路不稳时成功页数会掉到 0，须设 `HTTPS_PROXY` 走稳定出口 |
+| 2026-11-21 | P2-1（知识库 H3 分层）**从计划中撤下**：实测 `docs/knowledge_writing_guide.md` 把 H3 专门留给「常见问题」下的 `### <问题>`（要求与 `config/knowledge.ts` 的 `faq[].q` 逐字一致），且 `check_knowledge_toc.mjs` 断言「FAQPage 问题数 = 组件渲染的 FAQ 折叠项数」；给正文加 H3 会与既有写法规范和断言冲突。改用其它召回粒度杠杆（§4.5 的结论段与锚文本对齐已覆盖大部分收益） |
 | 2026-11-20 | 基础设施发现：官网在国内访问频繁 25s 超时的根因是 Cloudflare anycast 边缘选路（DNS 返回的两个 IP 落在不同 colo，LAX 那个约 40% 超时、HKG 那个零超时），不是代码或源站问题。爬虫重试会浪费抓取预算，是「被收录但排名上不去」的一个成因。详见记忆 cf-pages-cn-edge-routing |

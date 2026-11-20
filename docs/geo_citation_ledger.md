@@ -64,6 +64,27 @@ ChatGPT / Perplexity / 文心 / 豆包 会不会引用 claude-unlimited.aiautoto
 **填表约定**：引用本站记 URL 路径（如 `/knowledge/what-is-claude-unlimited`）；
 未引用记「否」；引用了但口径错记 `FAIL:价格` 这样。
 
+## 机器门禁能替我们做什么
+
+人工抽检和机器门禁各管一半，别互相替代：
+
+| 手段 | 命令 | 管什么 |
+|---|---|---|
+| 自研 GEO 审计 | `npm run audit:geo` | 本地产物齐不齐：llms.txt 章节、md 镜像、答案胶囊长度、站内死链 |
+| llms.txt 规范校验 | `npm run check:llms-txt` | llms.txt 是否符合 llmstxt.org 规范（第三方校验器，`--no-network`） |
+| 第三方 GEO 审计 | `npm run audit:geo:external` | 外部视角给整站打分，43 页一起跑，结果写 `docs/geo_audit_baseline.md` |
+
+**机器查不了的就是这份台账**：AI 到底引不引用本站、引的是哪条 URL、口径有没有被改写。
+这三个问题只能靠问，问出来才有数。
+
+第三方审计有个坑：国内线路打官网经常超时，成功页数会掉到 0（看起来像全站崩了）。
+跑之前先设 `HTTPS_PROXY` 走稳定出口：
+
+```bash
+export HTTPS_PROXY=http://127.0.0.1:7897   # 换成本机可用的代理端口
+npm run audit:geo:external
+```
+
 ## 怎么读这份台账
 
 - 引用率（引用本站的问句数 ÷ 总问句数）随轮次上升，说明 llms.txt 与答案胶囊在起作用。

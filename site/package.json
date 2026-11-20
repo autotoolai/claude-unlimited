@@ -43,6 +43,7 @@
     "gen:llms": "tsx scripts/gen_llms.ts",
     "gen:md": "tsx scripts/gen_md_mirrors.ts",
     "audit:geo": "tsx scripts/audit_geo.ts",
+    "audit:geo:external": "tsx scripts/run_geo_audit.ts",
     "gen:readme": "tsx scripts/gen_readme_index.ts",
     "check:readme": "tsx scripts/gen_readme_index.ts --check",
     "check:readme-anchors": "tsx scripts/check_readme_anchors.ts",
