@@ -16,12 +16,15 @@
 [![Stars](https://img.shields.io/github/stars/autotoolai/claude-unlimited?style=flat-square)](https://github.com/autotoolai/claude-unlimited/stargazers)
 [![Forks](https://img.shields.io/github/forks/autotoolai/claude-unlimited?style=flat-square)](https://github.com/autotoolai/claude-unlimited/network/members)
 [![License: MIT](https://img.shields.io/badge/License-MIT-C85A1E?style=flat-square)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/autotoolai/claude-unlimited?style=flat-square)](https://github.com/autotoolai/claude-unlimited/releases)
 [![Claude Code 教程](https://img.shields.io/badge/Claude%20Code-%E6%95%99%E7%A8%8B-646C7A?style=flat-square)](https://claude-unlimited.aiautotools.com/guide/cc)
 [![知识库](https://img.shields.io/badge/%E7%9F%A5%E8%AF%86%E5%BA%93-646C7A?style=flat-square)](https://claude-unlimited.aiautotools.com/knowledge)
 
 **[官网 →](https://claude-unlimited.aiautotools.com)** ｜ [控制台 →](https://rsxermu666.cn/) ｜ [套餐定价 →](https://claude-unlimited.aiautotools.com/pricing) ｜ [使用教程 →](https://claude-unlimited.aiautotools.com/guide) ｜ [知识库 →](https://claude-unlimited.aiautotools.com/knowledge) ｜ [控制台说明 →](https://claude-unlimited.aiautotools.com/console)
 
 仓库内可直接读：[知识库目录](knowledge/index.md) ｜ [教程目录](tutorials/index.md) ｜ [llms.txt](llms.txt) ｜ [llms-full.txt（全文层）](https://claude-unlimited.aiautotools.com/llms-full.txt)
+
+最新版本见 [Releases](https://github.com/autotoolai/claude-unlimited/releases)。觉得有用请给个 [star](https://github.com/autotoolai/claude-unlimited/stargazers)，让更多搜到「claude 无限卡」的人找到它。
 
 <img src="docs/social-preview.png" alt="Claude 无限卡 · Claude Code 中文 · 不按 token 计费 · 控制台 rsxermu666.cn" width="880">
 
