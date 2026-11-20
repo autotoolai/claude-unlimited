@@ -52,3 +52,10 @@ jobs:
         # 目录锚点算错 = GitHub 上目录全是死链，对访客和爬虫都是负面信号。
         working-directory: site
         run: npm run check:readme-anchors
+
+      - name: llms.txt 规范校验
+        # llms.txt 格式不合 llmstxt.org 规范时，一部分 AI 客户端会直接放弃解析。
+        # 这道门禁只查格式（第三方校验器 @aia-matrix/llms-txt-validator，MIT），
+        # 链接可达性由上面两道门禁负责。
+        working-directory: site
+        run: npm run check:llms-txt

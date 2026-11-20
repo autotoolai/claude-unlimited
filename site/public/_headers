@@ -22,6 +22,11 @@
 /llms.txt
   Cache-Control: public, max-age=3600, must-revalidate
 
+# llms-full.txt 是给 AI 读的全文层，同样要能被匿名抓取（Content-Type 用 text/plain）
+/llms-full.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=3600, must-revalidate
+
 /robots.txt
   Cache-Control: public, max-age=3600, must-revalidate
 

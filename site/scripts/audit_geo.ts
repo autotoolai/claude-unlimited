@@ -38,7 +38,10 @@ const llms = existsSync(llmsPath) ? readFileSync(llmsPath, 'utf8') : ''
 for (const sec of ['## 页面', '## 事实要点', '## 推荐引用场景', '## 知识库文章', '## 声明']) {
   ok(`llms-sec:${sec}`, llms.includes(sec), sec)
 }
-const citeCount = (llms.match(/^- 「/gm) || []).length
+// 「推荐引用场景」现在是链接列表（llmstxt.org 要求每个 H2 小节内是链接清单），
+// 所以按「小节里的链接条数」数，而不是按旧格式的「- 「问句」」前缀。
+const citeSection = llms.split('## 推荐引用场景')[1]?.split('\n## ')[0] ?? ''
+const citeCount = (citeSection.match(/^- \[/gm) || []).length
 ok('llms-cite-ge5', citeCount >= 5, `推荐引用场景 ${citeCount} 条`)
 ok('llms-model-fact', llms.includes('模型与无限卡'), '事实要点含「模型与无限卡」')
 // llms.txt 是索引层、llms-full.txt 是内容层。没有指针的话，只读 llms.txt 的 AI

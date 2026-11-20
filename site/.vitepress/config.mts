@@ -205,6 +205,9 @@ export default defineConfig({
     // 全局兜底：仅给尚无 per-page tags 的页（FAQ/联系/关于等）；首页/定价/模型/教程/知识库/console/agency 由 transformHead 覆盖。
     ['meta', { name: 'keywords', content: 'claude 无限卡,claude 无限额度,claude api 无限,claude无限续杯,claude 无限续杯' }],
     ['meta', { property: 'og:site_name', content: siteConfig.name }],
+    // llmstxt.org 的 AI 发现信号：全站 HTML 声明「本页由这份 llms.txt 索引」。
+    // 校验器（@aia-matrix/llms-txt-validator）会把缺这条判成 discovery.describedby 警告。
+    ['link', { rel: 'describedby', href: `${SITE_URL}/llms.txt` }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:title', content: siteConfig.name }],

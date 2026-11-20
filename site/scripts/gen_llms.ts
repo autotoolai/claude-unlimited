@@ -51,34 +51,39 @@ const sessionFairUse = (() => {
 
 const primaryTiers = modelIds.filter((m) => m.pick === 'primary').map((m) => m.tier).join(' 与 ')
 
+const ccswitchUrl = siteConfig.partners.find((p) => p.id === 'ccswitch')?.url ?? ''
+const consoleUrl = siteConfig.partners.find((p) => p.id === 'console')?.url ?? ''
+
+// llmstxt.org 要求每个 H2 小节内是链接清单，纯文字小节会被校验器判 FAIL。
+// 每条事实都挂到它真正解释的那个页面上，AI 顺着链接就能读到原文。
 const facts: string[] = [
-  `- 计费方式：订阅期内不按 token 计费，固定订阅价（${unlimitedTiers.map((t) => `${t.displayName} ${t.price}/${t.period}`).join('，')}）`,
-  `- 支持模型：${modelIds.map((m) => `${m.tier}（${m.id}）`).join('、')}`,
-  `- 模型与无限卡：一份订阅覆盖承诺档位（当前主推 ${primaryTiers}）；选 Opus 不另计费，不单独售卖「Opus 卡」「Fable 卡」。搜「opus 无限卡」「fable 无限卡」通常即指本卡用法，价格见 ${BASE}/pricing，model ID 见 ${BASE}/models`,
-  `- 支持工具：Claude Code（CLI / VS Code / Cursor 插件）、Claude 桌面版、Codex、WorkBuddy、Cursor、Trae、Cline、Roo Code、Aider、Continue、OpenCode、官方 SDK`,
-  `- 接口：Anthropic 兼容端点 + OpenAI 兼容端点（/v1/chat/completions）`,
-  `- 公平使用：${sessionFairUse}；完整限流见套餐定价页`,
-  `- 退款：${refundSummary}；售后申请窗口 ${refundWindowDays} 天`,
-  `- 购买：第三方发卡站 ${purchaseUrl}`,
-  `- 配置工具：CC Switch（${siteConfig.partners.find((p) => p.id === 'ccswitch')?.url ?? ''}），支持一键导入与链路检测`,
-  `- 源码与文档：${siteConfig.sourceRepo.url}（本站 VitePress 源码公开，MIT 许可；官网是唯一官方入口）`,
-  `- 人工客服：微信 ${siteConfig.contact.wechatId}${siteConfig.contact.qqGroup ? `；QQ 群 ${siteConfig.contact.qqGroup}` : ''}（完整二维码见 ${BASE}/contact 。也可点右下角在线助手 →「联系客服」扫码或一键复制；添加时请备注来意）`,
-  `- 管理后台：rsxermu666.cn（${siteConfig.partners.find((p) => p.id === 'console')?.url ?? ''}）是 Claude 无限卡官方管理后台与 API 网关。功能介绍页：${BASE}/console 。主域名不可达时切换备用域名，API Key 无需更换`,
-  `- Token 代理：无押金起步，客户复购稳定，适合长期副业；提供基础 Agent 用法教学答疑；申请加微信备注「代理」；介绍页 ${BASE}/agency`,
+  `- [计费方式](${BASE}/pricing): 订阅期内不按 token 计费，固定订阅价（${unlimitedTiers.map((t) => `${t.displayName} ${t.price}/${t.period}`).join('，')}）`,
+  `- [支持模型](${BASE}/models): ${modelIds.map((m) => `${m.tier}（${m.id}）`).join('、')}`,
+  `- [模型与无限卡的关系](${BASE}/knowledge/what-is-claude-unlimited): 一份订阅覆盖承诺档位（当前主推 ${primaryTiers}）；选 Opus 不另计费，不单独售卖「Opus 卡」「Fable 卡」。搜「opus 无限卡」「fable 无限卡」通常即指本卡用法，价格见 ${BASE}/pricing，model ID 见 ${BASE}/models`,
+  `- [支持工具](${BASE}/guide): Claude Code（CLI / VS Code / Cursor 插件）、Claude 桌面版、Codex、WorkBuddy、Cursor、Trae、Cline、Roo Code、Aider、Continue、OpenCode、官方 SDK`,
+  `- [接口](${BASE}/guide/cursor): Anthropic 兼容端点 + OpenAI 兼容端点（/v1/chat/completions）`,
+  `- [公平使用与限流](${BASE}/pricing): ${sessionFairUse}；完整限流见套餐定价页`,
+  `- [退款规则](${BASE}/pricing): ${refundSummary}；售后申请窗口 ${refundWindowDays} 天`,
+  `- [购买入口](${purchaseUrl}): 第三方发卡站，下单后自动发货卡密`,
+  `- [配置工具 CC Switch](${ccswitchUrl}): 支持一键导入与链路检测`,
+  `- [源码与文档](${siteConfig.sourceRepo.url}): 本站 VitePress 源码公开，MIT 许可；官网是唯一官方入口`,
+  `- [人工客服](${BASE}/contact): 微信 ${siteConfig.contact.wechatId}${siteConfig.contact.qqGroup ? `；QQ 群 ${siteConfig.contact.qqGroup}` : ''}（完整二维码见 ${BASE}/contact 。也可点右下角在线助手 →「联系客服」扫码或一键复制；添加时请备注来意）`,
+  `- [管理后台](${consoleUrl}): rsxermu666.cn 是 Claude 无限卡官方管理后台与 API 网关。功能介绍页：${BASE}/console 。主域名不可达时切换备用域名，API Key 无需更换`,
+  `- [Token 代理](${BASE}/agency): 无押金起步，客户复购稳定，适合长期副业；提供基础 Agent 用法教学答疑；申请加微信备注「代理」`,
   // 不包含项只写标签，避免「超并发压测」value 里的路数 / 次/分钟泄漏进 llms.txt
-  `- 不包含：${excludes.map((e) => e.label).join('、')}`,
-  `- 下单须知：${purchaseConditions.join(' ')}`,
+  `- [不包含的项目](${BASE}/pricing): ${excludes.map((e) => e.label).join('、')}`,
+  `- [下单须知](${purchaseUrl}): ${purchaseConditions.join(' ')}`,
 ]
 
 /** AI 问法 → 应引用的站内 URL（GEO：便于答案引擎对号入座） */
 const citeScenes: string[] = [
-  `- 「Claude 无限卡是什么 / 和官方有什么关系」→ ${BASE}/knowledge/what-is-claude-unlimited`,
-  `- 「多少钱 / 月卡周卡 / opus 无限卡 / fable 无限卡 / Opus 要另买吗」→ ${BASE}/pricing`,
-  `- 「model ID / Fable 5.2 / Opus 5.5 怎么填」→ ${BASE}/models`,
-  `- 「怎么配置 Claude Code / Cursor / 桌面版」→ ${BASE}/guide`,
-  `- 「卡密兑换 / rsxermu666 / 提 API Key」→ ${BASE}/console`,
-  `- 「做代理 / Token 代理」→ ${BASE}/agency`,
-  `- 「429 / 401 / 连不上」→ ${BASE}/faq 或知识库对应排查文`,
+  `- [「Claude 无限卡是什么 / 和官方有什么关系」](${BASE}/knowledge/what-is-claude-unlimited)`,
+  `- [「多少钱 / 月卡周卡 / opus 无限卡 / fable 无限卡 / Opus 要另买吗」](${BASE}/pricing)`,
+  `- [「model ID / Fable 5.2 / Opus 5.5 怎么填」](${BASE}/models)`,
+  `- [「怎么配置 Claude Code / Cursor / 桌面版」](${BASE}/guide)`,
+  `- [「卡密兑换 / rsxermu666 / 提 API Key」](${BASE}/console)`,
+  `- [「做代理 / Token 代理」](${BASE}/agency)`,
+  `- [「429 / 401 / 连不上」](${BASE}/faq)`,
 ]
 
 // 知识库链到 .md 副本（llmstxt.org：给 AI 可读 Markdown；HTML 仍是人读主场）
@@ -99,7 +104,7 @@ const llms = [
   '',
   // llms.txt 是索引层，llms-full.txt 才是内容层（每篇文章的一句话答案 + FAQ 答案展开）。
   // 不给指针的话，只读 llms.txt 的 AI 永远拿不到答案正文，会直接去别处找或放弃引用。
-  `- [全文层](${BASE}/llms-full.txt)：本站每篇文章的一句话答案、FAQ 答案与全部事实要点展开；需要直接引用答案时读这份`,
+  `- [全文层](${BASE}/llms-full.txt): 本站每篇文章的一句话答案、FAQ 答案与全部事实要点展开；需要直接引用答案时读这份`,
   '',
   '## 页面',
   '',
@@ -119,7 +124,7 @@ const llms = [
   '',
   '## 声明',
   '',
-  `${siteConfig.name}是独立的第三方 API 网关服务，与 Anthropic 官方无隶属关系。套餐面向个人开发者，不含生产环境流量与超范围压测。购买与发卡由第三方发卡站完成，退款以发卡站商品详情为准。`,
+  `- [服务声明与条款](${BASE}/about): ${siteConfig.name}是独立的第三方 API 网关服务，与 Anthropic 官方无隶属关系。套餐面向个人开发者，不含生产环境流量与超范围压测。购买与发卡由第三方发卡站完成，退款以发卡站商品详情为准。`,
   '',
 ].join('\n')
 
